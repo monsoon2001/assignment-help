@@ -36,3 +36,4 @@ node scripts/test-phase7to10.mjs   # notifications + admin panel (Phase 7-10)
 5. While in test mode, keep test-mode Stripe keys. To go live, swap all Stripe keys and the webhook secret for live-mode values (settings page / admin panel reference them via env).
 6. `vercel --prod` (auth/proxy conventions are already in `src/proxy.ts`; Realtime needs Supabase Realtime enabled — the `admin_messages` publication is added by migration `20260910000009_admin_panel.sql`).
 # assignment-help
+# assignment-help
