@@ -133,7 +133,7 @@ export default async function OrderPaymentPage({
           </div>
         </div>
 
-        <CheckoutPanel orderId={order.id} basePrice={order.price} baseCurrency={order.currency} />
+        <CheckoutPanel orderId={order.id} basePrice={order.price} baseCurrency={order.currency} title={order.title} />
 
         <div className="flex items-start gap-2 p-3.5 rounded-xl bg-surface-container-low">
           <School size={16} className="text-primary shrink-0 mt-0.5" />

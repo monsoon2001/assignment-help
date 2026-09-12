@@ -191,10 +191,6 @@ export default function RequestWorkspace({
     };
   }, [requestId, loadRequest, loadMessages, loadProposal]);
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
   if (loading) {
     return (
       <div className="w-full py-24 flex items-center justify-center">

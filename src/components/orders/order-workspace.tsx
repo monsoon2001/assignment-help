@@ -37,6 +37,8 @@ type OrderData = {
   proposal_id: string;
   helper: { id: string; name: string | null } | null;
   proposal: {
+    id: string | null;
+    request_id: string | null;
     description: string | null;
     revisions_included: number | null;
     request: { title: string | null; subject: string | null } | null;
@@ -84,11 +86,12 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
   const [deliveryError, setDeliveryError] = useState<string | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
+  const requestIdRef = useRef<string | null>(null);
 
   const loadOrder = useCallback(async () => {
     const { data, error } = await supabase.current
       .from("orders")
-      .select("id, status, price, currency, deadline, created_at, student_id, proposal_id, helper:users!orders_helper_id_fkey(id, name), proposal:proposals(description, revisions_included, request:requests(title, subject))")
+      .select("id, status, price, currency, deadline, created_at, student_id, proposal_id, helper:users!orders_helper_id_fkey(id, name), proposal:proposals(id, request_id, description, revisions_included, request:requests(title, subject))")
       .eq("id", orderId)
       .maybeSingle();
 
@@ -100,12 +103,15 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
 
     const proposal =
       (Array.isArray(data.proposal) ? data.proposal[0] : data.proposal) ?? null;
+    requestIdRef.current = proposal?.request_id ?? null;
 
     const normalized: OrderData = {
       ...(data as Omit<OrderData, "helper" | "proposal">),
       helper: Array.isArray(data.helper) ? data.helper[0] ?? null : data.helper,
       proposal: proposal
         ? {
+            id: proposal.id,
+            request_id: proposal.request_id,
             description: proposal.description,
             revisions_included: proposal.revisions_included,
             request: Array.isArray(proposal.request)
@@ -126,11 +132,18 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
   }, [orderId]);
 
   const loadMessages = useCallback(async () => {
-    const { data } = await supabase.current
-      .from("messages")
-      .select("id, sender_id, body, attachment_url, created_at, sender:users(id, name)")
-      .eq("order_id", orderId)
-      .order("created_at", { ascending: true });
+    const requestId = requestIdRef.current;
+    const { data } = requestId
+      ? await supabase.current
+          .from("messages")
+          .select("id, sender_id, body, attachment_url, created_at, sender:users(id, name)")
+          .or(`order_id.eq.${orderId},request_id.eq.${requestId}`)
+          .order("created_at", { ascending: true })
+      : await supabase.current
+          .from("messages")
+          .select("id, sender_id, body, attachment_url, created_at, sender:users(id, name)")
+          .eq("order_id", orderId)
+          .order("created_at", { ascending: true });
     setMessages((data ?? []) as unknown as ChatMessageRow[]);
   }, [orderId]);
 
@@ -178,10 +191,6 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
       if (channel) void client.removeChannel(channel);
     };
   }, [orderId, loadOrder, loadMessages, loadDeliveries]);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
 
   if (loading) {
     return (

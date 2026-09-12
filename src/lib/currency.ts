@@ -1,5 +1,9 @@
 export const SUPPORTED_CURRENCIES = ["USD", "AUD", "CAD", "GBP", "NZD"] as const;
 
+// PeerCraft's platform fee, deducted from the helper's share of an order.
+// The student always pays the agreed price; the helper receives (1 - fee) of it.
+export const PLATFORM_FEE_RATE = 0.2;
+
 export type CurrencyCode = (typeof SUPPORTED_CURRENCIES)[number];
 
 export const CURRENCY_LABELS: Record<CurrencyCode, string> = {

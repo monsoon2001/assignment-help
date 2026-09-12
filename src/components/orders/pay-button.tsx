@@ -47,7 +47,7 @@ export default function PayButton({
           <Loader2 size={18} className="animate-spin" />
         ) : (
           <>
-            Pay {formatCurrency(amount, normalizeCurrency(currency))} &amp; Confirm Order
+            Pay {formatCurrency(amount, normalizeCurrency(currency))}
             <ArrowRight size={16} />
           </>
         )}

@@ -7,6 +7,7 @@ import Avatar from "@/components/ui/avatar";
 import Button from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { unwrapRow } from "@/lib/embedded";
+import MessagesLiveRefresh from "@/components/requests/messages-live-refresh";
 
 export const dynamic = "force-dynamic";
 
@@ -62,7 +63,7 @@ export default async function HelperMessagesPage() {
     supabase
       .from("orders")
       .select(
-        "id, status, created_at, student:users!orders_student_id_fkey(id, name, avatar_url), proposal:proposals(request:requests(title))"
+        "id, status, created_at, student:users!orders_student_id_fkey(id, name, avatar_url), proposal:proposals(id, request_id, request:requests(title))"
       )
       .eq("helper_id", user.id)
       .in("status", orderStatuses)
@@ -73,26 +74,37 @@ export default async function HelperMessagesPage() {
     ...r,
     student: unwrapRow<Counterpart>(r.student),
   }));
-  const orders = (orderRows ?? []).map((o) => ({
-    ...o,
-    student: unwrapRow<Counterpart>(o.student),
-    makeTitle:
-      unwrapRow<{ request: { title: string | null } | null }>(
-        o.proposal
-      )?.request?.title ?? "Untitled Order",
-  }));
+  const orders = (orderRows ?? []).map((o) => {
+    const proposal = unwrapRow<{
+      id: string | null;
+      request_id: string | null;
+      request: { title: string | null } | null;
+    }>(o.proposal);
+    return {
+      ...o,
+      student: unwrapRow<Counterpart>(o.student),
+      requestId: proposal?.request_id ?? null,
+      makeTitle: proposal?.request?.title ?? "Untitled Order",
+    };
+  });
+
+  const ordersByRequest = new Map<string, string>();
+  for (const o of orders) {
+    if (o.requestId) ordersByRequest.set(o.requestId, o.id);
+  }
 
   const requestIds = requests.map((r) => r.id);
   const orderIds = orders.map((o) => o.id);
+  const allRequestIds = [...requestIds, ...ordersByRequest.keys()];
 
   const { data: requestMsgs } =
-    requestIds.length > 0
+    allRequestIds.length > 0
       ? await supabase
           .from("messages")
-          .select("id, body, created_at, request_id")
-          .in("request_id", requestIds)
+          .select("id, body, created_at, request_id, order_id")
+          .in("request_id", allRequestIds)
           .order("created_at", { ascending: false })
-          .limit(200)
+          .limit(300)
       : { data: null };
 
   const { data: orderMsgs } =
@@ -102,16 +114,28 @@ export default async function HelperMessagesPage() {
           .select("id, body, created_at, order_id")
           .in("order_id", orderIds)
           .order("created_at", { ascending: false })
-          .limit(200)
+          .limit(300)
       : { data: null };
 
+  const setLatest = (map: Map<string, { body: string; created_at: string }>, key: string, body: string, created_at: string) => {
+    const cur = map.get(key);
+    if (!cur || new Date(created_at).getTime() > new Date(cur.created_at).getTime()) {
+      map.set(key, { body, created_at });
+    }
+  };
+
   const latestByRequest = new Map<string, { body: string; created_at: string }>();
-  for (const m of (requestMsgs ?? []) as { request_id: string; body: string; created_at: string }[]) {
-    if (!latestByRequest.has(m.request_id)) latestByRequest.set(m.request_id, { body: m.body, created_at: m.created_at });
+  for (const m of (requestMsgs ?? []) as { request_id?: string; body: string; created_at: string }[]) {
+    if (m.request_id) setLatest(latestByRequest, m.request_id, m.body, m.created_at);
   }
   const latestByOrder = new Map<string, { body: string; created_at: string }>();
-  for (const m of (orderMsgs ?? []) as { order_id: string; body: string; created_at: string }[]) {
-    if (!latestByOrder.has(m.order_id)) latestByOrder.set(m.order_id, { body: m.body, created_at: m.created_at });
+  for (const m of (orderMsgs ?? []) as { order_id?: string; body: string; created_at: string }[]) {
+    if (m.order_id) setLatest(latestByOrder, m.order_id, m.body, m.created_at);
+  }
+  for (const m of (requestMsgs ?? []) as { request_id?: string; body: string; created_at: string }[]) {
+    if (m.request_id && ordersByRequest.has(m.request_id)) {
+      setLatest(latestByOrder, ordersByRequest.get(m.request_id)!, m.body, m.created_at);
+    }
   }
 
   const threads: Thread[] = [
@@ -147,6 +171,7 @@ export default async function HelperMessagesPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
+      <MessagesLiveRefresh />
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div>
           <h1 className="font-display font-bold text-2xl text-on-surface">Messages</h1>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { FileText, Loader2, Paperclip, Send, X } from "lucide-react";
 import Avatar from "@/components/ui/avatar";
 import Card from "@/components/ui/card";
@@ -55,9 +56,16 @@ export default function ChatPanel({
     }
   };
 
+  const messageListRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const el = messageListRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages.length]);
+
   return (
-    <Card className="flex flex-col h-[640px] overflow-hidden">
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-outline-variant bg-surface-container-low/60">
+    <Card className="flex flex-col h-[480px] sm:h-[560px] xl:h-[640px] overflow-hidden">
+      <div className="flex items-center gap-3 px-5 py-3.5 border-b border-outline-variant bg-surface-container-low/60">
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-on-surface">{title}</p>
           <p className="text-[11px] text-emerald-600 inline-flex items-center gap-1">
@@ -67,7 +75,7 @@ export default function ChatPanel({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4 bg-surface-container-low/40">
+      <div ref={messageListRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-4 bg-surface-container-low/40 overscroll-contain">
         {messages.length === 0 && (
           <div className="text-center pt-16">
             <p className="text-sm text-on-surface-variant">No messages yet — say hello!</p>
