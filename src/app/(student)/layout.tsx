@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { LayoutDashboard, FileText, MessageSquare, Bell, User, Plus, GraduationCap } from "lucide-react";
+import { LayoutDashboard, FileText, MessageSquare, Bell, User, Plus } from "lucide-react";
 import Header from "@/components/layout/header";
 import Badge from "@/components/ui/badge";
+import WarningsBanner from "@/components/layout/warnings-banner";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -41,6 +42,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
+      <WarningsBanner />
 
       <div className="flex flex-1 w-full max-w-[1440px] mx-auto">
         <aside className="hidden lg:flex flex-col w-60 shrink-0 border-r border-outline-variant px-4 py-6 gap-1 sticky top-16 h-[calc(100vh-4rem)] bg-surface-container-lowest">
@@ -70,10 +72,6 @@ export default async function StudentLayout({ children }: { children: React.Reac
               <Plus size={16} />
               Request Help
             </Link>
-            <p className="mt-3 px-3 text-[11px] leading-relaxed text-on-surface-variant flex items-start gap-1.5">
-              <GraduationCap size={12} className="shrink-0 mt-px" />
-              Academic Honor Pass active through {new Date().getFullYear() + 1}
-            </p>
           </div>
         </aside>
 

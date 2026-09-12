@@ -36,6 +36,14 @@ export async function GET(request: Request) {
   const target = next && next.startsWith("/") && !next.startsWith("//") ? next : home;
   const redirect = new URL(target, url.origin);
   redirect.searchParams.set("signedIn", "1");
+  const created = user.created_at ? new Date(user.created_at).getTime() : 0;
+  const isNew =
+    Number.isFinite(created) &&
+    Date.now() - created < 60_000;
+  redirect.searchParams.set("welcome", isNew ? "new" : "back");
+  if (user.user_metadata?.name) {
+    redirect.searchParams.set("user", String(user.user_metadata.name));
+  }
 
   return NextResponse.redirect(redirect);
 }

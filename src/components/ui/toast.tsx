@@ -52,10 +52,23 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (new URLSearchParams(window.location.search).get("signedIn") === "1") {
-      toast("Signed in successfully");
+    const params = new URLSearchParams(window.location.search);
+    const welcome = params.get("welcome");
+    const userName = params.get("user");
+    const firstName = userName?.split(" ")[0];
+    if (params.get("signedIn") === "1") {
+      if (welcome === "new") {
+        toast(`Welcome${firstName ? `, ${firstName}` : ""}! Your account is ready.`);
+      } else {
+        toast(
+          firstName ? `Welcome back, ${firstName}!` : "Welcome back!",
+          welcome === "back" ? "info" : "success"
+        );
+      }
       const clean = new URL(window.location.href);
       clean.searchParams.delete("signedIn");
+      clean.searchParams.delete("welcome");
+      clean.searchParams.delete("user");
       history.replaceState({}, "", clean.pathname + clean.search);
     }
   }, [toast]);
@@ -63,7 +76,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="fixed top-4 right-4 z-[100] flex flex-col gap-2 w-[calc(100vw-2rem)] max-w-sm pointer-events-none">
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 w-[calc(100vw-2rem)] max-w-sm items-center pointer-events-none">
         {toasts.map((t) => (
           <div
             key={t.id}

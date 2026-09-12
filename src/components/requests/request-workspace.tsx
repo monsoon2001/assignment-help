@@ -12,7 +12,9 @@ import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import Avatar from "@/components/ui/avatar";
 import Input from "@/components/ui/input";
+import Select from "@/components/ui/select";
 import Textarea from "@/components/ui/textarea";
+import { SUPPORTED_CURRENCIES, CURRENCY_LABELS } from "@/lib/currency";
 import ChatPanel, {
   type ChatMessageRow, fileNameFromUrl,
 } from "@/components/chat/chat-panel";
@@ -79,6 +81,7 @@ export default function RequestWorkspace({
   const [chatError, setChatError] = useState<string | null>(null);
 
   const [bidPrice, setBidPrice] = useState("");
+  const [bidCurrency, setBidCurrency] = useState("USD");
   const [bidDescription, setBidDescription] = useState("");
   const [bidRevisions, setBidRevisions] = useState("1");
   const [bidExpires, setBidExpires] = useState("");
@@ -94,7 +97,7 @@ export default function RequestWorkspace({
   const loadRequest = useCallback(async () => {
     const { data } = await supabase.current
       .from("requests")
-      .select("id, title, subject, description, deadline, status, file_urls, created_at, sent_at, student_id, helper:users(id, name), student:users(id, name)")
+      .select("id, title, subject, description, deadline, status, file_urls, created_at, sent_at, student_id, helper:users!requests_helper_id_fkey(id, name), student:users!requests_student_id_fkey(id, name)")
       .eq("id", requestId)
       .maybeSingle();
 
@@ -119,7 +122,7 @@ export default function RequestWorkspace({
   const loadProposal = useCallback(async () => {
     const { data } = await supabase.current
       .from("proposals")
-      .select("id, request_id, helper_id, price, description, revisions_included, expires_at, status, created_at, helper:users(id, name)")
+      .select("id, request_id, helper_id, price, currency, description, revisions_included, expires_at, status, created_at, helper:users(id, name)")
       .eq("request_id", requestId)
       .maybeSingle();
 
@@ -244,6 +247,7 @@ export default function RequestWorkspace({
     const result = await submitProposal({
       request_id: requestId,
       price: parsedPrice,
+      currency: bidCurrency,
       description: bidDescription.trim() || undefined,
       revisions_included: Math.max(0, Number(bidRevisions) || 0),
       expires_at: bidExpires ? new Date(`${bidExpires}T23:59:59`).toISOString() : null,
@@ -254,6 +258,7 @@ export default function RequestWorkspace({
       return;
     }
     setBidPrice("");
+    setBidCurrency("USD");
     setBidDescription("");
     setBidRevisions("1");
     setBidExpires("");
@@ -440,7 +445,7 @@ export default function RequestWorkspace({
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
-                  label="Price (USD)"
+                  label="Price"
                   type="number"
                   min="0.01"
                   step="0.01"
@@ -448,6 +453,14 @@ export default function RequestWorkspace({
                   value={bidPrice}
                   onChange={(e) => setBidPrice(e.target.value)}
                 />
+                <Select
+                  label="Currency"
+                  value={bidCurrency}
+                  onChange={(e) => setBidCurrency(e.target.value)}
+                  options={SUPPORTED_CURRENCIES.map((c) => ({ value: c, label: CURRENCY_LABELS[c] }))}
+                />
+              </div>
+              <div className="mt-4">
                 <Input
                   label="Revisions included"
                   type="number"

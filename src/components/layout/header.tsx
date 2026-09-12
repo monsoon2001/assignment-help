@@ -46,6 +46,11 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
 
       if (session?.user.id) {
         setUserId(session.user.id);
+        const metaAvatar =
+          session.user.user_metadata?.avatar_url ??
+          session.user.user_metadata?.picture ??
+          null;
+        setAvatarUrl((metaAvatar as string) ?? null);
         const { data: profile } = await supabase
           .from("users")
           .select("role, name, avatar_url")
@@ -54,7 +59,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
         if (!active) return;
         setRole((profile?.role as UserRole) ?? null);
         setUserName((profile?.name as string) ?? session.user.email ?? null);
-        setAvatarUrl((profile?.avatar_url as string) ?? null);
+        setAvatarUrl((profile?.avatar_url as string) ?? (metaAvatar as string) ?? null);
 
         const { count } = await supabase
           .from("notifications")
@@ -272,10 +277,10 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                 </span>
                 <div>
                   <h3 id="sign-out-dialog-title" className="font-display font-bold text-lg text-on-surface">
-                    Sign out?
+                    Confirm Sign Out
                   </h3>
                   <p className="text-sm text-on-surface-variant mt-1 leading-relaxed">
-                    Are you sure you want to sign out? You&apos;ll need to sign in again to access your dashboard.
+                    You&apos;ll need to sign in again to access your dashboard.
                   </p>
                 </div>
               </div>

@@ -34,7 +34,7 @@ export default async function HelperRequestsPage() {
 
   const { data: requests } = await supabase
     .from("requests")
-    .select("id, title, subject, description, deadline, status, created_at, student:users(id, name)")
+    .select("id, title, subject, description, deadline, status, created_at, student:users!requests_student_id_fkey(id, name)")
     .eq("helper_id", user.id)
     .in("status", ["requested", "proposal_sent"])
     .order("created_at", { ascending: false });

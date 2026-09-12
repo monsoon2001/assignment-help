@@ -32,7 +32,7 @@ export default async function AdminRequestsPage() {
 
   const { data: requests, error } = await adminClient
     .from("requests")
-    .select("id, title, subject, description, deadline, status, created_at, student:users(id, name), proposals:proposals(id, price, status, helper:users(id, name))")
+    .select("id, title, subject, description, deadline, status, created_at, student:users!requests_student_id_fkey(id, name), proposals:proposals(id, price, status, helper:users(id, name))")
     .order("created_at", { ascending: false })
     .limit(200);
 

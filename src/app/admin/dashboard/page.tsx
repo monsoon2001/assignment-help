@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
+import { formatCurrency, normalizeCurrency } from "@/lib/currency";
 import { EmptyState } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
@@ -69,7 +70,7 @@ export default async function AdminDashboardPage() {
 
   const { data: recentOrders } = await adminClient
     .from("orders")
-    .select("id, status, price, deadline, created_at, student:users(name), helper:helper_profiles(user:users(name))")
+    .select("id, status, price, currency, deadline, created_at, student:users!orders_student_id_fkey(name), helper:users!orders_helper_id_fkey(name)")
     .order("created_at", { ascending: false })
     .limit(8);
 
@@ -170,8 +171,7 @@ export default async function AdminDashboardPage() {
               <tbody>
                 {recentOrders.map((order) => {
                   const student = unwrapRow<{ id: string; name: string | null }>(order.student);
-                  const helperEmbed = unwrapRow<{ user: unknown }>(order.helper);
-                  const helper = unwrapRow<{ name: string | null }>(helperEmbed?.user);
+                  const helper = unwrapRow<{ name: string | null }>(order.helper);
                   return (
                     <tr key={order.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
                       <td className="px-6 py-4">
@@ -186,7 +186,7 @@ export default async function AdminDashboardPage() {
                           <span className="text-sm text-on-surface">{helper?.name ?? "—"}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm font-semibold text-on-surface">${Number(order.price).toFixed(2)}</td>
+                      <td className="px-6 py-4 text-sm font-semibold text-on-surface">{formatCurrency(Number(order.price), normalizeCurrency(order.currency))}</td>
                       <td className="px-6 py-4">
                         <Badge variant={STATUS_VARIANT[order.status] ?? "outline"}>
                           {order.status.replaceAll("_", " ")}

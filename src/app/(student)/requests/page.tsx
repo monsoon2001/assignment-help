@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Plus, Search, SlidersHorizontal, FileText, RefreshCcw, ChevronLeft, ChevronRight, Clock, CheckCircle2, Users, Award, CalendarDays, Paperclip } from "lucide-react";
+import { Plus, Search, SlidersHorizontal, FileText, RefreshCcw, ChevronLeft, ChevronRight, Clock, CheckCircle2, Users, CalendarDays, Paperclip } from "lucide-react";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
@@ -53,7 +53,7 @@ export default async function RequestsPage() {
 
   const { data: requests } = await supabase
     .from("requests")
-    .select("id, title, subject, description, deadline, file_urls, status, created_at, sent_at, helper:users(id, name)")
+    .select("id, title, subject, description, deadline, file_urls, status, created_at, sent_at, helper:users!requests_helper_id_fkey(id, name)")
     .eq("student_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -67,7 +67,7 @@ export default async function RequestsPage() {
     requestIdsForProposals.length > 0
       ? await supabase
           .from("proposals")
-          .select("id, request_id, helper_id, price, description, revisions_included, expires_at, status, created_at, helper:users(id, name)")
+          .select("id, request_id, helper_id, price, currency, description, revisions_included, expires_at, status, created_at, helper:users(id, name)")
           .in("request_id", requestIdsForProposals)
       : { data: null };
 
@@ -113,7 +113,7 @@ export default async function RequestsPage() {
 
   return (
     <div className="w-full max-w-7xl mx-auto flex flex-col gap-6">
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {stats.map((s) => {
           const Icon = s.icon;
           return (
@@ -128,19 +128,6 @@ export default async function RequestsPage() {
             </Card>
           );
         })}
-
-        <Card className="p-5 bg-gradient-to-br from-primary-container to-primary text-on-primary border-0">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-on-primary/80">Academic Honor Pass</p>
-              <p className="font-display font-bold text-lg mt-1">Status: Clear</p>
-              <p className="text-xs text-on-primary/80 mt-0.5">Renews {new Date().getFullYear() + 1} · 0 flags</p>
-            </div>
-            <span className="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-              <Award size={20} />
-            </span>
-          </div>
-        </Card>
       </section>
 
       <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

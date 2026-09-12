@@ -194,9 +194,7 @@ export default function SignUpPage() {
                     />
                     <span>
                       I agree to the{" "}
-                      <Link href="/terms" className="font-semibold text-primary hover:underline">Terms of Service</Link>{" "}
-                      and{" "}
-                      <Link href="/honor-code" className="font-semibold text-primary hover:underline">Academic Honor Code</Link>
+                      <Link href="/terms" className="font-semibold text-primary hover:underline">Terms of Service</Link>
                       , including policies against submitting others&apos; work as your own.
                     </span>
                   </label>

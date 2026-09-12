@@ -1,114 +1,222 @@
-"use client";
-
-import { useState } from "react";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { ArrowRight, MessageSquare, Briefcase } from "lucide-react";
 import Card from "@/components/ui/card";
-import Avatar from "@/components/ui/avatar";
 import Badge from "@/components/ui/badge";
+import Avatar from "@/components/ui/avatar";
 import Button from "@/components/ui/button";
-import Input from "@/components/ui/input";
-import { Send, Search } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+import { unwrapRow } from "@/lib/embedded";
 
-const conversations = [
-  { id: 1, name: "Alex Chen", lastMessage: "Thanks for the draft! Can we discuss the introduction?", time: "2m ago", unread: 2, online: true },
-  { id: 2, name: "Sarah Kim", lastMessage: "I uploaded the additional research materials.", time: "15m ago", unread: 0, online: false },
-  { id: 3, name: "James Liu", lastMessage: "The problem set looks great. Left a 5-star review!", time: "1h ago", unread: 0, online: true },
-  { id: 4, name: "Emma Wilson", lastMessage: "When can we start working on the literature review?", time: "3h ago", unread: 1, online: false },
-  { id: 5, name: "David Park", lastMessage: "Perfect, I'll review the calculus notes tonight.", time: "1d ago", unread: 0, online: false },
-];
+export const dynamic = "force-dynamic";
 
-const chatMessages = [
-  { id: 1, sender: "Alex Chen", message: "Hi Maya! I've reviewed the first draft of my research paper. The structure looks great, but I have a few questions about the introduction.", time: "10:32 AM", isMe: false },
-  { id: 2, sender: "Me", message: "Thanks for reviewing! What specific changes would you like to see in the introduction?", time: "10:35 AM", isMe: true },
-  { id: 3, sender: "Alex Chen", message: "I was thinking we could add a stronger hook at the beginning. Maybe something about the recent global energy summit? Also, the thesis statement could be more specific.", time: "10:38 AM", isMe: false },
-  { id: 4, sender: "Me", message: "Great idea! I'll revise the opening with a reference to the 2026 Global Energy Summit and tighten up the thesis statement. I'll have the updated version ready by tonight.", time: "10:40 AM", isMe: true },
-  { id: 5, sender: "Alex Chen", message: "Thanks for the draft! Can we discuss the introduction?", time: "10:42 AM", isMe: false },
-];
+type Counterpart = { id: string; name: string | null; avatar_url: string | null } | null;
 
-export default function HelperMessages() {
-  const [selectedConvo, setSelectedConvo] = useState(1);
-  const [newMessage, setNewMessage] = useState("");
+type Thread = {
+  key: string;
+  kind: "order" | "request";
+  title: string;
+  counterpart: Counterpart;
+  statusLabel: string;
+  statusVariant: "primary" | "warning" | "success" | "secondary" | "outline";
+  link: string;
+  lastAt: number;
+  lastPreview: string | null;
+};
+
+const REQUEST_META: Record<string, { label: string; variant: "primary" | "warning" | "success" | "secondary" | "outline" }> = {
+  requested: { label: "Open", variant: "primary" },
+  proposal_sent: { label: "Proposal Sent", variant: "warning" },
+};
+
+const ORDER_META: Record<string, { label: string; variant: "primary" | "warning" | "success" | "danger" | "outline" }> = {
+  payment_pending: { label: "Payment Pending", variant: "warning" },
+  in_progress: { label: "In Progress", variant: "primary" },
+  delivered: { label: "Delivered", variant: "success" },
+  revision_requested: { label: "Revision", variant: "warning" },
+  completed: { label: "Completed", variant: "success" },
+  disputed: { label: "Under Review", variant: "danger" },
+};
+
+export default async function HelperMessagesPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  const orderStatuses = ["payment_pending", "in_progress", "delivered", "revision_requested", "disputed", "completed"];
+  const requestStatuses = ["requested", "proposal_sent"];
+  const userRole = String(user.user_metadata?.role ?? user.user_metadata?.account_type ?? "") === "helper";
+
+  const [{ data: reqRows }, { data: orderRows }] = await Promise.all([
+    supabase
+      .from("requests")
+      .select("id, title, status, created_at, student:users!requests_student_id_fkey(id, name, avatar_url)")
+      .eq("helper_id", user.id)
+      .in("status", requestStatuses)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("orders")
+      .select(
+        "id, status, created_at, student:users!orders_student_id_fkey(id, name, avatar_url), proposal:proposals(request:requests(title))"
+      )
+      .eq("helper_id", user.id)
+      .in("status", orderStatuses)
+      .order("created_at", { ascending: false }),
+  ]);
+
+  const requests = (reqRows ?? []).map((r) => ({
+    ...r,
+    student: unwrapRow<Counterpart>(r.student),
+  }));
+  const orders = (orderRows ?? []).map((o) => ({
+    ...o,
+    student: unwrapRow<Counterpart>(o.student),
+    makeTitle:
+      unwrapRow<{ request: { title: string | null } | null }>(
+        o.proposal
+      )?.request?.title ?? "Untitled Order",
+  }));
+
+  const requestIds = requests.map((r) => r.id);
+  const orderIds = orders.map((o) => o.id);
+
+  const { data: requestMsgs } =
+    requestIds.length > 0
+      ? await supabase
+          .from("messages")
+          .select("id, body, created_at, request_id")
+          .in("request_id", requestIds)
+          .order("created_at", { ascending: false })
+          .limit(200)
+      : { data: null };
+
+  const { data: orderMsgs } =
+    orderIds.length > 0
+      ? await supabase
+          .from("messages")
+          .select("id, body, created_at, order_id")
+          .in("order_id", orderIds)
+          .order("created_at", { ascending: false })
+          .limit(200)
+      : { data: null };
+
+  const latestByRequest = new Map<string, { body: string; created_at: string }>();
+  for (const m of (requestMsgs ?? []) as { request_id: string; body: string; created_at: string }[]) {
+    if (!latestByRequest.has(m.request_id)) latestByRequest.set(m.request_id, { body: m.body, created_at: m.created_at });
+  }
+  const latestByOrder = new Map<string, { body: string; created_at: string }>();
+  for (const m of (orderMsgs ?? []) as { order_id: string; body: string; created_at: string }[]) {
+    if (!latestByOrder.has(m.order_id)) latestByOrder.set(m.order_id, { body: m.body, created_at: m.created_at });
+  }
+
+  const threads: Thread[] = [
+    ...requests.map((r) => {
+      const last = latestByRequest.get(r.id);
+      return {
+        key: `request-${r.id}`,
+        kind: "request" as const,
+        title: r.title,
+        counterpart: r.student,
+        statusLabel: REQUEST_META[r.status]?.label ?? r.status,
+        statusVariant: (REQUEST_META[r.status]?.variant ?? "outline") as Thread["statusVariant"],
+        link: `/helper/requests/${r.id}`,
+        lastAt: last ? new Date(last.created_at).getTime() : new Date(r.created_at).getTime(),
+        lastPreview: last?.body ?? "No messages yet",
+      };
+    }),
+    ...orders.map((o) => {
+      const last = latestByOrder.get(o.id);
+      return {
+        key: `order-${o.id}`,
+        kind: "order" as const,
+        title: o.makeTitle,
+        counterpart: o.student,
+        statusLabel: ORDER_META[o.status]?.label ?? o.status,
+        statusVariant: (ORDER_META[o.status]?.variant ?? "outline") as Thread["statusVariant"],
+        link: `/helper/orders/${o.id}`,
+        lastAt: last ? new Date(last.created_at).getTime() : new Date(o.created_at).getTime(),
+        lastPreview: last?.body ?? "No messages yet",
+      };
+    }),
+  ].sort((a, b) => b.lastAt - a.lastAt);
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="mb-6">
-        <h1 className="font-display text-2xl font-bold text-on-surface">Messages</h1>
-        <p className="text-on-surface-variant mt-1">Communicate with your students.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <div>
+          <h1 className="font-display font-bold text-2xl text-on-surface">Messages</h1>
+          <p className="text-sm text-on-surface-variant mt-0.5">
+            Conversations with students about your requests and orders
+          </p>
+        </div>
+        {!userRole && (
+          <Link href="/helper/requests">
+            <Button size="sm"><Briefcase size={15} /> Browse Requests</Button>
+          </Link>
+        )}
       </div>
 
-      <Card className="flex h-[600px] overflow-hidden">
-        <div className="w-80 border-r border-outline-variant/30 flex flex-col">
-          <div className="p-4 border-b border-outline-variant/30">
-            <Input placeholder="Search messages..." icon={<Search size={16} />} />
-          </div>
-          <div className="flex-1 overflow-y-auto">
-            {conversations.map((convo) => (
-              <button
-                key={convo.id}
-                onClick={() => setSelectedConvo(convo.id)}
-                className={`w-full flex items-start gap-3 p-4 text-left transition-colors ${
-                  selectedConvo === convo.id ? "bg-primary-container/10" : "hover:bg-surface-container-low"
-                }`}
+      {threads.length === 0 ? (
+        <Card className="p-12 text-center">
+          <MessageSquare size={28} className="mx-auto text-on-surface-variant/60 mb-3" />
+          <p className="text-on-surface-variant">No conversations yet.</p>
+          <p className="text-sm text-on-surface-variant mt-1">
+            Students you work with will appear here.
+          </p>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <Card className="lg:col-span-1 divide-y divide-outline-variant/40 overflow-hidden lg:max-h-[70vh] overflow-y-auto">
+            {threads.map((t) => (
+              <Link
+                key={t.key}
+                href={t.link}
+                className="flex items-start gap-3 p-4 hover:bg-surface-container-low transition-colors group"
               >
-                <Avatar name={convo.name} size="sm" online={convo.online} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-on-surface truncate">{convo.name}</span>
-                    <span className="text-xs text-on-surface-variant shrink-0 ml-2">{convo.time}</span>
+                <Avatar name={t.counterpart?.name ?? "Student"} size="md" src={t.counterpart?.avatar_url ?? undefined} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-semibold text-on-surface truncate group-hover:underline">
+                      {t.counterpart?.name ?? "Student"}
+                    </p>
+                    <span className="text-[11px] text-on-surface-variant shrink-0">
+                      {new Date(t.lastAt).toLocaleDateString([], { month: "short", day: "numeric" })}
+                    </span>
                   </div>
-                  <p className="text-sm text-on-surface-variant truncate mt-0.5">{convo.lastMessage}</p>
+                  <p className="text-xs font-medium text-on-surface truncate">{t.title}</p>
+                  <p className="text-xs text-on-surface-variant truncate mt-0.5">{t.lastPreview}</p>
+                  <Badge variant={t.statusVariant} className="mt-2">{t.statusLabel}</Badge>
                 </div>
-                {convo.unread > 0 && (
-                  <Badge variant="primary" className="shrink-0 mt-1">{convo.unread}</Badge>
-                )}
-              </button>
+              </Link>
             ))}
-          </div>
-        </div>
+          </Card>
 
-        <div className="flex-1 flex flex-col">
-          <div className="p-4 border-b border-outline-variant/30 flex items-center gap-3">
-            <Avatar
-              name={conversations.find((c) => c.id === selectedConvo)?.name}
-              size="sm"
-              online={conversations.find((c) => c.id === selectedConvo)?.online}
-            />
-            <div>
-              <p className="text-sm font-medium text-on-surface">
-                {conversations.find((c) => c.id === selectedConvo)?.name}
-              </p>
-              <p className="text-xs text-on-surface-variant">
-                {conversations.find((c) => c.id === selectedConvo)?.online ? "Online" : "Offline"}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {chatMessages.map((msg) => (
-              <div key={msg.id} className={`flex ${msg.isMe ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[70%] px-4 py-3 rounded-2xl ${
-                  msg.isMe ? "bg-primary-container text-on-primary rounded-br-md" : "bg-surface-container-high text-on-surface rounded-bl-md"
-                }`}>
-                  <p className="text-sm">{msg.message}</p>
-                  <p className={`text-xs mt-1 ${msg.isMe ? "text-on-primary/70" : "text-on-surface-variant"}`}>{msg.time}</p>
-                </div>
+          <div className="lg:col-span-2 flex flex-col gap-4">
+            <Card className="p-8 text-center flex flex-col items-center gap-3">
+              <div className="w-14 h-14 rounded-2xl bg-primary-container/30 flex items-center justify-center">
+                <MessageSquare size={26} className="text-primary" />
               </div>
-            ))}
-          </div>
-
-          <div className="p-4 border-t border-outline-variant/30">
-            <div className="flex items-center gap-3">
-              <input
-                type="text"
-                placeholder="Type a message..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                className="flex-1 h-10 px-4 bg-surface-container-low border border-outline-variant rounded-xl text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
-              />
-              <Button size="md"><Send size={16} /></Button>
-            </div>
+              <div>
+                <h2 className="font-display font-bold text-lg text-on-surface">Live chats live in the workspace</h2>
+                <p className="text-sm text-on-surface-variant mt-1 max-w-md">
+                  Select a conversation to open its request or order workspace, where
+                  the realtime chat, files, and deliverables live.
+                </p>
+              </div>
+              {threads[0] && (
+                <Link href={threads[0].link} className="mt-2">
+                  <Button>Open latest conversation <ArrowRight size={15} /></Button>
+                </Link>
+              )}
+            </Card>
           </div>
         </div>
-      </Card>
+      )}
     </div>
   );
 }

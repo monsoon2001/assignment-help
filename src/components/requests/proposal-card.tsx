@@ -8,12 +8,14 @@ import {
 import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
 import { acceptProposal, declineProposal } from "@/lib/orders";
+import { normalizeCurrency, formatCurrency } from "@/lib/currency";
 
 export type RequestProposal = {
   id: string;
   request_id: string;
   helper_id: string;
   price: number;
+  currency?: string | null;
   description: string | null;
   revisions_included: number;
   expires_at: string | null;
@@ -53,11 +55,8 @@ export default function ProposalCard({
   const [busy, setBusy] = useState<"accept" | "decline" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const price = Number(proposal.price).toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  });
+  const currency = normalizeCurrency(proposal.currency);
+  const price = formatCurrency(Number(proposal.price), currency);
 
   const statusMeta = ACTIONS[proposal.status] ?? { label: proposal.status, variant: "primary" as const };
 
@@ -69,6 +68,7 @@ export default function ProposalCard({
       helper_id: proposal.helper_id,
       request_id: proposal.request_id,
       price: Number(proposal.price),
+      currency,
       request_deadline: requestDeadline ?? null,
     });
     setBusy(null);
@@ -115,10 +115,10 @@ export default function ProposalCard({
               <span className="font-display text-2xl font-bold text-primary tracking-tight">
                 {price}
               </span>
-              <span className="text-[11px] text-on-surface-variant font-medium">USD</span>
+              <span className="text-[11px] text-on-surface-variant font-medium">{currency}</span>
             </div>
             <p className="text-[11px] text-on-surface-variant mt-0.5">
-              No hidden charges &middot; Platform escrow held
+              No hidden charges &middot; Pay securely on the platform
             </p>
           </div>
           <div className="flex flex-col justify-center sm:pl-3">
@@ -204,7 +204,7 @@ export default function ProposalCard({
               </Button>
               <Button
                 size="sm"
-                className="w-full sm:flex-1"
+                className="w-full sm:w-auto"
                 disabled={busy !== null}
                 onClick={handleAccept}
               >
@@ -218,7 +218,7 @@ export default function ProposalCard({
             </div>
             <p className="text-[11px] text-on-surface-variant inline-flex items-center gap-1">
               <ShieldCheck size={12} className="text-primary shrink-0" />
-              Your payment is held in escrow under the PeerCraft Academic Quality Guarantee.
+              Funds are released only after you review and approve the finalized draft.
             </p>
           </div>
         ) : (

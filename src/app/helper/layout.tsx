@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Header from "@/components/layout/header";
+import WarningsBannerClient from "@/components/layout/warnings-banner-client";
 import {
   LayoutDashboard,
   Inbox,
@@ -31,6 +32,7 @@ export default function HelperLayout({
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
+      <WarningsBannerClient />
       <div className="flex flex-1">
         <aside className="w-64 shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 min-h-[calc(100vh-4rem)] p-4 hidden lg:flex flex-col gap-1">
           {links.map((link) => {

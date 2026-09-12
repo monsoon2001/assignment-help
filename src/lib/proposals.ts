@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/client";
 export interface NewProposalInput {
   request_id: string;
   price: number;
+  currency?: string;
   description?: string;
   revisions_included?: number;
   expires_at?: string | null;
@@ -26,6 +27,7 @@ export async function submitProposal(
       request_id: input.request_id,
       helper_id: user.id,
       price: input.price,
+      currency: input.currency ?? "USD",
       description: input.description ?? null,
       revisions_included: input.revisions_included ?? 0,
       expires_at: input.expires_at ?? null,

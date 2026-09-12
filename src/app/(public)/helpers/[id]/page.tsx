@@ -1,29 +1,100 @@
 import Link from "next/link";
-import { ChevronRight, Star, Clock, MessageSquare, Award, BookOpen } from "lucide-react";
+import { notFound } from "next/navigation";
+import { ChevronRight, Star, Clock, MessageSquare, BookOpen, GraduationCap } from "lucide-react";
+import Avatar from "@/components/ui/avatar";
+import { createClient } from "@/lib/supabase/server";
 
-const helper = {
-  id: "maya-r",
-  name: "Maya R.",
-  avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face",
-  rating: 4.9,
-  reviews: 127,
-  verified: true,
-  bio: "Published literary analyst with expertise in essay structure, thesis development, and MLA/APA formatting. I help you find your voice while mastering academic conventions. With over 3 years of tutoring experience, I've guided hundreds of students through everything from first-year composition to advanced literary criticism.",
-  longBio: "I believe every student has a unique perspective — my job is to help you express it clearly and convincingly. Whether you're struggling with thesis statements, need help organizing your argument, or want to polish your citations, I'm here to guide you through the process step by step. I specialize in literary analysis, critical essays, and research papers, with deep knowledge of MLA, APA, and Chicago citation styles.",
-  subjects: ["English Literature", "Essay Writing", "Creative Writing", "Research Papers", "MLA/APA Formatting"],
-  stats: { onTime: "98%", avgReply: "< 1 hour", completedTasks: 127, satisfactionRate: "99%" },
-  education: "B.A. English Literature, University of California",
-  specialties: ["Thesis Development", "Literary Analysis", "MLA/APA Formatting", "Critical Essays", "Research Methodology"],
-  availability: "Available Mon-Sat, usually responds within 1 hour",
+export const dynamic = "force-dynamic";
+
+type RawHelper = {
+  id: string;
+  name: string | null;
+  email: string;
+  avatar_url: string | null;
+  helper_profiles:
+    | {
+        subjects: string[];
+        skills: string[];
+        bio: string | null;
+        rating_avg: number;
+      }[]
+    | {
+        subjects: string[];
+        skills: string[];
+        bio: string | null;
+        rating_avg: number;
+      }
+    | null;
 };
 
-const reviews = [
-  { name: "Alex M.", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face", rating: 5, text: "Maya helped me structure my thesis argument beautifully. The step-by-step feedback was invaluable — I learned more in one session than in weeks of struggling alone.", date: "2 weeks ago" },
-  { name: "Jessica T.", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face", rating: 5, text: "Incredible attention to detail. Maya didn't just fix my grammar — she helped me understand why my argument wasn't working and how to rebuild it. My essay went from a C to an A.", date: "1 month ago" },
-  { name: "Ryan K.", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face", rating: 5, text: "Best MLA formatting help I've ever received. Maya caught citation errors I would have never noticed and explained the rules clearly. Highly recommend for any English Lit student.", date: "3 weeks ago" },
-];
+type RawReview = {
+  id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  student_user_id: string;
+  student_name: string | null;
+  student_avatar_url: string | null;
+};
 
-export default function HelperProfilePage() {
+function ratingWord(rating: number) {
+  if (rating === 5) return "Excellent";
+  if (rating >= 4) return "Great";
+  if (rating >= 3) return "Good";
+  if (rating >= 2) return "Fair";
+  return "Poor";
+}
+
+export default async function HelperProfilePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const supabase = await createClient();
+
+  const { data: helperData } = await supabase
+    .from("users")
+    .select("id, name, email, avatar_url, helper_profiles(subjects, skills, bio, rating_avg)")
+    .eq("id", id)
+    .eq("role", "helper")
+    .maybeSingle();
+
+  if (!helperData) {
+    notFound();
+  }
+
+  const helper = helperData as unknown as RawHelper;
+  const profile = Array.isArray(helper.helper_profiles)
+    ? (helper.helper_profiles[0] ?? null)
+    : (helper.helper_profiles ?? null);
+
+  const { data: reviewRows } = await supabase
+    .from("helper_reviews")
+    .select("id, rating, comment, created_at, student_user_id, student_name, student_avatar_url")
+    .eq("helper_id", id)
+    .order("created_at", { ascending: false });
+
+  const reviews = (reviewRows as unknown as RawReview[] | null) ?? [];
+
+  const { count: openOrdersCount } = await supabase
+    .from("orders")
+    .select("id", { count: "exact" })
+    .eq("helper_id", id)
+    .in("status", ["in_progress", "revision_requested"]);
+
+  const { count: completedOrdersCount } = await supabase
+    .from("orders")
+    .select("id", { count: "exact" })
+    .eq("helper_id", id)
+    .eq("status", "completed");
+
+  const rating = profile?.rating_avg ?? 0;
+  const isNew = rating <= 0 && reviews.length === 0;
+  const subjects = profile?.subjects ?? [];
+  const skills = profile?.skills ?? [];
+  const bio = profile?.bio ?? null;
+
   return (
     <>
       <div className="bg-surface-container-high border-b border-outline-variant/50">
@@ -33,7 +104,7 @@ export default function HelperProfilePage() {
             <ChevronRight className="w-3.5 h-3.5" />
             <Link href="/browse-helpers" className="hover:text-primary transition-colors">Helpers</Link>
             <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-on-surface font-medium">{helper.name}</span>
+            <span className="text-on-surface font-medium">{helper.name ?? "Helper"}</span>
           </nav>
         </div>
       </div>
@@ -45,72 +116,87 @@ export default function HelperProfilePage() {
             {/* Profile Header */}
             <div className="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/30">
               <div className="flex flex-col sm:flex-row gap-6">
-                <img src={helper.avatar} alt={helper.name} className="w-24 h-24 rounded-full object-cover shrink-0" />
+                <Avatar name={helper.name ?? "Helper"} src={helper.avatar_url ?? undefined} size="lg" className="w-24 h-24" />
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h1 className="font-display text-2xl font-bold text-on-surface">{helper.name}</h1>
-                    {helper.verified && (
-                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-container/10 text-primary text-xs font-semibold">
-                        <span className="material-symbols-outlined text-sm">verified</span>
-                        Verified
-                      </span>
-                    )}
+                    <h1 className="font-display text-2xl font-bold text-on-surface">{helper.name ?? "Helper"}</h1>
+                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-container/10 text-primary text-xs font-semibold">
+                      <span className="material-symbols-outlined text-sm">verified</span>
+                      Verified
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 mb-3">
                     <div className="flex items-center gap-1">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                        <Star key={i} className={`w-4 h-4 ${i < Math.round(rating) ? "fill-amber-400 text-amber-400" : "text-outline-variant"}`} />
                       ))}
-                      <span className="text-sm font-semibold text-on-surface ml-1">{helper.rating}</span>
+                      <span className="text-sm font-semibold text-on-surface ml-1">
+                        {isNew ? "New" : `${rating.toFixed(1)} · ${ratingWord(rating)}`}
+                      </span>
                     </div>
-                    <span className="text-sm text-on-surface-variant">({helper.reviews} reviews)</span>
+                    {!isNew && (
+                      <span className="text-sm text-on-surface-variant">
+                        ({reviews.length} {reviews.length === 1 ? "review" : "reviews"})
+                      </span>
+                    )}
                   </div>
-                  <p className="text-sm text-on-surface-variant mb-3">{helper.education}</p>
-                  <p className="text-sm text-on-surface-variant leading-relaxed">{helper.bio}</p>
+                  {bio && <p className="text-sm text-on-surface-variant leading-relaxed">{bio}</p>}
                 </div>
               </div>
             </div>
 
             {/* About */}
-            <div className="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/30">
-              <h2 className="font-display text-lg font-bold text-on-surface mb-4">About {helper.name}</h2>
-              <p className="text-sm text-on-surface-variant leading-relaxed">{helper.longBio}</p>
-            </div>
+            {bio && (
+              <div className="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/30">
+                <h2 className="font-display text-lg font-bold text-on-surface mb-4">About {helper.name}</h2>
+                <p className="text-sm text-on-surface-variant leading-relaxed">{bio}</p>
+              </div>
+            )}
 
             {/* Specialties */}
-            <div className="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/30">
-              <h2 className="font-display text-lg font-bold text-on-surface mb-4">Specialties</h2>
-              <div className="flex flex-wrap gap-2">
-                {helper.specialties.map((s) => (
-                  <span key={s} className="px-3 py-1.5 rounded-full bg-secondary-container text-on-secondary-container text-sm font-medium">{s}</span>
-                ))}
+            {skills.length > 0 && (
+              <div className="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/30">
+                <h2 className="font-display text-lg font-bold text-on-surface mb-4">Specialties</h2>
+                <div className="flex flex-wrap gap-2">
+                  {skills.map((s) => (
+                    <span key={s} className="px-3 py-1.5 rounded-full bg-secondary-container text-on-secondary-container text-sm font-medium">{s}</span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Reviews */}
             <div className="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/30">
               <h2 className="font-display text-lg font-bold text-on-surface mb-6">Reviews</h2>
-              <div className="space-y-6">
-                {reviews.map((r, i) => (
-                  <div key={i} className={i < reviews.length - 1 ? "pb-6 border-b border-outline-variant/30" : ""}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <img src={r.avatar} alt={r.name} className="w-10 h-10 rounded-full object-cover" />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-on-surface">{r.name}</span>
-                          <span className="text-xs text-on-surface-variant">{r.date}</span>
-                        </div>
-                        <div className="flex items-center gap-0.5">
-                          {[...Array(r.rating)].map((_, j) => (
-                            <Star key={j} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                          ))}
+              {reviews.length === 0 ? (
+                <p className="text-sm text-on-surface-variant">
+                  No reviews yet. Be the first to work with {helper.name ?? "this helper"}!
+                </p>
+              ) : (
+                <div className="space-y-6">
+                  {reviews.map((r, i) => (
+                    <div key={r.id} className={i < reviews.length - 1 ? "pb-6 border-b border-outline-variant/30" : ""}>
+                      <div className="flex items-center gap-3 mb-3">
+                        <Avatar name={r.student_name ?? "Student"} src={r.student_avatar_url ?? undefined} />
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-on-surface">{r.student_name ?? "Student"}</span>
+                            <span className="text-xs text-on-surface-variant">
+                              {new Date(r.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-0.5">
+                            {[...Array(r.rating)].map((_, j) => (
+                              <Star key={j} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                            ))}
+                          </div>
                         </div>
                       </div>
+                      {r.comment && <p className="text-sm text-on-surface-variant leading-relaxed">{r.comment}</p>}
                     </div>
-                    <p className="text-sm text-on-surface-variant leading-relaxed">{r.text}</p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -122,50 +208,55 @@ export default function HelperProfilePage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2 text-sm text-on-surface-variant">
-                    <Clock className="w-4 h-4" />
-                    On-Time Rate
+                    <Star className="w-4 h-4" />
+                    Rating
                   </span>
-                  <span className="text-sm font-semibold text-on-surface">{helper.stats.onTime}</span>
+                  <span className="text-sm font-semibold text-on-surface">{isNew ? "New" : rating.toFixed(1)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2 text-sm text-on-surface-variant">
                     <MessageSquare className="w-4 h-4" />
-                    Avg Reply
+                    Reviews
                   </span>
-                  <span className="text-sm font-semibold text-on-surface">{helper.stats.avgReply}</span>
+                  <span className="text-sm font-semibold text-on-surface">{reviews.length}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-sm text-on-surface-variant">
+                    <Clock className="w-4 h-4" />
+                    Active Tasks
+                  </span>
+                  <span className="text-sm font-semibold text-on-surface">{openOrdersCount ?? 0}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2 text-sm text-on-surface-variant">
                     <BookOpen className="w-4 h-4" />
                     Completed
                   </span>
-                  <span className="text-sm font-semibold text-on-surface">{helper.stats.completedTasks} tasks</span>
+                  <span className="text-sm font-semibold text-on-surface">{completedOrdersCount ?? 0} tasks</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2 text-sm text-on-surface-variant">
-                    <Award className="w-4 h-4" />
-                    Satisfaction
+                    <GraduationCap className="w-4 h-4" />
+                    Level
                   </span>
-                  <span className="text-sm font-semibold text-on-surface">{helper.stats.satisfactionRate}</span>
+                  <span className="text-sm font-semibold text-on-surface">
+                    {completedOrdersCount && completedOrdersCount >= 20 ? "Expert" : completedOrdersCount && completedOrdersCount >= 5 ? "Intermediate" : "Beginner"}
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Subjects */}
-            <div className="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30">
-              <h3 className="font-display font-bold text-on-surface mb-3">Subjects</h3>
-              <div className="flex flex-wrap gap-1.5">
-                {helper.subjects.map((s) => (
-                  <span key={s} className="px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container text-xs font-medium">{s}</span>
-                ))}
+            {subjects.length > 0 && (
+              <div className="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30">
+                <h3 className="font-display font-bold text-on-surface mb-3">Subjects</h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {subjects.map((s) => (
+                    <span key={s} className="px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container text-xs font-medium">{s}</span>
+                  ))}
+                </div>
               </div>
-            </div>
-
-            {/* Availability */}
-            <div className="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30">
-              <h3 className="font-display font-bold text-on-surface mb-3">Availability</h3>
-              <p className="text-sm text-on-surface-variant">{helper.availability}</p>
-            </div>
+            )}
 
             {/* CTA */}
             <div className="bg-primary-container/5 rounded-2xl p-6 border border-primary-container/20 space-y-3">

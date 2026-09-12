@@ -4,36 +4,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Upload } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { savePendingDraft } from "@/lib/requests";
+import { savePendingDraft, saveDraftFiles } from "@/lib/requests";
+import { SUBJECTS, SERVICE_TYPES, ACADEMIC_LEVELS, OTHER_OPTION, composeSelection } from "@/lib/constants";
 
-const SUBJECTS = [
-  "English Literature",
-  "Mathematics",
-  "Biology",
-  "Chemistry",
-  "Physics",
-  "Computer Science",
-  "History",
-  "Business Studies",
-];
-
-const HELP_TYPES = [
-  "Essay Writing",
-  "Report Writing",
-  "Homework Help",
-  "Project Guidance",
-  "Editing & Proofreading",
-  "Tutoring",
-];
-
-const LEVELS = ["High School", "Undergraduate", "Graduate", "Postgraduate"];
-
-const DEADLINE_KEYS = ["24 hours", "3 days", "1 week", "2 weeks"];
+const SUBJECT_OPTIONS = [...SUBJECTS, OTHER_OPTION];
+const HELP_TYPE_OPTIONS = [...SERVICE_TYPES, OTHER_OPTION];
 
 export default function PriceEstimateForm() {
   const router = useRouter();
   const [subject, setSubject] = useState("");
+  const [customSubject, setCustomSubject] = useState("");
   const [helpType, setHelpType] = useState("");
+  const [customHelpType, setCustomHelpType] = useState("");
   const [level, setLevel] = useState("");
   const [deadline, setDeadline] = useState("");
   const [wordCount, setWordCount] = useState("");
@@ -50,19 +32,39 @@ export default function PriceEstimateForm() {
     e.preventDefault();
     setError("");
 
-    if (!subject || !helpType || !level || !deadline) {
-      setError("Please fill in subject, type of help, academic level, and deadline.");
+    const subjectRaw = composeSelection(subject, subject === OTHER_OPTION, customSubject);
+    const helpTypeRaw = composeSelection(helpType, helpType === OTHER_OPTION, customHelpType);
+
+    if (!subjectRaw) {
+      setError("Please select a subject.");
+      return;
+    }
+    if (!helpTypeRaw) {
+      setError("Please select the type of help you need.");
+      return;
+    }
+    if (!level) {
+      setError("Please select your academic level.");
+      return;
+    }
+    if (!deadline) {
+      setError("Please choose a deadline.");
+      return;
+    }
+    if (!wordCount.trim() && !details.trim()) {
+      setError("Add a word count or a short description so a helper can assess the scope.");
       return;
     }
 
     savePendingDraft({
-      service: helpType,
-      subject,
+      service: helpTypeRaw,
+      subject: subjectRaw,
       level,
-      deadlineKey: deadline,
+      deadline,
       wordCount,
       details,
     });
+    await saveDraftFiles(files);
 
     const supabase = createClient();
     const {
@@ -75,34 +77,60 @@ export default function PriceEstimateForm() {
     router.push("/requests/new");
   };
 
+  const today = new Date().toISOString().slice(0, 10);
+
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-on-surface">Subject</label>
           <select
             value={subject}
-            onChange={(e) => setSubject(e.target.value)}
+            onChange={(e) => {
+              setSubject(e.target.value);
+              setError("");
+            }}
             className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
           >
             <option value="">Select subject</option>
-            {SUBJECTS.map((s) => (
+            {SUBJECT_OPTIONS.map((s) => (
               <option key={s} value={s}>{s}</option>
             ))}
           </select>
+          {subject === OTHER_OPTION && (
+            <input
+              type="text"
+              placeholder="Type your subject, e.g. Music Theory"
+              value={customSubject}
+              onChange={(e) => setCustomSubject(e.target.value)}
+              className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+            />
+          )}
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-on-surface">Type of Help</label>
           <select
             value={helpType}
-            onChange={(e) => setHelpType(e.target.value)}
+            onChange={(e) => {
+              setHelpType(e.target.value);
+              setError("");
+            }}
             className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
           >
             <option value="">Select type</option>
-            {HELP_TYPES.map((t) => (
+            {HELP_TYPE_OPTIONS.map((t) => (
               <option key={t} value={t}>{t}</option>
             ))}
           </select>
+          {helpType === OTHER_OPTION && (
+            <input
+              type="text"
+              placeholder="Type the help you need, e.g. Lab Report"
+              value={customHelpType}
+              onChange={(e) => setCustomHelpType(e.target.value)}
+              className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+            />
+          )}
         </div>
       </div>
       <div className="flex flex-col gap-1.5">
@@ -113,24 +141,21 @@ export default function PriceEstimateForm() {
           className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
         >
           <option value="">Select level</option>
-          {LEVELS.map((l) => (
+          {ACADEMIC_LEVELS.map((l) => (
             <option key={l} value={l}>{l}</option>
           ))}
         </select>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-on-surface">Deadline</label>
-          <select
+          <input
+            type="date"
+            min={today}
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}
-            className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
-          >
-            <option value="">Select deadline</option>
-            {DEADLINE_KEYS.map((d) => (
-              <option key={d} value={d}>{d}</option>
-            ))}
-          </select>
+            className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+          />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-on-surface">Word Count</label>

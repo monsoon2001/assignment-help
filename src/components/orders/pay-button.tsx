@@ -3,8 +3,17 @@
 import { useState } from "react";
 import { Loader2, Lock, ArrowRight } from "lucide-react";
 import Button from "@/components/ui/button";
+import { normalizeCurrency, formatCurrency } from "@/lib/currency";
 
-export default function PayButton({ orderId, amount }: { orderId: string; amount: number }) {
+export default function PayButton({
+  orderId,
+  amount,
+  currency,
+}: {
+  orderId: string;
+  amount: number;
+  currency: string;
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -14,7 +23,7 @@ export default function PayButton({ orderId, amount }: { orderId: string; amount
     const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ orderId }),
+      body: JSON.stringify({ orderId, currency }),
     });
     const data = await res.json();
     if (!res.ok) {
@@ -38,7 +47,7 @@ export default function PayButton({ orderId, amount }: { orderId: string; amount
           <Loader2 size={18} className="animate-spin" />
         ) : (
           <>
-            Pay {amount.toLocaleString("en-US", { style: "currency", currency: "USD" })} &amp; Confirm Order
+            Pay {formatCurrency(amount, normalizeCurrency(currency))} &amp; Confirm Order
             <ArrowRight size={16} />
           </>
         )}

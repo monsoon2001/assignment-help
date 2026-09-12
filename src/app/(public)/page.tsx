@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { Star, CheckCircle, ArrowRight } from "lucide-react";
 import PriceEstimateForm from "@/components/marketing/price-estimate-form";
+import Avatar from "@/components/ui/avatar";
+import { createClient } from "@/lib/supabase/server";
+import { SERVICE_TYPES } from "@/lib/constants";
+
+export const dynamic = "force-dynamic";
 
 const services = [
   { icon: "edit_note", title: "Essay Writing", desc: "From brainstorming to final draft — structure, arguments, and citations guided step by step." },
@@ -18,12 +23,6 @@ const steps = [
   { num: "4", icon: "task_alt", title: "Get completed work", desc: "Get your completed work with 2 free revision rounds within 14 days. Payments are final — no refunds." },
 ];
 
-const helpers = [
-  { name: "Maya R.", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face", rating: 4.9, reviews: 127, subjects: ["English Literature", "Essay Writing"], specialty: "MLA & APA Formatting Expert" },
-  { name: "Daniel K.", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face", rating: 4.8, reviews: 98, subjects: ["Statistics", "Mathematics"], specialty: "Data Analysis & Research Methods" },
-  { name: "Priya S.", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face", rating: 4.9, reviews: 156, subjects: ["Biology", "Chemistry"], specialty: "Lab Reports & Scientific Writing" },
-];
-
 const benefits = [
   { icon: "paid", title: "Clear Pricing", desc: "Know exactly what you'll pay upfront. No surprise charges, no hidden fees." },
   { icon: "chat", title: "Direct Communication", desc: "Message your helper directly. Ask questions, share files, and track progress." },
@@ -33,37 +32,52 @@ const benefits = [
 
 const subjects = ["English Literature", "Mathematics", "Biology", "Chemistry", "Physics", "Computer Science", "History", "Psychology", "Economics", "Business Studies", "Nursing", "Engineering", "Statistics", "Philosophy", "Sociology", "Political Science"];
 
-const marqueeItems = [
-  "Essay Writing",
-  "Report Writing",
-  "Proofreading",
-  "Editing",
-  "Plagiarism Check",
-  "AI Detector",
-  "Similarity Check",
-  "Paraphrasing",
-  "MLA & APA Formatting",
-  "Citation & Referencing",
-  "Thesis & Dissertation",
-  "Case Study",
-  "Literature Review",
-  "Research Proposal",
-  "Lab Report",
-  "Math & Statistics Help",
-  "Programming Help",
-  "Data Analysis",
-  "Business Plan",
-  "Personal Statement",
-  "Presentation & Slides",
-];
+const marqueeItems = SERVICE_TYPES;
 
 const testimonials = [
-  { name: "Alex M.", role: "English Major", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face", rating: 5, text: "Maya helped me structure my thesis argument beautifully. The step-by-step feedback was invaluable — I learned more in one session than in weeks of struggling alone." },
-  { name: "Sarah L.", role: "Biology Student", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face", rating: 5, text: "Priya's guidance on my lab report was exceptional. She helped me understand the methodology deeply instead of just fixing the writing." },
-  { name: "James W.", role: "Business Student", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face", rating: 5, text: "Daniel's project guidance was exactly what I needed. He walked me through the data analysis step by step, and the final report came together clearly. Direct communication, clear pricing, and the result exceeded my expectations." },
+  { name: "Alex M.", role: "English Major", rating: 5, text: "The helper I worked with helped me structure my thesis argument beautifully. The step-by-step feedback was invaluable — I learned more in one session than in weeks of struggling alone." },
+  { name: "Sarah L.", role: "Biology Student", rating: 5, text: "The guidance on my lab report was exceptional. My helper helped me understand the methodology deeply instead of just fixing the writing." },
+  { name: "James W.", role: "Business Student", rating: 5, text: "The project guidance was exactly what I needed. They walked me through the data analysis step by step, and the final report came together clearly. Direct communication, clear pricing, and the result exceeded my expectations." },
 ];
 
-export default function HomePage() {
+type HomeHelper = {
+  id: string;
+  name: string | null;
+  avatar_url: string | null;
+  rating_avg: number;
+  subjects: string[];
+  bio: string | null;
+};
+
+export default async function HomePage() {
+  const supabase = await createClient();
+  const { data: helpersData } = await supabase
+    .from("users")
+    .select("id, name, avatar_url, helper_profiles(rating_avg, bio, subjects)")
+    .eq("role", "helper")
+    .order("name", { ascending: true })
+    .limit(6);
+
+  const helpers: HomeHelper[] = (helpersData ?? []).map((u) => {
+    const record = u as unknown as {
+      id: string;
+      name: string | null;
+      avatar_url: string | null;
+      helper_profiles:
+        | { rating_avg: number; bio: string | null; subjects: string[] }[]
+        | null;
+    };
+    const profile = record.helper_profiles?.[0];
+    return {
+      id: record.id,
+      name: record.name,
+      avatar_url: record.avatar_url,
+      rating_avg: profile?.rating_avg ?? 0,
+      subjects: profile?.subjects ?? [],
+      bio: profile?.bio ?? null,
+    };
+  });
+
   return (
     <>
       {/* Trust Banner */}
@@ -137,8 +151,13 @@ export default function HomePage() {
               {/* Rating Panel */}
               <div className="flex items-center gap-4 pt-2">
                 <div className="flex -space-x-2">
-                  {["https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face", "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face", "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face"].map((src, i) => (
-                    <img key={i} src={src} alt="" className="w-9 h-9 rounded-full border-2 border-surface-container-lowest object-cover" />
+                  {helpers.slice(0, 4).map((h) => (
+                    <Avatar
+                      key={h.id}
+                      name={h.name ?? "Helper"}
+                      src={h.avatar_url ?? undefined}
+                      className="border-2 border-surface-container-lowest"
+                    />
                   ))}
                 </div>
                 <div>
@@ -264,29 +283,37 @@ export default function HomePage() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {helpers.map((helper) => (
-              <div key={helper.name} className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 hover:shadow-md transition-shadow">
+              <div key={helper.id} className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 hover:shadow-md transition-shadow">
                 <div className="flex items-start gap-4 mb-4">
-                  <img src={helper.avatar} alt={helper.name} className="w-14 h-14 rounded-full object-cover" />
+                  <Avatar name={helper.name ?? "Helper"} src={helper.avatar_url ?? undefined} size="lg" />
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-display font-bold text-on-surface">{helper.name}</h3>
+                      <h3 className="font-display font-bold text-on-surface">{helper.name ?? "Helper"}</h3>
                       <span className="material-symbols-outlined text-primary text-sm">verified</span>
                     </div>
                     <div className="flex items-center gap-1 mt-0.5">
                       <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                      <span className="text-sm font-semibold text-on-surface">{helper.rating}</span>
-                      <span className="text-xs text-on-surface-variant">({helper.reviews} reviews)</span>
+                      <span className="text-sm font-semibold text-on-surface">
+                        {helper.rating_avg > 0 ? helper.rating_avg.toFixed(1) : "New"}
+                      </span>
                     </div>
                   </div>
                 </div>
-                <p className="text-sm text-on-surface-variant mb-3">{helper.specialty}</p>
+                {helper.bio && helper.bio.trim().length > 0 ? (
+                  <p className="text-sm text-on-surface-variant mb-3 line-clamp-2">{helper.bio}</p>
+                ) : (
+                  <p className="text-sm text-on-surface-variant mb-3 line-clamp-2">
+                    Subject helper ready to guide you through coursework and
+                    assignments with clear, step-by-step support.
+                  </p>
+                )}
                 <div className="flex flex-wrap gap-1.5 mb-4">
-                  {helper.subjects.map((s) => (
+                  {helper.subjects.slice(0, 3).map((s) => (
                     <span key={s} className="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-xs font-medium">{s}</span>
                   ))}
                 </div>
                 <div className="flex gap-3">
-                  <Link href={`/helpers/${helper.name.toLowerCase().replace(/\s+/g, "-")}`} className="flex-1 text-center px-4 py-2 text-sm font-medium border border-outline-variant rounded-xl text-on-surface hover:bg-surface-container-low transition-colors">
+                  <Link href={`/helpers/${helper.id}`} className="flex-1 text-center px-4 py-2 text-sm font-medium border border-outline-variant rounded-xl text-on-surface hover:bg-surface-container-low transition-colors">
                     View Profile
                   </Link>
                   <Link href="/contact" className="flex-1 text-center px-4 py-2 text-sm font-medium bg-primary-container text-on-primary rounded-xl hover:bg-primary transition-colors">
@@ -376,18 +403,18 @@ export default function HomePage() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {testimonials.map((t) => (
-              <div key={t.name} className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30">
+              <div key={t.name} className="flex flex-col bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30">
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(t.rating)].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
                   ))}
                 </div>
-                <p className="text-sm text-on-surface-variant leading-relaxed mb-6">&ldquo;{t.text}&rdquo;</p>
-                <div className="flex items-center gap-3 pt-4 border-t border-outline-variant/30">
-                  <img src={t.avatar} alt={t.name} className="w-10 h-10 rounded-full object-cover" />
+                <p className="text-sm text-on-surface-variant leading-relaxed mb-6 grow">&ldquo;{t.text}&rdquo;</p>
+                <div className="flex items-center gap-3 pt-4 border-t border-outline-variant/30 mt-auto">
+                  <Avatar name={t.name} />
                   <div>
-                    <p className="text-sm font-semibold text-on-surface">{t.name}</p>
-                    <p className="text-xs text-on-surface-variant">{t.role}</p>
+                    <p className="text-sm font-semibold text-on-surface leading-snug">{t.name}</p>
+                    <p className="text-xs text-on-surface-variant leading-snug">{t.role}</p>
                   </div>
                 </div>
               </div>

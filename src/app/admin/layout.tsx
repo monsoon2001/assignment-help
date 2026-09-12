@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import {
   LayoutDashboard,
   Users,
@@ -10,8 +12,10 @@ import {
   Briefcase,
   CreditCard,
   MessageSquare,
+  ShieldAlert,
   Settings,
   Shield,
+  UserRound,
 } from "lucide-react";
 
 const links = [
@@ -22,7 +26,9 @@ const links = [
   { href: "/admin/orders", label: "Orders", icon: Briefcase },
   { href: "/admin/payments", label: "Payments", icon: CreditCard },
   { href: "/admin/messages", label: "Messages", icon: MessageSquare },
+  { href: "/admin/chat-monitor", label: "Chat Monitor", icon: ShieldAlert },
   { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/profile", label: "Profile", icon: UserRound },
 ];
 
 export default function AdminLayout({
@@ -31,6 +37,30 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+
+  const [identity, setIdentity] = useState<{ name: string; email: string } | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    const supabase = createClient();
+    (async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user || !active) return;
+      const fallbackName = user.user_metadata?.full_name ?? user.user_metadata?.name ?? "Admin";
+      setIdentity({ name: fallbackName, email: user.email ?? "" });
+      const { data } = await supabase
+        .from("users")
+        .select("name, email")
+        .eq("id", user.id)
+        .single();
+      if (data && active) setIdentity({ name: data.name ?? fallbackName, email: data.email ?? user.email ?? "" });
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen flex bg-background">
@@ -75,9 +105,9 @@ export default function AdminLayout({
             <div className="w-8 h-8 rounded-full bg-primary-container/20 flex items-center justify-center">
               <Shield size={16} className="text-primary" />
             </div>
-            <div>
-              <p className="text-sm font-medium text-on-surface">Admin User</p>
-              <p className="text-xs text-on-surface-variant">admin@peercraft.com</p>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-on-surface truncate">{identity?.name ?? "Loading…"}</p>
+              <p className="text-xs text-on-surface-variant truncate">{identity?.email ?? "—"}</p>
             </div>
           </div>
         </div>

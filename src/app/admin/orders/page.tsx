@@ -6,6 +6,7 @@ import Avatar from "@/components/ui/avatar";
 import { Briefcase, Eye } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
+import { formatCurrency, normalizeCurrency } from "@/lib/currency";
 import { EmptyState } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +34,7 @@ export default async function AdminOrdersPage() {
 
   const { data: orders, error } = await adminClient
     .from("orders")
-    .select("id, status, price, deadline, created_at, student:users(id, name), helper:users(id, name)")
+    .select("id, status, price, currency, deadline, created_at, student:users!orders_student_id_fkey(id, name), helper:users!orders_helper_id_fkey(id, name)")
     .order("created_at", { ascending: false })
     .limit(200);
 
@@ -78,7 +79,7 @@ export default async function AdminOrdersPage() {
                         <span className="text-sm text-on-surface">{helper?.name ?? "—"}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm font-semibold text-on-surface">${Number(order.price).toFixed(2)}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-on-surface">{formatCurrency(Number(order.price), normalizeCurrency(order.currency))}</td>
                     <td className="px-6 py-4">
                       <Badge variant={STATUS_VARIANT[order.status] ?? "outline"}>
                         {order.status.replaceAll("_", " ")}

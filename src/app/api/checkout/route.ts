@@ -3,14 +3,17 @@ import { stripe } from "@/lib/stripe";
 import { unwrapRow } from "@/lib/embedded";
 import { adminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { normalizeCurrency, isSupportedCurrency, convertCurrency } from "@/lib/currency";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
-  const { orderId } = await request.json().catch(() => ({}));
+  const { orderId, currency } = await request.json().catch(() => ({}));
   if (!orderId || typeof orderId !== "string") {
     return NextResponse.json({ error: "Missing order id" }, { status: 400 });
   }
+
+  const payCurrency = isSupportedCurrency(currency) ? currency : "USD";
 
   const supabase = await createClient();
   const {
@@ -23,7 +26,7 @@ export async function POST(request: Request) {
 
   const { data: order, error } = await supabase
     .from("orders")
-    .select("id, price, status, deadline, proposal_id, student_id, helper_id")
+    .select("id, price, currency, status, deadline, proposal_id, student_id, helper_id")
     .eq("id", orderId)
     .single();
 
@@ -52,7 +55,13 @@ export async function POST(request: Request) {
   const requestTitle = unwrapRow<{ title: string }>(proposal?.request)?.title ?? null;
   const title = requestTitle || "PeerCraft Order";
 
-  const priceCents = Math.round(Number(order.price) * 100);
+  const orderCurrency = normalizeCurrency(order.currency);
+  const amountInPayCurrency = convertCurrency(
+    Number(order.price),
+    orderCurrency,
+    payCurrency
+  );
+  const priceCents = Math.round(amountInPayCurrency * 100);
 
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
@@ -60,7 +69,7 @@ export async function POST(request: Request) {
     line_items: [
       {
         price_data: {
-          currency: "usd",
+          currency: payCurrency.toLowerCase(),
           product_data: {
             name: title,
             description: proposal?.description ?? "PeerCraft academic order",

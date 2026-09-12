@@ -10,6 +10,7 @@ import { adminClient } from "@/lib/supabase/admin";
 import Badge from "@/components/ui/badge";
 import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
+import { normalizeCurrency, formatCurrency } from "@/lib/currency";
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +44,7 @@ export default async function OrderConfirmedPage({
   // Load order + proposal context.
   const { data: orderRow } = await adminClient
     .from("orders")
-    .select("id, price, status, proposal_id, proposal:proposals(request:requests(title), helper:users(id, name))")
+    .select("id, price, currency, status, proposal_id, proposal:proposals(request:requests(title), helper:users(id, name))")
     .eq("id", id)
     .maybeSingle();
 
@@ -100,7 +101,8 @@ export default async function OrderConfirmedPage({
 
         await adminClient.from("payments").insert({
           order_id: order.id,
-          amount: order.price,
+          amount: Number(session.amount_total) / 100,
+          currency: session.currency?.toUpperCase() ?? "USD",
           stripe_payment_intent_id: intentId2,
           status: "paid",
         });
@@ -110,10 +112,8 @@ export default async function OrderConfirmedPage({
     }
   }
 
-  const price = order.price.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-  });
+  const currency = normalizeCurrency(orderRow.currency);
+  const price = formatCurrency(Number(orderRow.price), currency);
 
   return (
     <div className="w-full max-w-xl mx-auto flex flex-col gap-5 py-4">

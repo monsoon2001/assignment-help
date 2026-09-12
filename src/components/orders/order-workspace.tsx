@@ -15,6 +15,7 @@ import Avatar from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/client";
 import { realtimeTopic } from "@/lib/supabase/realtime";
 import { uploadOrderFile } from "@/lib/order-files";
+import { normalizeCurrency, formatCurrency } from "@/lib/currency";
 import ChatPanel, { type ChatMessageRow, timeLabel, fileNameFromUrl } from "@/components/chat/chat-panel";
 
 type OrderStatus =
@@ -29,6 +30,7 @@ type OrderData = {
   id: string;
   status: OrderStatus;
   price: number;
+  currency: string;
   deadline: string | null;
   created_at: string;
   student_id: string;
@@ -86,7 +88,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
   const loadOrder = useCallback(async () => {
     const { data, error } = await supabase.current
       .from("orders")
-      .select("id, status, price, deadline, created_at, student_id, proposal_id, helper:users(id, name), proposal:proposals(description, revisions_included, request:requests(title, subject))")
+      .select("id, status, price, currency, deadline, created_at, student_id, proposal_id, helper:users!orders_helper_id_fkey(id, name), proposal:proposals(description, revisions_included, request:requests(title, subject))")
       .eq("id", orderId)
       .maybeSingle();
 
@@ -205,7 +207,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
   const isStudent = role === "student";
   const title = order.proposal?.request?.title ?? "Order";
   const subject = order.proposal?.request?.subject ?? "General";
-  const price = order.price.toLocaleString("en-US", { style: "currency", currency: "USD" });
+  const price = formatCurrency(Number(order.price), normalizeCurrency(order.currency));
 
   const logoName = order.helper?.name || "Helper";
 

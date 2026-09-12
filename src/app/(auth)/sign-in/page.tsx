@@ -34,8 +34,7 @@ export default function SignInPage() {
       .eq("id", sessionUserId)
       .maybeSingle();
     const home = roleToHome(profile?.role);
-    router.replace(nextPath() === "/" ? home : nextPath());
-    router.refresh();
+    await router.replace(nextPath() === "/" ? home : nextPath());
   }
 
   async function handleEmailSubmit(e: React.FormEvent) {
@@ -136,7 +135,7 @@ export default function SignInPage() {
                 <Input
                   label="Email address"
                   type="email"
-                  placeholder="alex.chen@university.edu"
+                  placeholder="you@example.com"
                   icon={<Mail size={18} />}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}

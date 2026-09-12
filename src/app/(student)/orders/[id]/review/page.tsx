@@ -31,7 +31,7 @@ export default async function OrderReviewPage({
 
   const { data: orderRow } = await supabase
     .from("orders")
-    .select("id, status, student_id, helper:users(id, name), proposal:proposals(request:requests(title))")
+    .select("id, status, student_id, helper:users!orders_helper_id_fkey(id, name), proposal:proposals(request:requests(title))")
     .eq("id", id)
     .maybeSingle();
 
@@ -85,14 +85,6 @@ export default async function OrderReviewPage({
         </div>
         <ReviewForm orderId={id} helperName={helper?.name ?? "Helper"} />
       </Card>
-
-      <div className="flex items-start gap-2 p-4 rounded-xl bg-surface-container-low">
-        <ShieldCheck size={17} className="text-primary shrink-0 mt-0.5" />
-        <p className="text-xs leading-relaxed text-on-surface-variant">
-          The <span className="font-semibold text-on-surface">PeerCraft Honor Shield</span> verifies authentic,
-          syllabus-compliant assessments. Your review is displayed anonymously as a verified student.
-        </p>
-      </div>
     </div>
   );
 }

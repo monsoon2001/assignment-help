@@ -7,6 +7,7 @@ import Avatar from "@/components/ui/avatar";
 import { ArrowLeft, Mail, Package, Star } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
+import { formatCurrency, normalizeCurrency } from "@/lib/currency";
 import { EmptyState } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
@@ -35,7 +36,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
 
   const { data: order } = await adminClient
     .from("orders")
-    .select("id, status, price, deadline, created_at, student:users(id, name, email), helper:users(id, name, email), proposal:proposals(id, description, revisions_included, created_at, request:requests(title, description))")
+    .select("id, status, price, currency, deadline, created_at, student:users!orders_student_id_fkey(id, name, email), helper:users!orders_helper_id_fkey(id, name, email), proposal:proposals(id, currency, description, revisions_included, created_at, request:requests(title, description))")
     .eq("id", id)
     .maybeSingle();
 
@@ -44,7 +45,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
   const [messages, deliveries, payments, reviews] = await Promise.all([
     adminClient.from("messages").select("id").eq("order_id", id),
     adminClient.from("deliveries").select("id, message, file_urls, created_at").eq("order_id", id).order("created_at", { ascending: true }),
-    adminClient.from("payments").select("id, amount, status, stripe_payment_intent_id, created_at").eq("order_id", id).order("created_at", { ascending: true }),
+    adminClient.from("payments").select("id, amount, currency, status, stripe_payment_intent_id, created_at").eq("order_id", id).order("created_at", { ascending: true }),
     adminClient.from("reviews").select("id, rating, comment, created_at").eq("order_id", id).maybeSingle(),
   ]);
 
@@ -109,7 +110,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
       <Card>
         <div className="p-6 border-b border-outline-variant/30 flex items-center justify-between">
           <h2 className="font-display text-lg font-semibold text-on-surface">Payments</h2>
-          <Badge variant="outline">Price ${Number(order.price).toFixed(2)}</Badge>
+          <Badge variant="outline">Price {formatCurrency(Number(order.price), normalizeCurrency(order.currency))}</Badge>
         </div>
         {(payments.data ?? []).length > 0 ? (
           <div className="divide-y divide-outline-variant/20">
@@ -117,7 +118,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
               <div key={payment.id} className="p-5 flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-on-surface">
-                    ${Number(payment.amount).toFixed(2)} <span className="font-normal text-on-surface-variant">· {formatDate(payment.created_at)}</span>
+                    {formatCurrency(Number(payment.amount), normalizeCurrency(payment.currency))} <span className="font-normal text-on-surface-variant">· {formatDate(payment.created_at)}</span>
                   </p>
                   <p className="text-xs text-on-surface-variant font-mono mt-0.5">{payment.stripe_payment_intent_id ?? "No payment intent"}</p>
                 </div>

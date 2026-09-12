@@ -7,6 +7,7 @@ import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
 import { Eye, MessageSquare, Clock, DollarSign, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { normalizeCurrency, formatCurrency } from "@/lib/currency";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,7 @@ type OrderRow = {
   id: string;
   status: string;
   price: number;
+  currency: string;
   deadline: string | null;
   created_at: string;
   student: { id: string; name: string | null } | null;
@@ -53,7 +55,7 @@ export default async function HelperOrders() {
 
   const { data } = await supabase
     .from("orders")
-    .select("id, status, price, deadline, created_at, student:users(id, name), proposal:proposals(request:requests(title, subject))")
+    .select("id, status, price, currency, deadline, created_at, student:users!orders_student_id_fkey(id, name), proposal:proposals(request:requests(title, subject))")
     .eq("helper_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -106,7 +108,7 @@ export default async function HelperOrders() {
                     </div>
                     <span className="text-sm font-semibold text-on-surface shrink-0 inline-flex items-center gap-1">
                       <DollarSign size={14} />
-                      {order.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                      {formatCurrency(Number(order.price), normalizeCurrency(order.currency))}
                     </span>
                   </div>
 

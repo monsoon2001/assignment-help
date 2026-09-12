@@ -17,7 +17,7 @@ export default async function RequestSentPage({
   const supabase = await createClient();
   const { data: request, error } = await supabase
     .from("requests")
-    .select("id, title, description, subject, deadline, created_at, helper:users(name)")
+    .select("id, title, description, subject, deadline, created_at, helper:users!requests_helper_id_fkey(name)")
     .eq("id", id)
     .maybeSingle();
 

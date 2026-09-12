@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { FileText, Upload, Info, CheckCircle2, ShieldCheck, GraduationCap, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
+import { FileText, Upload, Info, CheckCircle2, ShieldCheck, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
 import Select from "@/components/ui/select";
@@ -10,27 +10,37 @@ import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
 import HelperPicker from "@/components/requests/helper-picker";
 import {
-  submitRequest, loadPendingDraft, clearPendingDraft, type PendingRequestDraft,
+  submitRequest, loadPendingDraft, clearPendingDraft, loadDraftFiles, clearDraftFiles,
   type HelperCandidate,
 } from "@/lib/requests";
 
+import { SUBJECTS, SERVICE_TYPES, ACADEMIC_LEVELS, OTHER_OPTION, withCustom } from "@/lib/constants";
+
 const SERVICES = [
-  { value: "essay", label: "Essay Writing" },
-  { value: "research", label: "Research Help" },
-  { value: "problems", label: "Problem Solving" },
-  { value: "report", label: "Lab / Project Report" },
-  { value: "notes", label: "Summary & Notes" },
-  { value: "proofread", label: "Proofreading & Editing" },
+  ...SERVICE_TYPES.map((label, i) => ({ value: `service-${i}`, label })),
+  { value: OTHER_OPTION, label: OTHER_OPTION },
 ];
 
-const SUBJECTS = [
-  { value: "history-201", label: "History 201 — American Civilization" },
-  { value: "math-320", label: "MATH 320 — Calculus III" },
-  { value: "bio-220", label: "BIO 220 — Molecular Biology" },
-  { value: "eng-410", label: "ENG 410 — Advanced Composition" },
-  { value: "psy-150", label: "PSY 150 — Introduction to Psychology" },
-  { value: "other", label: "Other (Community College)" },
+const SUBJECT_OPTIONS = [
+  ...SUBJECTS.map((label, i) => ({ value: `subject-${i}`, label })),
+  { value: OTHER_OPTION, label: OTHER_OPTION },
 ];
+
+const LEVEL_OPTIONS = ACADEMIC_LEVELS.map((label) => ({ value: label, label }));
+
+function resolveDraftSelection(options: { value: string; label: string }[], value?: string): { value: string; custom: string } {
+  if (!value) return { value: options[0].value, custom: "" };
+  const parsed = withCustom(value);
+  if (parsed.isOther) return { value: OTHER_OPTION, custom: parsed.raw };
+  const match =
+    options.find((o) => o.label === parsed.value) ??
+    options.find((o) =>
+      o.label.toLowerCase().includes(parsed.value.toLowerCase()) ||
+      parsed.value.toLowerCase().includes(o.label.toLowerCase())
+    );
+  if (match) return { value: match.value, custom: "" };
+  return { value: OTHER_OPTION, custom: parsed.value };
+}
 
 const DRAFT_DEADLINE_MS: Record<string, number> = {
   "24 hours": 24 * 60 * 60 * 1000,
@@ -38,16 +48,6 @@ const DRAFT_DEADLINE_MS: Record<string, number> = {
   "1 week": 7 * 24 * 60 * 60 * 1000,
   "2 weeks": 14 * 24 * 60 * 60 * 1000,
 };
-
-function resolveSubjectFromDraft(draftSubject?: string): { value: string; custom: string } {
-  if (!draftSubject) return { value: "history-201", custom: "" };
-  const needle = draftSubject.toLowerCase();
-  const match = SUBJECTS.find(
-    (s) => s.label.toLowerCase().includes(needle) || needle.includes(s.label.split("—")[0].trim().toLowerCase())
-  );
-  if (match) return { value: match.value, custom: "" };
-  return { value: "other", custom: draftSubject };
-}
 
 function deadlineFromKey(key?: string): string {
   const ms = DRAFT_DEADLINE_MS[key ?? ""];
@@ -57,44 +57,78 @@ function deadlineFromKey(key?: string): string {
 
 export default function NewRequestPage() {
   const router = useRouter();
-  const [draft] = useState<PendingRequestDraft | null>(() => {
-    if (typeof window === "undefined") return null;
-    const d = loadPendingDraft();
-    if (d) clearPendingDraft();
-    return d;
-  });
-  const [service, setService] = useState(
-    () => SERVICES.find((s) => s.label === draft?.service)?.value ?? "essay"
-  );
-  const resolvedDraftSubject = resolveSubjectFromDraft(draft?.subject);
-  const [subject, setSubject] = useState(() => resolvedDraftSubject.value);
-  const [customSubject, setCustomSubject] = useState(() => resolvedDraftSubject.custom);
-  const [wordCount, setWordCount] = useState(() => draft?.wordCount ?? "");
-  const [deadline, setDeadline] = useState(
-    () => (draft?.deadlineKey ? deadlineFromKey(draft.deadlineKey) : (draft?.deadline ?? ""))
-  );
-  const [description, setDescription] = useState(() => draft?.details ?? "");
+  const [ready, setReady] = useState(false);
+  const [service, setService] = useState(SERVICES[0].value);
+  const [customService, setCustomService] = useState("");
+  const [subject, setSubject] = useState(SUBJECT_OPTIONS[0].value);
+  const [customSubject, setCustomSubject] = useState("");
+  const [wordCount, setWordCount] = useState("");
+  const [deadline, setDeadline] = useState("");
+  const [description, setDescription] = useState("");
   const [files, setFiles] = useState<File[]>([]);
-  const [completedLevel, setCompletedLevel] = useState(() => draft?.level ?? "");
+  const [completedLevel, setCompletedLevel] = useState("");
   const [step, setStep] = useState<"details" | "helper">("details");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const d = loadPendingDraft();
+      const saved = await loadDraftFiles();
+      if (cancelled) return;
+      if (d) clearPendingDraft();
+      if (d) {
+        const dd = resolveDraftSelection(SERVICES, d.service);
+        setService(dd.value);
+        setCustomService(dd.custom);
+        const ds = resolveDraftSelection(SUBJECT_OPTIONS, d.subject);
+        setSubject(ds.value);
+        setCustomSubject(ds.custom);
+        setWordCount(d.wordCount ?? "");
+        setDeadline(d.deadline ?? (d.deadlineKey ? deadlineFromKey(d.deadlineKey) : ""));
+        setDescription(d.details ?? "");
+        setCompletedLevel(d.level ?? "");
+        setStep("helper");
+      }
+      if (saved.length > 0) setFiles(saved);
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const today = new Date().toISOString().slice(0, 10);
 
   const handleFiles = (selected: FileList | null) => {
     if (!selected) return;
     setFiles(Array.from(selected));
   };
 
+  const resolvedServiceLabel =
+    service === OTHER_OPTION && customService.trim()
+      ? customService.trim()
+      : (SERVICES.find((s) => s.value === service)?.label ?? service);
+
   const resolvedSubjectLabel =
-    subject === "other" && customSubject.trim()
+    subject === OTHER_OPTION && customSubject.trim()
       ? customSubject.trim()
-      : (SUBJECTS.find((s) => s.value === subject)?.label ?? subject);
+      : (SUBJECT_OPTIONS.find((s) => s.value === subject)?.label ?? subject);
 
   const handleContinue = () => {
     setError("");
-    if (subject === "other" && !customSubject.trim()) {
+    if (service === OTHER_OPTION && !customService.trim()) {
+      setError("Enter the type of help you need.");
+      return;
+    }
+    if (subject === OTHER_OPTION && !customSubject.trim()) {
       setError("Enter the subject or course you need help with.");
+      return;
+    }
+    if (!completedLevel) {
+      setError("Select your academic level.");
       return;
     }
     if (!description.trim() && !wordCount.trim()) {
@@ -108,7 +142,7 @@ export default function NewRequestPage() {
     setSubmitting(true);
     setError("");
 
-    const serviceLabel = SERVICES.find((s) => s.value === service)?.label ?? service;
+    const serviceLabel = resolvedServiceLabel;
     const title = `${serviceLabel} — ${resolvedSubjectLabel}`;
     const descriptionWithMeta = [
       description,
@@ -132,6 +166,8 @@ export default function NewRequestPage() {
       setError(result.error);
       return;
     }
+    clearPendingDraft();
+    await clearDraftFiles();
     router.push(`/requests/sent?id=${result.id}`);
   };
 
@@ -172,23 +208,39 @@ export default function NewRequestPage() {
             })}
           </div>
 
-          {step === "details" && (
+          {!ready ? (
+            <div className="flex items-center justify-center gap-2 py-16 text-on-surface-variant">
+              <Loader2 size={18} className="animate-spin text-primary" />
+              <span className="text-sm">Preparing your request…</span>
+            </div>
+          ) : step === "details" ? (
             <form className="flex flex-col gap-5" onSubmit={(e) => { e.preventDefault(); handleContinue(); }}>
-              <Select
-                label="Service Type"
-                value={service}
-                onChange={(e) => setService(e.target.value)}
-                options={SERVICES}
-              />
+              <div className="flex flex-col gap-3">
+                <Select
+                  label="Type of Help"
+                  value={service}
+                  onChange={(e) => setService(e.target.value)}
+                  options={SERVICES}
+                />
+                {service === OTHER_OPTION && (
+                  <Input
+                    label="Type of help needed"
+                    type="text"
+                    placeholder="e.g. Lab Report"
+                    value={customService}
+                    onChange={(e) => setCustomService(e.target.value)}
+                  />
+                )}
+              </div>
 
               <div className="flex flex-col gap-3">
                 <Select
-                  label="Subject / Course"
+                  label="Subject"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  options={SUBJECTS}
+                  options={SUBJECT_OPTIONS}
                 />
-                {subject === "other" && (
+                {subject === OTHER_OPTION && (
                   <Input
                     label="Subject or course name"
                     type="text"
@@ -199,24 +251,34 @@ export default function NewRequestPage() {
                 )}
               </div>
 
+              <div className="flex flex-col gap-3">
+                <Select
+                  label="Academic Level"
+                  value={completedLevel}
+                  onChange={(e) => setCompletedLevel(e.target.value)}
+                  options={LEVEL_OPTIONS}
+                />
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <Input
-                  label="Pages / Word Count"
+                  label="Word Count"
                   type="text"
-                  placeholder="e.g. 8 pages or 2,000 words"
+                  placeholder="e.g. 1500"
                   value={wordCount}
                   onChange={(e) => setWordCount(e.target.value)}
                 />
                 <Input
                   label="Deadline"
                   type="date"
+                  min={today}
                   value={deadline}
                   onChange={(e) => setDeadline(e.target.value)}
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-on-surface">Assignment Description</label>
+                <label className="text-sm font-medium text-on-surface">Assignment Details</label>
                 <Textarea
                   rows={7}
                   placeholder="Describe the assignment prompt, required format, sources, and any rubric or expectations from your course..."
@@ -229,7 +291,7 @@ export default function NewRequestPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-on-surface">Attach Files</label>
+                <label className="text-sm font-medium text-on-surface">Attachments</label>
                 <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-outline-variant bg-surface-container-low px-6 py-8 text-center cursor-pointer hover:border-primary-container hover:bg-surface-container-lowest transition-colors">
                   <span className="w-11 h-11 rounded-xl bg-surface-container-lowest border border-outline-variant flex items-center justify-center text-on-surface-variant">
                     <Upload size={20} />
@@ -274,9 +336,7 @@ export default function NewRequestPage() {
                 </Button>
               </div>
             </form>
-          )}
-
-          {step === "helper" && (
+          ) : (
             <div className="flex flex-col gap-5">
               <div className="rounded-xl border border-outline-variant bg-surface-container-low p-4">
                 <div className="flex items-center justify-between gap-3 mb-2">
@@ -289,8 +349,9 @@ export default function NewRequestPage() {
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-on-surface-variant">
-                  <span><strong className="text-on-surface">{SERVICES.find((s) => s.value === service)?.label ?? service}</strong></span>
+                  <span><strong className="text-on-surface">{resolvedServiceLabel}</strong></span>
                   <span>{resolvedSubjectLabel}</span>
+                  {completedLevel && <span>{completedLevel}</span>}
                   {wordCount && <span>{wordCount}</span>}
                   {deadline && (
                     <span>
@@ -364,20 +425,9 @@ export default function NewRequestPage() {
                 <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> 100% originality checks on every delivered draft.
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> Escrow payments released only after you approve.
+                <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> Payments released only after you approve.
               </li>
             </ul>
-          </Card>
-
-          <Card className="p-5 flex items-start gap-3 bg-primary-fixed border border-outline-variant">
-            <GraduationCap size={18} className="text-primary shrink-0 mt-0.5" />
-            <div>
-              <h3 className="font-semibold text-sm text-on-surface">Reminder: Honor Code</h3>
-              <p className="text-xs leading-relaxed text-on-surface-variant mt-1">
-                Use deliverables as study aids and reference material. Don&apos;t submit helper work as your own —
-                your Academic Honor Pass depends on it.
-              </p>
-            </div>
           </Card>
         </div>
       </div>

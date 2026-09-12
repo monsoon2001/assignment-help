@@ -52,6 +52,7 @@ export async function POST(request: Request) {
       const { error: paymentError } = await adminClient.from("payments").insert({
         order_id: orderId,
         amount: Number(session.amount_total) / 100,
+        currency: typeof session.currency === "string" ? session.currency.toUpperCase() : "USD",
         stripe_payment_intent_id: intentId,
         status: "paid",
       });

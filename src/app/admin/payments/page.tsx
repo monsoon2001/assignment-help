@@ -5,6 +5,7 @@ import Avatar from "@/components/ui/avatar";
 import { CreditCard } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
+import { formatCurrency, normalizeCurrency } from "@/lib/currency";
 import RefundButton from "@/app/admin/components/refund-button";
 import { EmptyState } from "@/components/ui/states";
 
@@ -30,11 +31,11 @@ export default async function AdminPaymentsPage() {
 
   const { data: payments, error } = await adminClient
     .from("payments")
-    .select("id, amount, status, stripe_payment_intent_id, created_at, order:orders(id, status, student:users(name), helper:users(name))")
+    .select("id, amount, currency, status, stripe_payment_intent_id, created_at, order:orders(id, status, student:users!orders_student_id_fkey(name), helper:users!orders_helper_id_fkey(name))")
     .order("created_at", { ascending: false })
     .limit(200);
 
-  const paidSum = (payments ?? []).filter((p) => p.status === "paid").reduce((sum, p) => sum + Number(p.amount), 0);
+  const paidCount = (payments ?? []).filter((p) => p.status === "paid").length;
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -43,7 +44,7 @@ export default async function AdminPaymentsPage() {
           <h1 className="font-display text-2xl font-bold text-on-surface">Payments</h1>
           <p className="text-on-surface-variant mt-1">All payment transactions and refunds.</p>
         </div>
-        <Badge variant="success">Collected ${paidSum.toFixed(2)}</Badge>
+        <Badge variant="success">{paidCount} paid</Badge>
       </div>
 
       {error ? (
@@ -81,7 +82,7 @@ export default async function AdminPaymentsPage() {
                         <span className="text-sm text-on-surface">{orderHelper?.name ?? "—"}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm font-semibold text-on-surface">${Number(payment.amount).toFixed(2)}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-on-surface">{formatCurrency(Number(payment.amount), normalizeCurrency(payment.currency))}</td>
                     <td className="px-6 py-4">
                       <Badge variant="outline">{order?.status ?? "—"}</Badge>
                     </td>

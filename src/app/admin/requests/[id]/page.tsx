@@ -7,6 +7,7 @@ import Avatar from "@/components/ui/avatar";
 import { FileText, ArrowLeft } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
+import { formatCurrency, normalizeCurrency } from "@/lib/currency";
 import { EmptyState } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +27,7 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
 
   const { data: request } = await adminClient
     .from("requests")
-    .select("id, title, description, subject, deadline, status, file_urls, created_at, student:users(id, name, email), proposals:proposals(id, price, description, revisions_included, status, created_at, helper:users(id, name))")
+    .select("id, title, description, subject, deadline, status, file_urls, created_at, student:users!requests_student_id_fkey(id, name, email), proposals:proposals(id, price, currency, description, revisions_included, status, created_at, helper:users(id, name))")
     .eq("id", id)
     .maybeSingle();
 
@@ -38,6 +39,7 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
   type ProposalRow = {
     id: string;
     price: number;
+    currency?: string | null;
     description: string | null;
     revisions_included: number;
     status: string;
@@ -121,7 +123,7 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
                   </p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-lg font-bold text-on-surface">${Number(proposal.price).toFixed(2)}</p>
+                  <p className="text-lg font-bold text-on-surface">{formatCurrency(Number(proposal.price), normalizeCurrency(proposal.currency))}</p>
                   <p className="text-xs text-on-surface-variant">{formatDate(proposal.created_at)}</p>
                 </div>
               </div>

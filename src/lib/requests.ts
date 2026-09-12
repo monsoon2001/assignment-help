@@ -42,6 +42,63 @@ export function clearPendingDraft() {
   window.localStorage.removeItem(DRAFT_KEY);
 }
 
+const DRAFT_FILES_DB = "peercraft:draft-files";
+const DRAFT_FILES_STORE = "files";
+const DRAFT_FILES_KEY = "pending";
+
+function openDraftStore(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DRAFT_FILES_DB, 1);
+    request.onupgradeneeded = () => {
+      request.result.createObjectStore(DRAFT_FILES_STORE);
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function readDraftFiles(): Promise<File[]> {
+  if (typeof window === "undefined" || !("indexedDB" in window)) return [];
+  try {
+    const db = await openDraftStore();
+    const tx = db.transaction(DRAFT_FILES_STORE, "readonly");
+    const request = tx.objectStore(DRAFT_FILES_STORE).get(DRAFT_FILES_KEY);
+    return new Promise<File[]>((resolve) => {
+      request.onsuccess = () => resolve(request.result ?? []);
+      request.onerror = () => resolve([]);
+    });
+  } catch {
+    return [];
+  }
+}
+
+export async function saveDraftFiles(files: File[]) {
+  if (typeof window === "undefined" || !("indexedDB" in window)) return;
+  try {
+    const db = await openDraftStore();
+    const tx = db.transaction(DRAFT_FILES_STORE, "readwrite");
+    tx.objectStore(DRAFT_FILES_STORE).put(files, DRAFT_FILES_KEY);
+  } catch {
+    /* best-effort */
+  }
+}
+
+export async function clearDraftFiles() {
+  if (typeof window === "undefined" || !("indexedDB" in window)) return;
+  try {
+    const db = await openDraftStore();
+    const tx = db.transaction(DRAFT_FILES_STORE, "readwrite");
+    tx.objectStore(DRAFT_FILES_STORE).delete(DRAFT_FILES_KEY);
+  } catch {
+    /* best-effort */
+  }
+}
+
+/** Restores files saved by the estimate form across the redirect. */
+export async function loadDraftFiles(): Promise<File[]> {
+  return readDraftFiles();
+}
+
 export async function submitRequest(
   input: NewRequestInput
 ): Promise<{ id: string } | { error: string }> {
@@ -119,7 +176,7 @@ export type HelperCandidate = {
 };
 
 export async function fetchHelperCandidates(
-  subject?: string | null
+  _subject?: string | null
 ): Promise<{ helpers: HelperCandidate[] } | { error: string }> {
   const supabase = createClient();
 
@@ -156,19 +213,5 @@ export async function fetchHelperCandidates(
     };
   });
 
-  const needle = (subject ?? "").trim();
-  if (!needle) return { helpers };
-
-  const primary = needle.split(/\s+/)[0].toLowerCase();
-  const matches = helpers.filter(
-    (h) =>
-      h.subjects.some(
-        (s) =>
-          s.toLowerCase().includes(needle.toLowerCase()) ||
-          needle.toLowerCase().includes(s.toLowerCase()) ||
-          s.toLowerCase().includes(primary)
-      )
-  );
-
-  return { helpers: matches.length > 0 ? matches : helpers };
+  return { helpers };
 }
