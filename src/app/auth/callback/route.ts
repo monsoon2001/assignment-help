@@ -33,7 +33,8 @@ export async function GET(request: Request) {
     .maybeSingle();
 
   const home = roleToHome(profile?.role);
-  const target = next && next.startsWith("/") && !next.startsWith("//") ? next : home;
+  const target =
+    next && next !== "/" && next.startsWith("/") && !next.startsWith("//") ? next : home;
   const redirect = new URL(target, url.origin);
   redirect.searchParams.set("signedIn", "1");
   const created = user.created_at ? new Date(user.created_at).getTime() : 0;

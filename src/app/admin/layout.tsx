@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { createClient } from "@/lib/supabase/client";
+import Button from "@/components/ui/button";
 import {
   LayoutDashboard,
   Users,
@@ -16,6 +18,7 @@ import {
   Settings,
   Shield,
   UserRound,
+  LogOut,
 } from "lucide-react";
 
 const links = [
@@ -37,8 +40,18 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const [identity, setIdentity] = useState<{ name: string; email: string } | null>(null);
+  const [signOutOpen, setSignOutOpen] = useState(false);
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setSignOutOpen(false);
+    router.push("/sign-in");
+    router.refresh();
+  }
 
   useEffect(() => {
     let active = true;
@@ -110,10 +123,59 @@ export default function AdminLayout({
               <p className="text-xs text-on-surface-variant truncate">{identity?.email ?? "—"}</p>
             </div>
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full mt-2"
+            onClick={() => setSignOutOpen(true)}
+            aria-label="Sign out"
+          >
+            <LogOut size={16} />
+            Sign Out
+          </Button>
         </div>
       </aside>
 
       <main className="flex-1 p-6 lg:p-8 overflow-auto min-h-screen">{children}</main>
+
+      {signOutOpen &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/40 animate-[dialog-in_0.2s_ease-out]"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="admin-sign-out-title"
+            onClick={() => setSignOutOpen(false)}
+          >
+            <div
+              className="w-full max-w-sm bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-xl p-6 pointer-events-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start gap-4">
+                <span className="w-11 h-11 rounded-xl bg-error-container/40 text-error flex items-center justify-center shrink-0">
+                  <LogOut size={20} />
+                </span>
+                <div>
+                  <h3 id="admin-sign-out-title" className="font-display font-bold text-lg text-on-surface">
+                    Confirm Sign Out
+                  </h3>
+                  <p className="text-sm text-on-surface-variant mt-1 leading-relaxed">
+                    You&apos;ll need to sign in again to access the admin dashboard.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <Button variant="ghost" size="md" className="flex-1" onClick={() => setSignOutOpen(false)}>
+                  Cancel
+                </Button>
+                <Button variant="danger" size="md" className="flex-1" onClick={handleSignOut}>
+                  Sign Out
+                </Button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
