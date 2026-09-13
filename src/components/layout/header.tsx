@@ -108,21 +108,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
           .channel(realtimeTopic("header-notifications"))
           .on(
             "postgres_changes",
-            { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${session.user.id}` },
-            () => {
-              void fetchUnread();
-            }
-          )
-          .on(
-            "postgres_changes",
-            { event: "UPDATE", schema: "public", table: "notifications", filter: `user_id=eq.${session.user.id}` },
-            () => {
-              void fetchUnread();
-            }
-          )
-          .on(
-            "postgres_changes",
-            { event: "DELETE", schema: "public", table: "notifications", filter: `user_id=eq.${session.user.id}` },
+            { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${session.user.id}` },
             () => {
               void fetchUnread();
             }

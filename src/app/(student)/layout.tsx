@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, LayoutDashboard, FileText, MessageSquare, Bell, User } from "lucide-react";
 import Header from "@/components/layout/header";
 import StudentNav from "@/components/layout/student-nav";
+import RoleBottomNav from "@/components/layout/role-bottom-nav";
 import WarningsBanner from "@/components/layout/warnings-banner";
 import { createClient } from "@/lib/supabase/server";
 
@@ -62,12 +63,26 @@ export default async function StudentLayout({ children }: { children: React.Reac
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0 px-4 md:px-8 py-6">
+        <main className="flex-1 min-w-0 px-4 md:px-8 py-6 pb-24 md:pb-10">
           {children}
         </main>
       </div>
 
-      <footer className="py-5 text-center text-xs text-on-surface-variant border-t border-outline-variant bg-surface-container-lowest">
+      <RoleBottomNav
+        roleLabel="Student"
+        primary={[
+          { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+          { href: "/requests", label: "Requests", icon: FileText, badge: requestCount > 0 ? requestCount : undefined },
+          { href: "/messages", label: "Messages", icon: MessageSquare },
+        ]}
+        more={[
+          { href: "/notifications", label: "Notifications", icon: Bell, badge: notifCount > 0 ? notifCount : undefined },
+          { href: "/profile", label: "Profile", icon: User },
+          { href: "/requests/new", label: "Request Help", icon: Plus },
+        ]}
+      />
+
+      <footer className="py-5 text-center text-xs text-on-surface-variant border-t border-outline-variant bg-surface-container-lowest pb-24 md:pb-5">
         © {new Date().getFullYear()} PeerCraft Academic Network for Eastview University. Connect with your academic
         integrity office for questions.
       </footer>

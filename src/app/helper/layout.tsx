@@ -6,6 +6,7 @@ import Header from "@/components/layout/header";
 import WarningsBannerClient from "@/components/layout/warnings-banner-client";
 import { VoiceCallProvider, useVoiceCall } from "@/components/call/voice-call";
 import Button from "@/components/ui/button";
+import RoleBottomNav from "@/components/layout/role-bottom-nav";
 import {
   LayoutDashboard,
   Inbox,
@@ -64,8 +65,23 @@ export default function HelperLayout({
           })}
           <CallAdminButton />
         </aside>
-        <main className="flex-1 p-6 lg:p-8 overflow-auto">{children}</main>
+        <main className="flex-1 p-6 lg:p-8 pb-24 lg:pb-8 overflow-auto">{children}</main>
       </div>
+
+      <RoleBottomNav
+        roleLabel="Helper"
+        primary={[
+          { href: "/helper/dashboard", label: "Dashboard", icon: LayoutDashboard },
+          { href: "/helper/requests", label: "Requests", icon: Inbox },
+          { href: "/helper/messages", label: "Messages", icon: MessageSquare },
+        ]}
+        more={[
+          { href: "/helper/orders", label: "Orders", icon: Briefcase },
+          { href: "/helper/earnings", label: "Earnings", icon: DollarSign },
+          { href: "/helper/chat-admin", label: "Chat With Admin", icon: MessagesSquare },
+          { href: "/helper/profile", label: "Profile", icon: User },
+        ]}
+      />
     </div>
     </VoiceCallProvider>
   );

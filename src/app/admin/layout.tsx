@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import { createClient } from "@/lib/supabase/client";
 import Button from "@/components/ui/button";
 import { VoiceCallProvider } from "@/components/call/voice-call";
+import RoleBottomNav from "@/components/layout/role-bottom-nav";
 import {
   LayoutDashboard,
   Users,
@@ -78,8 +79,24 @@ export default function AdminLayout({
 
   return (
     <VoiceCallProvider role="admin">
-    <div className="min-h-screen flex bg-background">
-      <aside className="w-64 shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 min-h-screen p-4 flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
+      <div className="lg:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-2.5 bg-surface-container-lowest/95 backdrop-blur border-b border-outline-variant">
+        <Link href="/admin/dashboard" className="flex items-center gap-2">
+          <span className="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">
+            <span className="material-symbols-outlined text-on-primary text-lg">school</span>
+          </span>
+          <span className="font-display font-bold text-lg text-on-surface">PeerCraft</span>
+          <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-primary-container text-on-primary rounded-md">
+            Admin
+          </span>
+        </Link>
+        <Button variant="ghost" size="sm" onClick={() => setSignOutOpen(true)} aria-label="Sign out">
+          <LogOut size={16} />
+          <span className="hidden sm:inline">Sign Out</span>
+        </Button>
+      </div>
+      <div className="flex flex-1 min-h-0">
+      <aside className="hidden lg:flex w-64 shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 min-h-screen p-4 flex-col sticky top-0 h-screen overflow-y-auto">
         <div className="flex items-center gap-2 px-3 py-3 mb-4">
           <div className="w-8 h-8 bg-primary-container rounded-lg flex items-center justify-center">
             <span className="material-symbols-outlined text-on-primary text-lg">
@@ -138,7 +155,20 @@ export default function AdminLayout({
         </div>
       </aside>
 
-      <main className="flex-1 p-6 lg:p-8 overflow-auto min-h-screen">{children}</main>
+      <main className="flex-1 min-w-0 p-4 md:p-6 lg:p-8 pb-24 lg:pb-8 overflow-auto min-h-screen">{children}</main>
+      </div>
+
+      <RoleBottomNav
+        roleLabel="Admin"
+        primary={[
+          { href: "/admin/dashboard", label: "Dashboard", icon: links[0].icon },
+          { href: "/admin/requests", label: "Requests", icon: links[3].icon },
+          { href: "/admin/messages", label: "Messages", icon: links[6].icon },
+        ]}
+        more={links
+          .filter((l) => !["/admin/dashboard", "/admin/requests", "/admin/messages"].includes(l.href))
+          .map((l) => ({ href: l.href, label: l.label, icon: l.icon }))}
+      />
 
       {signOutOpen &&
         createPortal(

@@ -196,7 +196,7 @@ export default function RequestWorkspace({
     const poll = setInterval(() => {
       if (!active) return;
       void Promise.all([loadMessages(), loadRequest(), loadProposal()]);
-    }, 10000);
+    }, 20000);
 
     return () => {
       active = false;

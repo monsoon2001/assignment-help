@@ -215,7 +215,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
     const poll = setInterval(() => {
       if (!active) return;
       void Promise.all([loadMessages(), loadDeliveries(), loadOrder()]);
-    }, 10000);
+    }, 20000);
 
     return () => {
       active = false;

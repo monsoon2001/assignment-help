@@ -64,10 +64,9 @@ export default function RequestSent({
 
   return (
     <div className="w-full max-w-xl mx-auto flex flex-col items-center">
-      {/* Status Icon Badge with Subtle Pulse Animation */}
+      {/* Status Icon Badge */}
       <div className="relative flex items-center justify-center mb-6">
-        <div className="absolute w-20 h-20 rounded-full bg-primary/10 animate-ping opacity-75" />
-        <div className="relative w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center shadow-md">
+        <div className="w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center shadow-md">
           <CheckCircle2 size={32} className="text-primary" fill="currentColor" />
         </div>
       </div>
@@ -146,7 +145,7 @@ export default function RequestSent({
               <span className="text-sm">Estimated Response</span>
             </div>
             <span className="text-sm font-semibold text-primary flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-primary" />
               Within 2 hours
             </span>
           </div>

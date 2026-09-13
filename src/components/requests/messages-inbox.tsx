@@ -63,7 +63,7 @@ export default function MessagesInbox({
 
     const poll = setInterval(() => {
       if (active) void refresh();
-    }, 12000);
+    }, 20000);
 
     return () => {
       active = false;

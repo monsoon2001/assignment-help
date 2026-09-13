@@ -13,6 +13,7 @@ interface AvatarProps {
 
 export default function Avatar({ src, alt, name, size = "md", online, className = "" }: AvatarProps) {
   const sizes = { sm: "w-8 h-8", md: "w-10 h-10", lg: "w-14 h-14" };
+  const dims = { sm: 32, md: 40, lg: 56 };
   const initials = name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "?";
   const [error, setError] = useState(false);
 
@@ -22,6 +23,10 @@ export default function Avatar({ src, alt, name, size = "md", online, className 
         <img
           src={src}
           alt={alt || name || ""}
+          width={dims[size]}
+          height={dims[size]}
+          loading="lazy"
+          decoding="async"
           onError={() => setError(true)}
           className={`${sizes[size]} rounded-full object-cover`}
         />

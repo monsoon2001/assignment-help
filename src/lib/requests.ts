@@ -176,15 +176,21 @@ export type HelperCandidate = {
 };
 
 export async function fetchHelperCandidates(
-  _subject?: string | null
+  subject?: string | null
 ): Promise<{ helpers: HelperCandidate[] } | { error: string }> {
   const supabase = createClient();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("users")
     .select("id, name, avatar_url, helper_profiles(user_id, rating_avg, bio, subjects)")
     .eq("role", "helper")
-    .order("name", { ascending: true });
+    .limit(50);
+
+  if (subject) {
+    query = query.contains("helper_profiles.subjects", [subject]);
+  }
+
+  const { data, error } = await query.order("name", { ascending: true });
 
   if (error) {
     return { error: error.message };
