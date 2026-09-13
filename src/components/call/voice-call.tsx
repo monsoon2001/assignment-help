@@ -210,6 +210,7 @@ export function VoiceCallProvider({
       soundStopRef.current.stop();
       soundStopRef.current = null;
     }
+    stopAllSounds();
   }, [clearLog]);
 
   const autoIdle = useCallback(
@@ -389,6 +390,7 @@ export function VoiceCallProvider({
         soundStopRef.current = playOutgoingRingback();
         break;
       case "active":
+        stopAllSounds();
         if (prev === "incoming" || prev === "outgoing") playConnected();
         break;
       case "declined":

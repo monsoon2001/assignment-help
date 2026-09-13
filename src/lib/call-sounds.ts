@@ -1,6 +1,6 @@
 "use client";
 
-type ToneOpts = {
+type BeepOpts = {
   freq: number;
   dur: number;
   start?: number;
@@ -10,7 +10,6 @@ type ToneOpts = {
 
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
-const running: Array<{ stop: () => void }> = [];
 
 function ensureCtx(): AudioContext | null {
   if (typeof window === "undefined") return null;
@@ -29,9 +28,50 @@ function ensureCtx(): AudioContext | null {
   return ctx;
 }
 
-function beep({ freq, dur, start = 0, vol = 0.15, type = "sine" }: ToneOpts) {
+type Live = {
+  osc: OscillatorNode;
+  gain: GainNode;
+  startedAt: number;
+};
+
+const live = new Set<Live>();
+
+function silence(entry: Live): void {
+  live.delete(entry);
+  entry.osc.onended = null;
+  const now = ctx ? ctx.currentTime : performance.now() / 1000;
+  const param = entry.gain.gain;
+  try {
+    param.cancelAndHoldAtTime(now);
+  } catch {
+    try {
+      param.cancelScheduledValues(now);
+    } catch {
+      /* never */
+    }
+  }
+  try {
+    param.setValueAtTime(0.0001, now + 0.005);
+  } catch {
+    /* never */
+  }
+  try {
+    entry.gain.disconnect();
+  } catch {
+    /* never */
+  }
+  if (entry.startedAt < now) {
+    try {
+      entry.osc.stop();
+    } catch {
+      /* already stopped or not started */
+    }
+  }
+}
+
+function beep({ freq, dur, start = 0, vol = 0.15, type = "sine" }: BeepOpts): Live | null {
   const c = ensureCtx();
-  if (!c || !master) return;
+  if (!c || !master) return null;
   const t0 = c.currentTime + start;
   const osc = c.createOscillator();
   const gain = c.createGain();
@@ -43,27 +83,38 @@ function beep({ freq, dur, start = 0, vol = 0.15, type = "sine" }: ToneOpts) {
   gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
   osc.connect(gain);
   gain.connect(master);
+  const entry: Live = { osc, gain, startedAt: t0 };
+  live.add(entry);
+  osc.onended = () => live.delete(entry);
   osc.start(t0);
   osc.stop(t0 + dur + 0.05);
+  return entry;
 }
 
-function loopTone(opts: { freq: number; onMS: number; offMS: number; vol?: number }): { stop: () => void } {
+type LoopOpts = { freq: number; onMS: number; offMS: number; vol?: number };
+
+function loopTone({ freq, onMS, offMS, vol }: LoopOpts): { stop: () => void } {
   const c = ensureCtx();
   if (!c) return { stop: () => {} };
   let stopped = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let current: Live | null = null;
 
   const step = (offsetSec: number) => {
     if (stopped) return;
-    beep({ freq: opts.freq, dur: opts.onMS / 1000, start: offsetSec, vol: opts.vol, type: "sine" });
-    timer = setTimeout(
-      () => step(offsetSec + (opts.onMS + opts.offMS) / 1000),
-      opts.onMS + opts.offMS
-    );
+    current = beep({ freq, dur: onMS / 1000, start: offsetSec, vol, type: "sine" });
+    timer = setTimeout(() => step(offsetSec + (onMS + offMS) / 1000), onMS + offMS);
   };
 
   step(0);
-  const handle = { stop: () => { stopped = true; if (timer) clearTimeout(timer); } };
+
+  const handle = {
+    stop: () => {
+      stopped = true;
+      if (timer) clearTimeout(timer);
+      if (current) silence(current);
+    },
+  };
   running.push(handle);
   return handle;
 }
@@ -90,8 +141,11 @@ export function playHangup(): void {
   beep({ freq: 494, dur: 0.16, start: 0.16, vol: 0.16 });
 }
 
+const running: Array<{ stop: () => void }> = [];
+
 export function stopAllSounds(): void {
   for (const handle of running.splice(0)) handle.stop();
+  for (const entry of Array.from(live)) silence(entry);
 }
 
 export function unlockAudio(): void {

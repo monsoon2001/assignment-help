@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import Avatar from "@/components/ui/avatar";
 import Button from "@/components/ui/button";
-import { MessageSquare, Phone, Send } from "lucide-react";
+import { MessageSquare, Phone, PhoneCall, Send, PhoneMissed, PhoneOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { ADMIN_MESSAGES_CHANNEL } from "@/lib/supabase/realtime";
 import { useVoiceCall } from "@/components/call/voice-call";
@@ -26,8 +26,54 @@ type AdminMessage = {
   created_at: string;
 };
 
+type CallLog = {
+  id: string;
+  caller_id: string;
+  callee_id: string;
+  direction: "outgoing" | "incoming";
+  status: string;
+  started_at: string;
+  duration_seconds: number;
+};
+
+type TimelineItem =
+  | { kind: "message"; msg: AdminMessage }
+  | { kind: "call"; log: CallLog };
+
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+}
+
+function formatDuration(secs: number): string {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  if (m <= 0) return `${s}s`;
+  return `${m}m ${s}s`;
+}
+
+function callIcon(status: string) {
+  if (status === "answered") return <PhoneCall size={13} className="text-emerald-600" />;
+  if (status === "missed" || status === "failed") return <PhoneMissed size={13} className="text-red-500" />;
+  if (status === "declined" || status === "busy") return <PhoneOff size={13} className="text-amber-600" />;
+  if (status === "cancelled") return <PhoneOff size={13} className="text-on-surface-variant" />;
+  return <Phone size={13} className="text-on-surface-variant" />;
+}
+
+function callColor(status: string) {
+  if (status === "answered") return "bg-emerald-50 border-emerald-200 text-emerald-800";
+  if (status === "missed" || status === "failed") return "bg-red-50 border-red-200 text-red-700";
+  if (status === "declined" || status === "busy") return "bg-amber-50 border-amber-200 text-amber-700";
+  return "bg-surface-container-high border-outline-variant text-on-surface-variant";
+}
+
+function callStatusLabel(status: string) {
+  if (status === "answered") return "Answered";
+  if (status === "missed") return "Missed";
+  if (status === "declined") return "Declined";
+  if (status === "cancelled") return "Cancelled";
+  if (status === "busy") return "Busy";
+  if (status === "failed") return "Failed";
+  return status;
 }
 
 export default function AdminMessages({ helpers }: { helpers: HelperLite[] }) {
@@ -45,6 +91,7 @@ const selectedIdRef = useRef<string | null>(null);
     selectedIdRef.current = selectedId;
   }, [selectedId]);
   const [messages, setMessages] = useState<AdminMessage[]>([]);
+  const [logs, setLogs] = useState<CallLog[]>([]);
   const [unread, setUnread] = useState<Record<string, number>>({});
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
@@ -79,6 +126,23 @@ const selectedIdRef = useRef<string | null>(null);
           }
         }
       )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "call_logs" },
+        () => {
+          const openId = selectedIdRef.current;
+          const userId = meRef.current;
+          if (!openId || !userId) return;
+          void (async () => {
+            const { data } = await supabase
+              .from("call_logs")
+              .select("id, caller_id, callee_id, direction, status, started_at, duration_seconds")
+              .or(`and(caller_id.eq.${userId},callee_id.eq.${openId}),and(caller_id.eq.${openId},callee_id.eq.${userId})`)
+              .order("started_at", { ascending: true });
+            setLogs((data ?? []) as CallLog[]);
+          })();
+        }
+      )
       .subscribe();
 
     return () => {
@@ -108,6 +172,12 @@ const selectedIdRef = useRef<string | null>(null);
         .filter((m: AdminMessage) => (m.sender_id === me || m.recipient_id === me) && (m.sender_id === helperId || m.recipient_id === helperId))
         .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
     );
+    const { data: logRows } = await supabaseRef.current
+      .from("call_logs")
+      .select("id, caller_id, callee_id, direction, status, started_at, duration_seconds")
+      .or(`and(caller_id.eq.${me},callee_id.eq.${helperId}),and(caller_id.eq.${helperId},callee_id.eq.${me})`)
+      .order("started_at", { ascending: true });
+    setLogs((logRows ?? []) as CallLog[]);
   }, [me]);
 
   useEffect(() => {
@@ -128,6 +198,14 @@ const selectedIdRef = useRef<string | null>(null);
   const selected = !selectedId ? null : helpers.find((h) => h.id === selectedId) ?? null;
   const { startCall, phase } = useVoiceCall();
   const callBusy = phase !== "idle";
+
+  const timeline = useMemo((): TimelineItem[] => {
+    const items: TimelineItem[] = [
+      ...messages.map((m) => ({ kind: "message" as const, msg: m, ts: m.created_at })),
+      ...logs.map((l) => ({ kind: "call" as const, log: l, ts: l.started_at })),
+    ].sort((a, b) => new Date(a.ts).getTime() - new Date(b.ts).getTime());
+    return items;
+  }, [messages, logs]);
 
   return (
     <div className="grid lg:grid-cols-[280px_1fr] gap-6">
@@ -181,12 +259,33 @@ const selectedIdRef = useRef<string | null>(null);
             </div>
 
             <div className="flex-1 overflow-y-auto p-5 space-y-3 bg-surface-container-low/40">
-              {messages.length === 0 && (
+              {timeline.length === 0 && (
                 <p className="text-center text-sm text-on-surface-variant py-10">
                   No messages yet. Say hi!
                 </p>
               )}
-              {messages.map((m) => {
+              {timeline.map((item) => {
+                if (item.kind === "call") {
+                  const l = item.log;
+                  const outgoing = l.caller_id === me;
+                  return (
+                    <div key={`call-${l.id}`} className="flex justify-center">
+                      <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium ${callColor(l.status)}`}>
+                        {callIcon(l.status)}
+                        <span>
+                          {outgoing ? "Call to Helper" : "Call from Helper"}
+                          {" \u00b7 "}
+                          {callStatusLabel(l.status)}
+                          {l.status === "answered" && l.duration_seconds > 0
+                            ? ` \u00b7 ${formatDuration(l.duration_seconds)}`
+                            : ""}
+                        </span>
+                        <span className="text-[10px] opacity-60 ml-1">{formatTime(l.started_at)}</span>
+                      </div>
+                    </div>
+                  );
+                }
+                const m = item.msg;
                 const mine = m.sender_id === me;
                 return (
                   <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
