@@ -5,9 +5,10 @@ import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import Avatar from "@/components/ui/avatar";
 import Button from "@/components/ui/button";
-import { MessageSquare, Send } from "lucide-react";
+import { MessageSquare, Phone, Send } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { realtimeTopic } from "@/lib/supabase/realtime";
+import { useVoiceCall } from "@/components/call/voice-call";
 
 type HelperLite = {
   id: string;
@@ -125,6 +126,8 @@ const selectedIdRef = useRef<string | null>(null);
   }
 
   const selected = !selectedId ? null : helpers.find((h) => h.id === selectedId) ?? null;
+  const { startCall, phase } = useVoiceCall();
+  const callBusy = phase !== "idle";
 
   return (
     <div className="grid lg:grid-cols-[280px_1fr] gap-6">
@@ -159,10 +162,22 @@ const selectedIdRef = useRef<string | null>(null);
           <>
             <div className="p-4 border-b border-outline-variant/30 flex items-center gap-3">
               <Avatar name={selected.name ?? "Helper"} src={selected.avatar_url ?? undefined} size="md" />
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-on-surface">{selected.name ?? "Helper"}</p>
-                <p className="text-xs text-on-surface-variant">{selected.email}</p>
+                <p className="text-xs text-on-surface-variant truncate">{selected.email}</p>
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={callBusy}
+                onClick={() =>
+                  startCall({ id: selected.id, name: selected.name ?? "Helper", avatarUrl: selected.avatar_url })
+                }
+                aria-label={`Call ${selected.name ?? "Helper"}`}
+              >
+                <Phone size={15} />
+                Call
+              </Button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-5 space-y-3 bg-surface-container-low/40">

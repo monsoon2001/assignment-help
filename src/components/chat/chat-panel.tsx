@@ -35,8 +35,11 @@ export function fileNameFromUrl(url: string): string {
 
 const EMOJIS = [
   "😀", "😂", "😊", "😍", "😎", "🤔",
-  "👍", "👏", "🙏", "💪", "🤝", "✨",
-  "❤️", "🎉", "🔥", "✅", "🚀", "📚",
+  "😅", "😉", "🤗", "😴", "🤯", "🥳",
+  "🙌", "👍", "👏", "🙏", "💪", "🤝",
+  "✨", "🔥", "🎉", "❤️", "💯", "🚀",
+  "✅", "⭐", "🎯", "📚", "📖", "✏️",
+  "📝", "📅", "⏰", "☕", "🧠", "🎓",
 ];
 
 export default function ChatPanel({
@@ -88,7 +91,7 @@ export default function ChatPanel({
   }
 
   return (
-    <Card className="flex flex-col h-[480px] sm:h-[560px] xl:h-[640px] overflow-hidden">
+    <Card className="flex flex-col h-[clamp(300px,calc(100vh-320px),480px)] sm:h-[clamp(360px,calc(100vh-300px),560px)] xl:h-[clamp(400px,calc(100vh-280px),600px)] overflow-hidden">
       <div className="flex items-center gap-3 px-5 py-3.5 border-b border-outline-variant bg-surface-container-low/60">
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-on-surface">{title}</p>
@@ -99,7 +102,7 @@ export default function ChatPanel({
         </div>
       </div>
 
-      <div ref={messageListRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-4 bg-surface-container-low/40 overscroll-contain">
+      <div ref={messageListRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-4 bg-surface-container-low/40 overscroll-contain pb-6">
         {messages.length === 0 && (
           <div className="text-center pt-16">
             <p className="text-sm text-on-surface-variant">No messages yet — say hello!</p>
@@ -176,7 +179,7 @@ export default function ChatPanel({
               ref={emojiRef}
               className="absolute bottom-12 left-0 z-20 p-2.5 rounded-2xl bg-surface-container-lowest border border-outline-variant shadow-lg"
             >
-              <div className="grid grid-cols-6 gap-1">
+              <div className="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto pr-0.5">
                 {EMOJIS.map((e) => (
                   <button
                     key={e}

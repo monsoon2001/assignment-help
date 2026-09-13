@@ -45,7 +45,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
       <WarningsBanner />
 
       <div className="flex flex-1 w-full max-w-[1440px] mx-auto">
-        <aside className="hidden lg:flex flex-col w-60 shrink-0 border-r border-outline-variant px-4 py-6 gap-1 sticky top-16 h-[calc(100vh-4rem)] bg-surface-container-lowest">
+        <aside className="hidden md:flex flex-col w-60 shrink-0 border-r border-outline-variant px-4 py-6 gap-1 sticky top-16 h-[calc(100vh-4rem)] bg-surface-container-lowest">
           <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-widest text-on-surface-variant">
             Student
           </p>
@@ -54,7 +54,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
           <div className="mt-auto pt-4">
             <Link
               href="/requests/new"
-              className="flex items-center justify-center gap-2 w-full px-3 py-2.5 rounded-lg bg-primary-container text-on-primary text-sm font-semibold hover:bg-primary transition-colors"
+              className="flex items-center justify-center gap-2 w-full px-3 py-2.5 rounded-lg bg-primary text-on-primary text-sm font-semibold hover:bg-primary/90 transition-colors"
             >
               <Plus size={16} />
               Request Help

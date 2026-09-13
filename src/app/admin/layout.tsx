@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { createClient } from "@/lib/supabase/client";
 import Button from "@/components/ui/button";
+import { VoiceCallProvider } from "@/components/call/voice-call";
 import {
   LayoutDashboard,
   Users,
@@ -76,6 +77,7 @@ export default function AdminLayout({
   }, []);
 
   return (
+    <VoiceCallProvider role="admin">
     <div className="min-h-screen flex bg-background">
       <aside className="w-64 shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 min-h-screen p-4 flex flex-col">
         <div className="flex items-center gap-2 px-3 py-3 mb-4">
@@ -177,5 +179,6 @@ export default function AdminLayout({
           document.body
         )}
     </div>
+    </VoiceCallProvider>
   );
 }

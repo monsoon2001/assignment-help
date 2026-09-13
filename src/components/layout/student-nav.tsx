@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useSelectedLayoutSegments } from "next/navigation";
 import {
   LayoutDashboard,
   FileText,
@@ -27,16 +27,18 @@ const ICONS: Record<StudentNavItem["key"], LucideIcon> = {
 };
 
 export default function StudentNav({ items }: { items: StudentNavItem[] }) {
-  const pathname = usePathname();
+  const segments = useSelectedLayoutSegments();
+  const current = segments[0];
   return (
     <>
       {items.map((item) => {
         const Icon = ICONS[item.key];
-        const active = pathname === item.href;
+        const active = current === item.key;
         return (
           <Link
             key={item.href}
             href={item.href}
+            aria-current={active ? "page" : undefined}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
               active
                 ? "bg-primary-container text-on-primary shadow-sm"
