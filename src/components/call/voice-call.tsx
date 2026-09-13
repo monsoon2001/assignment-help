@@ -52,13 +52,15 @@ type Signal =
   | { kind: "end"; call: string; to: string; from: string }
   | { kind: "decline"; call: string; to: string; from: string }
   | { kind: "no-answer"; call: string; to: string; from: string }
-  | { kind: "busy"; call: string; to: string; from: string };
+  | { kind: "busy"; call: string; to: string; from: string }
+  | { kind: "mute"; call: string; to: string; from: string; muted: boolean };
 
 type VoiceCallApi = {
   phase: CallPhase;
   peer: CallPeer | null;
   seconds: number;
   muted: boolean;
+  peerMuted: boolean;
   error: string | null;
   adminPeer: CallPeer | null;
   startCall: (peer: CallPeer) => Promise<void>;
@@ -96,6 +98,7 @@ export function VoiceCallProvider({
   const [peer, setPeer] = useState<CallPeer | null>(null);
   const [seconds, setSeconds] = useState(0);
   const [muted, setMuted] = useState(false);
+  const [peerMuted, setPeerMuted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [adminPeer, setAdminPeer] = useState<CallPeer | null>(null);
 
@@ -206,6 +209,7 @@ export function VoiceCallProvider({
     clearLog();
     setSeconds(0);
     setMuted(false);
+    setPeerMuted(false);
     if (soundStopRef.current) {
       soundStopRef.current.stop();
       soundStopRef.current = null;
@@ -238,6 +242,7 @@ export function VoiceCallProvider({
           pendingOfferRef.current = sig.sdp;
           peerRef.current = { id: sig.from, name: sig.fromName ?? "PeerCraft Support", avatarUrl: sig.fromAvatar ?? null };
           setPeer(peerRef.current);
+          setPeerMuted(false);
           setPhaseBoth("incoming");
           noAnswerTimerRef.current = setTimeout(() => {
             if (phaseRef.current === "incoming") {
@@ -308,6 +313,11 @@ export function VoiceCallProvider({
           patchLog({ status: "busy", ended_at: new Date().toISOString() });
           cleanup();
           autoIdle("busy");
+          break;
+        }
+        case "mute": {
+          if (callIdRef.current !== sig.call || phaseRef.current !== "active") return;
+          setPeerMuted(sig.muted === true);
           break;
         }
         default:
@@ -583,6 +593,13 @@ export function VoiceCallProvider({
     const next = !muted;
     setMuted(next);
     stream.getAudioTracks().forEach((t) => (t.enabled = !next));
+    send({
+      kind: "mute",
+      call: callIdRef.current ?? "",
+      to: peerRef.current?.id ?? "",
+      from: meRef.current ?? "",
+      muted: next,
+    });
   }
 
   const api: VoiceCallApi = {
@@ -590,6 +607,7 @@ export function VoiceCallProvider({
     peer,
     seconds,
     muted,
+    peerMuted,
     error,
     adminPeer,
     startCall,
@@ -674,6 +692,7 @@ export function VoiceCallProvider({
                 subtitle={formatTimer(seconds)}
                 timer={formatTimer(seconds)}
                 muted={muted}
+                peerMuted={peerMuted}
                 onMute={toggleMute}
                 onEnd={end}
                 live
@@ -710,6 +729,7 @@ function CallPanel({
   subtitle,
   timer,
   muted,
+  peerMuted,
   onMute,
   onEnd,
   live = false,
@@ -719,6 +739,7 @@ function CallPanel({
   subtitle: string;
   timer: React.ReactNode;
   muted: boolean;
+  peerMuted?: boolean;
   onMute: () => void;
   onEnd: () => void;
   live?: boolean;
@@ -748,6 +769,18 @@ function CallPanel({
             subtitle
           )}
         </p>
+        {live && peerMuted && (
+          <p className="text-[11px] font-medium text-amber-600 mt-1.5 inline-flex items-center gap-1.5">
+            <MicOff size={12} />
+            {name} muted the call
+          </p>
+        )}
+        {live && muted && (
+          <p className="text-[11px] font-medium text-warning mt-1.5 inline-flex items-center gap-1.5">
+            <MicOff size={12} />
+            You muted the call
+          </p>
+        )}
       </div>
       <div className="flex items-center justify-center gap-5 mt-8">
         <div className="flex flex-col items-center gap-1.5">
