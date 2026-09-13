@@ -159,14 +159,14 @@ export default function SignUpPage() {
                   />
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-on-surface">University Email</label>
+                    <label className="text-sm font-medium text-on-surface">Email</label>
                     <div className="relative flex items-center">
                       <span className="absolute left-3.5 text-on-surface-variant pointer-events-none [&>svg]:w-5 [&>svg]:h-5">
                         <Mail size={18} />
                       </span>
                       <input
                         type="email"
-                        placeholder="alex.chen@university.edu"
+                        placeholder="you@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
@@ -175,7 +175,7 @@ export default function SignUpPage() {
                     </div>
                     <p className="text-xs text-on-surface-variant flex items-center gap-1">
                       <Check size={12} className="text-success shrink-0 mt-px" />
-                      Must be a valid .edu address. We verify institutional affiliation for academic integrity.
+                      We&apos;ll send a 6-digit verification code to this email.
                     </p>
                   </div>
 
