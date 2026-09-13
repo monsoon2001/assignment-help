@@ -8,6 +8,7 @@ import {
   ChevronRight, LayoutGrid, MessageSquare, Package, Check,
   ShieldCheck, FileText, Download, RotateCcw, Star, Clock,
   Loader2, CalendarDays, Timer, DollarSign, CheckCircle2, Paperclip,
+  Receipt, ExternalLink,
 } from "lucide-react";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
@@ -54,6 +55,14 @@ type DeliveryRow = {
   created_at: string;
 };
 
+type PaymentRow = {
+  status: string | null;
+  amount: number | null;
+  currency: string | null;
+  receipt_url: string | null;
+  created_at: string | null;
+};
+
 const STATUS_META: Record<OrderStatus, { label: string; variant: "primary" | "success" | "warning" | "outline" | "danger" }> = {
   payment_pending: { label: "Payment Pending", variant: "warning" },
   in_progress: { label: "In Progress", variant: "primary" },
@@ -76,6 +85,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
   const [activeTab, setActiveTab] = useState<"overview" | "chat" | "delivery">("overview");
   const [messages, setMessages] = useState<ChatMessageRow[]>([]);
   const [deliveries, setDeliveries] = useState<DeliveryRow[]>([]);
+  const [payment, setPayment] = useState<PaymentRow | null>(null);
 
   const [draft, setDraft] = useState("");
   const [chatFiles, setChatFiles] = useState<File[]>([]);
@@ -135,6 +145,14 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
     setCurrentUserId(current?.id);
     setRole(current && normalized.student_id === current.id ? "student" : "helper");
     setOrder(normalized);
+
+    const { data: paymentData } = await supabase.current
+      .from("payments")
+      .select("status, amount, currency, receipt_url, created_at")
+      .eq("order_id", orderId)
+      .maybeSingle();
+    setPayment((paymentData as PaymentRow | null) ?? null);
+
     setLoading(false);
   }, [orderId]);
 
@@ -231,6 +249,14 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
   const title = order.proposal?.request?.title ?? "Order";
   const subject = order.proposal?.request?.subject ?? "General";
   const price = formatCurrency(Number(order.price), normalizeCurrency(order.currency));
+
+  const paidLabel =
+    payment?.status === "paid"
+      ? `Paid ${formatCurrency(Number(payment.amount ?? order.price), normalizeCurrency(payment.currency ?? order.currency))}` +
+        (payment.created_at
+          ? ` · ${new Date(payment.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+          : "")
+      : "Awaiting payment";
 
   const logoName = order.helper?.name || "Helper";
 
@@ -349,7 +375,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
               <Badge variant={meta.variant} dot className="shrink-0">{meta.label}</Badge>
             </div>
             <p className="text-xs text-on-surface-variant mt-1">
-              #{order.id.slice(0, 8).toUpperCase()} · {subject} · Paid {price}
+              #{order.id.slice(0, 8).toUpperCase()} · {subject} · {paidLabel}
             </p>
             <p className="text-xs text-on-surface-variant mt-1 inline-flex items-center gap-1">
               <Timer size={12} />{" "}
@@ -473,6 +499,53 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                     : "Flexible"}
                 </span>
               </div>
+            </Card>
+
+            <Card className="p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="font-display font-semibold text-on-surface inline-flex items-center gap-2">
+                  <Receipt size={16} className="text-primary" /> Payment
+                </h2>
+                <Badge variant={payment?.status === "paid" ? "success" : "warning"}>
+                  {payment?.status === "paid" ? "Paid" : "Awaiting Payment"}
+                </Badge>
+              </div>
+              <div className="flex flex-wrap items-center gap-3 text-sm">
+                <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
+                  <DollarSign size={14} />{" "}
+                  {formatCurrency(
+                    Number(payment?.amount ?? order.price),
+                    normalizeCurrency(payment?.currency ?? order.currency)
+                  )}
+                </span>
+                {payment?.status === "paid" && payment.created_at && (
+                  <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
+                    <CalendarDays size={14} />{" "}
+                    Paid{" "}
+                    {new Date(payment.created_at).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </span>
+                )}
+              </div>
+              {payment?.status === "paid" && payment.receipt_url ? (
+                <a
+                  href={payment.receipt_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                >
+                  View payment receipt <ExternalLink size={12} />
+                </a>
+              ) : (
+                <p className="text-xs text-on-surface-variant mt-3 leading-relaxed">
+                  {isHelper
+                    ? "Payment is secured by PeerCraft and releases to you after the student reviews the delivery. The student's paid receipt is shown here once confirmed."
+                    : "Complete payment to start your order."}
+                </p>
+              )}
             </Card>
 
             <Card className="p-5">

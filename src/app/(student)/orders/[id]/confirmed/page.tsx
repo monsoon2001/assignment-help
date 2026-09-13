@@ -99,11 +99,27 @@ export default async function OrderConfirmedPage({
             ? session.payment_intent
             : (session.payment_intent?.id ?? null);
 
+        let receiptUrl: string | null = null;
+        if (intentId2) {
+          try {
+            const charged = await stripe.paymentIntents.retrieve(intentId2, {
+              expand: ["latest_charge"],
+            });
+            const charge = charged.latest_charge;
+            receiptUrl =
+              typeof charge === "string" ? null : (charge?.receipt_url ?? null);
+          } catch {
+            // best-effort
+          }
+        }
+
         await adminClient.from("payments").insert({
           order_id: order.id,
           amount: Number(session.amount_total) / 100,
           currency: session.currency?.toUpperCase() ?? "USD",
           stripe_payment_intent_id: intentId2,
+          receipt_url: receiptUrl,
+          customer_email: typeof session.customer_email === "string" ? session.customer_email : null,
           status: "paid",
         });
       } catch {
@@ -111,6 +127,17 @@ export default async function OrderConfirmedPage({
       }
     }
   }
+
+  const { data: paymentRow } = await adminClient
+    .from("payments")
+    .select("amount, currency, status, receipt_url, created_at")
+    .eq("order_id", order.id)
+    .maybeSingle();
+
+  const receiptUrl =
+    typeof paymentRow?.receipt_url === "string" && paymentRow.receipt_url.length > 0
+      ? paymentRow.receipt_url
+      : null;
 
   const currency = normalizeCurrency(orderRow.currency);
   const price = formatCurrency(Number(orderRow.price), currency);
@@ -163,9 +190,20 @@ export default async function OrderConfirmedPage({
           <p className="text-xs text-on-surface-variant inline-flex items-center gap-1.5">
             <CalendarCheck size={13} /> Guaranteed delivery per agreed deadline &middot; work may begin immediately
           </p>
-          <p className="text-xs text-on-surface-variant inline-flex items-center gap-1.5">
-            <MailCheck size={13} /> Receipt sent to your account email
-          </p>
+          {receiptUrl ? (
+            <a
+              href={receiptUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-primary inline-flex items-center gap-1.5 font-semibold hover:underline"
+            >
+              <MailCheck size={13} /> View your payment receipt
+            </a>
+          ) : (
+            <p className="text-xs text-on-surface-variant inline-flex items-center gap-1.5">
+              <MailCheck size={13} /> Receipt sent to your account email
+            </p>
+          )}
         </div>
       </div>
 

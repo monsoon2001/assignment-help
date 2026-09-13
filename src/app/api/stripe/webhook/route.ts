@@ -31,6 +31,22 @@ export async function POST(request: Request) {
         ? session.payment_intent
         : (session.payment_intent?.id ?? null);
 
+    let receiptUrl: string | null = null;
+    if (intentId) {
+      try {
+        const paymentIntent = await stripe.paymentIntents.retrieve(intentId, {
+          expand: ["latest_charge"],
+        });
+        const charge = paymentIntent.latest_charge;
+        receiptUrl =
+          typeof charge === "string"
+            ? null
+            : (charge?.receipt_url ?? null);
+      } catch {
+        // Receipt URL is best-effort; payment record still proceeds without it.
+      }
+    }
+
     const orderId = session.metadata?.order_id;
 
     const { data: existing } = await adminClient
@@ -54,6 +70,8 @@ export async function POST(request: Request) {
         amount: Number(session.amount_total) / 100,
         currency: typeof session.currency === "string" ? session.currency.toUpperCase() : "USD",
         stripe_payment_intent_id: intentId,
+        receipt_url: receiptUrl,
+        customer_email: typeof session.customer_email === "string" ? session.customer_email : null,
         status: "paid",
       });
 
