@@ -73,7 +73,26 @@ export default async function AdminChatMonitorPage() {
       participants: [...toParticipant(t.student), ...toParticipant(t.helper)],
       messages: toMessages(t.messages),
     })),
-  ];
+  ]
+    .filter((t) => t.messages.length > 0)
+    .map((t) => {
+      const sorted = [...t.messages].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      const last = sorted[0];
+      return {
+        ...t,
+        messages: sorted,
+        lastMessage: last
+          ? { body: last.body, senderName: last.sender?.name ?? null, createdAt: last.created_at }
+          : null,
+      };
+    })
+    .sort((a, b) => {
+      const pa = new Date(a.messages[0]?.created_at ?? a.createdAt).getTime();
+      const pb = new Date(b.messages[0]?.created_at ?? b.createdAt).getTime();
+      return pb - pa;
+    });
 
   const { data: warnings } = await adminClient
     .from("user_warnings")

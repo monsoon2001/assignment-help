@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { FileText, Loader2, Paperclip, Send, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { FileText, Loader2, Paperclip, Send, SmilePlus, X } from "lucide-react";
 import Avatar from "@/components/ui/avatar";
 import Card from "@/components/ui/card";
 
@@ -33,6 +33,12 @@ export function fileNameFromUrl(url: string): string {
   }
 }
 
+const EMOJIS = [
+  "😀", "😂", "😊", "😍", "😎", "🤔",
+  "👍", "👏", "🙏", "💪", "🤝", "✨",
+  "❤️", "🎉", "🔥", "✅", "🚀", "📚",
+];
+
 export default function ChatPanel({
   title = "Order Chat",
   messages, draft, setDraft, files, setFiles, sending, error, onSend, bottomRef, currentUserId,
@@ -57,11 +63,29 @@ export default function ChatPanel({
   };
 
   const messageListRef = useRef<HTMLDivElement | null>(null);
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const emojiRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const el = messageListRef.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages.length]);
+
+  useEffect(() => {
+    if (!emojiOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (emojiRef.current && !emojiRef.current.contains(e.target as Node)) {
+        setEmojiOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [emojiOpen]);
+
+  function insertEmoji(emoji: string) {
+    setDraft((draft || "") + emoji);
+    setEmojiOpen(false);
+  }
 
   return (
     <Card className="flex flex-col h-[480px] sm:h-[560px] xl:h-[640px] overflow-hidden">
@@ -146,7 +170,26 @@ export default function ChatPanel({
           </div>
         )}
         {error && <p className="text-xs text-error mb-2">{error}</p>}
-        <div className="flex items-end gap-2">
+        <div className="relative">
+          {emojiOpen && (
+            <div
+              ref={emojiRef}
+              className="absolute bottom-12 left-0 z-20 p-2.5 rounded-2xl bg-surface-container-lowest border border-outline-variant shadow-lg"
+            >
+              <div className="grid grid-cols-6 gap-1">
+                {EMOJIS.map((e) => (
+                  <button
+                    key={e}
+                    onClick={() => insertEmoji(e)}
+                    className="w-8 h-8 flex items-center justify-center text-lg rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer"
+                  >
+                    {e}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          <div className="flex items-end gap-2">
           <label className="w-9 h-9 shrink-0 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-low cursor-pointer">
             <Paperclip size={17} />
             <input
@@ -158,6 +201,15 @@ export default function ChatPanel({
               }}
             />
           </label>
+          <button
+            onClick={() => setEmojiOpen((o) => !o)}
+            className={`w-9 h-9 shrink-0 flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
+              emojiOpen ? "bg-primary-container text-on-primary" : "text-on-surface-variant hover:bg-surface-container-low"
+            }`}
+            aria-label="Add emoji"
+          >
+            <SmilePlus size={17} />
+          </button>
           <div className="flex-1 rounded-xl border border-outline-variant bg-surface-container-lowest focus-within:border-primary-container focus-within:ring-2 focus-within:ring-primary-container/20 transition-all px-3 py-2">
             <textarea
               rows={1}
@@ -176,6 +228,7 @@ export default function ChatPanel({
           >
             {sending ? <Loader2 size={17} className="animate-spin" /> : <Send size={17} />}
           </button>
+          </div>
         </div>
       </div>
     </Card>

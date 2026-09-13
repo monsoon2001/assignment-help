@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { unwrapRow } from "@/lib/embedded";
+import { Receipt } from "lucide-react";
 import { formatCurrency, normalizeCurrency, type CurrencyCode } from "@/lib/currency";
 
 export const dynamic = "force-dynamic";
@@ -21,6 +22,7 @@ type PaymentRow = {
   currency: string;
   status: string;
   created_at: string;
+  receipt_url: string | null;
   order: {
     status: string;
     proposal: { request: { title: string | null } | null } | null;
@@ -46,7 +48,7 @@ export default async function HelperEarnings() {
 
   const { data: payments, error } = await supabase
     .from("payments")
-    .select("id, amount, currency, status, created_at, order:orders!inner(status, proposal:proposals(request:requests(title)))")
+    .select("id, amount, currency, status, created_at, receipt_url, order:orders!inner(status, proposal:proposals(request:requests(title)))")
     .eq("status", "paid")
     .order("created_at", { ascending: false });
 
@@ -200,6 +202,16 @@ export default async function HelperEarnings() {
                           <div>
                             <p className="text-sm font-medium text-on-surface truncate max-w-[320px]">{title}</p>
                             <p className="text-xs text-on-surface-variant font-mono">{txn.id.slice(0, 8).toUpperCase()}</p>
+                            {txn.receipt_url && (
+                              <a
+                                href={txn.receipt_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline mt-1"
+                              >
+                                <Receipt size={12} /> View receipt
+                              </a>
+                            )}
                           </div>
                         </td>
                         <td className="px-6 py-4 text-sm text-on-surface-variant">

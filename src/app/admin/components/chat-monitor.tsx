@@ -20,6 +20,11 @@ export type ChatMonitorThread = {
   createdAt: string;
   status?: string;
   participants: ThreadParticipant[];
+  lastMessage?: {
+    body: string | null;
+    senderName: string | null;
+    createdAt: string;
+  } | null;
   messages: {
     id: string;
     body: string | null;
@@ -143,6 +148,17 @@ export default function ChatMonitor({
                     </span>
                   ))}
                 </div>
+                {!open && thread.lastMessage && (
+                  <p className="mt-2 text-sm text-on-surface-variant line-clamp-2">
+                    {thread.lastMessage.senderName && (
+                      <span className="font-medium text-on-surface">{thread.lastMessage.senderName}: </span>
+                    )}
+                    {thread.lastMessage.body}
+                    <span className="text-xs text-on-surface-variant/80 ml-2">
+                      {formatTime(thread.lastMessage.createdAt)}
+                    </span>
+                  </p>
+                )}
               </div>
               <Button size="sm" variant="outline" onClick={() => setExpanded((e) => ({ ...e, [key]: !open }))}>
                 {open ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
