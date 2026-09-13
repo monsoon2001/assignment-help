@@ -3,23 +3,17 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { GraduationCap, Mail, ArrowRight, ShieldCheck, Building2, Check, KeyRound, RotateCcw, Lock } from "lucide-react";
+import { GraduationCap, Mail, ArrowRight, ShieldCheck, Building2, Check, Lock } from "lucide-react";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { roleToHome } from "@/lib/auth";
 
-type Stage = "email" | "otp";
-type Mode = "code" | "password";
-
 export default function SignInPage() {
   const router = useRouter();
   const supabase = createClient();
-  const [stage, setStage] = useState<Stage>("email");
-  const [mode, setMode] = useState<Mode>("code");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,38 +24,7 @@ export default function SignInPage() {
     return "/";
   }
 
-  async function finalize(sessionUserId: string) {
-    const { data: profile } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", sessionUserId)
-      .maybeSingle();
-    const home = roleToHome(profile?.role);
-    await router.replace(nextPath() === "/" ? home : nextPath());
-  }
-
-  async function handleEmailSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { shouldCreateUser: false },
-    });
-
-    setLoading(false);
-
-    if (error) {
-      setError(error.message);
-      return;
-    }
-
-    setOtp("");
-    setStage("otp");
-  }
-
-  async function handlePasswordSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (password.length === 0) {
       setError("Enter your password.");
@@ -88,34 +51,13 @@ export default function SignInPage() {
       return;
     }
 
-    await finalize(userId);
-  }
-
-  async function handleOtpSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (otp.length !== 6) {
-      setError("Enter the 6-digit code sent to your email.");
-      return;
-    }
-    setLoading(true);
-    setError(null);
-
-    const { data, error } = await supabase.auth.verifyOtp({ email, token: otp, type: "email" });
-
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-      return;
-    }
-
-    const userId = data.user?.id;
-    if (!userId) {
-      setError("Could not identify the signed-in user.");
-      setLoading(false);
-      return;
-    }
-
-    await finalize(userId);
+    const { data: profile } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", userId)
+      .maybeSingle();
+    const home = roleToHome(profile?.role);
+    await router.replace(nextPath() === "/" ? home : nextPath());
   }
 
   async function handleGoogle() {
@@ -153,146 +95,45 @@ export default function SignInPage() {
                 <Building2 size={12} />
                 Academic Portal
               </span>
-              <h1 className="font-display font-bold text-2xl text-on-surface">
-                {stage === "email" ? "Welcome back" : "Enter verification code"}
-              </h1>
+              <h1 className="font-display font-bold text-2xl text-on-surface">Welcome back</h1>
               <p className="text-sm text-on-surface-variant mt-1.5">
-                {stage === "email"
-                  ? mode === "password"
-                    ? "Sign in with Google or your email & password"
-                    : "Sign in with Google or an email verification code"
-                  : `We sent a 6-digit code to ${email}`}
+                Sign in with Google or your email &amp; password
               </p>
             </div>
 
-            {stage === "email" ? (
-              <>
-                <div className="grid grid-cols-2 gap-1 p-1 rounded-lg bg-surface-container-low mb-4">
-                  {(["code", "password"] as const).map((m) => (
-                    <button
-                      key={m}
-                      type="button"
-                      onClick={() => setMode(m)}
-                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                        mode === m
-                          ? "bg-surface-container-lowest text-on-surface shadow-sm"
-                          : "text-on-surface-variant hover:text-on-surface"
-                      }`}
-                    >
-                      {m === "code" ? "Email code" : "Password"}
-                    </button>
-                  ))}
-                </div>
+            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+              <Input
+                label="Email address"
+                type="email"
+                placeholder="you@example.com"
+                icon={<Mail size={18} />}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
 
-                {mode === "code" ? (
-                  <form className="flex flex-col gap-4" onSubmit={handleEmailSubmit}>
-                    <Input
-                      label="Email address"
-                      type="email"
-                      placeholder="you@example.com"
-                      icon={<Mail size={18} />}
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
+              <Input
+                label="Password"
+                type="password"
+                placeholder="Enter your password"
+                icon={<Lock size={18} />}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
 
-                    {error && (
-                      <p className="text-sm text-error bg-error-container/30 border border-error/20 rounded-lg px-3 py-2">
-                        {error}
-                      </p>
-                    )}
+              {error && (
+                <p className="text-sm text-error bg-error-container/30 border border-error/20 rounded-lg px-3 py-2">
+                  {error}
+                </p>
+              )}
 
-                    <Button type="submit" size="lg" className="w-full justify-between" disabled={loading}>
-                      {loading ? "Sending code..." : "Continue with Email"}
-                      <ArrowRight size={18} />
-                    </Button>
-                  </form>
-                ) : (
-                  <form className="flex flex-col gap-4" onSubmit={handlePasswordSubmit}>
-                    <Input
-                      label="Email address"
-                      type="email"
-                      placeholder="you@example.com"
-                      icon={<Mail size={18} />}
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-
-                    <Input
-                      label="Password"
-                      type="password"
-                      placeholder="Enter your password"
-                      icon={<Lock size={18} />}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      autoComplete="current-password"
-                      required
-                    />
-
-                    {error && (
-                      <p className="text-sm text-error bg-error-container/30 border border-error/20 rounded-lg px-3 py-2">
-                        {error}
-                      </p>
-                    )}
-
-                    <Button type="submit" size="lg" className="w-full justify-between" disabled={loading}>
-                      {loading ? "Signing in..." : "Sign In with Password"}
-                      <ArrowRight size={18} />
-                    </Button>
-                  </form>
-                )}
-              </>
-            ) : (
-              <form className="flex flex-col gap-4" onSubmit={handleOtpSubmit}>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-on-surface">Verification code</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    pattern="[0-9]*"
-                    maxLength={6}
-                    placeholder="000000"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                    required
-                    className="w-full h-12 px-4 bg-surface-container-lowest border border-outline-variant rounded-lg text-center text-lg font-mono font-semibold tracking-[0.5em] text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
-                  />
-                </div>
-
-                {error && (
-                  <p className="text-sm text-error bg-error-container/30 border border-error/20 rounded-lg px-3 py-2">
-                    {error}
-                  </p>
-                )}
-
-                <Button type="submit" size="lg" className="w-full justify-between" disabled={loading}>
-                  {loading ? "Verifying..." : "Verify & Sign In"}
-                  <ArrowRight size={18} />
-                </Button>
-
-                <div className="flex items-center justify-between">
-                  <button
-                    type="button"
-                    onClick={() => setStage("email")}
-                    className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1"
-                  >
-                    <KeyRound size={13} />
-                    Change email
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleEmailSubmit}
-                    disabled={loading}
-                    className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1 disabled:opacity-50"
-                  >
-                    <RotateCcw size={13} />
-                    Resend code
-                  </button>
-                </div>
-              </form>
-            )}
+              <Button type="submit" size="lg" className="w-full justify-between" disabled={loading}>
+                {loading ? "Signing in..." : "Sign In"}
+                <ArrowRight size={18} />
+              </Button>
+            </form>
 
             <div className="flex items-center gap-3 my-6">
               <div className="flex-1 h-px bg-outline-variant" />
