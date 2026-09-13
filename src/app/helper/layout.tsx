@@ -12,6 +12,7 @@ import {
   Briefcase,
   DollarSign,
   MessageSquare,
+  MessagesSquare,
   User,
   Phone,
   Headset,
@@ -23,6 +24,7 @@ const links = [
   { key: "orders", href: "/helper/orders", label: "Active Orders", icon: Briefcase },
   { key: "earnings", href: "/helper/earnings", label: "Earnings", icon: DollarSign },
   { key: "messages", href: "/helper/messages", label: "Messages", icon: MessageSquare },
+  { key: "chat-admin", href: "/helper/chat-admin", label: "Chat With Admin", icon: MessagesSquare },
   { key: "profile", href: "/helper/profile", label: "Profile", icon: User },
 ];
 

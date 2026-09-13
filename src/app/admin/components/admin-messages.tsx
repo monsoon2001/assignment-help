@@ -7,7 +7,7 @@ import Avatar from "@/components/ui/avatar";
 import Button from "@/components/ui/button";
 import { MessageSquare, Phone, Send } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { realtimeTopic } from "@/lib/supabase/realtime";
+import { ADMIN_MESSAGES_CHANNEL } from "@/lib/supabase/realtime";
 import { useVoiceCall } from "@/components/call/voice-call";
 
 type HelperLite = {
@@ -59,7 +59,7 @@ const selectedIdRef = useRef<string | null>(null);
     });
 
     supabase
-      .channel(realtimeTopic("admin-messages"))
+      .channel(ADMIN_MESSAGES_CHANNEL)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "admin_messages" },

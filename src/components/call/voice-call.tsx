@@ -12,6 +12,15 @@ import {
 import { createPortal } from "react-dom";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
+import {
+  playIncomingRing,
+  playOutgoingRingback,
+  playBusy,
+  playConnected,
+  playHangup,
+  stopAllSounds,
+  unlockAudio,
+} from "@/lib/call-sounds";
 import { Phone, PhoneOff, Mic, MicOff, Loader2 } from "lucide-react";
 import Avatar from "@/components/ui/avatar";
 
@@ -42,6 +51,7 @@ type Signal =
   | { kind: "ice"; call: string; to: string; from: string; candidate: RTCIceCandidateInit }
   | { kind: "end"; call: string; to: string; from: string }
   | { kind: "decline"; call: string; to: string; from: string }
+  | { kind: "no-answer"; call: string; to: string; from: string }
   | { kind: "busy"; call: string; to: string; from: string };
 
 type VoiceCallApi = {
@@ -89,7 +99,10 @@ export function VoiceCallProvider({
   const [error, setError] = useState<string | null>(null);
   const [adminPeer, setAdminPeer] = useState<CallPeer | null>(null);
 
+  const supabase = createClient();
   const phaseRef = useRef<CallPhase>("idle");
+  const prevPhaseRef = useRef<CallPhase>("idle");
+  const soundStopRef = useRef<{ stop: () => void } | null>(null);
   const callIdRef = useRef<string | null>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -103,10 +116,67 @@ export function VoiceCallProvider({
   const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
   const noAnswerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoIdleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const logIdRef = useRef<string | null>(null);
+  const answeredAtRef = useRef<number | null>(null);
 
   const setPhaseBoth = useCallback((p: CallPhase) => {
     phaseRef.current = p;
     setPhase(p);
+  }, []);
+
+  const recordLog = useCallback(
+    async (row: {
+      caller_id: string;
+      callee_id: string;
+      direction: "outgoing" | "incoming";
+      status: string;
+    }): Promise<string | null> => {
+      try {
+        const { data, error } = await supabase
+          .from("call_logs")
+          .insert(row)
+          .select("id")
+          .single();
+        if (error) throw error;
+        logIdRef.current = data?.id ?? null;
+        return data?.id ?? null;
+      } catch {
+        logIdRef.current = null;
+        return null;
+      }
+    },
+    [supabase]
+  );
+
+  const patchLog = useCallback(
+    (patch: {
+      status?: string;
+      answered_at?: string | null;
+      ended_at?: string | null;
+      duration_seconds?: number;
+    }) => {
+      const id = logIdRef.current;
+      if (!id) return;
+      void (async () => {
+        try {
+          await supabase.from("call_logs").update(patch).eq("id", id);
+        } catch {
+          /* non-fatal */
+        }
+      })();
+    },
+    [supabase]
+  );
+
+  const clearLog = useCallback(() => {
+    logIdRef.current = null;
+    answeredAtRef.current = null;
+  }, []);
+
+  const durationSinceAnswer = useCallback(() => {
+    const a = answeredAtRef.current;
+    if (!a) return 0;
+    return Math.max(0, Math.round((Date.now() - a) / 1000));
   }, []);
 
   const send = useCallback((signal: Signal) => {
@@ -133,9 +203,14 @@ export function VoiceCallProvider({
     pendingOfferRef.current = null;
     callIdRef.current = null;
     peerRef.current = null;
+    clearLog();
     setSeconds(0);
     setMuted(false);
-  }, []);
+    if (soundStopRef.current) {
+      soundStopRef.current.stop();
+      soundStopRef.current = null;
+    }
+  }, [clearLog]);
 
   const autoIdle = useCallback(
     (p: "declined" | "busy" | "no-answer" | "ended" | "failed") => {
@@ -165,7 +240,7 @@ export function VoiceCallProvider({
           setPhaseBoth("incoming");
           noAnswerTimerRef.current = setTimeout(() => {
             if (phaseRef.current === "incoming") {
-              send({ kind: "decline", call: callIdRef.current ?? "", to: peerRef.current?.id ?? "", from: meRef.current ?? "" });
+              send({ kind: "no-answer", call: callIdRef.current ?? "", to: peerRef.current?.id ?? "", from: meRef.current ?? "" });
               cleanup();
               setPhaseBoth("idle");
             }
@@ -184,6 +259,8 @@ export function VoiceCallProvider({
             return;
           }
           if (noAnswerTimerRef.current) clearTimeout(noAnswerTimerRef.current);
+          answeredAtRef.current = Date.now();
+          patchLog({ status: "answered", answered_at: new Date().toISOString() });
           setPhaseBoth("active");
           break;
         }
@@ -198,18 +275,36 @@ export function VoiceCallProvider({
         }
         case "end": {
           if (callIdRef.current !== sig.call) return;
+          if (phaseRef.current === "active") {
+            patchLog({
+              status: "answered",
+              ended_at: new Date().toISOString(),
+              duration_seconds: durationSinceAnswer(),
+            });
+          } else {
+            patchLog({ status: "cancelled", ended_at: new Date().toISOString() });
+          }
           cleanup();
           autoIdle("ended");
           break;
         }
         case "decline": {
           if (callIdRef.current !== sig.call) return;
+          patchLog({ status: "declined", ended_at: new Date().toISOString() });
           cleanup();
           autoIdle("declined");
           break;
         }
+        case "no-answer": {
+          if (callIdRef.current !== sig.call) return;
+          patchLog({ status: "missed", ended_at: new Date().toISOString() });
+          cleanup();
+          autoIdle("no-answer");
+          break;
+        }
         case "busy": {
           if (callIdRef.current !== sig.call) return;
+          patchLog({ status: "busy", ended_at: new Date().toISOString() });
           cleanup();
           autoIdle("busy");
           break;
@@ -218,21 +313,21 @@ export function VoiceCallProvider({
           break;
       }
     },
-    [autoIdle, cleanup, send, setPhaseBoth]
+    [autoIdle, cleanup, durationSinceAnswer, patchLog, send, setPhaseBoth]
   );
 
   useEffect(() => {
-    const supabase = createClient();
+    const client = supabase;
     let alive = true;
 
     void (async () => {
       const {
         data: { user },
-      } = await supabase.auth.getUser();
+      } = await client.auth.getUser();
       if (!user || !alive) return;
       meRef.current = user.id;
 
-      const { data: profile } = await supabase
+      const { data: profile } = await client
         .from("users")
         .select("name, avatar_url, role")
         .eq("id", user.id)
@@ -242,7 +337,7 @@ export function VoiceCallProvider({
       myAvatarRef.current = row?.avatar_url ?? null;
 
       if (role === "helper") {
-        const { data: admins } = await supabase
+        const { data: admins } = await client
           .from("users")
           .select("id, name, avatar_url")
           .eq("role", "admin")
@@ -251,7 +346,7 @@ export function VoiceCallProvider({
         if (ad) setAdminPeer({ id: ad.id, name: ad.name ?? "Admin", avatarUrl: ad.avatar_url });
       }
 
-      const channel = supabase
+      const channel = client
         .channel(CALL_CHANNEL)
         .on("broadcast", { event: "call-signal" }, (payload) => {
           void handleSignal(payload.payload);
@@ -264,13 +359,55 @@ export function VoiceCallProvider({
       alive = false;
       void supabase.removeAllChannels();
       cleanup();
+      stopAllSounds();
     };
-  }, [role, cleanup, handleSignal]);
+  }, [role, cleanup, handleSignal, supabase, setAdminPeer]);
 
   useEffect(() => {
     if (phase !== "active") return;
     const iv = setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => clearInterval(iv);
+  }, [phase]);
+
+  useEffect(() => {
+    const prev = prevPhaseRef.current;
+    prevPhaseRef.current = phase;
+    if (prev === phase) return;
+
+    if (soundStopRef.current) {
+      soundStopRef.current.stop();
+      soundStopRef.current = null;
+    }
+
+    switch (phase) {
+      case "incoming":
+        unlockAudio();
+        soundStopRef.current = playIncomingRing();
+        break;
+      case "outgoing":
+        unlockAudio();
+        soundStopRef.current = playOutgoingRingback();
+        break;
+      case "active":
+        if (prev === "incoming" || prev === "outgoing") playConnected();
+        break;
+      case "declined":
+      case "busy":
+      case "no-answer":
+        soundStopRef.current = playBusy();
+        break;
+      case "ended":
+        playHangup();
+        break;
+      case "failed":
+        playHangup();
+        break;
+      case "idle":
+        if (prev === "active" || prev === "outgoing") playHangup();
+        break;
+      default:
+        break;
+    }
   }, [phase]);
 
   async function startCall(target: CallPeer) {
@@ -284,6 +421,13 @@ export function VoiceCallProvider({
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
       if (localAudioRef.current) localAudioRef.current.srcObject = stream;
+
+      await recordLog({
+        caller_id: meRef.current ?? "",
+        callee_id: target.id,
+        direction: "outgoing",
+        status: "ringing",
+      });
 
       const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
       pcRef.current = pc;
@@ -322,17 +466,18 @@ export function VoiceCallProvider({
       setPhaseBoth("outgoing");
       noAnswerTimerRef.current = setTimeout(() => {
         if (phaseRef.current === "outgoing") {
-          send({
-            kind: "end",
-            call: callIdRef.current ?? "",
-            to: peerRef.current?.id ?? "",
-            from: meRef.current ?? "",
-          });
+          patchLog({ status: "missed", ended_at: new Date().toISOString() });
           cleanup();
           autoIdle("no-answer");
         }
       }, 60000);
     } catch (e) {
+      recordLog({
+        caller_id: meRef.current ?? "",
+        callee_id: target.id,
+        direction: "outgoing",
+        status: "failed",
+      });
       cleanup();
       setError(e instanceof Error ? e.message : "Could not start the call (microphone access was denied).");
       autoIdle("failed");
@@ -410,6 +555,15 @@ export function VoiceCallProvider({
     if (phaseRef.current === "incoming") {
       decline();
       return;
+    }
+    if (phaseRef.current === "active") {
+      patchLog({
+        status: "answered",
+        ended_at: new Date().toISOString(),
+        duration_seconds: durationSinceAnswer(),
+      });
+    } else if (phaseRef.current === "outgoing") {
+      patchLog({ status: "cancelled", ended_at: new Date().toISOString() });
     }
     send({
       kind: "end",
