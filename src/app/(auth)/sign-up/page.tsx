@@ -17,6 +17,8 @@ export default function SignUpPage() {
   const [stage, setStage] = useState<Stage>("email");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [accepted, setAccepted] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -26,6 +28,27 @@ export default function SignUpPage() {
     e?.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (!name.trim()) {
+      setError("Enter your full name.");
+      setLoading(false);
+      return;
+    }
+    if (email.trim().length === 0) {
+      setError("Enter your email address.");
+      setLoading(false);
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      setLoading(false);
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -66,6 +89,13 @@ export default function SignUpPage() {
     const userId = data.user?.id;
     if (!userId) {
       setError("Could not identify the created user.");
+      setLoading(false);
+      return;
+    }
+
+    const { error: passwordError } = await supabase.auth.updateUser({ password });
+    if (passwordError) {
+      setError(passwordError.message);
       setLoading(false);
       return;
     }
@@ -178,6 +208,28 @@ export default function SignUpPage() {
                       We&apos;ll send a 6-digit verification code to this email.
                     </p>
                   </div>
+
+                  <Input
+                    label="Password"
+                    type="password"
+                    placeholder="Create a password"
+                    icon={<KeyRound size={18} />}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="new-password"
+                    required
+                  />
+
+                  <Input
+                    label="Confirm Password"
+                    type="password"
+                    placeholder="Re-enter your password"
+                    icon={<KeyRound size={18} />}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    autoComplete="new-password"
+                    required
+                  />
 
                   {error && (
                     <p className="text-sm text-error bg-error-container/30 border border-error/20 rounded-lg px-3 py-2">

@@ -3,19 +3,22 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { GraduationCap, Mail, ArrowRight, ShieldCheck, Building2, Check, KeyRound, RotateCcw } from "lucide-react";
+import { GraduationCap, Mail, ArrowRight, ShieldCheck, Building2, Check, KeyRound, RotateCcw, Lock } from "lucide-react";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { roleToHome } from "@/lib/auth";
 
 type Stage = "email" | "otp";
+type Mode = "code" | "password";
 
 export default function SignInPage() {
   const router = useRouter();
   const supabase = createClient();
   const [stage, setStage] = useState<Stage>("email");
+  const [mode, setMode] = useState<Mode>("code");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,6 +59,36 @@ export default function SignInPage() {
 
     setOtp("");
     setStage("otp");
+  }
+
+  async function handlePasswordSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (password.length === 0) {
+      setError("Enter your password.");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    const userId = data.user?.id;
+    if (!userId) {
+      setError("Could not identify the signed-in user.");
+      setLoading(false);
+      return;
+    }
+
+    await finalize(userId);
   }
 
   async function handleOtpSubmit(e: React.FormEvent) {
@@ -125,34 +158,91 @@ export default function SignInPage() {
               </h1>
               <p className="text-sm text-on-surface-variant mt-1.5">
                 {stage === "email"
-                  ? "Sign in with Google or an email verification code"
+                  ? mode === "password"
+                    ? "Sign in with Google or your email & password"
+                    : "Sign in with Google or an email verification code"
                   : `We sent a 6-digit code to ${email}`}
               </p>
             </div>
 
             {stage === "email" ? (
-              <form className="flex flex-col gap-4" onSubmit={handleEmailSubmit}>
-                <Input
-                  label="Email address"
-                  type="email"
-                  placeholder="you@example.com"
-                  icon={<Mail size={18} />}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
+              <>
+                <div className="grid grid-cols-2 gap-1 p-1 rounded-lg bg-surface-container-low mb-4">
+                  {(["code", "password"] as const).map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setMode(m)}
+                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                        mode === m
+                          ? "bg-surface-container-lowest text-on-surface shadow-sm"
+                          : "text-on-surface-variant hover:text-on-surface"
+                      }`}
+                    >
+                      {m === "code" ? "Email code" : "Password"}
+                    </button>
+                  ))}
+                </div>
 
-                {error && (
-                  <p className="text-sm text-error bg-error-container/30 border border-error/20 rounded-lg px-3 py-2">
-                    {error}
-                  </p>
+                {mode === "code" ? (
+                  <form className="flex flex-col gap-4" onSubmit={handleEmailSubmit}>
+                    <Input
+                      label="Email address"
+                      type="email"
+                      placeholder="you@example.com"
+                      icon={<Mail size={18} />}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+
+                    {error && (
+                      <p className="text-sm text-error bg-error-container/30 border border-error/20 rounded-lg px-3 py-2">
+                        {error}
+                      </p>
+                    )}
+
+                    <Button type="submit" size="lg" className="w-full justify-between" disabled={loading}>
+                      {loading ? "Sending code..." : "Continue with Email"}
+                      <ArrowRight size={18} />
+                    </Button>
+                  </form>
+                ) : (
+                  <form className="flex flex-col gap-4" onSubmit={handlePasswordSubmit}>
+                    <Input
+                      label="Email address"
+                      type="email"
+                      placeholder="you@example.com"
+                      icon={<Mail size={18} />}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+
+                    <Input
+                      label="Password"
+                      type="password"
+                      placeholder="Enter your password"
+                      icon={<Lock size={18} />}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      autoComplete="current-password"
+                      required
+                    />
+
+                    {error && (
+                      <p className="text-sm text-error bg-error-container/30 border border-error/20 rounded-lg px-3 py-2">
+                        {error}
+                      </p>
+                    )}
+
+                    <Button type="submit" size="lg" className="w-full justify-between" disabled={loading}>
+                      {loading ? "Signing in..." : "Sign In with Password"}
+                      <ArrowRight size={18} />
+                    </Button>
+                  </form>
                 )}
-
-                <Button type="submit" size="lg" className="w-full justify-between" disabled={loading}>
-                  {loading ? "Sending code..." : "Continue with Email"}
-                  <ArrowRight size={18} />
-                </Button>
-              </form>
+              </>
             ) : (
               <form className="flex flex-col gap-4" onSubmit={handleOtpSubmit}>
                 <div className="flex flex-col gap-1.5">
