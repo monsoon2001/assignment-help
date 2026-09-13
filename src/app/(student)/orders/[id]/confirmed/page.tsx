@@ -185,9 +185,9 @@ export default async function OrderConfirmedPage({
       <div className="flex items-start gap-2 p-4 rounded-xl bg-surface-container-low">
         <ShieldCheck size={17} className="text-primary shrink-0 mt-0.5" />
         <p className="text-xs leading-relaxed text-on-surface-variant">
-          Protected by the <span className="font-semibold text-on-surface">PeerCraft Academic Guarantee</span>: a{" "}
-          <span className="font-semibold text-on-surface inline-flex items-center gap-1"><Timer size={11} /> free revision window</span>{" "}
-          begins upon delivery. Funds release to the mentor only after your review.
+          Protected by the <span className="font-semibold text-on-surface">PeerCraft Academic Guarantee</span>:{" "}
+          <span className="font-semibold text-on-surface inline-flex items-center gap-1"><Timer size={11} /> unlimited revisions</span>{" "}
+          until you&apos;re satisfied. Funds release to the mentor only after your review.
         </p>
       </div>
     </div>

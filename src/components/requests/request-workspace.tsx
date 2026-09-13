@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import {
   CalendarDays, CheckCircle2, ChevronRight, Clock, FileText, Loader2, RotateCcw, Send, ShieldCheck,
@@ -25,6 +26,7 @@ import { realtimeTopic } from "@/lib/supabase/realtime";
 import { fetchRequestMessages, sendRequestMessage } from "@/lib/request-chat";
 import { reassignRequest, type HelperCandidate } from "@/lib/requests";
 import { submitProposal } from "@/lib/proposals";
+import { markThreadNotificationsRead } from "@/lib/notifications";
 
 const RESPONSE_WINDOW_MS = 2 * 60 * 60 * 1000;
 
@@ -93,6 +95,11 @@ export default function RequestWorkspace({
   const [resendError, setResendError] = useState<string | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    markThreadNotificationsRead(pathname);
+  }, [pathname]);
 
   const loadRequest = useCallback(async () => {
     const { data } = await supabase.current
@@ -185,8 +192,15 @@ export default function RequestWorkspace({
     }
 
     void init();
+
+    const poll = setInterval(() => {
+      if (!active) return;
+      void Promise.all([loadMessages(), loadRequest(), loadProposal()]);
+    }, 10000);
+
     return () => {
       active = false;
+      clearInterval(poll);
       if (channel) void client.removeChannel(channel);
     };
   }, [requestId, loadRequest, loadMessages, loadProposal]);
@@ -457,13 +471,12 @@ export default function RequestWorkspace({
                 />
               </div>
               <div className="mt-4">
-                <Input
-                  label="Revisions included"
-                  type="number"
-                  min="0"
-                  value={bidRevisions}
-                  onChange={(e) => setBidRevisions(e.target.value)}
-                />
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-surface-container-low border border-outline-variant">
+                  <RotateCcw size={15} className="text-primary shrink-0 mt-0.5" />
+                  <p className="text-xs leading-relaxed text-on-surface-variant">
+                    Unlimited revisions until the student is satisfied with the delivered work — no extra cost.
+                  </p>
+                </div>
               </div>
               <div className="mt-4">
                 <Input

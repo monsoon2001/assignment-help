@@ -133,7 +133,7 @@ export default function ProposalCard({
             </div>
             <div className="flex items-center gap-1.5 text-on-surface-variant text-[11px] mt-0.5">
               <RotateCcw size={12} />
-              {proposal.revisions_included} revision{proposal.revisions_included !== 1 ? "s" : ""} included
+              Unlimited revisions until you&apos;re satisfied
             </div>
           </div>
         </div>
@@ -156,14 +156,10 @@ export default function ProposalCard({
 
         <div className="flex items-center gap-2 text-xs text-on-surface-variant">
           <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
-          {proposal.revisions_included > 0 ? (
-            <span>
-              <span className="font-semibold text-on-surface">{proposal.revisions_included} revision round{proposal.revisions_included !== 1 ? "s" : ""}</span>{" "}
-              included within the agreed scope at zero supplemental cost.
-            </span>
-          ) : (
-            <span>Fixed-scope engagement &middot; review before acceptance.</span>
-          )}
+          <span>
+            <span className="font-semibold text-on-surface">Unlimited revisions</span>{" "}
+            until you&apos;re fully satisfied with the delivered work, at zero supplemental cost.
+          </span>
           <span className="text-outline-variant">&middot;</span>
           <CalendarDays size={14} className="shrink-0" />
           <span>{requestTitle || "Delivery"} coordinated in workspace chat.</span>

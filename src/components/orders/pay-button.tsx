@@ -53,7 +53,7 @@ export default function PayButton({
         )}
       </Button>
       <p className="text-xs text-on-surface-variant text-center inline-flex items-center justify-center gap-1">
-        <Lock size={12} /> 256-bit encrypted checkout. Revisions are included if you are not satisfied.
+        <Lock size={12} /> 256-bit encrypted checkout. Unlimited revisions until you&apos;re satisfied.
       </p>
     </div>
   );

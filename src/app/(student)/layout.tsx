@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { LayoutDashboard, FileText, MessageSquare, Bell, User, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import Header from "@/components/layout/header";
-import Badge from "@/components/ui/badge";
+import StudentNav from "@/components/layout/student-nav";
 import WarningsBanner from "@/components/layout/warnings-banner";
 import { createClient } from "@/lib/supabase/server";
 
@@ -32,12 +32,12 @@ export default async function StudentLayout({ children }: { children: React.Reac
     notifCount = notif ?? 0;
   }
 
-  const navItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/requests", label: "My Requests", icon: FileText, badge: requestCount > 0 ? String(requestCount) : undefined },
-    { href: "/messages", label: "Messages", icon: MessageSquare },
-    { href: "/notifications", label: "Notifications", icon: Bell, badge: notifCount > 0 ? String(notifCount) : undefined },
-    { href: "/profile", label: "Profile", icon: User },
+  const navItems: { key: "dashboard" | "requests" | "messages" | "notifications" | "profile"; href: string; label: string; badge?: string }[] = [
+    { key: "dashboard", href: "/dashboard", label: "Dashboard" },
+    { key: "requests", href: "/requests", label: "My Requests", badge: requestCount > 0 ? String(requestCount) : undefined },
+    { key: "messages", href: "/messages", label: "Messages" },
+    { key: "notifications", href: "/notifications", label: "Notifications", badge: notifCount > 0 ? String(notifCount) : undefined },
+    { key: "profile", href: "/profile", label: "Profile" },
   ];
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -49,20 +49,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
           <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-widest text-on-surface-variant">
             Student
           </p>
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors"
-              >
-                <Icon size={18} className="shrink-0" />
-                <span className="flex-1">{item.label}</span>
-                {item.badge && <Badge variant="primary" className="px-2 py-0.5">{item.badge}</Badge>}
-              </Link>
-            );
-          })}
+          <StudentNav items={navItems} />
 
           <div className="mt-auto pt-4">
             <Link

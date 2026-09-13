@@ -75,7 +75,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
           <p className="text-sm font-medium text-on-surface">{request?.title ?? "Untitled request"}</p>
           <p className="text-sm text-on-surface-variant mt-1 line-clamp-4">{proposal?.description ?? request?.description}</p>
           <p className="text-xs text-on-surface-variant mt-3">
-            {(proposal?.revisions_included ?? 0) > 0 ? `${proposal?.revisions_included} revision(s) included` : "No revisions included"}
+            Unlimited revisions until the student is satisfied
           </p>
           <p className="text-xs text-on-surface-variant mt-1">Deadline: {formatDate(order.deadline)}</p>
         </Card>

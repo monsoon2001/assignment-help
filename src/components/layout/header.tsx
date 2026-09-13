@@ -33,6 +33,40 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
   const pathname = usePathname();
   const router = useRouter();
 
+  const fetchUnread = useCallback(async () => {
+    const supabase = createClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.user.id) return;
+    const { count } = await supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", session.user.id)
+      .eq("read", false);
+    setUnreadCount(count ?? 0);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    void (async () => {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.user.id || !active) return;
+      const { count } = await supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", session.user.id)
+        .eq("read", false);
+      if (active) setUnreadCount(count ?? 0);
+    })();
+    return () => {
+      active = false;
+    };
+  }, [pathname]);
+
   useEffect(() => {
     let active = true;
     let channel: ReturnType<ReturnType<typeof createClient>["channel"]> | null = null;
@@ -76,7 +110,21 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
             "postgres_changes",
             { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${session.user.id}` },
             () => {
-              setUnreadCount((prev) => prev + 1);
+              void fetchUnread();
+            }
+          )
+          .on(
+            "postgres_changes",
+            { event: "UPDATE", schema: "public", table: "notifications", filter: `user_id=eq.${session.user.id}` },
+            () => {
+              void fetchUnread();
+            }
+          )
+          .on(
+            "postgres_changes",
+            { event: "DELETE", schema: "public", table: "notifications", filter: `user_id=eq.${session.user.id}` },
+            () => {
+              void fetchUnread();
             }
           )
           .subscribe();
@@ -88,7 +136,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
       active = false;
       if (channel) void supabase.removeChannel(channel);
     };
-  }, []);
+  }, [fetchUnread]);
 
   const handleSignOut = useCallback(async () => {
     const supabase = createClient();

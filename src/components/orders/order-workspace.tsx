@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   ChevronRight, LayoutGrid, MessageSquare, Package, Check,
   ShieldCheck, FileText, Download, RotateCcw, Star, Clock,
@@ -16,6 +17,7 @@ import { createClient } from "@/lib/supabase/client";
 import { realtimeTopic } from "@/lib/supabase/realtime";
 import { uploadOrderFile } from "@/lib/order-files";
 import { normalizeCurrency, formatCurrency } from "@/lib/currency";
+import { markThreadNotificationsRead } from "@/lib/notifications";
 import ChatPanel, { type ChatMessageRow, timeLabel, fileNameFromUrl } from "@/components/chat/chat-panel";
 
 type OrderStatus =
@@ -87,6 +89,11 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const requestIdRef = useRef<string | null>(null);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    markThreadNotificationsRead(pathname);
+  }, [pathname]);
 
   const loadOrder = useCallback(async () => {
     const { data, error } = await supabase.current
@@ -186,8 +193,15 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
     }
 
     void init();
+
+    const poll = setInterval(() => {
+      if (!active) return;
+      void Promise.all([loadMessages(), loadDeliveries(), loadOrder()]);
+    }, 10000);
+
     return () => {
       active = false;
+      clearInterval(poll);
       if (channel) void client.removeChannel(channel);
     };
   }, [orderId, loadOrder, loadMessages, loadDeliveries]);
@@ -450,7 +464,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                   <DollarSign size={14} /> {price} fixed
                 </span>
                 <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
-                  <RotateCcw size={14} /> {order.proposal?.revisions_included ?? 0} revisions
+                  <RotateCcw size={14} /> Unlimited revisions
                 </span>
                 <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
                   <CalendarDays size={14} />{" "}

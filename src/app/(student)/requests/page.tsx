@@ -307,8 +307,8 @@ export default async function RequestsPage() {
         <div>
           <h3 className="font-semibold text-sm text-on-surface">Revision policy</h3>
           <p className="text-xs leading-relaxed text-on-surface-variant mt-1">
-            Every delivery includes up to <span className="font-semibold text-on-surface">2 free revision rounds</span>{" "}
-            within 14 days of delivery. Helpers are expected to address scope-matching feedback; entirely new
+            Revisions are <span className="font-semibold text-on-surface">unlimited until you&apos;re fully satisfied</span>{" "}
+            with the delivered work. Helpers are expected to address scope-matching feedback; entirely new
             requirements may open a new request. Disputes are mediated by the Academic Integrity Office.
           </p>
         </div>

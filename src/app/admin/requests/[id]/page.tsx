@@ -119,7 +119,7 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
                   </div>
                   <p className="text-sm text-on-surface-variant mt-1">{proposal.description || "No description."}</p>
                   <p className="text-xs text-on-surface-variant mt-2">
-                    {proposal.revisions_included > 0 ? `${proposal.revisions_included} revision(s) included` : "No revisions included"}
+                    Unlimited revisions until the student is satisfied
                   </p>
                 </div>
                 <div className="text-right shrink-0">

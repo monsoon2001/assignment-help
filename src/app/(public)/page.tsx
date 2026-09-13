@@ -20,14 +20,14 @@ const steps = [
   { num: "1", icon: "edit_note", title: "Tell us what you need", desc: "Describe your assignment, upload any files, and select the subject and deadline." },
   { num: "2", icon: "group_add", title: "Choose your helper", desc: "Pick the helper who specializes in your subject area and feel most comfortable with." },
   { num: "3", icon: "receipt_long", title: "Review price & confirm", desc: "Receive a transparent quote. No hidden fees — confirm only when you're satisfied." },
-  { num: "4", icon: "task_alt", title: "Get completed work", desc: "Get your completed work with 2 free revision rounds within 14 days. Payments are final — no refunds." },
+  { num: "4", icon: "task_alt", title: "Get completed work", desc: "Receive your completed work on time, with unlimited revisions until you're fully satisfied." },
 ];
 
 const benefits = [
   { icon: "paid", title: "Clear Pricing", desc: "Know exactly what you'll pay upfront. No surprise charges, no hidden fees." },
   { icon: "chat", title: "Direct Communication", desc: "Message your helper directly. Ask questions, share files, and track progress." },
   { icon: "verified", title: "Quality You Can Trust", desc: "Every helper is vetted. Work is reviewed for accuracy and originality." },
-  { icon: "replay", title: "Simple Revisions", desc: "Not quite right? You get 2 free revision rounds within 14 days of delivery — payments are final, quality is guaranteed." },
+  { icon: "replay", title: "Unlimited Revisions", desc: "Not quite right? Request as many revisions as you need until you're fully satisfied — no extra cost, no deadlines." },
 ];
 
 const subjects = ["English Literature", "Mathematics", "Biology", "Chemistry", "Physics", "Computer Science", "History", "Psychology", "Economics", "Business Studies", "Nursing", "Engineering", "Statistics", "Philosophy", "Sociology", "Political Science"];
@@ -35,9 +35,9 @@ const subjects = ["English Literature", "Mathematics", "Biology", "Chemistry", "
 const marqueeItems = SERVICE_TYPES;
 
 const testimonials = [
-  { name: "Alex M.", role: "English Major", rating: 5, text: "The helper I worked with helped me structure my thesis argument beautifully. The step-by-step feedback was invaluable — I learned more in one session than in weeks of struggling alone." },
-  { name: "Sarah L.", role: "Biology Student", rating: 5, text: "The guidance on my lab report was exceptional. My helper helped me understand the methodology deeply instead of just fixing the writing." },
-  { name: "James W.", role: "Business Student", rating: 5, text: "The project guidance was exactly what I needed. They walked me through the data analysis step by step, and the final report came together clearly. Direct communication, clear pricing, and the result exceeded my expectations." },
+  { name: "Aarati K.", role: "English Major", rating: 5, text: "The helper I worked with helped me structure my thesis argument beautifully. The step-by-step feedback was invaluable — I learned more in one session than in weeks of struggling alone." },
+  { name: "Sushmita R.", role: "Biology Student", rating: 5, text: "The guidance on my lab report was exceptional. My helper helped me understand the methodology deeply instead of just fixing the writing." },
+  { name: "Pratik B.", role: "Business Student", rating: 5, text: "The project guidance was exactly what I needed. They walked me through the data analysis step by step, and the final report came together clearly. Direct communication, clear pricing, and the result exceeded my expectations." },
 ];
 
 type HomeHelper = {
@@ -211,6 +211,16 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
+
+          <div className="text-center mt-10">
+            <Link
+              href="/services"
+              className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium border border-outline-variant rounded-xl text-on-surface hover:bg-surface-container-low transition-colors"
+            >
+              Explore All Services
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -266,6 +276,13 @@ export default async function HomePage() {
             <p className="text-xs text-on-surface-variant mt-3">
               No credit card required — create a free account in minutes.
             </p>
+            <Link
+              href="/how-it-works"
+              className="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold text-primary hover:underline"
+            >
+              See how it works in detail
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
