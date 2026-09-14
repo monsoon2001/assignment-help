@@ -21,7 +21,7 @@ import {
   stopAllSounds,
   unlockAudio,
 } from "@/lib/call-sounds";
-import { Phone, PhoneOff, Mic, MicOff, Loader2 } from "lucide-react";
+import { Phone, PhoneOff, Mic, MicOff, Loader2, Minimize2, Maximize2 } from "lucide-react";
 import Avatar from "@/components/ui/avatar";
 
 export type CallPeer = { id: string; name: string; avatarUrl?: string | null };
@@ -63,11 +63,14 @@ type VoiceCallApi = {
   peerMuted: boolean;
   error: string | null;
   adminPeer: CallPeer | null;
+  minimized: boolean;
   startCall: (peer: CallPeer) => Promise<void>;
   accept: () => Promise<void>;
   decline: () => void;
   end: () => void;
   toggleMute: () => void;
+  minimize: () => void;
+  restore: () => void;
 };
 
 const VoiceCallContext = createContext<VoiceCallApi | null>(null);
@@ -101,6 +104,7 @@ export function VoiceCallProvider({
   const [peerMuted, setPeerMuted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [adminPeer, setAdminPeer] = useState<CallPeer | null>(null);
+  const [minimized, setMinimized] = useState(false);
 
   const supabase = createClient();
   const phaseRef = useRef<CallPhase>("idle");
@@ -210,6 +214,7 @@ export function VoiceCallProvider({
     setSeconds(0);
     setMuted(false);
     setPeerMuted(false);
+    setMinimized(false);
     if (soundStopRef.current) {
       soundStopRef.current.stop();
       soundStopRef.current = null;
@@ -610,11 +615,14 @@ export function VoiceCallProvider({
     peerMuted,
     error,
     adminPeer,
+    minimized,
     startCall,
     accept,
     decline,
     end,
     toggleMute,
+    minimize: () => setMinimized(true),
+    restore: () => setMinimized(false),
   };
 
   const name = peer?.name ?? "PeerCraft Support";
@@ -628,91 +636,110 @@ export function VoiceCallProvider({
 
       {phase !== "idle" &&
         createPortal(
-          <div
-            className="fixed inset-0 z-[120] flex items-center justify-center p-4"
-            style={{ background: phase === "incoming" ? "rgba(0,0,0,0.4)" : "transparent", pointerEvents: phase === "incoming" ? "auto" : "none" }}
-          >
-            {phase === "incoming" && (
-              <div
-                className="w-full max-w-sm bg-surface-container-lowest rounded-3xl border border-outline-variant shadow-2xl p-8 text-center animate-[dialog-in_0.2s_ease-out]"
-                role="dialog"
-                aria-modal="true"
-                aria-label="Incoming call"
-              >
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success-container/30 text-success text-xs font-semibold mb-5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Incoming Call
-                </span>
-                <div className="flex flex-col items-center">
-                  <Avatar name={name} src={avatarUrl} size="lg" online className="mb-3" />
-                  <h3 className="font-display font-bold text-lg text-on-surface">{name}</h3>
-                  <p className="text-sm text-on-surface-variant mt-0.5">PeerCraft Support Desk</p>
-                </div>
-                <div className="flex items-center justify-center gap-5 mt-8">
-                  <div className="flex flex-col items-center gap-1.5">
+          <div className="fixed inset-0 z-[120] pointer-events-none">
+            {phase === "incoming" && !minimized && (
+              <div className="absolute inset-0 pointer-events-auto" style={{ background: "rgba(0,0,0,0.4)" }} />
+            )}
+
+            {minimized && (phase === "incoming" || phase === "outgoing" || phase === "active") && (
+              <DragWindow className="absolute pointer-events-auto cursor-grab active:cursor-grabbing touch-none select-none">
+                <MiniCallBubble
+                  name={name}
+                  avatarUrl={avatarUrl}
+                  live={phase === "active"}
+                  timer={formatTimer(seconds)}
+                  muted={muted}
+                  onRestore={() => setMinimized(false)}
+                  onEnd={end}
+                />
+              </DragWindow>
+            )}
+
+            {!minimized && phase === "incoming" && (
+              <DragWindow className="absolute pointer-events-auto cursor-grab active:cursor-grabbing touch-none select-none">
+                <div
+                  className="w-full max-w-sm bg-surface-container-lowest rounded-3xl border border-outline-variant shadow-2xl p-8 text-center animate-[dialog-in_0.2s_ease-out]"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="Incoming call"
+                >
+                  <div className="flex items-center justify-end -mt-3 -mr-3 mb-1">
                     <button
-                      onClick={decline}
-                      aria-label="Decline call"
-                      className="w-14 h-14 rounded-full bg-error text-white flex items-center justify-center hover:bg-error/85 transition-colors cursor-pointer"
+                      onClick={() => setMinimized(true)}
+                      aria-label="Minimize call"
+                      className="w-9 h-9 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center hover:bg-surface-container-high/70 transition-colors cursor-pointer"
                     >
-                      <PhoneOff size={20} />
+                      <Minimize2 size={16} />
                     </button>
-                    <span className="text-xs text-on-surface-variant">Decline</span>
                   </div>
-                  <div className="flex flex-col items-center gap-1.5">
-                    <button
-                      onClick={() => void accept()}
-                      aria-label="Accept call"
-                      className="w-14 h-14 rounded-full bg-emerald-500 text-white flex items-center justify-center hover:bg-emerald-600 transition-colors cursor-pointer"
-                    >
-                      <Phone size={20} />
-                    </button>
-                    <span className="text-xs text-on-surface-variant">Accept</span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success-container/30 text-success text-xs font-semibold mb-5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Incoming Call
+                  </span>
+                  <div className="flex flex-col items-center">
+                    <Avatar name={name} src={avatarUrl} size="lg" online className="mb-3" />
+                    <h3 className="font-display font-bold text-lg text-on-surface">{name}</h3>
+                    <p className="text-sm text-on-surface-variant mt-0.5">PeerCraft Support Desk</p>
+                  </div>
+                  <div className="flex items-center justify-center gap-5 mt-8">
+                    <div className="flex flex-col items-center gap-1.5">
+                      <button
+                        onClick={decline}
+                        aria-label="Decline call"
+                        className="w-14 h-14 rounded-full bg-error text-white flex items-center justify-center hover:bg-error/85 transition-colors cursor-pointer"
+                      >
+                        <PhoneOff size={20} />
+                      </button>
+                      <span className="text-xs text-on-surface-variant">Decline</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1.5">
+                      <button
+                        onClick={() => void accept()}
+                        aria-label="Accept call"
+                        className="w-14 h-14 rounded-full bg-emerald-500 text-white flex items-center justify-center hover:bg-emerald-600 transition-colors cursor-pointer"
+                      >
+                        <Phone size={20} />
+                      </button>
+                      <span className="text-xs text-on-surface-variant">Accept</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </DragWindow>
             )}
 
-            {phase === "outgoing" && (
-              <CallPanel
-                name={name}
-                avatarUrl={avatarUrl}
-                subtitle="Calling…"
-                timer={<Loader2 size={15} className="animate-spin" />}
-                muted={muted}
-                onMute={toggleMute}
-                onEnd={end}
-              />
+            {!minimized && (phase === "outgoing" || phase === "active") && (
+              <DragWindow className="absolute pointer-events-auto cursor-grab active:cursor-grabbing touch-none select-none">
+                <CallPanel
+                  name={name}
+                  avatarUrl={avatarUrl}
+                  subtitle={phase === "active" ? formatTimer(seconds) : "Calling…"}
+                  timer={phase === "active" ? formatTimer(seconds) : <Loader2 size={15} className="animate-spin" />}
+                  muted={muted}
+                  peerMuted={peerMuted}
+                  live={phase === "active"}
+                  onMute={toggleMute}
+                  onEnd={end}
+                  onMinimize={() => setMinimized(true)}
+                />
+              </DragWindow>
             )}
 
-            {phase === "active" && (
-              <CallPanel
-                name={name}
-                avatarUrl={avatarUrl}
-                subtitle={formatTimer(seconds)}
-                timer={formatTimer(seconds)}
-                muted={muted}
-                peerMuted={peerMuted}
-                onMute={toggleMute}
-                onEnd={end}
-                live
-              />
-            )}
-
-            {(phase === "declined" || phase === "busy" || phase === "no-answer" || phase === "ended" || phase === "failed") && (
-              <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-xl px-6 py-4 flex items-center gap-3">
-                <span className="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center shrink-0">
-                  <PhoneOff size={16} className="text-on-surface-variant" />
-                </span>
-                <div className="text-left">
-                  <p className="text-sm font-semibold text-on-surface">
-                    {phase === "declined" ? "Call declined"
-                      : phase === "busy" ? "Unavailable right now"
-                        : phase === "no-answer" ? "No answer"
-                          : phase === "failed" ? "Call failed"
-                            : "Call ended"}
-                  </p>
-                  {error && <p className="text-xs text-on-surface-variant max-w-xs">{error}</p>}
+            {!minimized && (phase === "declined" || phase === "busy" || phase === "no-answer" || phase === "ended" || phase === "failed") && (
+              <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-auto">
+                <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-xl px-6 py-4 flex items-center gap-3">
+                  <span className="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center shrink-0">
+                    <PhoneOff size={16} className="text-on-surface-variant" />
+                  </span>
+                  <div className="text-left">
+                    <p className="text-sm font-semibold text-on-surface">
+                      {phase === "declined" ? "Call declined"
+                        : phase === "busy" ? "Unavailable right now"
+                          : phase === "no-answer" ? "No answer"
+                            : phase === "failed" ? "Call failed"
+                              : "Call ended"}
+                    </p>
+                    {error && <p className="text-xs text-on-surface-variant max-w-xs">{error}</p>}
+                  </div>
                 </div>
               </div>
             )}
@@ -720,6 +747,114 @@ export function VoiceCallProvider({
           document.body
         )}
     </VoiceCallContext.Provider>
+  );
+}
+
+function DragWindow({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const winRef = useRef<HTMLDivElement>(null);
+  const dragStateRef = useRef<{ dx: number; dy: number } | null>(null);
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    if (winRef.current) {
+      const el = winRef.current;
+      setPos({
+        x: Math.max(8, (window.innerWidth - el.offsetWidth) / 2),
+        y: Math.max(8, (window.innerHeight - el.offsetHeight) / 2),
+      });
+    }
+  }, []);
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest("button")) return;
+    if (!winRef.current) return;
+    const el = winRef.current;
+    const rect = el.getBoundingClientRect();
+    dragStateRef.current = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
+    el.setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragStateRef.current || !winRef.current) return;
+    const el = winRef.current;
+    setPos({
+      x: Math.min(Math.max(8, e.clientX - dragStateRef.current.dx), window.innerWidth - el.offsetWidth - 8),
+      y: Math.min(Math.max(8, e.clientY - dragStateRef.current.dy), window.innerHeight - el.offsetHeight - 8),
+    });
+  };
+
+  const stopDrag = () => {
+    dragStateRef.current = null;
+  };
+
+  return (
+    <div
+      ref={winRef}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={stopDrag}
+      onPointerCancel={stopDrag}
+      className={className}
+      style={
+        pos
+          ? { left: pos.x, top: pos.y }
+          : { left: "50%", top: "50%", transform: "translate(-50%, -50%)" }
+      }
+    >
+      {children}
+    </div>
+  );
+}
+
+function MiniCallBubble({
+  name,
+  avatarUrl,
+  live,
+  timer,
+  muted,
+  onRestore,
+  onEnd,
+}: {
+  name: string;
+  avatarUrl?: string;
+  live: boolean;
+  timer: string;
+  muted: boolean;
+  onRestore: () => void;
+  onEnd: () => void;
+}) {
+  return (
+    <div className="flex items-center gap-2.5 bg-surface-container-lowest rounded-full border border-outline-variant shadow-xl pl-2 pr-2 py-2 animate-[dialog-in_0.2s_ease-out]">
+      <Avatar name={name} src={avatarUrl} size="sm" />
+      <div className="leading-tight">
+        <p className="text-sm font-semibold text-on-surface">{name}</p>
+        <p className="text-[11px] text-on-surface-variant inline-flex items-center gap-1">
+          {live && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />}
+          {live ? `In call · ${timer}` : "Calling…"}
+          {muted && <MicOff size={11} className="text-warning ml-0.5" />}
+        </p>
+      </div>
+      <button
+        onClick={onRestore}
+        aria-label="Expand call"
+        className="w-9 h-9 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center hover:bg-surface-container-high/70 transition-colors cursor-pointer"
+      >
+        <Maximize2 size={15} />
+      </button>
+      <button
+        onClick={onEnd}
+        aria-label="End call"
+        className="w-9 h-9 rounded-full bg-error text-white flex items-center justify-center hover:bg-error/85 transition-colors cursor-pointer"
+      >
+        <PhoneOff size={15} />
+      </button>
+    </div>
   );
 }
 
@@ -732,6 +867,7 @@ function CallPanel({
   peerMuted,
   onMute,
   onEnd,
+  onMinimize,
   live = false,
 }: {
   name: string;
@@ -742,6 +878,7 @@ function CallPanel({
   peerMuted?: boolean;
   onMute: () => void;
   onEnd: () => void;
+  onMinimize: () => void;
   live?: boolean;
 }) {
   return (
@@ -751,6 +888,25 @@ function CallPanel({
       aria-modal="true"
       aria-label="Call"
     >
+      <div className="flex items-center justify-between gap-3 mb-4 -mt-3 -mr-3">
+        <div className="flex items-center gap-2 min-w-0">
+          <Avatar name={name} src={avatarUrl} size="sm" className={live ? "" : "grayscale"} />
+          <div className="min-w-0 text-left leading-tight">
+            <p className="font-display font-bold text-sm text-on-surface truncate">{name}</p>
+            <p className="text-xs text-on-surface-variant truncate inline-flex items-center gap-1">
+              {live && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />}
+              {subtitle}
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={onMinimize}
+          aria-label="Minimize call"
+          className="w-9 h-9 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center hover:bg-surface-container-high/70 transition-colors cursor-pointer shrink-0"
+        >
+          <Minimize2 size={16} />
+        </button>
+      </div>
       <div className="flex flex-col items-center">
         <div className="relative">
           <Avatar name={name} src={avatarUrl} size="lg" className={live ? "" : "grayscale"} />
