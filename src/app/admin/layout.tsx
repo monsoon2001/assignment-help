@@ -161,13 +161,24 @@ export default function AdminLayout({
       <RoleBottomNav
         roleLabel="Admin"
         primary={[
-          { href: "/admin/dashboard", label: "Dashboard", icon: links[0].icon },
-          { href: "/admin/requests", label: "Requests", icon: links[3].icon },
-          { href: "/admin/messages", label: "Messages", icon: links[6].icon },
+          { href: "/admin/dashboard", label: "Dashboard", icon: "dashboard" },
+          { href: "/admin/requests", label: "Requests", icon: "requests" },
+          { href: "/admin/messages", label: "Messages", icon: "messages" },
         ]}
         more={links
           .filter((l) => !["/admin/dashboard", "/admin/requests", "/admin/messages"].includes(l.href))
-          .map((l) => ({ href: l.href, label: l.label, icon: l.icon }))}
+          .map((l) => ({
+            href: l.href,
+            label: l.label,
+            icon:
+              l.href === "/admin/students" ? "students"
+              : l.href === "/admin/helpers" ? "helpers"
+              : l.href === "/admin/payments" ? "payments"
+              : l.href === "/admin/orders" ? "orders"
+              : l.href === "/admin/chat-monitor" ? "chat_monitor"
+              : l.href === "/admin/settings" ? "settings"
+              : "admin_profile",
+          }))}
       />
 
       {signOutOpen &&

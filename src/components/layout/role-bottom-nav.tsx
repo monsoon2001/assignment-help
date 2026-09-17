@@ -3,13 +3,52 @@
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, GraduationCap } from "lucide-react";
+import {
+  Menu,
+  X,
+  GraduationCap,
+  LayoutDashboard,
+  FileText,
+  MessageSquare,
+  Bell,
+  User,
+  Plus,
+  Inbox,
+  Briefcase,
+  DollarSign,
+  MessagesSquare,
+  Users,
+  UserCheck,
+  CreditCard,
+  ShieldAlert,
+  Settings,
+  UserRound,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+
+const ICONS: Record<string, LucideIcon> = {
+  dashboard: LayoutDashboard,
+  requests: FileText,
+  messages: MessageSquare,
+  notifications: Bell,
+  profile: User,
+  new_request: Plus,
+  inbox: Inbox,
+  orders: Briefcase,
+  earnings: DollarSign,
+  chat_admin: MessagesSquare,
+  students: Users,
+  helpers: UserCheck,
+  payments: CreditCard,
+  chat_monitor: ShieldAlert,
+  settings: Settings,
+  admin_profile: UserRound,
+};
 
 export type RoleNavItem = {
   href: string;
   label: string;
-  icon: LucideIcon;
+  icon: string;
   badge?: number;
 };
 
@@ -36,7 +75,7 @@ export default function RoleBottomNav({
       >
         <div className="flex items-stretch justify-around">
           {primary.map((item) => {
-            const Icon = item.icon;
+            const Icon = ICONS[item.icon] ?? Menu;
             const active = isActive(item.href);
             return (
               <Link
@@ -101,7 +140,7 @@ export default function RoleBottomNav({
             </div>
             <div className="px-3 pb-4 grid grid-cols-2 gap-1.5">
               {[...primary, ...more].map((item) => {
-                const Icon = item.icon;
+                const Icon = ICONS[item.icon] ?? Menu;
                 const active = isActive(item.href);
                 return (
                   <Link

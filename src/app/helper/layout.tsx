@@ -71,15 +71,15 @@ export default function HelperLayout({
       <RoleBottomNav
         roleLabel="Helper"
         primary={[
-          { href: "/helper/dashboard", label: "Dashboard", icon: LayoutDashboard },
-          { href: "/helper/requests", label: "Requests", icon: Inbox },
-          { href: "/helper/messages", label: "Messages", icon: MessageSquare },
+          { href: "/helper/dashboard", label: "Dashboard", icon: "dashboard" },
+          { href: "/helper/requests", label: "Requests", icon: "inbox" },
+          { href: "/helper/messages", label: "Messages", icon: "messages" },
         ]}
         more={[
-          { href: "/helper/orders", label: "Orders", icon: Briefcase },
-          { href: "/helper/earnings", label: "Earnings", icon: DollarSign },
-          { href: "/helper/chat-admin", label: "Chat With Admin", icon: MessagesSquare },
-          { href: "/helper/profile", label: "Profile", icon: User },
+          { href: "/helper/orders", label: "Orders", icon: "orders" },
+          { href: "/helper/earnings", label: "Earnings", icon: "earnings" },
+          { href: "/helper/chat-admin", label: "Chat With Admin", icon: "chat_admin" },
+          { href: "/helper/profile", label: "Profile", icon: "profile" },
         ]}
       />
     </div>
