@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { roleToHome } from "@/lib/auth";
+import { AUTH_AT_COOKIE, authAtCookieOptions } from "@/lib/session-timebox";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -46,5 +47,7 @@ export async function GET(request: Request) {
     redirect.searchParams.set("user", String(user.user_metadata.name));
   }
 
-  return NextResponse.redirect(redirect);
+  const response = NextResponse.redirect(redirect);
+  response.cookies.set(AUTH_AT_COOKIE, String(Date.now()), authAtCookieOptions());
+  return response;
 }

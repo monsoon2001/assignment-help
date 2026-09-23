@@ -105,6 +105,7 @@ export function VoiceCallProvider({
   const [error, setError] = useState<string | null>(null);
   const [adminPeer, setAdminPeer] = useState<CallPeer | null>(null);
   const [minimized, setMinimized] = useState(false);
+  const [windowPos, setWindowPos] = useState<{ x: number; y: number } | null>(null);
 
   const supabase = createClient();
   const phaseRef = useRef<CallPhase>("idle");
@@ -642,7 +643,7 @@ export function VoiceCallProvider({
             )}
 
             {minimized && (phase === "incoming" || phase === "outgoing" || phase === "active") && (
-              <DragWindow className="absolute pointer-events-auto cursor-grab active:cursor-grabbing touch-none select-none">
+              <DragWindow className="absolute pointer-events-auto cursor-grab active:cursor-grabbing touch-none select-none" pos={windowPos} onPosChange={setWindowPos}>
                 <MiniCallBubble
                   name={name}
                   avatarUrl={avatarUrl}
@@ -656,7 +657,7 @@ export function VoiceCallProvider({
             )}
 
             {!minimized && phase === "incoming" && (
-              <DragWindow className="absolute pointer-events-auto cursor-grab active:cursor-grabbing touch-none select-none">
+              <DragWindow className="absolute pointer-events-auto cursor-grab active:cursor-grabbing touch-none select-none" pos={windowPos} onPosChange={setWindowPos}>
                 <div
                   className="w-full max-w-sm bg-surface-container-lowest rounded-3xl border border-outline-variant shadow-2xl p-8 text-center animate-[dialog-in_0.2s_ease-out]"
                   role="dialog"
@@ -708,7 +709,7 @@ export function VoiceCallProvider({
             )}
 
             {!minimized && (phase === "outgoing" || phase === "active") && (
-              <DragWindow className="absolute pointer-events-auto cursor-grab active:cursor-grabbing touch-none select-none">
+              <DragWindow className="absolute pointer-events-auto cursor-grab active:cursor-grabbing touch-none select-none" pos={windowPos} onPosChange={setWindowPos}>
                 <CallPanel
                   name={name}
                   avatarUrl={avatarUrl}
@@ -753,23 +754,31 @@ export function VoiceCallProvider({
 function DragWindow({
   children,
   className,
+  pos,
+  onPosChange,
 }: {
   children: React.ReactNode;
   className?: string;
+  pos: { x: number; y: number } | null;
+  onPosChange: (pos: { x: number; y: number }) => void;
 }) {
   const winRef = useRef<HTMLDivElement>(null);
   const dragStateRef = useRef<{ dx: number; dy: number } | null>(null);
-  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
-    if (winRef.current) {
-      const el = winRef.current;
-      setPos({
-        x: Math.max(8, (window.innerWidth - el.offsetWidth) / 2),
-        y: Math.max(8, (window.innerHeight - el.offsetHeight) / 2),
-      });
+    if (!winRef.current) return;
+    const el = winRef.current;
+    if (pos !== null) {
+      const nx = Math.min(Math.max(8, pos.x), window.innerWidth - el.offsetWidth - 8);
+      const ny = Math.min(Math.max(8, pos.y), window.innerHeight - el.offsetHeight - 8);
+      if (nx !== pos.x || ny !== pos.y) onPosChange({ x: nx, y: ny });
+      return;
     }
-  }, []);
+    onPosChange({
+      x: Math.max(8, (window.innerWidth - el.offsetWidth) / 2),
+      y: Math.max(8, (window.innerHeight - el.offsetHeight) / 2),
+    });
+  }, [onPosChange, pos]);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if ((e.target as HTMLElement).closest("button")) return;
@@ -783,7 +792,7 @@ function DragWindow({
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!dragStateRef.current || !winRef.current) return;
     const el = winRef.current;
-    setPos({
+    onPosChange({
       x: Math.min(Math.max(8, e.clientX - dragStateRef.current.dx), window.innerWidth - el.offsetWidth - 8),
       y: Math.min(Math.max(8, e.clientY - dragStateRef.current.dy), window.innerHeight - el.offsetHeight - 8),
     });

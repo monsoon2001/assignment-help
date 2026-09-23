@@ -1,6 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { roleToHome, isStudentRoute, isHelperRoute, isAdminRoute, isAuthRoute } from "@/lib/auth";
+import {
+  AUTH_AT_COOKIE,
+  SESSION_TIMEBOX_MS,
+  authAtCookieOptions,
+  parseAuthAt,
+  supabaseCookiePrefix,
+} from "@/lib/session-timebox";
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -46,6 +53,26 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(url);
     }
     return supabaseResponse;
+  }
+
+  // 24-hour session timebox: every user must sign in again after 24 hours.
+  const authAt = parseAuthAt(request.cookies.get(AUTH_AT_COOKIE)?.value);
+  if (authAt === null) {
+    supabaseResponse.cookies.set(AUTH_AT_COOKIE, String(Date.now()), authAtCookieOptions());
+  } else if (Date.now() - authAt > SESSION_TIMEBOX_MS) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/sign-in";
+    url.searchParams.set("next", pathname);
+    url.searchParams.set("expired", "1");
+    const prefix = supabaseCookiePrefix(process.env.NEXT_PUBLIC_SUPABASE_URL!);
+    const response = NextResponse.redirect(url);
+    for (const cookie of request.cookies.getAll()) {
+      if (cookie.name.startsWith(prefix)) {
+        response.cookies.set(cookie.name, "", { ...authAtCookieOptions(), maxAge: 0 });
+      }
+    }
+    response.cookies.set(AUTH_AT_COOKIE, "", { ...authAtCookieOptions(), maxAge: 0 });
+    return response;
   }
 
   let role: string | null = null;

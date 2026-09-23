@@ -1,21 +1,32 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { GraduationCap, Mail, ArrowRight, ShieldCheck, Building2, Check, Lock } from "lucide-react";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { roleToHome } from "@/lib/auth";
+import { stampAuthAtCookie } from "@/lib/session-timebox";
 
 export default function SignInPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignInForm />
+    </Suspense>
+  );
+}
+
+function SignInForm() {
   const router = useRouter();
   const supabase = createClient();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const expired = searchParams.get("expired") === "1";
 
   function nextPath(): string {
     if (typeof window === "undefined") return "/";
@@ -50,6 +61,8 @@ export default function SignInPage() {
       setLoading(false);
       return;
     }
+
+    stampAuthAtCookie();
 
     const { data: profile } = await supabase
       .from("users")
@@ -100,6 +113,12 @@ export default function SignInPage() {
                 Sign in with Google or your email &amp; password
               </p>
             </div>
+
+            {expired && (
+              <div className="mb-5 rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-on-surface">
+                Your session has expired. Please sign in again to continue.
+              </div>
+            )}
 
             <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
               <Input

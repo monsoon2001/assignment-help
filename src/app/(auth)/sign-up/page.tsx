@@ -8,6 +8,7 @@ import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { roleToHome } from "@/lib/auth";
+import { stampAuthAtCookie } from "@/lib/session-timebox";
 
 type Stage = "email" | "otp";
 
@@ -92,6 +93,8 @@ export default function SignUpPage() {
       setLoading(false);
       return;
     }
+
+    stampAuthAtCookie();
 
     const { error: passwordError } = await supabase.auth.updateUser({ password });
     if (passwordError) {
