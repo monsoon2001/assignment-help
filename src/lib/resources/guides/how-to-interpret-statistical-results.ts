@@ -184,7 +184,7 @@ const guide: Resource = {
     title: "Need help interpreting output?",
     body: "Find a helper to work through your statistical output and what it actually supports.",
     cta: "Find a Statistics Helper",
-    href: "/services/statistics-help",
+    href: "/browse-helpers",
   },
 };
 

@@ -311,7 +311,7 @@ const howToWriteAnEssay: Resource = {
     title: "Need help with your essay?",
     body: "Find a helper who can work through structure, argument, and clarity with you before you submit.",
     cta: "Find an Essay Helper",
-    href: "/services/essay-feedback",
+    href: "/browse-helpers",
   },
 };
 

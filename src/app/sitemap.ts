@@ -18,20 +18,14 @@ const STATIC_ROUTES = [
   "/terms",
 ];
 
-const SERVICE_ROUTES = [
-  "/services/programming-help",
-  "/services/statistics-help",
-  "/services/essay-feedback",
-  "/services/research-help",
-  "/services/thesis-help",
-];
+// Only routes with a page.tsx. Several /services/* directories were removed
+// when the unimplemented quality-check services were dropped.
+const SERVICE_ROUTES = ["/services/programming-help"];
 
-const HELP_ROUTES = [
-  "/help/understand-assignment-rubric",
-  "/help/how-to-write-literature-review",
-  "/help/how-to-cite-apa",
-  "/help/debug-python-assignment",
-];
+// Only /help/debug-python-assignment has a page. The other three were empty
+// leftovers duplicating topics now covered by /resources/*, which would have
+// been duplicate content competing with the canonical guides.
+const HELP_ROUTES = ["/help/debug-python-assignment"];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const subjectRoutes = SUBJECT_CONTENT.map((s) => `/subjects/${s.slug}`);

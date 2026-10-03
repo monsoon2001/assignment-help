@@ -457,7 +457,7 @@ export default function NewRequestPage() {
                 <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> Subject-matter experts verified against university records.
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> 100% originality checks on every delivered draft.
+                <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> Revisions until you are satisfied with the draft.
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> Payments released only after you approve.

@@ -173,7 +173,7 @@ const guide: Resource = {
     title: "Need help structuring your report?",
     body: "Find a helper to work through sections, findings, and recommendations with you before you submit.",
     cta: "Find a Report Helper",
-    href: "/services/research-help",
+    href: "/browse-helpers",
   },
 };
 

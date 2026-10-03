@@ -179,7 +179,7 @@ const guide: Resource = {
     title: "Preparing a presentation?",
     body: "Find a helper to review your narrative, slide structure, and rehearsal before you present.",
     cta: "Find a Presentation Helper",
-    href: "/services/research-help",
+    href: "/browse-helpers",
   },
 };
 

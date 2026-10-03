@@ -17,16 +17,6 @@ const serviceGroups = [
     ],
   },
   {
-    title: "Quality Checks",
-    icon: "verified",
-    description: "Pre-submission scans so your work is original, authentic, and ready to hand in.",
-    services: [
-      { name: "Plagiarism Check", desc: "Originality review against academic sources to keep your work submission-safe." },
-      { name: "AI Detector", desc: "Review of AI-generated content indicators so your work reads genuinely yours." },
-      { name: "Similarity Check", desc: "Similarity scoring and guidance on reducing overlap before submission." },
-    ],
-  },
-  {
     title: "Research & Advanced Projects",
     icon: "menu_book",
     description: "Long-form and research-heavy projects, guided chapter by chapter.",
@@ -68,8 +58,6 @@ const GUIDE_BY_SERVICE: Record<string, string> = {
   Paraphrasing: "/resources/writing/how-to-paraphrase",
   "MLA & APA Formatting": "/resources/citations/mla-citation-guide",
   "Citation & Referencing": "/resources/citations/how-to-cite-sources",
-  "Plagiarism Check": "/resources/citations/how-to-avoid-plagiarism",
-  "Similarity Check": "/resources/citations/how-to-avoid-plagiarism",
   "Thesis & Dissertation": "/resources/projects/how-to-write-a-research-paper",
   "Case Study": "/resources/research/how-to-write-a-case-study",
   "Literature Review": "/resources/research/how-to-write-a-literature-review",
@@ -78,7 +66,6 @@ const GUIDE_BY_SERVICE: Record<string, string> = {
   "Math & Statistics Help": "/resources/technical/how-to-analyze-data",
   "Programming Help": "/resources/technical/how-to-approach-a-programming-assignment",
   "Data Analysis": "/resources/technical/how-to-analyze-data",
-  "Business Plan": "/resources/presentations/how-to-write-a-personal-statement",
   "Personal Statement": "/resources/presentations/how-to-write-a-personal-statement",
   "Presentation & Slides": "/resources/presentations/how-to-make-a-presentation",
 };

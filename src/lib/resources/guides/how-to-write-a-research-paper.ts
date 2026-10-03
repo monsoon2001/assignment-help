@@ -200,7 +200,7 @@ const guide: Resource = {
     title: "Developing a research paper?",
     body: "Find a helper to work through your question, method, and discussion structure with you.",
     cta: "Find a Research Helper",
-    href: "/services/thesis-help",
+    href: "/browse-helpers",
   },
 };
 

@@ -193,7 +193,7 @@ const guide: Resource = {
     title: "Working on a lab report?",
     body: "Find a helper to work through your method, results, and discussion before you submit.",
     cta: "Find a Lab Report Helper",
-    href: "/services/research-help",
+    href: "/browse-helpers",
   },
 };
 

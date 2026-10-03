@@ -175,7 +175,7 @@ const guide: Resource = {
     title: "Want an originality review?",
     body: "Find a helper to review your sources and citations before you submit.",
     cta: "Find a Similarity Helper",
-    href: "/services/research-help",
+    href: "/browse-helpers",
   },
 };
 

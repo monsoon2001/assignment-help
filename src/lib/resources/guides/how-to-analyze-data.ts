@@ -213,7 +213,7 @@ const guide: Resource = {
     title: "Working on an analysis?",
     body: "Find a helper to check your method choice, run your analysis, and interpret the output.",
     cta: "Find a Data Analysis Helper",
-    href: "/services/statistics-help",
+    href: "/browse-helpers",
   },
 };
 

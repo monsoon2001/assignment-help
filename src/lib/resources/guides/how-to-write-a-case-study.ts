@@ -200,7 +200,7 @@ const guide: Resource = {
     title: "Analysing a complex case?",
     body: "Find a helper to work through your framework, evidence, and analysis with you.",
     cta: "Find a Case Study Helper",
-    href: "/services/research-help",
+    href: "/browse-helpers",
   },
 };
 

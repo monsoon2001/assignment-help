@@ -159,7 +159,7 @@ const guide: Resource = {
     title: "Drafting an application?",
     body: "Find a helper to review your statement for specificity, structure, and whether it answers the prompt.",
     cta: "Find a Personal Statement Helper",
-    href: "/services/research-help",
+    href: "/browse-helpers",
   },
 };
 

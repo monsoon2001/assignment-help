@@ -159,7 +159,7 @@ const guide: Resource = {
     title: "Want a second pair of eyes?",
     body: "A helper can review your introduction for clarity, focus, and whether the thesis actually answers the question.",
     cta: "Find an Essay Helper",
-    href: "/services/essay-feedback",
+    href: "/browse-helpers",
   },
 };
 

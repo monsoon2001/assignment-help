@@ -205,7 +205,7 @@ const guide: Resource = {
     title: "Reviewing a large amount of literature?",
     body: "Find a helper to help you organise sources, build a synthesis, and structure the review.",
     cta: "Find a Literature Review Helper",
-    href: "/services/thesis-help",
+    href: "/browse-helpers",
   },
 };
 

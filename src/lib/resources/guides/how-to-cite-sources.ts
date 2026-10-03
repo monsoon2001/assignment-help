@@ -200,7 +200,7 @@ const guide: Resource = {
     title: "Getting your references right?",
     body: "Find a helper to check in-text citations, reference entries, and consistency across your document.",
     cta: "Find a Citation Helper",
-    href: "/services/essay-feedback",
+    href: "/browse-helpers",
   },
 };
 

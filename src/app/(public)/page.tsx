@@ -26,7 +26,7 @@ const steps = [
 const benefits = [
   { icon: "paid", title: "Clear Pricing", desc: "Know exactly what you'll pay upfront. No surprise charges, no hidden fees." },
   { icon: "chat", title: "Direct Communication", desc: "Message your helper directly. Ask questions, share files, and track progress." },
-  { icon: "verified", title: "Quality You Can Trust", desc: "Every helper is vetted. Work is reviewed for accuracy and originality." },
+  { icon: "verified", title: "Quality You Can Trust", desc: "Every helper is vetted. Message them directly before you commit to anything." },
   { icon: "replay", title: "Unlimited Revisions", desc: "Not quite right? Request as many revisions as you need until you're fully satisfied — no extra cost, no deadlines." },
 ];
 
@@ -84,7 +84,7 @@ export default async function HomePage() {
           <span className="hidden sm:inline text-outline-variant">|</span>
           <span className="flex items-center gap-1.5">
             <span className="material-symbols-outlined text-sm text-primary">verified_user</span>
-            100% Human-Written Work — No AI-Generated Content
+            Human-to-Human Academic Support
           </span>
         </div>
       </div>
@@ -130,7 +130,7 @@ export default async function HomePage() {
               <div className="flex flex-col sm:flex-row gap-4 text-sm text-on-surface-variant">
                 <span className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
-                  Plagiarism-free guidance
+                  Original support
                 </span>
                 <span className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />

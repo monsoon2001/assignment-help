@@ -218,7 +218,7 @@ const guide: Resource = {
     title: "Working on an MLA assignment?",
     body: "Find a helper to check your Works Cited entries and in-text citations against your style guide.",
     cta: "Find a Citation Helper",
-    href: "/services/essay-feedback",
+    href: "/browse-helpers",
   },
 };
 

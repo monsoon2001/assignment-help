@@ -165,7 +165,7 @@ const guide: Resource = {
     title: "Stuck on your thesis?",
     body: "A helper can help you narrow a topic into a defensible argument and check it against your rubric.",
     cta: "Find an Essay Helper",
-    href: "/services/essay-feedback",
+    href: "/browse-helpers",
   },
 };
 

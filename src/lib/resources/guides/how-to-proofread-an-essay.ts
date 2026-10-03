@@ -165,7 +165,7 @@ const guide: Resource = {
     title: "Want a proofreading review?",
     body: "Find a helper who can check grammar, flow, and structure before you hand your work in.",
     cta: "Find a Proofreading Helper",
-    href: "/services/essay-feedback",
+    href: "/browse-helpers",
   },
 };
 

@@ -180,7 +180,7 @@ const guide: Resource = {
     title: "Want your paraphrasing checked?",
     body: "A helper can review whether your restatements stay accurate to the original sources.",
     cta: "Find a Paraphrasing Helper",
-    href: "/services/essay-feedback",
+    href: "/browse-helpers",
   },
 };
 

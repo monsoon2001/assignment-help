@@ -216,7 +216,7 @@ const guide: Resource = {
     title: "Need citations formatted correctly?",
     body: "Find a helper to format APA references and in-text citations consistently across your work.",
     cta: "Find a Citation Helper",
-    href: "/services/essay-feedback",
+    href: "/browse-helpers",
   },
 };
 

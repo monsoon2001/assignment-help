@@ -30,9 +30,6 @@ export const SERVICE_TYPES = [
   // Homepage services marquee
   "Proofreading",
   "Editing",
-  "Plagiarism Check",
-  "AI Detector",
-  "Similarity Check",
   "Paraphrasing",
   "MLA & APA Formatting",
   "Citation & Referencing",
