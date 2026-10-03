@@ -411,9 +411,9 @@ export default async function HomePage() {
               Testimonials
             </span>
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-4">What Students Say</h2>
-            <p className="text-on-surface-variant max-w-2xl mx-auto">
-              We're just getting started. Become one of our first students and help shape Acadibo.
-            </p>
+                <p className="text-on-surface-variant max-w-2xl mx-auto">
+                  We&apos;re just getting started. Become one of our first students and help shape Acadibo.
+                </p>
           </div>
           <div className="text-center py-10 text-on-surface-variant">
             <p>No testimonials yet — join us to be the first!</p>

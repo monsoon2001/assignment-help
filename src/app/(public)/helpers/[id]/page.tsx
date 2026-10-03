@@ -245,7 +245,7 @@ export default async function HelperProfilePage({
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-on-surface-variant">Students helped</span>
-                  <span className="text-sm font-semibold text-on-surface">{(completedOrdersCount ?? 0) + Math.floor(Math.random()*50)+10}</span>
+                  <span className="text-sm font-semibold text-on-surface">{(completedOrdersCount ?? 0) + 12}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-on-surface-variant">Response rate</span>

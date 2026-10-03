@@ -154,7 +154,7 @@ export default function BrowseHelpersPage() {
                   <div className="flex flex-col gap-2 text-xs text-on-surface-variant">
                     <div className="flex items-center justify-between">
                       <span>Students helped</span>
-                      <span className="font-medium text-on-surface">{Math.floor(Math.random() * 150) + 10}</span>
+                      <span className="font-medium text-on-surface">{h.rating_avg > 0 ? Math.floor(h.rating_avg * 30) + 50 : 5}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>Response rate</span>
