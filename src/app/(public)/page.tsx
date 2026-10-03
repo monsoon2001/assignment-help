@@ -34,8 +34,6 @@ const subjects = ["English Literature", "Mathematics", "Biology", "Chemistry", "
 
 const marqueeItems = SERVICE_TYPES;
 
-const testimonials = [];
-
 type HomeHelper = {
   id: string;
   name: string | null;
@@ -122,10 +120,10 @@ export default async function HomePage() {
                 Independent Peer Guidance
               </span>
               <h1 className="font-display text-4xl sm:text-5xl font-bold text-on-surface leading-tight">
-                Get expert help with your essays, reports, and assignments.
+                Find the Right Assignment Helper
               </h1>
               <p className="text-lg text-on-surface-variant leading-relaxed max-w-xl">
-                Connect with verified peer helpers who guide you through coursework, improve your writing, and help you understand concepts — so you can learn effectively and submit with confidence.
+                Tell us what you&apos;re working on, browse relevant helpers, choose who you want to work with, discuss your requirements, and receive a personalized proposal before you pay.
               </p>
 
               {/* Trust Checkmarks */}
@@ -174,7 +172,7 @@ export default async function HomePage() {
                   <span className="material-symbols-outlined text-primary">calculate</span>
                 </div>
                 <div>
-              <h2 className="font-display font-bold text-on-surface">Let's understand your assignment</h2>
+              <h2 className="font-display font-bold text-on-surface">Let&apos;s understand your assignment</h2>
               <p className="text-xs text-on-surface-variant">Share a few details to get started</p>
                 </div>
               </div>

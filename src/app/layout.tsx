@@ -16,8 +16,8 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Acadibo — Academic Help Marketplace",
-  description: "Get expert help with your essays, reports, and assignments from verified subject-matter helpers.",
+  title: "Assignment Help Online | Find a Qualified Assignment Helper",
+  description: "Find a suitable assignment helper for your subject, discuss your requirements, receive a personalized quote, and manage your work in one place.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

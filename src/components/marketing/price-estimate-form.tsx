@@ -180,22 +180,15 @@ export default function PriceEstimateForm() {
       </div>
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium text-on-surface">Files</label>
-        <div className="flex flex-col gap-2">
-          <label className="flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-outline-variant rounded-xl cursor-pointer hover:border-primary-container hover:bg-primary-container/5 transition-all text-on-surface-variant">
-            <Upload className="w-5 h-5" />
-            <span className="text-sm font-medium">
-              {files.length > 0
-                ? `${files.length} file${files.length > 1 ? "s" : ""} attached`
-                : "+ Upload assignment instructions"}
-            </span>
-            <input type="file" className="hidden" multiple accept=".pdf,.docx,.doc,.png,.jpg,.jpeg" onChange={(e) => handleFiles(e.target.files)} />
-          </label>
-          <label className="flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-outline-variant rounded-xl cursor-pointer hover:border-primary-container hover:bg-primary-container/5 transition-all text-on-surface-variant">
-            <Upload className="w-5 h-5" />
-            <span className="text-sm font-medium">+ Upload rubric</span>
-            <input type="file" className="hidden" multiple accept=".pdf,.docx,.doc,.png,.jpg,.jpeg" onChange={(e) => handleFiles(e.target.files)} />
-          </label>
-        </div>
+        <label className="flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-outline-variant rounded-xl cursor-pointer hover:border-primary-container hover:bg-primary-container/5 transition-all text-on-surface-variant">
+          <Upload className="w-5 h-5" />
+          <span className="text-sm font-medium">
+            {files.length > 0
+              ? `${files.length} file${files.length > 1 ? "s" : ""} attached`
+              : "+ Upload assignment instructions"}
+          </span>
+          <input type="file" className="hidden" multiple accept=".pdf,.docx,.doc,.png,.jpg,.jpeg" onChange={(e) => handleFiles(e.target.files)} />
+        </label>
       </div>
       {error && (
         <p className="text-sm text-error bg-error-container/40 border border-error/30 rounded-lg px-3 py-2">
