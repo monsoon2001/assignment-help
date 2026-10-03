@@ -18,7 +18,7 @@ export default function PriceEstimateForm() {
   const [customHelpType, setCustomHelpType] = useState("");
   const [level, setLevel] = useState("");
   const [deadline, setDeadline] = useState("");
-  const [wordCount, setWordCount] = useState("");
+  const [pagesWords, setPagesWords] = useState("");
   const [details, setDetails] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState("");
@@ -51,8 +51,8 @@ export default function PriceEstimateForm() {
       setError("Please choose a deadline.");
       return;
     }
-    if (!wordCount.trim() && !details.trim()) {
-      setError("Add a word count or a short description so a helper can assess the scope.");
+    if (!pagesWords.trim() && !details.trim()) {
+      setError("Add pages/words or a short description so a helper can assess the scope.");
       return;
     }
 
@@ -61,7 +61,7 @@ export default function PriceEstimateForm() {
       subject: subjectRaw,
       level,
       deadline,
-      wordCount,
+      wordCount: pagesWords,
       details,
     });
     await saveDraftFiles(files);
@@ -134,7 +134,7 @@ export default function PriceEstimateForm() {
       </div>
       </div>
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-on-surface">Academic Level</label>
+        <label className="text-sm font-medium text-on-surface">Academic level</label>
         <select
           value={level}
           onChange={(e) => setLevel(e.target.value)}
@@ -158,52 +158,20 @@ export default function PriceEstimateForm() {
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-on-surface">Word Count</label>
+          <label className="text-sm font-medium text-on-surface">How many pages/words?</label>
           <input
             type="text"
-            placeholder="e.g. 1500"
-            value={wordCount}
-            onChange={(e) => setWordCount(e.target.value)}
+            placeholder="e.g. 5 pages or 1500 words"
+            value={pagesWords}
+            onChange={(e) => setPagesWords(e.target.value)}
             className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
           />
         </div>
       </div>
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-on-surface">What do you need?</label>
-        <div className="flex flex-col gap-2">
-          <label className="flex items-center gap-2 text-sm text-on-surface">
-            <input type="checkbox" className="rounded border-outline-variant" onChange={(e) => {
-              if (e.target.checked) setDetails((d) => d ? d + " • Understand the problem\n" : "Understand the problem\n");
-            }} />
-            Understand the problem
-          </label>
-          <label className="flex items-center gap-2 text-sm text-on-surface">
-            <input type="checkbox" className="rounded border-outline-variant" onChange={(e) => {
-              if (e.target.checked) setDetails((d) => d ? d + " • Debug my code\n" : "Debug my code\n");
-            }} />
-            Debug my code
-          </label>
-          <label className="flex items-center gap-2 text-sm text-on-surface">
-            <input type="checkbox" className="rounded border-outline-variant" onChange={(e) => {
-              if (e.target.checked) setDetails((d) => d ? d + " • Review my approach\n" : "Review my approach\n");
-            }} />
-            Review my approach
-          </label>
-          <label className="flex items-center gap-2 text-sm text-on-surface">
-            <input type="checkbox" className="rounded border-outline-variant" onChange={(e) => {
-              if (e.target.checked) setDetails((d) => d ? d + " • Explain the concepts\n" : "Explain the concepts\n");
-            }} />
-            Explain the concepts
-          </label>
-          <label className="flex items-center gap-2 text-sm text-on-surface">
-            <input type="checkbox" className="rounded border-outline-variant" onChange={(e) => {
-              if (e.target.checked) setDetails((d) => d ? d + " • Review my draft\n" : "Review my draft\n");
-            }} />
-            Review my draft
-          </label>
-        </div>
+        <label className="text-sm font-medium text-on-surface">Tell us about your assignment</label>
         <textarea
-          placeholder="Tell us more about your assignment..."
+          placeholder="Describe what you need help with..."
           rows={3}
           value={details}
           onChange={(e) => setDetails(e.target.value)}
@@ -211,16 +179,23 @@ export default function PriceEstimateForm() {
         />
       </div>
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-on-surface">Attachments</label>
-        <label className="flex items-center justify-center gap-2 w-full py-6 border-2 border-dashed border-outline-variant rounded-xl cursor-pointer hover:border-primary-container hover:bg-primary-container/5 transition-all text-on-surface-variant">
-          <Upload className="w-5 h-5" />
-          <span className="text-sm font-medium">
-            {files.length > 0
-              ? `${files.length} file${files.length > 1 ? "s" : ""} attached`
-              : "Upload files (PDF, DOCX, images)"}
-          </span>
-          <input type="file" className="hidden" multiple accept=".pdf,.docx,.doc,.png,.jpg,.jpeg" onChange={(e) => handleFiles(e.target.files)} />
-        </label>
+        <label className="text-sm font-medium text-on-surface">Files</label>
+        <div className="flex flex-col gap-2">
+          <label className="flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-outline-variant rounded-xl cursor-pointer hover:border-primary-container hover:bg-primary-container/5 transition-all text-on-surface-variant">
+            <Upload className="w-5 h-5" />
+            <span className="text-sm font-medium">
+              {files.length > 0
+                ? `${files.length} file${files.length > 1 ? "s" : ""} attached`
+                : "+ Upload assignment instructions"}
+            </span>
+            <input type="file" className="hidden" multiple accept=".pdf,.docx,.doc,.png,.jpg,.jpeg" onChange={(e) => handleFiles(e.target.files)} />
+          </label>
+          <label className="flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-outline-variant rounded-xl cursor-pointer hover:border-primary-container hover:bg-primary-container/5 transition-all text-on-surface-variant">
+            <Upload className="w-5 h-5" />
+            <span className="text-sm font-medium">+ Upload rubric</span>
+            <input type="file" className="hidden" multiple accept=".pdf,.docx,.doc,.png,.jpg,.jpeg" onChange={(e) => handleFiles(e.target.files)} />
+          </label>
+        </div>
       </div>
       {error && (
         <p className="text-sm text-error bg-error-container/40 border border-error/30 rounded-lg px-3 py-2">
@@ -231,7 +206,7 @@ export default function PriceEstimateForm() {
         type="submit"
         className="w-full h-12 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer"
       >
-        Get Price Estimate
+        Find Matching Helpers →
         <ArrowRight className="w-4 h-4" />
       </button>
       <p className="text-xs text-on-surface-variant text-center">
