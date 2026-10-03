@@ -34,11 +34,7 @@ const subjects = ["English Literature", "Mathematics", "Biology", "Chemistry", "
 
 const marqueeItems = SERVICE_TYPES;
 
-const testimonials = [
-  { name: "Aarati K.", role: "English Major", rating: 5, text: "The helper I worked with helped me structure my thesis argument beautifully. The step-by-step feedback was invaluable — I learned more in one session than in weeks of struggling alone." },
-  { name: "Sushmita R.", role: "Biology Student", rating: 5, text: "The guidance on my lab report was exceptional. My helper helped me understand the methodology deeply instead of just fixing the writing." },
-  { name: "Pratik B.", role: "Business Student", rating: 5, text: "The project guidance was exactly what I needed. They walked me through the data analysis step by step, and the final report came together clearly. Direct communication, clear pricing, and the result exceeded my expectations." },
-];
+const testimonials = [];
 
 type HomeHelper = {
   id: string;
@@ -85,7 +81,7 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-center gap-6 text-xs font-medium text-on-surface-variant flex-wrap">
           <span className="flex items-center gap-1.5">
             <span className="material-symbols-outlined text-sm text-primary">verified</span>
-            Verified Academic Mentors &amp; Subject Helpers
+            Verified Mentors
           </span>
           <span className="hidden sm:inline text-outline-variant">|</span>
           <span className="flex items-center gap-1.5">
@@ -178,8 +174,8 @@ export default async function HomePage() {
                   <span className="material-symbols-outlined text-primary">calculate</span>
                 </div>
                 <div>
-                  <h2 className="font-display font-bold text-on-surface">Get a Price Estimate</h2>
-                  <p className="text-xs text-on-surface-variant">Describe your assignment for a quick quote</p>
+              <h2 className="font-display font-bold text-on-surface">Let's understand your assignment</h2>
+              <p className="text-xs text-on-surface-variant">Share a few details to get started</p>
                 </div>
               </div>
               <PriceEstimateForm />
@@ -415,26 +411,12 @@ export default async function HomePage() {
               Testimonials
             </span>
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-4">What Students Say</h2>
-            <p className="text-on-surface-variant max-w-2xl mx-auto">Real feedback from students who&apos;ve used Acadibo for academic guidance</p>
+            <p className="text-on-surface-variant max-w-2xl mx-auto">
+              We're just getting started. Become one of our first students and help shape Acadibo.
+            </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {testimonials.map((t) => (
-              <div key={t.name} className="flex flex-col bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30">
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(t.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <p className="text-sm text-on-surface-variant leading-relaxed mb-6 grow">&ldquo;{t.text}&rdquo;</p>
-                <div className="flex items-center gap-3 pt-4 border-t border-outline-variant/30 mt-auto">
-                  <Avatar name={t.name} />
-                  <div>
-                    <p className="text-sm font-semibold text-on-surface leading-snug">{t.name}</p>
-                    <p className="text-xs text-on-surface-variant leading-snug">{t.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="text-center py-10 text-on-surface-variant">
+            <p>No testimonials yet — join us to be the first!</p>
           </div>
         </div>
       </section>

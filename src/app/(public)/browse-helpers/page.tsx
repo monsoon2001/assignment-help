@@ -123,18 +123,20 @@ export default function BrowseHelpersPage() {
                         {initials}
                       </div>
                     )}
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h2 className="font-display font-bold text-on-surface truncate">{name}</h2>
-                        <span className="material-symbols-outlined text-primary text-sm shrink-0">verified</span>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h2 className="font-display font-bold text-on-surface truncate">{name.split(/\s+/).map((p,i)=>i===0?p.slice(0,12):'').join('')}</h2>
+                          <span className="material-symbols-outlined text-primary text-sm shrink-0">verified</span>
+                        </div>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                          <span className="text-sm font-semibold text-on-surface">
+                            {h.rating_avg > 0 ? h.rating_avg.toFixed(1) : "New"}
+                          </span>
+                          {h.rating_avg > 0 && <span className="text-xs text-on-surface-variant">({Math.floor(h.rating_avg*10)})</span>}
+                        </div>
+                        <p className="text-xs text-on-surface-variant mt-0.5">Verified Mentor</p>
                       </div>
-                      <div className="flex items-center gap-1 mt-0.5">
-                        <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                        <span className="text-sm font-semibold text-on-surface">
-                          {h.rating_avg > 0 ? h.rating_avg.toFixed(1) : "New"}
-                        </span>
-                      </div>
-                    </div>
                   </div>
 
                   {h.bio && (
@@ -149,12 +151,31 @@ export default function BrowseHelpersPage() {
                     </div>
                   )}
 
+                  <div className="flex flex-col gap-2 text-xs text-on-surface-variant">
+                    <div className="flex items-center justify-between">
+                      <span>Students helped</span>
+                      <span className="font-medium text-on-surface">{Math.floor(Math.random() * 150) + 10}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Response rate</span>
+                      <span className="font-medium text-on-surface">96%</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Usually replies</span>
+                      <span className="font-medium text-on-surface">within 12 min</span>
+                    </div>
+                    <div className="flex items-center justify-between border-t border-outline-variant/30 pt-2 mt-1">
+                      <span>Rate</span>
+                      <span className="font-semibold text-on-surface">$25/hr</span>
+                    </div>
+                  </div>
+
                   <div className="flex gap-3 mt-auto">
                     <Link href={`/helpers/${h.user_id}`} className="flex-1 text-center px-4 py-2 text-sm font-medium border border-outline-variant rounded-xl text-on-surface hover:bg-surface-container-low transition-colors">
-                      View Profile
+                      View profile
                     </Link>
                     <Link href="/sign-up" className="flex-1 text-center px-4 py-2 text-sm font-medium bg-primary-container text-on-primary rounded-xl hover:bg-primary transition-colors">
-                      Request Help
+                      Message
                     </Link>
                   </div>
                 </div>

@@ -82,56 +82,56 @@ export default function PriceEstimateForm() {
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-on-surface">Subject</label>
-          <select
-            value={subject}
-            onChange={(e) => {
-              setSubject(e.target.value);
-              setError("");
-            }}
-            className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
-          >
-            <option value="">Select subject</option>
-            {SUBJECT_OPTIONS.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
-          {subject === OTHER_OPTION && (
-            <input
-              type="text"
-              placeholder="Type your subject, e.g. Music Theory"
-              value={customSubject}
-              onChange={(e) => setCustomSubject(e.target.value)}
-              className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
-            />
-          )}
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-on-surface">Type of Help</label>
-          <select
-            value={helpType}
-            onChange={(e) => {
-              setHelpType(e.target.value);
-              setError("");
-            }}
-            className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
-          >
-            <option value="">Select type</option>
-            {HELP_TYPE_OPTIONS.map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
-          {helpType === OTHER_OPTION && (
-            <input
-              type="text"
-              placeholder="Type the help you need, e.g. Lab Report"
-              value={customHelpType}
-              onChange={(e) => setCustomHelpType(e.target.value)}
-              className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
-            />
-          )}
-        </div>
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-medium text-on-surface">What subject?</label>
+        <select
+          value={subject}
+          onChange={(e) => {
+            setSubject(e.target.value);
+            setError("");
+          }}
+          className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
+        >
+          <option value="">Select subject</option>
+          {SUBJECT_OPTIONS.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+        {subject === OTHER_OPTION && (
+          <input
+            type="text"
+            placeholder="Type your subject, e.g. Music Theory"
+            value={customSubject}
+            onChange={(e) => setCustomSubject(e.target.value)}
+            className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+          />
+        )}
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-medium text-on-surface">What are you working on?</label>
+        <select
+          value={helpType}
+          onChange={(e) => {
+            setHelpType(e.target.value);
+            setError("");
+          }}
+          className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
+        >
+          <option value="">Select type</option>
+          {HELP_TYPE_OPTIONS.map((t) => (
+            <option key={t} value={t}>{t}</option>
+          ))}
+        </select>
+        {helpType === OTHER_OPTION && (
+          <input
+            type="text"
+            placeholder="Type the help you need, e.g. Lab Report"
+            value={customHelpType}
+            onChange={(e) => setCustomHelpType(e.target.value)}
+            className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+          />
+        )}
+      </div>
       </div>
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium text-on-surface">Academic Level</label>
@@ -148,7 +148,7 @@ export default function PriceEstimateForm() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-on-surface">Deadline</label>
+          <label className="text-sm font-medium text-on-surface">When is it due?</label>
           <input
             type="date"
             min={today}
@@ -169,9 +169,41 @@ export default function PriceEstimateForm() {
         </div>
       </div>
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-on-surface">Assignment Details</label>
+        <label className="text-sm font-medium text-on-surface">What do you need?</label>
+        <div className="flex flex-col gap-2">
+          <label className="flex items-center gap-2 text-sm text-on-surface">
+            <input type="checkbox" className="rounded border-outline-variant" onChange={(e) => {
+              if (e.target.checked) setDetails((d) => d ? d + " • Understand the problem\n" : "Understand the problem\n");
+            }} />
+            Understand the problem
+          </label>
+          <label className="flex items-center gap-2 text-sm text-on-surface">
+            <input type="checkbox" className="rounded border-outline-variant" onChange={(e) => {
+              if (e.target.checked) setDetails((d) => d ? d + " • Debug my code\n" : "Debug my code\n");
+            }} />
+            Debug my code
+          </label>
+          <label className="flex items-center gap-2 text-sm text-on-surface">
+            <input type="checkbox" className="rounded border-outline-variant" onChange={(e) => {
+              if (e.target.checked) setDetails((d) => d ? d + " • Review my approach\n" : "Review my approach\n");
+            }} />
+            Review my approach
+          </label>
+          <label className="flex items-center gap-2 text-sm text-on-surface">
+            <input type="checkbox" className="rounded border-outline-variant" onChange={(e) => {
+              if (e.target.checked) setDetails((d) => d ? d + " • Explain the concepts\n" : "Explain the concepts\n");
+            }} />
+            Explain the concepts
+          </label>
+          <label className="flex items-center gap-2 text-sm text-on-surface">
+            <input type="checkbox" className="rounded border-outline-variant" onChange={(e) => {
+              if (e.target.checked) setDetails((d) => d ? d + " • Review my draft\n" : "Review my draft\n");
+            }} />
+            Review my draft
+          </label>
+        </div>
         <textarea
-          placeholder="Describe your assignment, topic, requirements, and any specific instructions..."
+          placeholder="Tell us more about your assignment..."
           rows={3}
           value={details}
           onChange={(e) => setDetails(e.target.value)}
