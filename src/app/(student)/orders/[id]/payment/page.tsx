@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
-  ArrowLeft, Lock, ShieldCheck, CreditCard, Wallet, School, Star, CalendarDays, BookOpen,
+  ArrowLeft, Lock, ShieldCheck, CreditCard, Wallet, School, CalendarDays, BookOpen,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { unwrapRow } from "@/lib/embedded";
@@ -14,7 +14,7 @@ import CheckoutPanel from "@/components/orders/checkout-panel";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Payment | PeerCraft",
+  title: "Payment | Acadibo",
 };
 
 export default async function OrderPaymentPage({
@@ -35,7 +35,7 @@ export default async function OrderPaymentPage({
 
   const { data: orderRow } = await supabase
     .from("orders")
-    .select("id, price, currency, status, deadline, proposal:proposals(request:requests(title), helper:users(id, name))")
+    .select("id, price, currency, status, deadline, proposal:proposals(request:requests(title, country), helper:users(id, name))")
     .eq("id", id)
     .maybeSingle();
 
@@ -43,8 +43,8 @@ export default async function OrderPaymentPage({
     redirect("/requests");
   }
 
-  const proposal = unwrapRow<{ request: { title: string }[] | { title: string } | null; helper: { id: string; name: string }[] | { id: string; name: string } | null }>(orderRow.proposal);
-  const requestTitle = unwrapRow<{ title: string }>(proposal?.request)?.title ?? null;
+  const proposal = unwrapRow<{ request: { title: string; country: string | null }[] | { title: string; country: string | null } | null; helper: { id: string; name: string }[] | { id: string; name: string } | null }>(orderRow.proposal);
+  const request = unwrapRow<{ title: string; country: string | null }>(proposal?.request);
   const helper = unwrapRow<{ id: string; name: string }>(proposal?.helper);
 
   const order = {
@@ -53,8 +53,9 @@ export default async function OrderPaymentPage({
     currency: typeof orderRow.currency === "string" ? orderRow.currency : "USD",
     status: orderRow.status,
     deadline: orderRow.deadline as string | null,
-    title: requestTitle ?? "PeerCraft Order",
-    helperName: helper?.name ?? "PeerCraft Helper",
+    title: request?.title ?? "Acadibo Order",
+    country: request?.country ?? null,
+    helperName: helper?.name ?? "Acadibo Helper",
   };
 
   if (order.status !== "payment_pending") {
@@ -108,12 +109,8 @@ export default async function OrderPaymentPage({
               <p className="font-semibold text-on-surface truncate">{order.helperName}</p>
               <ShieldCheck size={15} className="text-primary shrink-0" />
             </div>
-            <p className="text-xs text-on-surface-variant">PeerCraft verified mentor</p>
+            <p className="text-xs text-on-surface-variant">Acadibo verified mentor</p>
           </div>
-          <span className="inline-flex items-center gap-1 text-sm font-semibold text-on-surface">
-            <Star size={15} className="fill-amber-400 text-amber-400" />
-            4.9
-          </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -133,7 +130,13 @@ export default async function OrderPaymentPage({
           </div>
         </div>
 
-        <CheckoutPanel orderId={order.id} basePrice={order.price} baseCurrency={order.currency} title={order.title} />
+        <CheckoutPanel
+          orderId={order.id}
+          basePrice={order.price}
+          baseCurrency={order.currency}
+          country={order.country}
+          title={order.title}
+        />
 
         <div className="flex items-start gap-2 p-3.5 rounded-xl bg-surface-container-low">
           <School size={16} className="text-primary shrink-0 mt-0.5" />

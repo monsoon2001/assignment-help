@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { adminClient } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/admin";
+import { logAdminAction } from "@/lib/audit";
 
 export type ActionResult = { ok: boolean; message: string };
 
@@ -11,7 +12,7 @@ function clean(value: FormDataEntryValue | null): string {
 }
 
 export async function flagMessage(formData: FormData): Promise<void> {
-  await requireAdmin();
+  const adminId = await requireAdmin();
   const messageId = clean(formData.get("messageId"));
   const reason = clean(formData.get("reason")) || "Reported by admin";
   if (!messageId) return;
@@ -33,31 +34,32 @@ export async function flagMessage(formData: FormData): Promise<void> {
         order_id: message.order_id,
         reason,
         status: "pending",
+        flagged_by: adminId,
       },
       { onConflict: "message_id" }
     );
 
+  await logAdminAction(adminId, "message_flag", messageId, { reason });
   revalidatePath("/admin/chat-monitor");
 }
 
 export async function updateFlagStatus(formData: FormData): Promise<void> {
-  await requireAdmin();
+  const adminId = await requireAdmin();
   const flagId = clean(formData.get("flagId"));
   const status = clean(formData.get("status"));
   if (!flagId || !["confirmed", "dismissed"].includes(status)) return;
 
   await adminClient.from("chat_flags").update({ status }).eq("id", flagId);
+  await logAdminAction(adminId, "flag_status_change", flagId, { to: status });
   revalidatePath("/admin/chat-monitor");
 }
 
 export async function issueWarning(formData: FormData): Promise<ActionResult> {
-  await requireAdmin();
+  const admin = await requireAdmin();
   const userId = clean(formData.get("userId"));
   const messageId = clean(formData.get("messageId"));
   const reason = clean(formData.get("reason"));
   if (!userId || !reason) return { ok: false, message: "Missing details." };
-
-  const admin = await requireAdmin();
 
   const { error } = await adminClient.from("user_warnings").insert({
     user_id: userId,
@@ -71,16 +73,18 @@ export async function issueWarning(formData: FormData): Promise<ActionResult> {
   await adminClient.from("notifications").insert({
     user_id: userId,
     type: "warning",
-    message: "You received a warning from PeerCraft support.",
+    message: "You received a warning from Acadibo support.",
     link: null,
   });
+
+  await logAdminAction(admin, "issue_warning", userId, { message_id: messageId || null, reason });
 
   revalidatePath("/admin/chat-monitor");
   return { ok: true, message: "Warning issued." };
 }
 
 export async function resolveAllFlags(formData: FormData): Promise<void> {
-  await requireAdmin();
+  const adminId = await requireAdmin();
   const reason = clean(formData.get("reason"));
   if (!reason) return;
   await adminClient
@@ -88,5 +92,6 @@ export async function resolveAllFlags(formData: FormData): Promise<void> {
     .update({ status: "confirmed" })
     .eq("status", "pending")
     .ilike("reason", `%${reason}%`);
+  await logAdminAction(adminId, "resolve_all_flags", null, { reason_pattern: reason });
   revalidatePath("/admin/chat-monitor");
 }

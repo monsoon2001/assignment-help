@@ -5,8 +5,8 @@ import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 
 const faqs = [
-  { q: "What is PeerCraft?", a: "PeerCraft is an academic peer guidance platform that connects students with verified subject-matter helpers. Our helpers provide tutoring, editing, and guidance to help you improve your writing and understand coursework concepts — they do not complete assignments on your behalf." },
-  { q: "Is using PeerCraft considered cheating?", a: "No. PeerCraft operates as a tutoring and academic support platform. Our helpers provide guidance, explanations, and feedback to help you learn. Think of it like working with a tutor or visiting a writing center — you still do the work, but with expert guidance to improve your skills and understanding." },
+  { q: "What is Acadibo?", a: "Acadibo is an academic peer guidance platform that connects students with verified subject-matter helpers. Our helpers provide tutoring, editing, and guidance to help you improve your writing and understand coursework concepts — they do not complete assignments on your behalf." },
+  { q: "Is using Acadibo considered cheating?", a: "No. Acadibo operates as a tutoring and academic support platform. Our helpers provide guidance, explanations, and feedback to help you learn. Think of it like working with a tutor or visiting a writing center — you still do the work, but with expert guidance to improve your skills and understanding." },
   { q: "How are helpers verified?", a: "Every helper goes through a rigorous verification process including academic credential verification, subject-matter testing, sample work review, and an interview. We only accept helpers with strong academic records and demonstrated expertise in their subjects." },
   { q: "What subjects do you cover?", a: "We cover a wide range of subjects including English Literature, Mathematics, Biology, Chemistry, Physics, Computer Science, History, Psychology, Economics, Business Studies, Nursing, Engineering, Statistics, Philosophy, and more. If your subject isn't listed, contact us and we'll do our best to match you with a helper." },
   { q: "How does pricing work?", a: "Pricing is transparent and based on the type of help needed, subject complexity, deadline, and word count. You'll receive a clear quote before confirming any work — no hidden fees. You only pay after you confirm the match and are satisfied with the quoted price." },
@@ -30,7 +30,7 @@ export default function FAQPage() {
             <span className="text-on-surface font-medium">FAQ</span>
           </nav>
           <h1 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-2">Frequently Asked Questions</h1>
-          <p className="text-on-surface-variant max-w-2xl">Everything you need to know about PeerCraft.</p>
+          <p className="text-on-surface-variant max-w-2xl">Everything you need to know about Acadibo.</p>
         </div>
       </div>
 

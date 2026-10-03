@@ -80,7 +80,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-on-surface mb-1">Email Us</h3>
-                  <p className="text-sm text-on-surface-variant">support@peercraft.com</p>
+                  <p className="text-sm text-on-surface-variant">support@acadibo.com</p>
                   <p className="text-xs text-on-surface-variant mt-1">We respond within 24 hours</p>
                 </div>
               </div>
@@ -104,7 +104,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-on-surface mb-1">Location</h3>
-                  <p className="text-sm text-on-surface-variant">PeerCraft HQ</p>
+                  <p className="text-sm text-on-surface-variant">Acadibo HQ</p>
                   <p className="text-sm text-on-surface-variant">San Francisco, CA</p>
                 </div>
               </div>

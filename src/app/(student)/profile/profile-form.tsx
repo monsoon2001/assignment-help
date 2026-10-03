@@ -43,7 +43,7 @@ export default function StudentProfileForm({
     { ok: false, message: "" }
   );
 
-  const displayName = name || (email ? email.split("@")[0] : "PeerCraft Student");
+  const displayName = name || (email ? email.split("@")[0] : "Acadibo Student");
 
   return (
     <div className="w-full max-w-6xl mx-auto flex flex-col gap-6">

@@ -3,9 +3,10 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { GraduationCap, Mail, ArrowRight, ShieldCheck, Building2, Check, Lock } from "lucide-react";
+import { GraduationCap, Mail, ArrowRight, Building2, Lock } from "lucide-react";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
+import AuthShowcase from "@/components/layout/auth-showcase";
 import { createClient } from "@/lib/supabase/client";
 import { roleToHome } from "@/lib/auth";
 import { stampAuthAtCookie } from "@/lib/session-timebox";
@@ -84,23 +85,26 @@ function SignInForm() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <header className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto w-full">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">
-            <GraduationCap size={18} />
-          </span>
-          <span className="font-display font-bold text-on-surface text-lg">PeerCraft</span>
-        </Link>
-        <Link href="/" className="text-sm text-on-surface-variant hover:text-on-surface font-medium inline-flex items-center gap-1.5">
-          Back to Platform
-        </Link>
-      </header>
+    <div className="h-dvh w-full overflow-hidden bg-background lg:grid lg:grid-cols-2">
+      <div className="flex h-full min-h-0 flex-col overflow-y-auto">
+        <header className="flex shrink-0 items-center justify-between px-6 py-4 sm:px-10">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">
+              <GraduationCap size={18} />
+            </span>
+            <span className="font-display font-bold text-on-surface text-lg">Acadibo</span>
+          </Link>
+          <Link
+            href="/"
+            className="text-sm text-on-surface-variant hover:text-on-surface font-medium inline-flex items-center gap-1.5"
+          >
+            Back to Platform
+          </Link>
+        </header>
 
-      <main className="flex-1 flex items-center justify-center px-4 py-10">
-        <div className="w-full max-w-[420px]">
-          <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant px-8 py-9">
-            <div className="flex flex-col items-center text-center mb-7">
+        <main className="flex flex-1 items-center justify-center px-6 py-6 sm:px-10">
+          <div className="w-full max-w-[400px]">
+            <div className="flex flex-col items-center text-center mb-6">
               <span className="w-14 h-14 rounded-2xl bg-primary-container text-on-primary flex items-center justify-center mb-4 shadow-md shadow-primary-container/30">
                 <GraduationCap size={28} />
               </span>
@@ -154,7 +158,7 @@ function SignInForm() {
               </Button>
             </form>
 
-            <div className="flex items-center gap-3 my-6">
+            <div className="flex items-center gap-3 my-5">
               <div className="flex-1 h-px bg-outline-variant" />
               <span className="text-xs text-on-surface-variant font-medium">Or continue with</span>
               <div className="flex-1 h-px bg-outline-variant" />
@@ -173,29 +177,21 @@ function SignInForm() {
               Continue with Google
             </button>
 
-            <p className="text-center text-sm text-on-surface-variant mt-6">
+            <p className="text-center text-sm text-on-surface-variant mt-5">
               Don&apos;t have an account?{" "}
-              <Link href="/sign-up" className="font-semibold text-primary hover:underline">Sign Up</Link>
+              <Link href="/sign-up" className="font-semibold text-primary hover:underline">
+                Sign Up
+              </Link>
             </p>
           </div>
+        </main>
 
-          <div className="flex items-center justify-center gap-5 mt-7 text-xs text-on-surface-variant">
-            <span className="inline-flex items-center gap-1.5">
-              <ShieldCheck size={14} className="text-success" />
-              256-bit encrypted
-            </span>
-            <span className="w-1 h-1 rounded-full bg-outline-variant" />
-            <span className="inline-flex items-center gap-1.5">
-              <Check size={14} className="text-success" />
-              FERPA Certified
-            </span>
-          </div>
-        </div>
-      </main>
+        <footer className="shrink-0 py-4 px-6 text-center text-xs text-on-surface-variant border-t border-outline-variant sm:px-10">
+          © {new Date().getFullYear()} Acadibo Academic Network. All rights reserved.
+        </footer>
+      </div>
 
-      <footer className="py-5 text-center text-xs text-on-surface-variant border-t border-outline-variant">
-        © {new Date().getFullYear()} PeerCraft Academic Network. All rights reserved.
-      </footer>
+      <AuthShowcase />
     </div>
   );
 }

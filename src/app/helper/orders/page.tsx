@@ -12,7 +12,7 @@ import { normalizeCurrency, formatCurrency } from "@/lib/currency";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Active Orders | PeerCraft",
+  title: "Active Orders | Acadibo",
 };
 
 const STATUS: Record<string, { label: string; variant: "primary" | "warning" | "success" | "danger" }> = {

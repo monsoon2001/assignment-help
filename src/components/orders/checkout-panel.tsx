@@ -1,15 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Globe2 } from "lucide-react";
 import Select from "@/components/ui/select";
 import PayButton from "@/components/orders/pay-button";
 import {
   SUPPORTED_CURRENCIES,
   CURRENCY_LABELS,
+  CURRENCY_FLAGS,
   normalizeCurrency,
   convertCurrency,
   formatCurrency,
+  defaultCurrencyForCountry,
   PLATFORM_FEE_RATE,
 } from "@/lib/currency";
 
@@ -17,15 +19,21 @@ export default function CheckoutPanel({
   orderId,
   basePrice,
   baseCurrency,
+  country,
   title,
 }: {
   orderId: string;
   basePrice: number;
   baseCurrency: string;
+  country?: string | null;
   title: string;
 }) {
-  const [selected, setSelected] = useState<string>(normalizeCurrency(baseCurrency));
+  const [selected, setSelected] = useState<string>(
+    (country ? defaultCurrencyForCountry(country) : null) ?? normalizeCurrency(baseCurrency)
+  );
   const currency = normalizeCurrency(selected);
+  const base = normalizeCurrency(baseCurrency);
+  const suggested = country ? defaultCurrencyForCountry(country) : null;
 
   const price = useMemo(
     () => convertCurrency(basePrice, normalizeCurrency(baseCurrency), currency),
@@ -71,7 +79,7 @@ export default function CheckoutPanel({
               <span className="font-medium text-on-surface">{formatCurrency(helperReceives, currency)}</span>
             </div>
             <div className="flex items-center justify-between px-4 py-3 border-b border-outline-variant/80 text-sm">
-              <span className="text-on-surface-variant">PeerCraft service fee</span>
+              <span className="text-on-surface-variant">Acadibo service fee</span>
               <span className="font-medium text-on-surface">{formatCurrency(fee, currency)}</span>
             </div>
             <div className="flex items-center justify-between px-4 py-3 bg-primary-container/10 text-sm">
@@ -87,12 +95,40 @@ export default function CheckoutPanel({
         </div>
       </div>
 
-      <Select
-        label="Pay in"
-        value={currency}
-        onChange={(e) => setSelected(e.target.value)}
-        options={SUPPORTED_CURRENCIES.map((c) => ({ value: c, label: CURRENCY_LABELS[c] }))}
-      />
+      <div className="flex flex-col gap-2">
+        <Select
+          label="Pay in"
+          value={currency}
+          onChange={(e) => setSelected(e.target.value)}
+          options={SUPPORTED_CURRENCIES.map((c) => ({
+            value: c,
+            label: `${CURRENCY_FLAGS[c]} ${CURRENCY_LABELS[c]}`,
+          }))}
+        />
+        {suggested && (
+          <p className="flex items-center gap-1.5 text-xs text-on-surface-variant">
+            <Globe2 size={13} className="shrink-0 text-primary" />
+            {country === "Other" ? (
+              <>
+                You selected &ldquo;Other&rdquo;, so we defaulted to{" "}
+                <span className="font-semibold text-on-surface">{suggested}</span>. Pick another
+                currency above if you prefer.
+              </>
+            ) : (
+              <>
+                Defaulted to{" "}
+                <span className="font-semibold text-on-surface">{suggested}</span> based on your
+                country, {country}.
+              </>
+            )}
+          </p>
+        )}
+        {base !== currency && (
+          <p className="text-xs text-on-surface-variant">
+            Converted from the agreed price of {formatCurrency(basePrice, base)}.
+          </p>
+        )}
+      </div>
 
       <PayButton orderId={orderId} amount={price} currency={currency} />
     </div>

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
 import { unwrapRow } from "@/lib/embedded";
+import { defaultCurrencyForCountry } from "@/lib/currency";
 
 export interface ProposalForAccept {
   proposal_id: string;
@@ -27,7 +28,7 @@ export async function acceptProposal(
   const { data: proposal, error: proposalError } = await supabase
     .from("proposals")
     .select(
-      "id, helper_id, price, currency, status, request:requests(id, student_id, status, deadline)"
+      "id, helper_id, price, currency, status, request:requests(id, student_id, status, deadline, country)"
     )
     .eq("id", input.proposal_id)
     .maybeSingle();
@@ -35,7 +36,7 @@ export async function acceptProposal(
   if (proposalError || !proposal) {
     return { error: "Proposal not found." };
   }
-  const request = unwrapRow<{ id: string; student_id: string; status: string; deadline: string | null }>(proposal.request);
+  const request = unwrapRow<{ id: string; student_id: string; status: string; deadline: string | null; country: string | null }>(proposal.request);
   if (!request) {
     return { error: "Proposal not found." };
   }
@@ -52,6 +53,11 @@ export async function acceptProposal(
     return { error: "This request has already been resolved." };
   }
 
+  // The order is quoted in the currency the helper priced their proposal in, so
+  // the amount the student sees always matches what the checkout route charges.
+  // The student's country is only a fallback for proposals with no currency.
+  const orderCurrency = proposal.currency ?? defaultCurrencyForCountry(request.country);
+
   const { data: order, error: insertError } = await supabase
     .from("orders")
     .insert({
@@ -60,7 +66,7 @@ export async function acceptProposal(
       helper_id: proposal.helper_id,
       status: "payment_pending",
       price: proposal.price,
-      currency: proposal.currency ?? "USD",
+      currency: orderCurrency,
       deadline: request.deadline ?? null,
     })
     .select("id")

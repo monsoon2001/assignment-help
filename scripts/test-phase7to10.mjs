@@ -25,10 +25,10 @@ const admin = createClient(url, secretKey, {
 });
 
 const password = "TestPass123!";
-const emailStudent = `p7.student.${Date.now()}@peercraft.test`;
-const emailHelper = `p7.helper.${Date.now()}@peercraft.test`;
-const emailAdmin = `p7.admin.${Date.now()}@peercraft.test`;
-const emailThird = `p7.third.${Date.now()}@peercraft.test`;
+const emailStudent = `p7.student.${Date.now()}@acadibo.test`;
+const emailHelper = `p7.helper.${Date.now()}@acadibo.test`;
+const emailAdmin = `p7.admin.${Date.now()}@acadibo.test`;
+const emailThird = `p7.third.${Date.now()}@acadibo.test`;
 
 const created = { student: null, helper: null, admin: null, third: null };
 let requestId, proposalId, orderId;

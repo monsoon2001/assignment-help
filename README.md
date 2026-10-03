@@ -1,4 +1,4 @@
-This repo is a **PeerCraft** build — a peer-to-peer academic help platform on Next.js (App Router) + Supabase + Stripe, with student, helper, and admin areas, realtime chat, notifications, and order/review flows.
+This repo is an **Acadibo** build — a peer-to-peer academic help platform on Next.js (App Router) + Supabase + Stripe, with student, helper, and admin areas, realtime chat, notifications, and order/review flows.
 
 ## Environment
 
@@ -7,6 +7,29 @@ Copy `.env.example` to `.env.local` and fill in your Supabase and Stripe (test-m
 ```bash
 psql "$DIRECT_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20260910000008_notifications.sql
 ```
+
+## Email verification (verification code, not a link)
+
+Sign-up uses `supabase.auth.signInWithOtp` and then `verifyOtp({ type: "email" })`, which only
+works if the email that arrives contains a **6-digit code**. Supabase ships link-based templates,
+so the `{{ .Token }}` placeholder must be added in the dashboard:
+
+1. Supabase dashboard → **Authentication → Emails → Templates**.
+2. Enable the **Email OTP** template and make sure **"Email OTP (Token)"** is the template used for
+   OTP sign-ins (Authentication → Sign In / Providers → Email → Email OTP).
+3. Use this body (the `{{ .Token }}` line is the important part):
+
+   ```html
+   <h2>Your Acadibo verification code</h2>
+   <p>Hi {{ .Email }}, use this code to finish creating your Acadibo account:</p>
+   <p style="font-size:28px;font-weight:700;letter-spacing:6px">{{ .Token }}</p>
+   <p>This code expires in 60 minutes. If you did not request it, ignore this email.</p>
+   ```
+
+4. Set the redirect allow-list to include `/auth/callback` so the Google flow keeps working.
+
+Without step 3 the user receives a confirmation link instead of a code, and the "Enter the 6-digit
+code" screen will never match the message that was sent.
 
 ## Verification
 

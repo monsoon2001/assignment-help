@@ -15,6 +15,15 @@ import {
 } from "@/lib/requests";
 
 import { SUBJECTS, SERVICE_TYPES, ACADEMIC_LEVELS, OTHER_OPTION, withCustom } from "@/lib/constants";
+import { COUNTRIES, defaultCurrencyForCountry, convertCurrency, formatCurrency } from "@/lib/currency";
+
+// Indicative bands, quoted in USD and converted to the student's currency.
+const PRICING_BANDS = [
+  { label: "Essays (per page)", from: 7, to: 15 },
+  { label: "Problem sets (per set)", from: 35, to: 90 },
+  { label: "Reports (per report)", from: 60, to: 160 },
+  { label: "Research help (per hour)", from: 20, to: 40 },
+];
 
 const SERVICES = [
   ...SERVICE_TYPES.map((label, i) => ({ value: `service-${i}`, label })),
@@ -27,6 +36,8 @@ const SUBJECT_OPTIONS = [
 ];
 
 const LEVEL_OPTIONS = ACADEMIC_LEVELS.map((label) => ({ value: label, label }));
+
+const COUNTRY_OPTIONS = COUNTRIES.map((label) => ({ value: label, label }));
 
 function resolveDraftSelection(options: { value: string; label: string }[], value?: string): { value: string; custom: string } {
   if (!value) return { value: options[0].value, custom: "" };
@@ -67,6 +78,7 @@ export default function NewRequestPage() {
   const [description, setDescription] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [completedLevel, setCompletedLevel] = useState("");
+  const [country, setCountry] = useState("United States");
   const [step, setStep] = useState<"details" | "helper">("details");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -117,6 +129,8 @@ export default function NewRequestPage() {
       ? customSubject.trim()
       : (SUBJECT_OPTIONS.find((s) => s.value === subject)?.label ?? subject);
 
+  const quoteCurrency = defaultCurrencyForCountry(country);
+
   const handleContinue = () => {
     setError("");
     if (service === OTHER_OPTION && !customService.trim()) {
@@ -129,6 +143,10 @@ export default function NewRequestPage() {
     }
     if (!completedLevel) {
       setError("Select your academic level.");
+      return;
+    }
+    if (!country) {
+      setError("Select your country so we can bill you in the right currency.");
       return;
     }
     if (!description.trim() && !wordCount.trim()) {
@@ -148,6 +166,7 @@ export default function NewRequestPage() {
       description,
       completedLevel ? `Academic level: ${completedLevel}` : "",
       wordCount ? `Expected length: ${wordCount}` : "",
+      country ? `Country: ${country} (bills in ${defaultCurrencyForCountry(country)})` : "",
     ]
       .filter(Boolean)
       .join("\n\n");
@@ -156,6 +175,7 @@ export default function NewRequestPage() {
       title,
       description: descriptionWithMeta || undefined,
       subject: resolvedSubjectLabel,
+      country,
       deadline: deadline ? new Date(`${deadline}T23:59:59`).toISOString() : null,
       files,
       helper_id: helper.user_id,
@@ -260,6 +280,22 @@ export default function NewRequestPage() {
                 />
               </div>
 
+              <div className="flex flex-col gap-3">
+                <Select
+                  label="Your Country"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  options={COUNTRY_OPTIONS}
+                />
+                <p className="text-xs text-on-surface-variant -mt-1">
+                  Sets your default payment currency to{" "}
+                  <span className="font-semibold text-on-surface">
+                    {defaultCurrencyForCountry(country)}
+                  </span>{" "}
+                  once you accept a helper&apos;s offer. You can still change it at checkout.
+                </p>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <Input
                   label="Word Count"
@@ -353,6 +389,11 @@ export default function NewRequestPage() {
                   <span>{resolvedSubjectLabel}</span>
                   {completedLevel && <span>{completedLevel}</span>}
                   {wordCount && <span>{wordCount}</span>}
+                  {country && (
+                    <span>
+                      {country} · pays in {defaultCurrencyForCountry(country)}
+                    </span>
+                  )}
                   {deadline && (
                     <span>
                       Due {new Date(`${deadline}T23:59:59`).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
@@ -386,28 +427,22 @@ export default function NewRequestPage() {
           <Card className="p-5">
             <h3 className="font-semibold text-sm text-on-surface mb-3 flex items-center gap-2">
               <Info size={15} className="text-primary" />
-              Pricing & Timeline
+              Pricing &amp; Timeline
             </h3>
             <div className="space-y-2.5 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-on-surface-variant">Essays (per page)</span>
-                <span className="font-semibold text-on-surface">$7 – $15</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-on-surface-variant">Problem sets (per set)</span>
-                <span className="font-semibold text-on-surface">$35 – $90</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-on-surface-variant">Reports (per report)</span>
-                <span className="font-semibold text-on-surface">$60 – $160</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-on-surface-variant">Research help (per hour)</span>
-                <span className="font-semibold text-on-surface">$20 – $40</span>
-              </div>
+              {PRICING_BANDS.map((band) => (
+                <div key={band.label} className="flex items-center justify-between">
+                  <span className="text-on-surface-variant">{band.label}</span>
+                  <span className="font-semibold text-on-surface">
+                    {formatCurrency(convertCurrency(band.from, "USD", quoteCurrency), quoteCurrency)} –{" "}
+                    {formatCurrency(convertCurrency(band.to, "USD", quoteCurrency), quoteCurrency)}
+                  </span>
+                </div>
+              ))}
             </div>
             <p className="text-xs text-on-surface-variant mt-3 leading-relaxed">
-              Your helper responds in the request chat within <span className="font-semibold">2 hours</span> or you can
+              Shown in <span className="font-semibold">{quoteCurrency}</span> for {country}. Your
+              helper responds in the request chat within <span className="font-semibold">2 hours</span> or you can
               choose someone else. Rush orders under 12 hours carry a <span className="font-semibold">+25%</span> premium.
             </p>
           </Card>
@@ -415,7 +450,7 @@ export default function NewRequestPage() {
           <Card className="p-5 bg-surface-container-low border border-outline-variant">
             <div className="flex items-center gap-2 mb-2">
               <ShieldCheck size={16} className="text-success" />
-              <h3 className="font-semibold text-sm text-on-surface">Why students trust PeerCraft</h3>
+              <h3 className="font-semibold text-sm text-on-surface">Why students trust Acadibo</h3>
             </div>
             <ul className="space-y-2 text-xs text-on-surface-variant leading-relaxed">
               <li className="flex items-start gap-2">

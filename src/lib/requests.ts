@@ -1,12 +1,13 @@
 import { createClient } from "@/lib/supabase/client";
 
-const DRAFT_KEY = "peercraft:pending-request";
+const DRAFT_KEY = "acadibo:pending-request";
 
 export interface NewRequestInput {
   title: string;
   description?: string;
   subject?: string;
   deadline?: string | null;
+  country?: string;
   files?: File[];
   helper_id?: string;
 }
@@ -42,7 +43,7 @@ export function clearPendingDraft() {
   window.localStorage.removeItem(DRAFT_KEY);
 }
 
-const DRAFT_FILES_DB = "peercraft:draft-files";
+const DRAFT_FILES_DB = "acadibo:draft-files";
 const DRAFT_FILES_STORE = "files";
 const DRAFT_FILES_KEY = "pending";
 
@@ -137,6 +138,7 @@ export async function submitRequest(
       title: input.title,
       description: input.description ?? null,
       subject: input.subject ?? null,
+      country: input.country ?? null,
       deadline: input.deadline ?? null,
       file_urls: fileUrls,
       status: "requested",

@@ -6,7 +6,7 @@ import HelperRequestsView from "@/components/helper/requests-view";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Incoming Requests | PeerCraft",
+  title: "Incoming Requests | Acadibo",
 };
 
 type RawRequest = {

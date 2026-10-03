@@ -27,7 +27,7 @@ const admin = createClient(url, secretKey, {
 const BASE = "http://localhost:3000";
 
 async function createUser(role, tag) {
-  const email = `test.${role}.${tag}@peercraft.test`;
+  const email = `test.${role}.${tag}@acadibo.test`;
   const { data, error } = await admin.auth.admin.createUser({
     email,
     password: "TestPass123!",
@@ -44,7 +44,7 @@ async function buildCookieHeader(role, tag) {
   const uid = await createUser(role, tag);
   const sb = createClient(url, anonKey, { realtime: { transport: WebSocket } });
   const { data: auth, error } = await sb.auth.signInWithPassword({
-    email: `test.${role}.${tag}@peercraft.test`,
+    email: `test.${role}.${tag}@acadibo.test`,
     password: "TestPass123!",
   });
   if (error) throw error;

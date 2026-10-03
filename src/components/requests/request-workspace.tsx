@@ -392,7 +392,7 @@ export default function RequestWorkspace({
               <Avatar name={otherParty?.name || (isHelper ? "Student" : "Helper")} size="lg" online />
               <div className="min-w-0 flex-1">
                 <p className="font-display font-semibold text-on-surface">
-                  {otherParty?.name || (isHelper ? "Student" : "PeerCraft Helper")}
+                  {otherParty?.name || (isHelper ? "Student" : "Acadibo Helper")}
                 </p>
                 <p className="text-xs text-on-surface-variant truncate">
                   {isHelper ? "Student who requested help" : "Expert assigned to your request"}

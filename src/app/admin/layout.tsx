@@ -85,7 +85,7 @@ export default function AdminLayout({
           <span className="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">
             <span className="material-symbols-outlined text-on-primary text-lg">school</span>
           </span>
-          <span className="font-display font-bold text-lg text-on-surface">PeerCraft</span>
+          <span className="font-display font-bold text-lg text-on-surface">Acadibo</span>
           <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-primary-container text-on-primary rounded-md">
             Admin
           </span>
@@ -104,7 +104,7 @@ export default function AdminLayout({
             </span>
           </div>
           <span className="font-display font-bold text-xl text-on-surface">
-            PeerCraft
+            Acadibo
           </span>
           <span className="ml-1 px-2 py-0.5 text-xs font-semibold bg-primary-container text-on-primary rounded-md">
             Admin

@@ -152,7 +152,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
             <GraduationCap size={20} />
           </span>
           <div className="leading-tight hidden sm:block">
-            <p className="font-display font-bold text-on-surface text-lg">PeerCraft</p>
+            <p className="font-display font-bold text-on-surface text-lg">Acadibo</p>
             <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">Academic Network</p>
           </div>
         </Link>

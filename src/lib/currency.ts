@@ -1,6 +1,6 @@
 export const SUPPORTED_CURRENCIES = ["USD", "AUD", "CAD", "GBP", "NZD"] as const;
 
-// PeerCraft's platform fee, deducted from the helper's share of an order.
+// Acadibo's platform fee, deducted from the helper's share of an order.
 // The student always pays the agreed price; the helper receives (1 - fee) of it.
 export const PLATFORM_FEE_RATE = 0.2;
 
@@ -40,8 +40,8 @@ const UNITS_PER_USD: Record<CurrencyCode, number> = {
   NZD: 1.64,
 };
 
-export function isSupportedCurrency(value: string): value is CurrencyCode {
-  return (SUPPORTED_CURRENCIES as readonly string[]).includes(value);
+export function isSupportedCurrency(value: unknown): value is CurrencyCode {
+  return typeof value === "string" && (SUPPORTED_CURRENCIES as readonly string[]).includes(value);
 }
 
 export function convertCurrency(
@@ -71,4 +71,39 @@ export function currencySymbol(currency: CurrencyCode): string {
 
 export function normalizeCurrency(value: string | null | undefined): CurrencyCode {
   return isSupportedCurrency(value ?? "") ? (value as CurrencyCode) : "USD";
+}
+
+// Countries offered in the request form. Anything not listed here (the
+// "Other" option, or a country we have not onboarded) falls back to USD.
+export const OTHER_COUNTRY = "Other";
+
+export const COUNTRIES = [
+  "Australia",
+  "Canada",
+  "New Zealand",
+  "United Kingdom",
+  "United States",
+  OTHER_COUNTRY,
+] as const;
+
+export type CountryName = (typeof COUNTRIES)[number];
+
+/** Default payment currency for a student's chosen country. */
+export const COUNTRY_CURRENCY: Record<string, CurrencyCode> = {
+  Australia: "AUD",
+  Canada: "CAD",
+  "New Zealand": "NZD",
+  "United Kingdom": "GBP",
+  "United States": "USD",
+};
+
+export function isKnownCountry(value: string | null | undefined): value is CountryName {
+  return (COUNTRIES as readonly string[]).includes(value ?? "");
+}
+
+export function defaultCurrencyForCountry(
+  country: string | null | undefined
+): CurrencyCode {
+  if (!country) return "USD";
+  return COUNTRY_CURRENCY[country] ?? "USD";
 }

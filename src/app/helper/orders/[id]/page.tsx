@@ -6,7 +6,7 @@ import OrderWorkspace from "@/components/orders/order-workspace";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Order Workspace | PeerCraft",
+  title: "Order Workspace | Acadibo",
 };
 
 export default async function HelperOrderPage({

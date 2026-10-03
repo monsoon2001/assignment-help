@@ -7,7 +7,7 @@ import MessagesInbox from "@/components/requests/messages-inbox";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Messages | PeerCraft",
+  title: "Messages | Acadibo",
 };
 
 export default async function HelperMessagesPage() {

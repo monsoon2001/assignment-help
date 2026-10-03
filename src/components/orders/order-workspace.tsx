@@ -542,7 +542,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
               ) : (
                 <p className="text-xs text-on-surface-variant mt-3 leading-relaxed">
                   {isHelper
-                    ? "Payment is secured by PeerCraft and releases to you after the student reviews the delivery. The student's paid receipt is shown here once confirmed."
+                    ? "Payment is secured by Acadibo and releases to you after the student reviews the delivery. The student's paid receipt is shown here once confirmed."
                     : "Complete payment to start your order."}
                 </p>
               )}
@@ -552,7 +552,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
               <div className="flex items-center gap-3 mb-3">
                 <Avatar name={logoName} size="lg" online />
                 <div className="min-w-0 flex-1">
-                  <p className="font-display font-semibold text-on-surface">{order.helper?.name ?? "PeerCraft Helper"}</p>
+                  <p className="font-display font-semibold text-on-surface">{order.helper?.name ?? "Acadibo Helper"}</p>
                   <p className="text-xs text-on-surface-variant truncate">Assigned mentor</p>
                 </div>
                 <Badge variant="success" className="shrink-0"><ShieldCheck size={12} /> Verified</Badge>

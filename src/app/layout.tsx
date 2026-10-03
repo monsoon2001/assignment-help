@@ -16,7 +16,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "PeerCraft — Academic Help Marketplace",
+  title: "Acadibo — Academic Help Marketplace",
   description: "Get expert help with your essays, reports, and assignments from verified subject-matter helpers.",
 };
 

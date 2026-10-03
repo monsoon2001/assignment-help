@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bell, FileText, ShoppingBag, MessageSquare, CheckCircle2, Settings, ChevronRight, Wallet, RotateCcw } from "lucide-react";
+import { Bell, FileText, ShoppingBag, MessageSquare, CheckCircle2, Settings, ChevronRight, Wallet, RotateCcw, Inbox } from "lucide-react";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import Button from "@/components/ui/button";
@@ -23,6 +23,7 @@ type Tone = { icon: React.ComponentType<{ size?: number; className?: string }>; 
 
 const typeConfig: Record<string, Tone> = {
   proposal: { icon: FileText, tone: "bg-secondary-container text-on-secondary-container" },
+  request: { icon: Inbox, tone: "bg-primary-container text-on-primary" },
   payment: { icon: Wallet, tone: "bg-emerald-100 text-emerald-700" },
   message: { icon: MessageSquare, tone: "bg-primary-container text-on-primary" },
   delivery: { icon: ShoppingBag, tone: "bg-tertiary-container text-on-tertiary" },

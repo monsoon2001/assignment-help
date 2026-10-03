@@ -72,7 +72,7 @@ export default function ServicesPage() {
           </nav>
           <h1 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-2">Services</h1>
           <p className="text-on-surface-variant max-w-2xl">
-            Everything PeerCraft can help with — from drafting and editing to quality checks and technical guidance.
+            Everything Acadibo can help with — from drafting and editing to quality checks and technical guidance.
           </p>
         </div>
       </div>

@@ -6,25 +6,17 @@ import {
 } from "lucide-react";
 import { stripe } from "@/lib/stripe";
 import { unwrapRow } from "@/lib/embedded";
-import { adminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import Badge from "@/components/ui/badge";
 import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
+import PaymentConfirming from "./pending-confirm";
 import { normalizeCurrency, formatCurrency } from "@/lib/currency";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Payment Confirmed | PeerCraft",
-};
-
-type OrderSummary = {
-  id: string;
-  price: number;
-  status: string;
-  proposal_id: string;
-  title: string;
-  helperName: string | null;
+  title: "Payment Confirmed | Acadibo",
 };
 
 export default async function OrderConfirmedPage({
@@ -37,102 +29,69 @@ export default async function OrderConfirmedPage({
   const { id } = await params;
   const { session_id } = await searchParams;
 
+  // User-scoped client only: RLS guarantees this row is the signed-in student's.
+  // Order/payment changes happen exclusively in the verified Stripe webhook.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/sign-in");
+
   if (!session_id) {
     redirect(`/orders/${id}/payment`);
   }
 
-  // Load order + proposal context.
-  const { data: orderRow } = await adminClient
+  const { data: orderRow } = await supabase
     .from("orders")
     .select("id, price, currency, status, proposal_id, proposal:proposals(request:requests(title), helper:users(id, name))")
     .eq("id", id)
+    .eq("student_id", user.id)
     .maybeSingle();
 
-  if (!orderRow) {
-    notFound();
-  }
+  if (!orderRow) notFound();
 
   const proposal = unwrapRow<{ request: { title: string }[] | { title: string } | null; helper: { id: string; name: string }[] | { id: string; name: string } | null }>(orderRow.proposal);
   const helper = unwrapRow<{ id: string; name: string }>(proposal?.helper);
+  const title = unwrapRow<{ title: string }>(proposal?.request)?.title ?? "Acadibo Order";
 
-  const order: OrderSummary = {
-    id: orderRow.id,
-    price: Number(orderRow.price),
-    status: orderRow.status,
-    proposal_id: orderRow.proposal_id,
-    title: unwrapRow<{ title: string }>(proposal?.request)?.title ?? "PeerCraft Order",
-    helperName: helper?.name ?? null,
-  };
-
-  // Verify the Stripe checkout session and finalize the order if not yet done.
-  if (order.status === "payment_pending") {
-    let paid = false;
-    try {
-      const session = await stripe.checkout.sessions.retrieve(session_id);
-      paid = session.payment_status === "paid";
-    } catch {
-      // Fall through; redirect back to payment if we can't verify.
-      redirect(`/orders/${id}/payment`);
-    }
-
-    if (!paid) {
-      redirect(`/orders/${id}/payment`);
-    }
-
-    // Finalize: mark order in_progress + record the payment (idempotent).
-    await adminClient
-      .from("orders")
-      .update({ status: "in_progress" })
-      .eq("id", order.id);
-
-    const { data: existing } = await adminClient
-      .from("payments")
-      .select("id")
-      .eq("order_id", order.id)
-      .maybeSingle();
-
-    if (!existing) {
-      try {
-        const session = await stripe.checkout.sessions.retrieve(session_id);
-        const intentId2 =
-          typeof session.payment_intent === "string"
-            ? session.payment_intent
-            : (session.payment_intent?.id ?? null);
-
-        let receiptUrl: string | null = null;
-        if (intentId2) {
-          try {
-            const charged = await stripe.paymentIntents.retrieve(intentId2, {
-              expand: ["latest_charge"],
-            });
-            const charge = charged.latest_charge;
-            receiptUrl =
-              typeof charge === "string" ? null : (charge?.receipt_url ?? null);
-          } catch {
-            // best-effort
-          }
-        }
-
-        await adminClient.from("payments").insert({
-          order_id: order.id,
-          amount: Number(session.amount_total) / 100,
-          currency: session.currency?.toUpperCase() ?? "USD",
-          stripe_payment_intent_id: intentId2,
-          receipt_url: receiptUrl,
-          customer_email: typeof session.customer_email === "string" ? session.customer_email : null,
-          status: "paid",
-        });
-      } catch {
-        // ignore; webhook also attempts this write
-      }
-    }
+  // Confirm the checkout session is genuinely bound to this order before
+  // showing any "paid" state. The webhook performs the authoritative write.
+  let sessionVerified = false;
+  try {
+    const session = await stripe.checkout.sessions.retrieve(session_id);
+    sessionVerified =
+      session.payment_status === "paid" && session.metadata?.order_id === id;
+  } catch {
+    sessionVerified = false;
   }
 
-  const { data: paymentRow } = await adminClient
+  if (!sessionVerified) {
+    redirect(`/orders/${id}/payment`);
+  }
+
+  const { data: paymentRow } = await supabase
     .from("payments")
     .select("amount, currency, status, receipt_url, created_at")
-    .eq("order_id", order.id)
+    .eq("order_id", id)
     .maybeSingle();
+
+  const finalized = paymentRow?.status === "paid" || orderRow.status !== "payment_pending";
+
+  if (!finalized) {
+    return (
+      <div className="w-full max-w-xl mx-auto flex flex-col gap-5 py-4">
+        <div className="text-center flex flex-col items-center gap-3">
+          <Badge variant="secondary" className="gap-1">
+            <Verified size={12} /> Redirecting to secure checkout… done
+          </Badge>
+          <h1 className="font-display text-2xl font-bold text-on-surface max-w-sm">
+            {orderRow.status === "payment_pending" ? "Payment received — finalizing…" : "Order confirmed"}
+          </h1>
+        </div>
+        <PaymentConfirming />
+      </div>
+    );
+  }
 
   const receiptUrl =
     typeof paymentRow?.receipt_url === "string" && paymentRow.receipt_url.length > 0
@@ -155,15 +114,14 @@ export default async function OrderConfirmedPage({
           You&apos;re all set — your order is officially active.
         </h1>
         <p className="text-sm text-on-surface-variant max-w-md">
-          {order.helperName ? `${order.helperName} has received` : "Your helper has received"} your assignment
-          brief and work has started.
+          {helper?.name} has received your assignment brief and work has started.
         </p>
       </div>
 
       <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest overflow-hidden shadow-sm">
         <div className="px-6 py-4 border-b border-outline-variant">
-          <p className="text-xs text-on-surface-variant">Order #{order.id.slice(0, 8).toUpperCase()}</p>
-          <p className="font-display font-semibold text-on-surface mt-0.5">{order.title}</p>
+          <p className="text-xs text-on-surface-variant">Order #{orderRow.id.slice(0, 8).toUpperCase()}</p>
+          <p className="font-display font-semibold text-on-surface mt-0.5">{title}</p>
         </div>
         <div className="px-6 py-5 grid grid-cols-2 sm:grid-cols-3 gap-5">
           <div>
@@ -181,8 +139,8 @@ export default async function OrderConfirmedPage({
           <div>
             <p className="text-[11px] text-on-surface-variant uppercase tracking-wide">Helper</p>
             <div className="flex items-center gap-2 mt-1">
-              <Avatar name={order.helperName || "Helper"} size="sm" />
-              <p className="text-sm font-semibold text-on-surface truncate">{order.helperName || "PeerCraft Helper"}</p>
+              <Avatar name={helper?.name || "Helper"} size="sm" />
+              <p className="text-sm font-semibold text-on-surface truncate">{helper?.name || "Acadibo Helper"}</p>
             </div>
           </div>
         </div>
@@ -208,14 +166,14 @@ export default async function OrderConfirmedPage({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Link href={`/orders/${order.id}`}>
+        <Link href={`/orders/${orderRow.id}`}>
           <Button className="w-full justify-center">
             Open Project Workspace
           </Button>
         </Link>
-        <Link href={`/orders/${order.id}`}>
+        <Link href={`/orders/${orderRow.id}`}>
           <Button variant="outline" className="w-full justify-center">
-            <MessageSquare size={15} /> Message {order.helperName?.split(" ")[0] || "Helper"}
+            <MessageSquare size={15} /> Message {(helper?.name || "Helper").split(" ")[0]}
           </Button>
         </Link>
       </div>
@@ -223,7 +181,7 @@ export default async function OrderConfirmedPage({
       <div className="flex items-start gap-2 p-4 rounded-xl bg-surface-container-low">
         <ShieldCheck size={17} className="text-primary shrink-0 mt-0.5" />
         <p className="text-xs leading-relaxed text-on-surface-variant">
-          Protected by the <span className="font-semibold text-on-surface">PeerCraft Academic Guarantee</span>:{" "}
+          Protected by the <span className="font-semibold text-on-surface">Acadibo Academic Guarantee</span>:{" "}
           <span className="font-semibold text-on-surface inline-flex items-center gap-1"><Timer size={11} /> unlimited revisions</span>{" "}
           until you&apos;re satisfied. Funds release to the mentor only after your review.
         </p>

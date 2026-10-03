@@ -3,7 +3,7 @@ import { Star, CheckCircle, ArrowRight } from "lucide-react";
 import PriceEstimateForm from "@/components/marketing/price-estimate-form";
 import Avatar from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/server";
-import { SERVICE_TYPES } from "@/lib/constants";
+import { SERVICE_TYPES, SUBJECTS } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -148,7 +148,7 @@ export default async function HomePage() {
                 </span>
               </div>
 
-              {/* Rating Panel */}
+              {/* Coverage Panel */}
               <div className="flex items-center gap-4 pt-2">
                 <div className="flex -space-x-2">
                   {helpers.slice(0, 4).map((h) => (
@@ -161,13 +161,12 @@ export default async function HomePage() {
                   ))}
                 </div>
                 <div>
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                    ))}
-                    <span className="text-sm font-semibold text-on-surface ml-1">4.9</span>
-                  </div>
-                  <p className="text-xs text-on-surface-variant">Trusted by 2,000+ students</p>
+                  <p className="text-sm font-semibold text-on-surface">
+                    Covering {SUBJECTS.length} subjects
+                  </p>
+                  <p className="text-xs text-on-surface-variant">
+                    {SERVICE_TYPES.length} types of help, from essays to lab reports
+                  </p>
                 </div>
               </div>
             </div>
@@ -355,7 +354,7 @@ export default async function HomePage() {
           <div className="text-center mb-12">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold mb-4">
               <span className="material-symbols-outlined text-sm">thumb_up</span>
-              Why PeerCraft
+              Why Acadibo
             </span>
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-4">Why Students Choose Us</h2>
             <p className="text-on-surface-variant max-w-2xl mx-auto">We&apos;re built for students, by people who understand the student experience</p>
@@ -416,7 +415,7 @@ export default async function HomePage() {
               Testimonials
             </span>
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-4">What Students Say</h2>
-            <p className="text-on-surface-variant max-w-2xl mx-auto">Real feedback from students who&apos;ve used PeerCraft for academic guidance</p>
+            <p className="text-on-surface-variant max-w-2xl mx-auto">Real feedback from students who&apos;ve used Acadibo for academic guidance</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {testimonials.map((t) => (
@@ -450,7 +449,7 @@ export default async function HomePage() {
             Ready to get help with your next assignment?
           </h2>
           <p className="text-on-surface-variant mb-8 max-w-xl mx-auto leading-relaxed">
-            Join thousands of students who&apos;ve improved their grades and understanding with the help of verified peer experts.
+            Work one-on-one with verified peer experts across {SUBJECTS.length} subjects and build real understanding of your coursework.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/browse-helpers" className="px-8 py-3.5 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors shadow-sm inline-flex items-center gap-2">

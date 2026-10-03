@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { SUBJECTS, SERVICE_TYPES, ACADEMIC_LEVELS } from "@/lib/constants";
+import { SUPPORTED_CURRENCIES } from "@/lib/currency";
 
 const values = [
   { icon: "school", title: "Academic Integrity First", desc: "We believe in genuine learning. Our helpers guide and teach — they don't do the work for you. Every interaction is designed to build your understanding." },
@@ -15,10 +17,10 @@ const team = [
 ];
 
 const stats = [
-  { value: "2,000+", label: "Students Served" },
-  { value: "150+", label: "Verified Helpers" },
-  { value: "4.9", label: "Average Rating" },
-  { value: "98%", label: "On-Time Delivery" },
+  { value: String(SUBJECTS.length), label: "Subjects Covered" },
+  { value: String(SERVICE_TYPES.length), label: "Types Of Help" },
+  { value: String(ACADEMIC_LEVELS.length), label: "Academic Levels" },
+  { value: String(SUPPORTED_CURRENCIES.length), label: "Currencies Supported" },
 ];
 
 export default function AboutPage() {
@@ -31,7 +33,7 @@ export default function AboutPage() {
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-on-surface font-medium">About Us</span>
           </nav>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-2">About PeerCraft</h1>
+          <h1 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-2">About Acadibo</h1>
           <p className="text-on-surface-variant max-w-2xl">Building a better way for students to get academic guidance — peer-to-peer.</p>
         </div>
       </div>
@@ -43,7 +45,7 @@ export default function AboutPage() {
             <span className="material-symbols-outlined text-primary text-4xl mb-4 block">emoji_objects</span>
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-on-surface mb-4">Our Mission</h2>
             <p className="text-on-surface-variant text-lg leading-relaxed max-w-2xl mx-auto">
-              PeerCraft exists to make quality academic support accessible to every student. We connect learners with verified peer helpers who provide genuine guidance — helping students understand concepts, improve their writing, and succeed academically on their own merit.
+              Acadibo exists to make quality academic support accessible to every student. We connect learners with verified peer helpers who provide genuine guidance — helping students understand concepts, improve their writing, and succeed academically on their own merit.
             </p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
@@ -93,7 +95,7 @@ export default function AboutPage() {
       {/* CTA */}
       <section className="py-16 bg-surface-container-high">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-display text-2xl font-bold text-on-surface mb-3">Join the PeerCraft community</h2>
+          <h2 className="font-display text-2xl font-bold text-on-surface mb-3">Join the Acadibo community</h2>
           <p className="text-on-surface-variant mb-6">Whether you&apos;re a student seeking guidance or an expert wanting to help others, we&apos;d love to have you.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/browse-helpers" className="px-6 py-3 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors">Browse Helpers</Link>

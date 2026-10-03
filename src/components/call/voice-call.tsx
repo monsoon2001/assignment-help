@@ -246,7 +246,7 @@ export function VoiceCallProvider({
           }
           callIdRef.current = sig.call;
           pendingOfferRef.current = sig.sdp;
-          peerRef.current = { id: sig.from, name: sig.fromName ?? "PeerCraft Support", avatarUrl: sig.fromAvatar ?? null };
+          peerRef.current = { id: sig.from, name: sig.fromName ?? "Acadibo Support", avatarUrl: sig.fromAvatar ?? null };
           setPeer(peerRef.current);
           setPeerMuted(false);
           setPhaseBoth("incoming");
@@ -626,7 +626,7 @@ export function VoiceCallProvider({
     restore: () => setMinimized(false),
   };
 
-  const name = peer?.name ?? "PeerCraft Support";
+  const name = peer?.name ?? "Acadibo Support";
   const avatarUrl = peer?.avatarUrl ?? undefined;
 
   return (
@@ -680,7 +680,7 @@ export function VoiceCallProvider({
                   <div className="flex flex-col items-center">
                     <Avatar name={name} src={avatarUrl} size="lg" online className="mb-3" />
                     <h3 className="font-display font-bold text-lg text-on-surface">{name}</h3>
-                    <p className="text-sm text-on-surface-variant mt-0.5">PeerCraft Support Desk</p>
+                    <p className="text-sm text-on-surface-variant mt-0.5">Acadibo Support Desk</p>
                   </div>
                   <div className="flex items-center justify-center gap-5 mt-8">
                     <div className="flex flex-col items-center gap-1.5">

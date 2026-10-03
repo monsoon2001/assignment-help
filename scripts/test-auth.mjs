@@ -24,7 +24,7 @@ const admin = createClient(url, secretKey, {
   realtime: { transport: WebSocket },
 });
 
-const email = `test.student.${Date.now()}@peercraft.test`;
+const email = `test.student.${Date.now()}@acadibo.test`;
 
 (async () => {
   // 1. Create a user directly with confirmed email (service role), role defaults to student via trigger

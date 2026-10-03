@@ -107,7 +107,7 @@ export default function BrowseHelpersPage() {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((h) => {
-              const name = h.user?.name ?? "PeerCraft Helper";
+              const name = h.user?.name ?? "Acadibo Helper";
               const avatar = h.user?.avatar_url ?? null;
               const initials = name.split(/\s+/).map((p) => p[0]).join("").toUpperCase().slice(0, 2);
               return (

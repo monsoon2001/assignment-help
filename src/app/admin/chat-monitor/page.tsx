@@ -5,7 +5,7 @@ import ChatMonitor from "@/app/admin/components/chat-monitor";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Chat Monitor | PeerCraft Admin",
+  title: "Chat Monitor | Acadibo Admin",
 };
 
 type Participant = { id: string; name: string | null; role: string | null };

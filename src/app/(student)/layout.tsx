@@ -83,7 +83,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
       />
 
       <footer className="py-5 text-center text-xs text-on-surface-variant border-t border-outline-variant bg-surface-container-lowest pb-24 md:pb-5">
-        © {new Date().getFullYear()} PeerCraft Academic Network for Eastview University. Connect with your academic
+        © {new Date().getFullYear()} Acadibo Academic Network for Eastview University. Connect with your academic
         integrity office for questions.
       </footer>
     </div>

@@ -30,7 +30,7 @@ export default function Footer() {
               <div className="w-8 h-8 bg-primary-container rounded-lg flex items-center justify-center">
                 <span className="material-symbols-outlined text-on-primary text-lg">school</span>
               </div>
-              <span className="font-display font-bold text-xl text-on-surface">PeerCraft</span>
+              <span className="font-display font-bold text-xl text-on-surface">Acadibo</span>
             </Link>
             <p className="text-sm text-on-surface-variant leading-relaxed">
               Connect with verified peer helpers for academic guidance and support across all subjects.
@@ -59,10 +59,10 @@ export default function Footer() {
         <div className="mt-10 pt-6 border-t border-outline-variant/50">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-on-surface-variant">
-              &copy; {new Date().getFullYear()} PeerCraft. All rights reserved.
+              &copy; {new Date().getFullYear()} Acadibo. All rights reserved.
             </p>
             <p className="text-xs text-on-surface-variant text-center md:text-right max-w-md">
-              PeerCraft is an academic peer guidance platform. All helpers provide guidance and tutoring
+              Acadibo is an academic peer guidance platform. All helpers provide guidance and tutoring
               — they do not complete assignments on behalf of students.
             </p>
           </div>

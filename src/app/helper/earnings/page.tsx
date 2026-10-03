@@ -12,7 +12,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { unwrapRow } from "@/lib/embedded";
 import { Receipt } from "lucide-react";
-import { formatCurrency, normalizeCurrency, type CurrencyCode } from "@/lib/currency";
+import { formatCurrency, normalizeCurrency, convertCurrency, type CurrencyCode } from "@/lib/currency";
 
 export const dynamic = "force-dynamic";
 
@@ -65,13 +65,14 @@ export default async function HelperEarnings() {
 
   const totalByCurrency = new Map<CurrencyCode, number>();
   const monthByCurrency = new Map<CurrencyCode, number>();
-  let monthTotal = 0;
+  let monthTotalUsd = 0;
   for (const p of rows) {
     const c = normalizeCurrency(p.currency);
-    totalByCurrency.set(c, (totalByCurrency.get(c) ?? 0) + Number(p.amount));
+    const amount = Number(p.amount);
+    totalByCurrency.set(c, (totalByCurrency.get(c) ?? 0) + amount);
     if (new Date(p.created_at).getTime() >= monthStart.getTime()) {
-      monthByCurrency.set(c, (monthByCurrency.get(c) ?? 0) + Number(p.amount));
-      monthTotal += Number(p.amount);
+      monthByCurrency.set(c, (monthByCurrency.get(c) ?? 0) + amount);
+      monthTotalUsd += convertCurrency(amount, c, "USD");
     }
   }
   const fmtTotal =
@@ -87,26 +88,23 @@ export default async function HelperEarnings() {
           .map(([c, amt]) => formatCurrency(amt, c))
           .join(" · ");
 
-  const monthlyEarnings = new Map<string, number>();
+  // The chart needs a single comparable scale, so every payment is converted to
+  // USD before being grouped by month. Summing raw amounts across different
+  // currency codes would be meaningless.
+  const monthlyUsd = new Map<string, number>();
   for (const p of rows) {
     const key = monthLabel(p.created_at);
-    monthlyEarnings.set(key, (monthlyEarnings.get(key) ?? 0) + Number(p.amount));
+    const usd = convertCurrency(Number(p.amount), normalizeCurrency(p.currency), "USD");
+    monthlyUsd.set(key, (monthlyUsd.get(key) ?? 0) + usd);
   }
-  const monthlyByCurrency = new Map<string, Map<CurrencyCode, number>>();
-  for (const p of rows) {
-    const key = monthLabel(p.created_at);
-    const inner = monthlyByCurrency.get(key) ?? new Map<CurrencyCode, number>();
-    inner.set(normalizeCurrency(p.currency), (inner.get(normalizeCurrency(p.currency)) ?? 0) + Number(p.amount));
-    monthlyByCurrency.set(key, inner);
-  }
-  const chart = Array.from(monthlyByCurrency.entries()).sort((a, b) => a[0].localeCompare(b[0]));
-  const maxMonth = chart.reduce((m, [, inner]) => Math.max(m, Math.max(...Array.from(inner.values()))), 0);
+  const chart = Array.from(monthlyUsd.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  const maxMonth = chart.reduce((m, [, v]) => Math.max(m, v), 0);
 
   const summaryStats = [
     { label: "Total Earnings", value: fmtTotal, icon: DollarSign, color: "bg-emerald-100 text-emerald-700" },
     { label: "This Month", value: fmtMonth, icon: TrendingUp, color: "bg-primary-container text-on-primary" },
     { label: "Completed Orders", value: String(completedCount ?? 0), icon: CheckCircle, color: "bg-secondary-container text-on-secondary-container" },
-    { label: "Net Monthly (USD)", value: `$${monthTotal.toLocaleString("en-US", { maximumFractionDigits: 2 })}`, icon: Clock, color: "bg-amber-100 text-amber-700" },
+    { label: "This Month (USD equiv.)", value: formatCurrency(monthTotalUsd, "USD"), icon: Clock, color: "bg-amber-100 text-amber-700" },
   ];
 
   return (
@@ -148,20 +146,45 @@ export default async function HelperEarnings() {
 
           {chart.length > 0 && (
             <Card className="p-6">
-              <h2 className="font-display text-lg font-semibold text-on-surface mb-4">Monthly Earnings</h2>
-              <div className="flex items-end gap-3 h-48">
-                {chart.map(([label, inner]) => {
-                  const totalMonth = Array.from(inner.values()).reduce((a, b) => a + b, 0);
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 mb-1">
+                <h2 className="font-display text-lg font-semibold text-on-surface">
+                  Monthly Earnings
+                </h2>
+                <span className="text-xs text-on-surface-variant">
+                  Shown in USD equivalent
+                </span>
+              </div>
+              <p className="text-sm text-on-surface-variant mb-6">
+                Net payouts grouped by month. Payments in other currencies are converted so the
+                bars share one scale.
+              </p>
+
+              <div className="flex items-end gap-3 sm:gap-5 h-48">
+                {chart.map(([label, total]) => {
+                  const pct = maxMonth > 0 ? (total / maxMonth) * 100 : 0;
                   return (
-                    <div key={label} className="flex-1 flex flex-col items-center gap-2">
-                      <span className="text-xs font-medium text-on-surface-variant">{formatCurrency(totalMonth)}</span>
-                      <div
-                        className="w-full bg-surface-container rounded-lg overflow-hidden relative"
-                        style={{ height: `${maxMonth > 0 ? (totalMonth / maxMonth) * 120 : 0}px` }}
+                    <div
+                      key={label}
+                      className="flex-1 min-w-0 h-full flex flex-col items-center justify-end gap-2"
+                    >
+                      <span
+                        className="text-xs font-semibold text-on-surface tabular-nums truncate max-w-full"
+                        title={formatCurrency(total, "USD")}
                       >
-                        <div className="absolute inset-0 bg-primary-container/80 rounded-lg" />
+                        {formatCurrency(total, "USD")}
+                      </span>
+                      <div
+                        className="w-full rounded-lg bg-surface-container flex items-end overflow-hidden"
+                        style={{ height: "120px" }}
+                      >
+                        <div
+                          className="w-full rounded-lg bg-primary"
+                          style={{ height: `${Math.max(pct, 3)}%` }}
+                        />
                       </div>
-                      <span className="text-xs text-on-surface-variant">{label}</span>
+                      <span className="text-xs text-on-surface-variant truncate max-w-full text-center">
+                        {label}
+                      </span>
                     </div>
                   );
                 })}
@@ -195,7 +218,7 @@ export default async function HelperEarnings() {
                   {rows.map((txn) => {
                     const title =
                       unwrapRow<{ request: { title: string | null } | null }>(txn.order?.proposal)?.request?.title ??
-                      "PeerCraft order";
+                      "Acadibo order";
                     return (
                       <tr key={txn.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
                         <td className="px-6 py-4">

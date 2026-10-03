@@ -56,7 +56,7 @@ export default function HowItWorksPage() {
 
         <div className="mt-16 text-center bg-surface-container-high rounded-2xl p-10">
           <h2 className="font-display text-2xl font-bold text-on-surface mb-3">Ready to get started?</h2>
-          <p className="text-on-surface-variant mb-6 max-w-lg mx-auto">Join thousands of students who&apos;ve improved their grades with PeerCraft.</p>
+          <p className="text-on-surface-variant mb-6 max-w-lg mx-auto">Get matched with a verified helper in your subject and start improving your grades with Acadibo.</p>
           <Link href="/browse-helpers" className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors">
             Browse Helpers
           </Link>
