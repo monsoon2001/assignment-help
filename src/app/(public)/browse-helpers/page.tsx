@@ -35,7 +35,15 @@ export default function BrowseHelpersPage() {
   const filtered = helpers.filter((h) => {
     const name = h.user?.name ?? "";
     const subjects = h.subjects ?? [];
-    if (search && !name.toLowerCase().includes(search.toLowerCase()) && !subjects.some(s => s.toLowerCase().includes(search.toLowerCase()))) return false;
+    const query = search.toLowerCase();
+    const subjectParamLower = subjectParam?.toLowerCase() ?? "";
+    const matchesSearch = !query || name.toLowerCase().includes(query) || subjects.some(s => s.toLowerCase().includes(query));
+    const matchesSubjectParam = !subjectParamLower || subjects.some(s => 
+      s.toLowerCase() === subjectParamLower || 
+      s.toLowerCase().includes(subjectParamLower) || 
+      subjectParamLower.includes(s.toLowerCase())
+    );
+    if (!matchesSearch || !matchesSubjectParam) return false;
     if (rating === "4.5+" && h.rating_avg < 4.5) return false;
     if (rating === "4.7+" && h.rating_avg < 4.7) return false;
     if (rating === "4.9+" && h.rating_avg < 4.9) return false;
