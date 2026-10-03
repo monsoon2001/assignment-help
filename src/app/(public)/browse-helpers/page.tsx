@@ -2,15 +2,18 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Search, Star, Clock, MessageSquare, ChevronRight, Loader2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { Search, Star, ChevronRight, Loader2 } from "lucide-react";
 import { fetchHelperCandidates, type HelperCandidate } from "@/lib/requests";
 
 const ratings = ["Any Rating", "4.5+", "4.7+", "4.9+"];
 
 export default function BrowseHelpersPage() {
+  const searchParams = useSearchParams();
+  const subjectParam = searchParams.get("subject");
   const [helpers, setHelpers] = useState<HelperCandidate[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(subjectParam ?? "");
   const [rating, setRating] = useState("Any Rating");
   const [topRated, setTopRated] = useState(false);
 
