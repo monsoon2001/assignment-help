@@ -60,6 +60,29 @@ const serviceGroups = [
   },
 ];
 
+const GUIDE_BY_SERVICE: Record<string, string> = {
+  "Essay Writing": "/resources/writing/how-to-write-an-essay",
+  "Report Writing": "/resources/research/how-to-write-a-report",
+  Proofreading: "/resources/writing/how-to-proofread-an-essay",
+  Editing: "/resources/writing/how-to-write-a-conclusion",
+  Paraphrasing: "/resources/writing/how-to-paraphrase",
+  "MLA & APA Formatting": "/resources/citations/mla-citation-guide",
+  "Citation & Referencing": "/resources/citations/how-to-cite-sources",
+  "Plagiarism Check": "/resources/citations/how-to-avoid-plagiarism",
+  "Similarity Check": "/resources/citations/how-to-avoid-plagiarism",
+  "Thesis & Dissertation": "/resources/projects/how-to-write-a-research-paper",
+  "Case Study": "/resources/research/how-to-write-a-case-study",
+  "Literature Review": "/resources/research/how-to-write-a-literature-review",
+  "Research Proposal": "/resources/projects/how-to-write-a-research-paper",
+  "Lab Report": "/resources/research/how-to-write-a-lab-report",
+  "Math & Statistics Help": "/resources/technical/how-to-analyze-data",
+  "Programming Help": "/resources/technical/how-to-approach-a-programming-assignment",
+  "Data Analysis": "/resources/technical/how-to-analyze-data",
+  "Business Plan": "/resources/presentations/how-to-write-a-personal-statement",
+  "Personal Statement": "/resources/presentations/how-to-write-a-personal-statement",
+  "Presentation & Slides": "/resources/presentations/how-to-make-a-presentation",
+};
+
 export default function ServicesPage() {
   return (
     <>
@@ -98,6 +121,14 @@ export default function ServicesPage() {
                   >
                     <h3 className="font-semibold text-on-surface mb-1.5">{s.name}</h3>
                     <p className="text-sm text-on-surface-variant leading-relaxed flex-1">{s.desc}</p>
+                    {GUIDE_BY_SERVICE[s.name] && (
+                      <Link
+                        href={GUIDE_BY_SERVICE[s.name]}
+                        className="text-xs font-medium text-primary hover:underline mt-3"
+                      >
+                        Read the free guide &rarr;
+                      </Link>
+                    )}
                   </div>
                 ))}
               </div>
@@ -106,6 +137,15 @@ export default function ServicesPage() {
         </div>
 
         <div className="mt-16 text-center bg-surface-container-high rounded-2xl p-10">
+          <h2 className="font-display text-2xl font-bold text-on-surface mb-2">Want to learn the process first?</h2>
+          <p className="text-on-surface-variant mb-6 max-w-lg mx-auto">
+            Our free student guides explain step by step how to approach each of these tasks, with examples and
+            checklists.
+          </p>
+          <Link href="/resources" className="inline-flex items-center gap-2 mb-10 px-8 py-3.5 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors">
+            Browse Student Guides
+            <ArrowRight className="w-4 h-4" />
+          </Link>
           <h2 className="font-display text-2xl font-bold text-on-surface mb-2">Don&apos;t see what you need?</h2>
           <p className="text-on-surface-variant mb-6 max-w-lg mx-auto">
             We support many more subject areas and task types. Tell us about your assignment and we&apos;ll help you get started.

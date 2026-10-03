@@ -5,6 +5,7 @@ const publicMenuItems = [
   { label: "Browse Helpers", href: "/browse-helpers" },
   { label: "Services", href: "/services" },
   { label: "Subjects", href: "/subjects" },
+  { label: "Resources", href: "/resources" },
   { label: "How It Works", href: "/how-it-works" },
   { label: "About", href: "/about" },
   { label: "FAQ", href: "/faq" },
