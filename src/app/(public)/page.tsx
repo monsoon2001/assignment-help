@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Star, CheckCircle, ArrowRight } from "lucide-react";
 import PriceEstimateForm from "@/components/marketing/price-estimate-form";
@@ -6,6 +7,37 @@ import { createClient } from "@/lib/supabase/server";
 import { SERVICE_TYPES, SUBJECTS } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
+
+const SITE_URL = "https://acadibo.com";
+
+const HERO_TITLE = "Assignment Help Online | Choose a Verified Assignment Helper | Acadibo";
+
+const HERO_DESCRIPTION = `Get assignment help online from verified peer helpers across ${SUBJECTS.length} subjects. Post your brief, compare helpers by subject, rating and price, agree a personalized proposal, and pay only after you approve — essay help, lab reports, citations, programming, data analysis and more.`;
+
+export const metadata: Metadata = {
+  title: HERO_TITLE,
+  description: HERO_DESCRIPTION,
+  keywords: [
+    "assignment help",
+    "assignment helper",
+    "homework help",
+    "online assignment help",
+    "essay help",
+    "verified assignment helper",
+    "tutoring",
+    "proofreading and editing",
+    "lab report help",
+    "citation help",
+  ],
+  alternates: { canonical: SITE_URL },
+  openGraph: {
+    title: HERO_TITLE,
+    description: HERO_DESCRIPTION,
+    url: SITE_URL,
+    siteName: "Acadibo",
+    type: "website",
+  },
+};
 
 const services = [
   { icon: "edit_note", title: "Essay Writing", desc: "From brainstorming to final draft — structure, arguments, and citations guided step by step." },
@@ -33,6 +65,35 @@ const benefits = [
 const subjects = ["English Literature", "Mathematics", "Biology", "Chemistry", "Physics", "Computer Science", "History", "Psychology", "Economics", "Business Studies", "Nursing", "Engineering", "Statistics", "Philosophy", "Sociology", "Political Science"];
 
 const marqueeItems = SERVICE_TYPES;
+
+const heroStats = [
+  { value: `${SUBJECTS.length}`, label: "Subjects covered", icon: "category" },
+  { value: `${SERVICE_TYPES.length}`, label: "Types of assignment help", icon: "handyman" },
+  { value: "100%", label: "Quote before you pay", icon: "request_quote" },
+  { value: "Unlimited", label: "Revisions on every job", icon: "replay" },
+];
+
+const heroHelpLinks = [
+  { label: "Essay help", href: "/resources/writing/how-to-write-an-essay" },
+  { label: "Lab report help", href: "/resources/research/how-to-write-a-lab-report" },
+  { label: "MLA & APA citations", href: "/resources/citations/mla-citation-guide" },
+  { label: "Programming help", href: "/services/programming-help" },
+  { label: "Data analysis", href: "/resources/technical/how-to-analyze-data" },
+  { label: "Thesis & dissertation", href: "/resources/projects/how-to-write-a-research-paper" },
+  { label: "Proofreading & editing", href: "/resources/writing/how-to-proofread-an-essay" },
+  { label: "Free study guides", href: "/resources" },
+];
+
+const heroSubjectLinks = [
+  { label: "English Literature", href: "/subjects/english-literature" },
+  { label: "Mathematics", href: "/subjects/mathematics" },
+  { label: "Biology", href: "/subjects/biology" },
+  { label: "Chemistry", href: "/subjects/chemistry" },
+  { label: "Physics", href: "/subjects/physics" },
+  { label: "Computer Science", href: "/subjects/computer-science" },
+  { label: "Statistics", href: "/subjects/statistics" },
+  { label: "Engineering", href: "/subjects/engineering" },
+];
 
 type HomeHelper = {
   id: string;
@@ -163,6 +224,56 @@ export default async function HomePage() {
                   </p>
                 </div>
               </div>
+
+              {/* Popular Help Types */}
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
+                <span className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
+                  Popular help
+                </span>
+                {heroHelpLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="px-2.5 py-1 rounded-full bg-surface-container-lowest border border-outline-variant/40 text-xs font-medium text-on-surface-variant hover:text-primary hover:border-primary-container transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+
+              {/* Popular Subjects */}
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm">
+                <span className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
+                  By subject
+                </span>
+                {heroSubjectLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="text-xs font-medium text-primary/90 hover:text-primary hover:underline"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+                <Link href="/subjects" className="text-xs font-semibold text-primary hover:underline">
+                  All {SUBJECTS.length} subjects
+                </Link>
+              </div>
+
+              {/* Stats */}
+              <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
+                {heroStats.map((stat) => (
+                  <div key={stat.label} className="flex items-start gap-2.5">
+                    <span className="material-symbols-outlined text-primary text-lg leading-none mt-0.5">
+                      {stat.icon}
+                    </span>
+                    <div>
+                      <dd className="font-display font-bold text-on-surface leading-tight">{stat.value}</dd>
+                      <dt className="text-xs text-on-surface-variant leading-snug">{stat.label}</dt>
+                    </div>
+                  </div>
+                ))}
+              </dl>
             </div>
 
             {/* Right Column - Price Estimate Form */}
