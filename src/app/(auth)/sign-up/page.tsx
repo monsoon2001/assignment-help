@@ -122,7 +122,7 @@ export default function SignUpPage() {
                 </h1>
                 <p className="text-sm text-on-surface-variant mt-1">
                   {stage === "email"
-                    ? "Sign up with Google or receive a verification link by email"
+                    ? "Sign up with Google or get a verification link by email"
                     : `Check your email for the verification link sent to ${email}`}
                 </p>
               </div>
