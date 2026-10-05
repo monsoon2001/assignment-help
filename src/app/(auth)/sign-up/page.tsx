@@ -20,17 +20,13 @@ import { createClient } from "@/lib/supabase/client";
 import { roleToHome } from "@/lib/auth";
 import { stampAuthAtCookie } from "@/lib/session-timebox";
 
-type Stage = "email" | "otp";
-
 export default function SignUpPage() {
   const router = useRouter();
   const supabase = createClient();
-  const [stage, setStage] = useState<Stage>("email");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [otp, setOtp] = useState("");
   const [accepted, setAccepted] = useState(true);
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -62,71 +58,23 @@ export default function SignUpPage() {
     // Emails a verification link (not a confirmation link). The code is
     // rendered into the message by Supabase's "Email OTP" / "Confirm signup"
     // template via {{ .Token }} — see README > Email verification.
-    const { error: otpError } = await supabase.auth.signInWithOtp({
+    const { error: signUpError } = await supabase.auth.signUp({
       email,
+      password,
       options: {
-        shouldCreateUser: true,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: { name, role: "student" },
       },
     });
 
     setLoading(false);
 
-    if (otpError) {
-      setError(otpError.message);
+    if (signUpError) {
+      setError(signUpError.message);
       return;
     }
 
-    setOtp("");
     setSent(true);
-    setStage("otp");
-  }
-
-  async function handleOtpSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (otp.length < 6) {
-      setError("Check your email for the verification link sent to your email.");
-      return;
-    }
-    setLoading(true);
-    setError(null);
-
-    const { data, error: verifyError } = await supabase.auth.verifyOtp({
-      email,
-      token: otp,
-      type: "email",
-    });
-
-    if (verifyError) {
-      setError(verifyError.message);
-      setLoading(false);
-      return;
-    }
-
-    const userId = data.user?.id;
-    if (!userId) {
-      setError("Could not identify the created user.");
-      setLoading(false);
-      return;
-    }
-
-    stampAuthAtCookie();
-
-    const { error: passwordError } = await supabase.auth.updateUser({ password });
-    if (passwordError) {
-      setError(passwordError.message);
-      setLoading(false);
-      return;
-    }
-
-    const { data: profile } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", userId)
-      .maybeSingle();
-
-    router.replace(roleToHome(profile?.role));
-    router.refresh();
   }
 
   async function handleGoogle() {
@@ -291,84 +239,20 @@ export default function SignUpPage() {
                       <ArrowRight size={18} />
                     </Button>
                   </form>
-                ) : (
-                  <form className="flex flex-col gap-4" onSubmit={handleOtpSubmit}>
-                    {sent && (
-                      <div className="rounded-lg border border-success/30 bg-success/10 px-4 py-2.5 text-xs text-on-surface">
-                        Verification code sent. Check your inbox — it expires in 60 minutes.
-                      </div>
-                    )}
-
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-medium text-on-surface">
-                        Verification code
-                      </label>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        autoComplete="one-time-code"
-                        pattern="[0-9]*"
-                        maxLength={6}
-                        placeholder="000000"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                        required
-                        className="w-full h-12 px-4 bg-surface-container-lowest border border-outline-variant rounded-lg text-center text-lg font-mono font-semibold tracking-[0.5em] text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
-                      />
+                                ) : (
+                  <div className="flex flex-col gap-4">
+                    <div className="rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm text-on-surface">
+                      We&apos;ve sent you a verification link. Please check your email and click the link to verify your account. If you don&apos;t see it, check your spam folder.
                     </div>
-
-                    {error && (
-                      <p className="text-sm text-error bg-error-container/30 border border-error/20 rounded-lg px-3 py-2">
-                        {error}
-                      </p>
-                    )}
-
-                    <Button type="submit" size="lg" className="w-full justify-between" disabled={loading}>
-                      {loading ? "Verifying..." : "Verify & Create Account"}
-                      <ArrowRight size={18} />
+                    <Button
+                      type="button"
+                      size="lg"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => setSent(false)}
+                      disabled={loading}
+                    >
+                      Back to sign up
                     </Button>
-
-                    <div className="flex items-center justify-between">
-                      <button
-                        type="button"
-                        onClick={() => setStage("email")}
-                        className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1"
-                      >
-                        <KeyRound size={13} />
-                        Change email
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleEmailSubmit()}
-                        disabled={loading}
-                        className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1 disabled:opacity-50"
-                      >
-                        <RotateCcw size={13} />
-                        Resend code
-                      </button>
-                    </div>
-                  </form>
+                  </div>
                 )}
-              </div>
-
-              <div className="border-t border-outline-variant bg-surface-container-low px-7 py-3.5">
-                <p className="text-center text-sm text-on-surface-variant">
-                  Already have an account?{" "}
-                  <Link href="/sign-in" className="font-semibold text-primary hover:underline">
-                    Sign In
-                  </Link>
-                </p>
-              </div>
-            </div>
-          </div>
-        </main>
-
-        <footer className="shrink-0 py-4 px-6 text-center text-xs text-on-surface-variant border-t border-outline-variant sm:px-10">
-          © {new Date().getFullYear()} Acadibo Academic Network. All rights reserved.
-        </footer>
-      </div>
-
-      <AuthShowcase />
-    </div>
-  );
-}
