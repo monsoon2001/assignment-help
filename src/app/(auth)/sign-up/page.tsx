@@ -59,7 +59,7 @@ export default function SignUpPage() {
 
     setLoading(true);
 
-    // Emails a 6-digit verification code (not a confirmation link). The code is
+    // Emails a verification link (not a confirmation link). The code is
     // rendered into the message by Supabase's "Email OTP" / "Confirm signup"
     // template via {{ .Token }} — see README > Email verification.
     const { error: otpError } = await supabase.auth.signInWithOtp({
@@ -84,8 +84,8 @@ export default function SignUpPage() {
 
   async function handleOtpSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (otp.length !== 6) {
-      setError("Enter the 6-digit code sent to your email.");
+    if (otp.length < 6) {
+      setError("Check your email for the verification link sent to your email.");
       return;
     }
     setLoading(true);
@@ -174,8 +174,8 @@ export default function SignUpPage() {
                 </h1>
                 <p className="text-sm text-on-surface-variant mt-1">
                   {stage === "email"
-                    ? "Sign up with Google or receive a verification code by email"
-                    : `Enter the 6-digit code sent to ${email}`}
+                    ? "Sign up with Google or receive a verification link by email"
+                    : `Check your email for the verification link sent to ${email}`}
                 </p>
               </div>
 
@@ -230,7 +230,7 @@ export default function SignUpPage() {
                       </div>
                       <p className="text-xs text-on-surface-variant flex items-center gap-1">
                         <Check size={12} className="text-success shrink-0 mt-px" />
-                        We&apos;ll email a 6-digit verification code to this address.
+                        We&apos;ll email a verification link to this address.
                       </p>
                     </div>
 
@@ -287,7 +287,7 @@ export default function SignUpPage() {
                       className="w-full justify-between"
                       disabled={!accepted || loading}
                     >
-                      {loading ? "Sending code..." : "Continue with Email"}
+                      {loading ? "Sending email..." : "Continue with Email"}
                       <ArrowRight size={18} />
                     </Button>
                   </form>
