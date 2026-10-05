@@ -15,6 +15,22 @@ function slugify(heading: string): string {
     .replace(/^-|-$/g, "");
 }
 
+// Several guides have a content section literally titled "Checklist" or
+// "Common Mistakes", which would otherwise duplicate the ids of the fixed
+// sections below — colliding React keys and two elements sharing one id, so
+// the table of contents jumped to the wrong one.
+function contentSectionIds(headings: string[]): string[] {
+  const taken = new Set(["key-takeaways", "checklist", "common-mistakes", "related-guides"]);
+  return headings.map((heading) => {
+    const base = `s-${slugify(heading)}`;
+    let id = base;
+    let n = 2;
+    while (taken.has(id)) id = `${base}-${n++}`;
+    taken.add(id);
+    return id;
+  });
+}
+
 function BlockView({ block }: { block: ResourceBlock }) {
   switch (block.t) {
     case "p":
@@ -126,8 +142,10 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
   const path = resourcePath(resource);
   const related = relatedResources(resource);
 
+  const contentIds = contentSectionIds(resource.sections.map((section) => section.heading));
+
   const toc = [
-    ...resource.sections.map((s) => ({ label: s.heading, id: slugify(s.heading) })),
+    ...resource.sections.map((s, i) => ({ label: s.heading, id: contentIds[i] })),
     { label: "Key Takeaways", id: "key-takeaways" },
     { label: "Checklist", id: "checklist" },
     { label: "Common Mistakes", id: "common-mistakes" },
@@ -230,10 +248,10 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
               ))}
             </div>
 
-            {resource.sections.map((section) => (
-              <section key={section.heading} className="mb-12">
+            {resource.sections.map((section, i) => (
+              <section key={contentIds[i]} className="mb-12">
                 <h2
-                  id={slugify(section.heading)}
+                  id={contentIds[i]}
                   className="font-display text-2xl font-bold text-on-surface mb-5 scroll-mt-24"
                 >
                   {section.heading}

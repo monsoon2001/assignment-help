@@ -1,5 +1,5 @@
-import { LoadingState } from "@/components/ui/states";
+import { AdminSkeleton } from "@/components/ui/skeleton";
 
 export default function RouteLoading() {
-  return <LoadingState label="Loading admin panel..." />;
+  return <AdminSkeleton />;
 }

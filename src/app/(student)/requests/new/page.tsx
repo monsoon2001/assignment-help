@@ -16,6 +16,7 @@ import {
 
 import { SUBJECTS, SERVICE_TYPES, ACADEMIC_LEVELS, OTHER_OPTION, withCustom } from "@/lib/constants";
 import { COUNTRIES, defaultCurrencyForCountry, convertCurrency, formatCurrency } from "@/lib/currency";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Indicative bands, quoted in USD and converted to the student's currency.
 const PRICING_BANDS = [
@@ -229,9 +230,21 @@ export default function NewRequestPage() {
           </div>
 
           {!ready ? (
-            <div className="flex items-center justify-center gap-2 py-16 text-on-surface-variant">
-              <Loader2 size={18} className="animate-spin text-primary" />
-              <span className="text-sm">Preparing your request…</span>
+            <div className="flex flex-col gap-5" aria-busy="true" aria-live="polite">
+              <span className="sr-only">Preparing your request…</span>
+              <div className="grid gap-5 sm:grid-cols-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="flex flex-col gap-2">
+                    <Skeleton className="h-3.5 w-28" />
+                    <Skeleton className="h-10 w-full rounded-xl" />
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-3.5 w-32" />
+                <Skeleton className="h-28 w-full rounded-xl" />
+              </div>
+              <Skeleton className="h-11 w-40 rounded-xl" />
             </div>
           ) : step === "details" ? (
             <form className="flex flex-col gap-5" onSubmit={(e) => { e.preventDefault(); handleContinue(); }}>

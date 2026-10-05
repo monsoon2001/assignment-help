@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { SUBJECT_CONTENT } from "@/lib/subject-content";
 import { ALL_RESOURCES, RESOURCE_CATEGORIES, resourcePath } from "@/lib/resources";
+import { SERVICE_PAGES } from "@/lib/services";
 
 const BASE_URL = "https://acadibo.com";
 
@@ -18,9 +19,9 @@ const STATIC_ROUTES = [
   "/terms",
 ];
 
-// Only routes with a page.tsx. Several /services/* directories were removed
-// when the unimplemented quality-check services were dropped.
-const SERVICE_ROUTES = ["/services/programming-help"];
+// One page per service, generated from the same data as /services and the
+// header mega-menu so the three can never drift apart.
+const SERVICE_ROUTES = SERVICE_PAGES.map((service) => `/services/${service.slug}`);
 
 // Only /help/debug-python-assignment has a page. The other three were empty
 // leftovers duplicating topics now covered by /resources/*, which would have

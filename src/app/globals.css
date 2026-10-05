@@ -64,6 +64,12 @@
   --font-display: var(--font-plus-jakarta-sans);
 }
 
+html {
+  /* Tailwind's rem-based type scale is built on this, so bumping it here
+     enlarges text across every page without touching individual classes. */
+  font-size: 17px;
+}
+
 body {
   background: var(--color-background);
   color: var(--color-on-surface);

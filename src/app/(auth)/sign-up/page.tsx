@@ -156,12 +156,12 @@ export default function SignUpPage() {
           </Link>
         </header>
 
-        <main className="flex flex-1 items-center justify-center px-6 py-6 sm:px-10">
+        <main className="flex flex-1 items-center justify-center px-6 py-2 sm:px-10">
           <div className="w-full max-w-[420px]">
             <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant overflow-hidden">
               <div className="h-1.5 bg-gradient-to-r from-primary-container via-secondary-container to-tertiary-container" />
 
-              <div className="px-7 pt-6 pb-3 flex flex-col items-center text-center">
+              <div className="px-7 pt-4 pb-2 flex flex-col items-center text-center">
                 <span className="w-12 h-12 rounded-2xl bg-primary-container text-on-primary flex items-center justify-center mb-3 shadow-md shadow-primary-container/30">
                   <GraduationCap size={24} />
                 </span>

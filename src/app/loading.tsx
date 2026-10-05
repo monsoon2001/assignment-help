@@ -1,5 +1,5 @@
-import { LoadingState } from "@/components/ui/states";
+import { PageSkeleton } from "@/components/ui/skeleton";
 
 export default function RouteLoading() {
-  return <LoadingState label="Loading..." />;
+  return <PageSkeleton />;
 }

@@ -75,24 +75,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Team */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-on-surface text-center mb-10">Meet The Team</h2>
-          <div className="grid sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
-            {team.map((t) => (
-              <div key={t.name} className="text-center">
-                <img src={t.avatar} alt={t.name} className="w-20 h-20 rounded-full object-cover mx-auto mb-4" />
-                <h3 className="font-display font-bold text-on-surface">{t.name}</h3>
-                <p className="text-sm text-primary font-medium mb-2">{t.role}</p>
-                <p className="text-sm text-on-surface-variant">{t.bio}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
+{/* CTA */}
       <section className="py-16 bg-surface-container-high">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="font-display text-2xl font-bold text-on-surface mb-3">Join the Acadibo community</h2>

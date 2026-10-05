@@ -1,16 +1,7 @@
 import React from "react";
-import { AlertTriangle, Loader2 } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
-
-export function LoadingState({ label = "Loading..." }: { label?: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center gap-3 py-20">
-      <Loader2 size={26} className="text-primary animate-spin" />
-      <p className="text-sm text-on-surface-variant">{label}</p>
-    </div>
-  );
-}
 
 export function ErrorState({
   title = "Something went wrong",

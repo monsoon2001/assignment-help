@@ -7,6 +7,7 @@ import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
 import Badge from "@/components/ui/badge";
 import { fetchHelperCandidates, type HelperCandidate } from "@/lib/requests";
+import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
 
 export default function HelperPicker({
   subject,
@@ -53,9 +54,29 @@ export default function HelperPicker({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center gap-2 py-10 text-on-surface-variant">
-        <Loader2 size={18} className="animate-spin text-primary" />
-        <span className="text-sm">Finding subject experts…</span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" aria-busy="true" aria-live="polite">
+        <span className="sr-only">Finding subject experts…</span>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className="p-4 rounded-2xl border border-outline-variant bg-surface-container-lowest flex flex-col gap-3"
+          >
+            <div className="flex items-center gap-3">
+              <SkeletonCircle className="w-12 h-12" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <Skeleton className="h-3.5 w-28" />
+                <Skeleton className="h-3 w-36" />
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {Array.from({ length: 3 }).map((_, j) => (
+                <Skeleton key={j} className="h-6 w-16 rounded-full" />
+              ))}
+            </div>
+            <SkeletonText lines={2} />
+            <Skeleton className="h-9 w-full rounded-xl" />
+          </div>
+        ))}
       </div>
     );
   }

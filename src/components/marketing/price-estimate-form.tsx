@@ -80,17 +80,17 @@ export default function PriceEstimateForm() {
   const today = new Date().toISOString().slice(0, 10);
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-on-surface">What subject?</label>
+    <form className="space-y-3" onSubmit={handleSubmit}>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="flex flex-col gap-1">
+        <label className="text-xs font-semibold text-on-surface">What subject?</label>
         <select
           value={subject}
           onChange={(e) => {
             setSubject(e.target.value);
             setError("");
           }}
-          className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
+          className="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
         >
           <option value="">Select subject</option>
           {SUBJECT_OPTIONS.map((s) => (
@@ -103,19 +103,19 @@ export default function PriceEstimateForm() {
             placeholder="Type your subject, e.g. Music Theory"
             value={customSubject}
             onChange={(e) => setCustomSubject(e.target.value)}
-            className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+            className="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
           />
         )}
       </div>
-      <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-on-surface">What are you working on?</label>
+      <div className="flex flex-col gap-1">
+        <label className="text-xs font-semibold text-on-surface">What are you working on?</label>
         <select
           value={helpType}
           onChange={(e) => {
             setHelpType(e.target.value);
             setError("");
           }}
-          className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
+          className="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
         >
           <option value="">Select type</option>
           {HELP_TYPE_OPTIONS.map((t) => (
@@ -128,17 +128,18 @@ export default function PriceEstimateForm() {
             placeholder="Type the help you need, e.g. Lab Report"
             value={customHelpType}
             onChange={(e) => setCustomHelpType(e.target.value)}
-            className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+            className="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
           />
         )}
       </div>
       </div>
-      <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-on-surface">Academic level</label>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="flex flex-col gap-1">
+        <label className="text-xs font-semibold text-on-surface">Academic level</label>
         <select
           value={level}
           onChange={(e) => setLevel(e.target.value)}
-          className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
+          className="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
         >
           <option value="">Select level</option>
           {ACADEMIC_LEVELS.map((l) => (
@@ -146,42 +147,41 @@ export default function PriceEstimateForm() {
           ))}
         </select>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-on-surface">When is it due?</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-semibold text-on-surface">When is it due?</label>
           <input
             type="date"
             min={today}
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}
-            className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+            className="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
           />
         </div>
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-on-surface">How many pages/words?</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-semibold text-on-surface">Pages / words</label>
           <input
             type="text"
-            placeholder="e.g. 5 pages or 1500 words"
+            placeholder="e.g. 5 pages"
             value={pagesWords}
             onChange={(e) => setPagesWords(e.target.value)}
-            className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
+            className="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
           />
         </div>
       </div>
-      <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-on-surface">Tell us about your assignment</label>
+      <div className="flex flex-col gap-1">
+        <label className="text-xs font-semibold text-on-surface">Tell us about your assignment</label>
         <textarea
           placeholder="Describe what you need help with..."
-          rows={3}
+          rows={2}
           value={details}
           onChange={(e) => setDetails(e.target.value)}
-          className="w-full p-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all resize-none"
+          className="w-full p-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all resize-none"
         />
       </div>
-      <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-on-surface">Files</label>
-        <label className="flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-outline-variant rounded-xl cursor-pointer hover:border-primary-container hover:bg-primary-container/5 transition-all text-on-surface-variant">
-          <Upload className="w-5 h-5" />
+      <div className="flex flex-col gap-1">
+        <label className="text-xs font-semibold text-on-surface">Files</label>
+        <label className="flex items-center justify-center gap-2 w-full py-2 border border-dashed border-outline-variant rounded-xl cursor-pointer hover:border-primary-container hover:bg-primary-container/5 transition-all text-on-surface-variant">
+          <Upload className="w-4 h-4" />
           <span className="text-sm font-medium">
             {files.length > 0
               ? `${files.length} file${files.length > 1 ? "s" : ""} attached`
@@ -197,7 +197,7 @@ export default function PriceEstimateForm() {
       )}
       <button
         type="submit"
-        className="w-full h-12 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+        className="w-full h-11 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer"
       >
         Find Matching Helpers →
         <ArrowRight className="w-4 h-4" />

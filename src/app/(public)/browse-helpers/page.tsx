@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Search, Star, ChevronRight, Loader2 } from "lucide-react";
+import { Search, Star, ChevronRight } from "lucide-react";
 import { fetchHelperCandidates, type HelperCandidate } from "@/lib/requests";
+import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
 
 const ratings = ["Any Rating", "4.5+", "4.7+", "4.9+"];
 
@@ -103,9 +104,45 @@ export default function BrowseHelpersPage() {
       {/* Helpers Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {loading ? (
-          <div className="flex flex-col items-center justify-center gap-3 py-20 text-on-surface-variant">
-            <Loader2 size={24} className="animate-spin text-primary" />
-            <p className="text-sm">Loading helpers...</p>
+          <div
+            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            aria-busy="true"
+            aria-live="polite"
+          >
+            <span className="sr-only">Loading helpers…</span>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-surface-container-lowest rounded-2xl border border-outline-variant p-6 flex flex-col gap-4 min-h-[460px]"
+              >
+                <div className="flex items-center gap-4">
+                  <SkeletonCircle className="w-14 h-14" />
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-20" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                </div>
+                <SkeletonText lines={3} />
+                <div className="flex flex-wrap gap-1.5">
+                  {Array.from({ length: 3 }).map((_, j) => (
+                    <Skeleton key={j} className="h-6 w-20 rounded-full" />
+                  ))}
+                </div>
+                <div className="space-y-2">
+                  {Array.from({ length: 4 }).map((_, j) => (
+                    <div key={j} className="flex items-center justify-between">
+                      <Skeleton className="h-3 w-28" />
+                      <Skeleton className="h-3 w-14" />
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-3 mt-auto">
+                  <Skeleton className="h-10 flex-1 rounded-xl" />
+                  <Skeleton className="h-10 flex-1 rounded-xl" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-20">
@@ -136,7 +173,7 @@ export default function BrowseHelpersPage() {
                     )}
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <h2 className="font-display font-bold text-on-surface truncate">{name.split(/\s+/).map((p,i)=>i===0?p.slice(0,12):'').join('')}</h2>
+                          <h2 className="font-display font-bold text-on-surface truncate">{name}</h2>
                           <span className="material-symbols-outlined text-primary text-sm shrink-0">verified</span>
                         </div>
                         <div className="flex items-center gap-1 mt-0.5">
@@ -185,8 +222,8 @@ export default function BrowseHelpersPage() {
                     <Link href={`/helpers/${h.user_id}`} className="flex-1 text-center px-4 py-2 text-sm font-medium border border-outline-variant rounded-xl text-on-surface hover:bg-surface-container-low transition-colors">
                       View profile
                     </Link>
-                    <Link href="/sign-up" className="flex-1 text-center px-4 py-2 text-sm font-medium bg-primary-container text-on-primary rounded-xl hover:bg-primary transition-colors">
-                      Message
+                    <Link href={`/helpers/${h.user_id}`} className="flex-1 text-center px-4 py-2 text-sm font-medium bg-primary-container text-on-primary rounded-xl hover:bg-primary transition-colors">
+                      Request Help
                     </Link>
                   </div>
                 </div>

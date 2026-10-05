@@ -27,6 +27,7 @@ import { fetchRequestMessages, sendRequestMessage } from "@/lib/request-chat";
 import { reassignRequest, type HelperCandidate } from "@/lib/requests";
 import { submitProposal } from "@/lib/proposals";
 import { markThreadNotificationsRead } from "@/lib/notifications";
+import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
 
 const RESPONSE_WINDOW_MS = 2 * 60 * 60 * 1000;
 
@@ -207,8 +208,33 @@ export default function RequestWorkspace({
 
   if (loading) {
     return (
-      <div className="w-full py-24 flex items-center justify-center">
-        <Loader2 className="animate-spin text-primary" size={28} />
+      <div className="w-full" aria-busy="true" aria-live="polite">
+        <span className="sr-only">Loading request…</span>
+        <div className="w-full rounded-2xl border border-outline-variant p-5 sm:p-6">
+          <div className="flex flex-wrap items-center gap-4">
+            <SkeletonCircle className="w-12 h-12" />
+            <div className="flex-1 min-w-[12rem] space-y-2">
+              <Skeleton className="h-5 w-56" />
+              <Skeleton className="h-3.5 w-40" />
+            </div>
+            <Skeleton className="h-9 w-28 rounded-xl" />
+          </div>
+          <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_320px]">
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="rounded-xl border border-outline-variant/40 p-4">
+                  <Skeleton className="h-3.5 w-28" />
+                  <SkeletonText lines={2} className="mt-3" />
+                </div>
+              ))}
+            </div>
+            <div className="rounded-xl border border-outline-variant/40 p-4">
+              <Skeleton className="h-4 w-32" />
+              <SkeletonText lines={4} className="mt-4" />
+              <Skeleton className="mt-5 h-10 w-full rounded-xl" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

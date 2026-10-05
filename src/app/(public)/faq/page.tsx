@@ -15,7 +15,11 @@ const faqs = [
   { q: "What payment methods do you accept?", a: "We accept all major credit cards, debit cards, and digital payment methods. All transactions are securely processed and your payment information is never shared with helpers." },
   { q: "What if I'm not satisfied with the work?", a: "Your satisfaction is our priority. Revisions are unlimited until you're fully satisfied — helpers are expected to keep revising until the work matches the agreed-upon scope. Payments are final — we don't offer refunds — so review the scope and price carefully before confirming. Disputes are mediated by the Academic Integrity Office." },
   { q: "Can I choose my own helper?", a: "Absolutely. You're in control — you browse verified helpers, review their profiles, ratings, and subject expertise, and choose the one who best fits your needs. Every request is directed to the helper you select." },
-];
+  { q: "How long does it take to get a proposal?", a: "After posting your request, available helpers can respond with proposals within minutes. Most students receive multiple quotes within an hour, depending on subject and deadline." },
+  { q: "Do helpers write complete assignments?", a: "No. We provide tutoring and learning support: explanations, feedback, outlines, editing, citations and guidance. Our policy is clear — you learn, you write. We don't do your entire submission." },
+  { q: "Is my information safe and private?", a: "Yes. We use encrypted connections, secure payments, and never share full assignment details beyond what's needed to quote. Files you upload stay private to the helper you choose." },
+  { q: "What happens if a helper misses the deadline?", a: "The agreed timeline is part of your proposal. If timing slips, communicate in the workspace to adjust or request revisions. Your scope and deadlines are documented in writing before payment." },
+  { q: "Can I work with the same helper again?", a: "Yes. Many students return to helpers they've worked well with. On your request, you can invite or pick the same helper when starting a new task." },];
 
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -35,7 +39,7 @@ export default function FAQPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="space-y-3">
+        <div className="grid gap-3 md:grid-cols-2">
           {faqs.map((faq, i) => (
             <div key={i} className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 overflow-hidden">
               <button

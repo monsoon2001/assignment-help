@@ -1,5 +1,5 @@
-import { LoadingState } from "@/components/ui/states";
+import { WorkspaceSkeleton } from "@/components/ui/skeleton";
 
 export default function RouteLoading() {
-  return <LoadingState label="Loading your helper workspace..." />;
+  return <WorkspaceSkeleton />;
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 /** Shows while we wait for the verified Stripe webhook to finalize the order.
  *  Order/payment status is changed ONLY by the webhook — never by this page. */
@@ -21,7 +21,12 @@ export default function PaymentConfirming() {
 
   return (
     <div className="text-center flex flex-col items-center gap-4 py-10">
-      <Loader2 size={36} className="animate-spin text-primary" />
+      <div className="w-full max-w-md" aria-busy="true" aria-live="polite">
+        <span className="sr-only">Confirming your payment…</span>
+        <div className="h-1.5 w-full rounded-full bg-surface-container-high overflow-hidden">
+          <div className="h-full w-1/3 rounded-full bg-primary motion-safe:animate-pulse" />
+        </div>
+      </div>
       <div>
         <p className="font-display font-semibold text-on-surface text-lg">Confirming your payment…</p>
         <p className="text-sm text-on-surface-variant mt-1 max-w-md mx-auto">
