@@ -192,40 +192,75 @@ type HelperProfileRow = {
 };
 
 /**
- * Loads helpers from `helper_profiles` rather than from `users`, because
- * PostgREST ignores filters on an embedded column: `.contains("helper_profiles.subjects")`
- * used to return every helper account (profile included or not), which is why
- * helper cards could show nothing but a name. Subject matching is done here
- * instead of in the query so it is case-insensitive and forgiving; when nothing
- * matches, every helper is returned so the student is never stuck.
+ * Loads every helper account from `users` and attaches the `helper_profiles` row
+ * when one exists. The account list has to be the source of truth: helpers who
+ * signed in with Google and never finished the profile step have no
+ * `helper_profiles` row, and querying that table alone hid them completely.
+ * Subject matching happens in code so it is case-insensitive and forgiving, and
+ * when nothing matches the full list is returned so a student is never stuck.
  */
 export async function fetchHelperCandidates(
   subject?: string | null
 ): Promise<{ helpers: HelperCandidate[]; exactMatch: boolean } | { error: string }> {
   const supabase = createClient();
 
-  const { data, error } = await supabase
-    .from("helper_profiles")
-    .select("user_id, rating_avg, bio, subjects, hourly_rate, user:users!inner(id, name, avatar_url)")
-    .limit(50)
-    .order("rating_avg", { ascending: false });
+  const { data: userRows, error } = await supabase
+    .from("users")
+    .select("id, name, avatar_url")
+    .eq("role", "helper")
+    .order("name", { ascending: true })
+    .limit(100);
 
   if (error) {
     return { error: error.message };
   }
 
-  const rows = (data ?? []) as unknown as HelperProfileRow[];
+  const helperUsers = (userRows ?? []) as { id: string; name: string | null; avatar_url: string | null }[];
 
-  const all: HelperCandidate[] = rows.map((row) => {
-    const user = Array.isArray(row.user) ? (row.user[0] ?? null) : row.user;
-    return {
-      user_id: row.user_id,
-      user: user ? { id: user.id, name: user.name, avatar_url: user.avatar_url } : null,
-      rating_avg: Number(row.rating_avg ?? 0),
-      bio: row.bio ?? null,
-      subjects: row.subjects ?? [],
-      hourly_rate: row.hourly_rate ?? null,
-    };
+  const { data: profileRows } = helperUsers.length
+    ? await supabase
+        .from("helper_profiles")
+        .select("user_id, rating_avg, bio, subjects, hourly_rate")
+        .in(
+          "user_id",
+          helperUsers.map((u) => u.id)
+        )
+    : { data: null };
+
+  const profiles = new Map<string, HelperProfileRow>();
+  for (const row of (profileRows ?? []) as unknown as HelperProfileRow[]) {
+    profiles.set(row.user_id, row);
+  }
+
+  const seenNames = new Set<string>();
+  const all: HelperCandidate[] = helperUsers
+    // The same person can own more than one helper account (e.g. a Google
+    // sign-in alongside an email one), so each name is listed once.
+    .filter((user) => {
+      const key = (user.name ?? "").trim().toLowerCase();
+      if (!key) return true;
+      if (seenNames.has(key)) return false;
+      seenNames.add(key);
+      return true;
+    })
+    .map((user) => {
+      const profile = profiles.get(user.id);
+      return {
+        user_id: user.id,
+        user: { id: user.id, name: user.name, avatar_url: user.avatar_url },
+        rating_avg: Number(profile?.rating_avg ?? 0),
+        bio: profile?.bio ?? null,
+        subjects: profile?.subjects ?? [],
+        hourly_rate: profile?.hourly_rate ?? null,
+      };
+    });
+
+  // Helpers with a filled profile first, best rated at the top.
+  all.sort((a, b) => {
+    const rated = Number(b.subjects.length > 0) - Number(a.subjects.length > 0);
+    if (rated !== 0) return rated;
+    if (b.rating_avg !== a.rating_avg) return b.rating_avg - a.rating_avg;
+    return (a.user?.name ?? "").localeCompare(b.user?.name ?? "");
   });
 
   const needle = subject?.trim().toLowerCase();
