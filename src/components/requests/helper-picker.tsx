@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Loader2, Send, Star, BadgeCheck, CircleDollarSign } from "lucide-react";
+import { Loader2, Send, Star, BadgeCheck, CircleDollarSign, Users } from "lucide-react";
 import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
 import Badge from "@/components/ui/badge";
@@ -24,6 +24,9 @@ export default function HelperPicker({
 }) {
   const [helpers, setHelpers] = useState<HelperCandidate[]>([]);
   const [exactMatch, setExactMatch] = useState(true);
+  // The subject filter can narrow the list to one helper; this widens it back
+  // to every helper without leaving the request wizard.
+  const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [working, setWorking] = useState<string | null>(null);
@@ -32,7 +35,7 @@ export default function HelperPicker({
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const result = await fetchHelperCandidates(subject);
+      const result = await fetchHelperCandidates(showAll ? null : subject);
       if (cancelled) return;
       if ("error" in result) {
         setError(result.error);
@@ -45,7 +48,7 @@ export default function HelperPicker({
     return () => {
       cancelled = true;
     };
-  }, [subject]);
+  }, [subject, showAll]);
 
   async function handleSelect(helper: HelperCandidate) {
     setWorking(helper.user_id);
@@ -105,7 +108,18 @@ export default function HelperPicker({
 
   return (
     <div>
-      <h3 className="font-display font-semibold text-on-surface mb-3">{heading}</h3>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+        <h3 className="font-display font-semibold text-on-surface">{showAll ? "All helpers" : heading}</h3>
+        {subject && showAll && (
+          <button
+            type="button"
+            onClick={() => setShowAll(false)}
+            className="text-xs font-medium text-primary hover:underline cursor-pointer"
+          >
+            Back to {subject} helpers
+          </button>
+        )}
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {helpers.map((helper) => {
           const name = helper.user?.name || "Acadivo Helper";
@@ -121,7 +135,7 @@ export default function HelperPicker({
               }`}
             >
               <div className="flex items-start gap-3">
-                <Avatar name={name} size="lg" src={helper.user?.avatar_url ?? undefined} />
+                <Avatar name={name} alt="" size="lg" src={helper.user?.avatar_url ?? undefined} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
                     <p className="font-semibold text-on-surface truncate">{name}</p>
@@ -192,15 +206,30 @@ export default function HelperPicker({
           );
         })}
       </div>
-      {!exactMatch && subject && (
+      {!showAll && !exactMatch && subject && (
         <p className="text-xs text-on-surface-variant mt-3">
           No helper lists {subject} exactly, so these are the closest matches.
         </p>
       )}
-      <p className="text-xs text-on-surface-variant mt-4">
+
+      {!showAll && subject && helpers.length > 0 && (
+        <Button
+          variant="outline"
+          className="w-full mt-4 justify-center"
+          onClick={() => setShowAll(true)}
+        >
+          <Users size={15} />
+          View more helpers
+        </Button>
+      )}
+
+      <p className="text-xs text-on-surface-variant mt-4 text-center">
         Not sure?{" "}
-        <Link href="/browse-helpers" className="text-primary font-medium hover:underline">
-          Browse all helpers
+        <Link
+          href={subject ? `/browse-helpers?subject=${encodeURIComponent(subject)}` : "/browse-helpers"}
+          className="text-primary font-medium hover:underline"
+        >
+          Browse the full directory
         </Link>
       </p>
     </div>

@@ -22,7 +22,7 @@ export default function Avatar({ src, alt, name, size = "md", online, className 
       {src && !error ? (
         <img
           src={src}
-          alt={alt || name || ""}
+          alt={alt ?? name ?? ""}
           width={dims[size]}
           height={dims[size]}
           loading="lazy"
