@@ -58,7 +58,7 @@ export default function HelperNav({
         );
       })}
 
-      <div className="mt-auto pt-4 flex flex-col gap-3">
+      <div className="mt-3 flex flex-col gap-3">
         <div className="rounded-xl border border-outline-variant/40 bg-surface-container-low px-3 py-3">
           <p className="text-sm font-medium text-on-surface">
             {completedOrders} completed order{completedOrders === 1 ? "" : "s"}
