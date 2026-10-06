@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { ChevronRight, ArrowRight, CheckCircle } from "lucide-react";
 import type { SubjectContent } from "@/lib/subject-content";
+import { CtaBand, PAGE_TONES } from "./page-shell";
+
+const SUBJECT_TONES = [
+  PAGE_TONES.violet,
+  PAGE_TONES.teal,
+  PAGE_TONES.amber,
+  PAGE_TONES.rose,
+];
 
 const STEPS = [
   { num: "1", title: "Tell us what you're working on", desc: "Share your assignment topic, details, and requirements." },
@@ -14,12 +22,12 @@ const STEPS = [
 export default function SubjectDetail({ subject }: { subject: SubjectContent }) {
   return (
     <>
-      <div className="bg-surface-container-high border-b border-outline-variant/50">
+      <div className="bg-gradient-to-r from-accent-violet-container/90 via-surface-container-high to-surface-container-low border-b border-outline-variant/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <nav className="flex items-center gap-2 text-sm text-on-surface-variant mb-4">
-            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+            <Link href="/" className="hover:text-accent-violet transition-colors">Home</Link>
             <ChevronRight className="w-3.5 h-3.5" />
-            <Link href="/subjects" className="hover:text-primary transition-colors">Subjects</Link>
+            <Link href="/subjects" className="hover:text-accent-violet transition-colors">Subjects</Link>
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-on-surface font-medium">{subject.name}</span>
           </nav>
@@ -31,32 +39,26 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
             {subject.intro}
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 text-sm text-on-surface-variant mb-6">
-            <span className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
-              Choose a specific helper
-            </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
-              Discuss before you pay
-            </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
-              Personalized proposal
-            </span>
+          <div className="flex flex-col sm:flex-row gap-3 text-sm text-on-surface-variant mb-6">
+            {["Choose a specific helper", "Discuss before you pay", "Personalized proposal"].map((item) => (
+              <span key={item} className="inline-flex items-center gap-2 bg-white/70 rounded-full px-3.5 py-1.5 ring-1 ring-accent-violet/20">
+                <CheckCircle className="w-4 h-4 text-accent-teal shrink-0" />
+                {item}
+              </span>
+            ))}
           </div>
 
           <div className="flex flex-wrap gap-4">
             <Link
               href={`/browse-helpers?subject=${encodeURIComponent(subject.name)}`}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-container to-accent-violet text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-primary-container/30"
             >
               Find {subject.name} Helpers
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="/how-it-works"
-              className="inline-flex items-center gap-2 px-6 py-3 border border-outline-variant rounded-xl font-semibold text-sm text-on-surface hover:bg-surface-container-low transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 border border-outline-variant bg-white/80 rounded-xl font-semibold text-sm text-on-surface hover:bg-white transition-colors"
             >
               How It Works
             </Link>
@@ -64,22 +66,30 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
         </div>
       </div>
 
-      <section className="py-12 bg-surface-container-low">
+      <section className="py-12 bg-white wash-split">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-display text-2xl font-bold text-on-surface mb-8 text-center">
-            {subject.name} Help by Topic
-          </h2>
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <span className="h-1 w-10 rounded-full bg-gradient-to-r from-accent-violet to-accent-violet-container" aria-hidden="true" />
+            <h2 className="font-display text-2xl font-bold text-on-surface">
+              {subject.name} Help by Topic
+            </h2>
+            <span className="h-1 w-10 rounded-full bg-gradient-to-r from-accent-violet-container to-accent-violet" aria-hidden="true" />
+          </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {subject.subtopics.map((t) => (
+            {subject.subtopics.map((t, i) => {
+              const tone = SUBJECT_TONES[i % SUBJECT_TONES.length];
+              return (
               <Link
                 key={t.title}
                 href={`/browse-helpers?subject=${encodeURIComponent(subject.name)}`}
-                className="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/30 hover:shadow-md hover:border-primary-container/40 transition-all"
+                className={`relative overflow-hidden bg-white rounded-2xl p-5 pt-6 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}
               >
-                <h3 className="font-display font-bold text-on-surface mb-1.5">{t.title}</h3>
+                <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${tone.hairline}`} aria-hidden="true" />
+                <h3 className={`font-display font-bold text-on-surface mb-1.5 transition-colors ${tone.text}`}>{t.title}</h3>
                 <p className="text-sm text-on-surface-variant leading-relaxed">{t.blurb}</p>
               </Link>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -94,29 +104,32 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {STEPS.map((s) => (
-              <div key={s.num} className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30">
+            {STEPS.map((s, i) => {
+              const tone = SUBJECT_TONES[i % SUBJECT_TONES.length];
+              return (
+              <div key={s.num} className={`bg-white rounded-2xl p-6 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-9 h-9 bg-primary-container/10 rounded-full flex items-center justify-center text-sm font-bold text-primary shrink-0">
+                  <div className={`w-9 h-9 ${tone.iconTile} rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${tone.icon}`}>
                     {s.num}
                   </div>
                   <h3 className="font-display font-bold text-on-surface text-sm sm:text-base">{s.title}</h3>
                 </div>
                 <p className="text-sm text-on-surface-variant leading-relaxed">{s.desc}</p>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
-      <section className="py-16 bg-surface-container-low">
+      <section className="py-16 bg-white wash-violet">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="font-display text-2xl font-bold text-on-surface mb-8 text-center">
             {subject.name} Assignment Help FAQs
           </h2>
           <div className="space-y-4">
             {subject.faqs.map((f, i) => (
-              <details key={i} className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-6 group">
+              <details key={i} className="bg-white rounded-xl border border-outline-variant/30 p-6 group hover:border-accent-violet/40 transition-colors">
                 <summary className="cursor-pointer list-none flex items-center justify-between gap-4 text-on-surface font-medium">
                   {f.q}
                   <span className="material-symbols-outlined group-open:rotate-180 transition-transform shrink-0">
@@ -130,34 +143,16 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
         </div>
       </section>
 
-      <section className="py-16 bg-surface-container-high border-t border-outline-variant/50">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="w-16 h-16 bg-primary-container rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <span className="material-symbols-outlined text-on-primary text-3xl">school</span>
-          </div>
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-on-surface mb-4">
-            Ready to find your {subject.name} helper?
-          </h2>
-          <p className="text-on-surface-variant mb-8 max-w-xl mx-auto leading-relaxed">
-            Browse relevant helpers, ask questions, and receive a personalized proposal before you pay.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href={`/browse-helpers?subject=${encodeURIComponent(subject.name)}`}
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors shadow-sm"
-            >
-              Find {subject.name} Helpers
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/resources"
-              className="inline-flex items-center gap-2 px-8 py-3.5 border border-outline-variant rounded-xl font-semibold text-sm text-on-surface hover:bg-surface-container-lowest transition-colors"
-            >
-              Read free guides
-            </Link>
-          </div>
-        </div>
-      </section>
+      <CtaBand
+        eyebrow="school"
+        title={`Ready to find your ${subject.name} helper?`}
+        body="Browse relevant helpers, ask questions, and receive a personalized proposal before you pay."
+        primary={{
+          label: `Find ${subject.name} Helpers`,
+          href: `/browse-helpers?subject=${encodeURIComponent(subject.name)}`,
+        }}
+        secondary={{ label: "Read free guides", href: "/resources" }}
+      />
     </>
   );
 }

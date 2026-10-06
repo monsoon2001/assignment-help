@@ -4,6 +4,15 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, Clock, X } from "lucide-react";
 import { ALL_RESOURCES, CATEGORY_BY_SLUG, resourcePath } from "@/lib/resources";
+import { PAGE_TONES } from "@/components/marketing/page-shell";
+
+// Cycling accents keep a long guide grid from reading as one flat white sheet.
+const RESOURCE_TONES = [
+  PAGE_TONES.amber,
+  PAGE_TONES.teal,
+  PAGE_TONES.violet,
+  PAGE_TONES.rose,
+];
 
 export default function ResourceBrowser() {
   const [query, setQuery] = useState("");
@@ -94,20 +103,22 @@ export default function ResourceBrowser() {
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {results.map((guide) => {
+          {results.map((guide, i) => {
             const category = CATEGORY_BY_SLUG.get(guide.category);
+            const tone = RESOURCE_TONES[i % RESOURCE_TONES.length];
             return (
               <Link
                 key={guide.slug}
                 href={resourcePath(guide)}
-                className="group flex flex-col bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 hover:shadow-md hover:border-primary-container/40 transition-all"
+                className={`group relative flex flex-col overflow-hidden bg-white rounded-2xl p-6 pt-7 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}
               >
+                <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${tone.hairline}`} aria-hidden="true" />
                 {category && (
-                  <span className="text-xs font-medium text-primary mb-3 self-start bg-primary-container/10 rounded-full px-3 py-1">
+                  <span className={`text-xs font-semibold mb-3 self-start rounded-full px-3 py-1 ${tone.chip}`}>
                     {category.name}
                   </span>
                 )}
-                <h3 className="font-display font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">
+                <h3 className={`font-display font-bold text-on-surface mb-2 transition-colors ${tone.text}`}>
                   {guide.title}
                 </h3>
                 <p className="text-sm text-on-surface-variant leading-relaxed line-clamp-3 mb-4">{guide.description}</p>
@@ -116,7 +127,7 @@ export default function ResourceBrowser() {
                     <Clock className="w-3.5 h-3.5" />
                     {guide.readingMinutes} min read
                   </span>
-                  <span className="text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className={`text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity ${tone.text}`}>
                     Read Guide →
                   </span>
                 </div>

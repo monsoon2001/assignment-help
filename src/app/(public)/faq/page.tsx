@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { CtaBand, PAGE_TONES, PageHeader } from "@/components/marketing/page-shell";
 import { useState } from "react";
 
 const faqs = [
@@ -26,48 +25,51 @@ export default function FAQPage() {
 
   return (
     <>
-      <div className="bg-surface-container-high border-b border-outline-variant/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <nav className="flex items-center gap-2 text-sm text-on-surface-variant mb-4">
-            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-on-surface font-medium">FAQ</span>
-          </nav>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-2">Frequently Asked Questions</h1>
-          <p className="text-on-surface-variant max-w-2xl">Everything you need to know about Acadivo.</p>
-        </div>
-      </div>
+      <PageHeader
+        tone="rose"
+        icon="help"
+        eyebrow="FAQ"
+        title="Frequently Asked Questions"
+        subtitle="Everything you need to know about Acadivo."
+        crumbs={[{ label: "Home", href: "/" }, { label: "FAQ" }]}
+      />
 
+      <div className="bg-white wash-rose">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid gap-3 md:grid-cols-2">
-          {faqs.map((faq, i) => (
-            <div key={i} className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 overflow-hidden">
+          {faqs.map((faq, i) => {
+            const tone = [PAGE_TONES.rose, PAGE_TONES.teal, PAGE_TONES.amber, PAGE_TONES.violet][i % 4];
+            const open = openIndex === i;
+            return (
+            <div key={i} className={`bg-white rounded-xl border overflow-hidden transition-all ${open ? `${tone.card} shadow-md` : `${tone.card} shadow-sm ${tone.cardHover}`}`}>
               <button
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="w-full flex items-center justify-between p-5 text-left cursor-pointer hover:bg-surface-container-low/50 transition-colors"
+                onClick={() => setOpenIndex(open ? null : i)}
+                className={`w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors ${open ? tone.iconTile : "hover:bg-surface-container-low/50"}`}
               >
-                <span className="font-semibold text-on-surface pr-4">{faq.q}</span>
-                <span className={`material-symbols-outlined text-on-surface-variant shrink-0 transition-transform ${openIndex === i ? "rotate-180" : ""}`}>
+                <span className={`font-semibold pr-4 ${open ? tone.text : "text-on-surface"}`}>{faq.q}</span>
+                <span className={`material-symbols-outlined shrink-0 transition-transform ${open ? tone.icon : "text-on-surface-variant"} ${open ? "rotate-180" : ""}`}>
                   expand_more
                 </span>
               </button>
-              {openIndex === i && (
+              {open && (
                 <div className="px-5 pb-5 text-sm text-on-surface-variant leading-relaxed border-t border-outline-variant/30 pt-4">
                   {faq.a}
                 </div>
               )}
             </div>
-          ))}
-        </div>
-
-        <div className="mt-12 text-center bg-surface-container-high rounded-2xl p-10">
-          <h2 className="font-display text-xl font-bold text-on-surface mb-3">Still have questions?</h2>
-          <p className="text-on-surface-variant mb-6">We&apos;re here to help. Reach out and we&apos;ll get back to you within 24 hours.</p>
-          <Link href="/contact" className="inline-flex items-center gap-2 px-6 py-3 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors">
-            Contact Us
-          </Link>
+            );
+          })}
         </div>
       </div>
+      </div>
+
+      <CtaBand
+        eyebrow="support_agent"
+        title="Still have questions?"
+        body="We're here to help. Reach out and we'll get back to you within 24 hours."
+        primary={{ label: "Contact Us", href: "/contact" }}
+        secondary={{ label: "Browse Helpers", href: "/browse-helpers" }}
+      />
     </>
   );
 }

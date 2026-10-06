@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { CtaBand, PAGE_TONES, PageHeader } from "@/components/marketing/page-shell";
 import { SUBJECTS, SERVICE_TYPES, ACADEMIC_LEVELS } from "@/lib/constants";
 import { SUPPORTED_CURRENCIES } from "@/lib/currency";
 
@@ -10,11 +9,6 @@ const values = [
   { icon: "eco", title: "Sustainable Growth", desc: "We invest in our helper community, ensuring fair compensation and continuous development so the quality of guidance keeps improving." },
 ];
 
-const team = [
-  { name: "Alex Chen", role: "Founder & CEO", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face", bio: "Former tutor who saw the need for a better academic support platform." },
-  { name: "Sarah Kim", role: "Head of Quality", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face", bio: "PhD in Education, ensuring every helper meets our high standards." },
-  { name: "Marcus Williams", role: "Head of Community", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face", bio: "Building and nurturing our community of verified peer helpers." },
-];
 
 const stats = [
   { value: String(SUBJECTS.length), label: "Subjects Covered" },
@@ -26,66 +20,76 @@ const stats = [
 export default function AboutPage() {
   return (
     <>
-      <div className="bg-surface-container-high border-b border-outline-variant/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <nav className="flex items-center gap-2 text-sm text-on-surface-variant mb-4">
-            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-on-surface font-medium">About Us</span>
-          </nav>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-2">About Acadivo</h1>
-          <p className="text-on-surface-variant max-w-2xl">Building a better way for students to get academic guidance — peer-to-peer.</p>
-        </div>
-      </div>
+      <PageHeader
+        tone="teal"
+        icon="info"
+        eyebrow="About Us"
+        title="About Acadivo"
+        subtitle="Building a better way for students to get academic guidance — peer-to-peer."
+        crumbs={[{ label: "Home", href: "/" }, { label: "About Us" }]}
+      />
 
       {/* Mission */}
-      <section className="py-16">
+      <section className="py-16 bg-white wash-split">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="material-symbols-outlined text-primary text-4xl mb-4 block">emoji_objects</span>
+            <span className="w-16 h-16 mx-auto rounded-2xl bg-accent-amber-container flex items-center justify-center mb-5">
+              <span className="material-symbols-outlined text-accent-amber text-3xl">emoji_objects</span>
+            </span>
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-on-surface mb-4">Our Mission</h2>
             <p className="text-on-surface-variant text-lg leading-relaxed max-w-2xl mx-auto">
               Acadivo exists to make quality academic support accessible to every student. We connect learners with verified peer helpers who provide genuine guidance — helping students understand concepts, improve their writing, and succeed academically on their own merit.
             </p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-            {stats.map((s) => (
-              <div key={s.label} className="text-center">
-                <div className="font-display text-3xl font-bold text-primary mb-1">{s.value}</div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
+            {stats.map((s, i) => {
+              const tone = [PAGE_TONES.teal, PAGE_TONES.amber, PAGE_TONES.violet, PAGE_TONES.rose][i % 4];
+              return (
+              <div key={s.label} className="text-center bg-white rounded-2xl border border-outline-variant/30 shadow-sm px-4 py-6">
+                <div className={`font-display text-3xl font-bold mb-1 ${tone.text}`}>{s.value}</div>
                 <div className="text-sm text-on-surface-variant">{s.label}</div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Values */}
-      <section className="py-16 bg-surface-container-low">
+      <section className="py-16 bg-white wash-teal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-display text-2xl sm:text-3xl font-bold text-on-surface text-center mb-10">Our Values</h2>
+          <div className="text-center mb-10">
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent-teal-container text-accent-teal text-sm font-semibold mb-3">
+              <span className="material-symbols-outlined text-sm">volunteer_activism</span>
+              Our Values
+            </span>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-on-surface">What we hold ourselves to</h2>
+          </div>
           <div className="grid sm:grid-cols-2 gap-6">
-            {values.map((v) => (
-              <div key={v.title} className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30">
-                <span className="material-symbols-outlined text-primary text-3xl mb-4 block">{v.icon}</span>
+            {values.map((v, i) => {
+              const tone = [PAGE_TONES.teal, PAGE_TONES.amber, PAGE_TONES.violet, PAGE_TONES.rose][i % 4];
+              return (
+              <div key={v.title} className={`relative overflow-hidden rounded-2xl bg-white p-6 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}>
+                <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${tone.hairline}`} aria-hidden="true" />
+                <span className={`inline-flex w-12 h-12 rounded-xl items-center justify-center mb-4 ${tone.iconTile}`}>
+                  <span className={`material-symbols-outlined ${tone.icon} text-3xl`}>{v.icon}</span>
+                </span>
                 <h3 className="font-display font-bold text-on-surface mb-2">{v.title}</h3>
                 <p className="text-sm text-on-surface-variant leading-relaxed">{v.desc}</p>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
-{/* CTA */}
-      <section className="py-16 bg-surface-container-high">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-display text-2xl font-bold text-on-surface mb-3">Join the Acadivo community</h2>
-          <p className="text-on-surface-variant mb-6">Whether you&apos;re a student seeking guidance or an expert wanting to help others, we&apos;d love to have you.</p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/browse-helpers" className="px-6 py-3 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors">Browse Helpers</Link>
-            <Link href="/contact" className="px-6 py-3 border border-outline-variant rounded-xl font-semibold text-sm text-on-surface hover:bg-surface-container-low transition-colors">Contact Us</Link>
-          </div>
-        </div>
-      </section>
+      <CtaBand
+        eyebrow="volunteer_activism"
+        title="Join the Acadivo community"
+        body="Whether you're a student seeking guidance or an expert wanting to help others, we'd love to have you."
+        primary={{ label: "Browse Helpers", href: "/browse-helpers" }}
+        secondary={{ label: "Contact Us", href: "/contact" }}
+      />
     </>
   );
 }

@@ -104,6 +104,67 @@ const services = [
   },
 ];
 
+// Subject and guide tiles reuse the same accent families at a calmer weight so
+// the page still reads as one palette rather than a colour wheel.
+const SUBJECT_ACCENTS = [
+  { card: "hover:border-accent-violet/40", tile: "bg-accent-violet-container", icon: "text-accent-violet", text: "group-hover:text-accent-violet" },
+  { card: "hover:border-accent-teal/40", tile: "bg-accent-teal-container", icon: "text-accent-teal", text: "group-hover:text-accent-teal" },
+  { card: "hover:border-accent-rose/40", tile: "bg-accent-rose-container", icon: "text-accent-rose", text: "group-hover:text-accent-rose" },
+  { card: "hover:border-accent-amber/40", tile: "bg-accent-amber-container", icon: "text-accent-amber", text: "group-hover:text-accent-amber" },
+] as const;
+
+const GUIDE_ACCENTS = [
+  { card: "hover:border-accent-rose/40", tile: "bg-accent-rose-container", icon: "text-accent-rose", chip: "bg-accent-rose-container text-accent-rose", text: "text-accent-rose group-hover:text-accent-rose" },
+  { card: "hover:border-accent-teal/40", tile: "bg-accent-teal-container", icon: "text-accent-teal", chip: "bg-accent-teal-container text-accent-teal", text: "text-accent-teal group-hover:text-accent-teal" },
+  { card: "hover:border-accent-violet/40", tile: "bg-accent-violet-container", icon: "text-accent-violet", chip: "bg-accent-violet-container text-accent-violet", text: "text-accent-violet group-hover:text-accent-violet" },
+] as const;
+
+// Step badges, tiles and checkmarks share one accent per step so the row reads
+// as a progression instead of four identical cards.
+const STEP_ACCENTS = [
+  { badge: "bg-accent-teal text-white shadow-accent-teal/30", tile: "bg-accent-teal-container text-accent-teal", icon: "text-accent-teal", card: "hover:border-accent-teal/40" },
+  { badge: "bg-accent-amber text-white shadow-accent-amber/30", tile: "bg-accent-amber-container text-accent-amber", icon: "text-accent-amber", card: "hover:border-accent-amber/40" },
+  { badge: "bg-accent-violet text-white shadow-accent-violet/30", tile: "bg-accent-violet-container text-accent-violet", icon: "text-accent-violet", card: "hover:border-accent-violet/40" },
+  { badge: "bg-accent-rose text-white shadow-accent-rose/30", tile: "bg-accent-rose-container text-accent-rose", icon: "text-accent-rose", card: "hover:border-accent-rose/40" },
+] as const;
+
+// Each service card carries one accent so the grid reads as six distinct tiles
+// instead of six copies of the same white box.
+const SERVICE_ACCENTS = [
+  {
+    card: "hover:border-accent-teal/40",
+    bar: "bg-gradient-to-r from-accent-teal to-accent-teal-container",
+    btn: "from-accent-teal to-accent-teal-container",
+    tile: "bg-accent-teal-container",
+    icon: "text-accent-teal",
+    text: "text-accent-teal",
+  },
+  {
+    card: "hover:border-accent-amber/40",
+    bar: "bg-gradient-to-r from-accent-amber to-accent-amber-container",
+    btn: "from-accent-amber to-accent-amber-container",
+    tile: "bg-accent-amber-container",
+    icon: "text-accent-amber",
+    text: "text-accent-amber",
+  },
+  {
+    card: "hover:border-accent-violet/40",
+    bar: "bg-gradient-to-r from-accent-violet to-accent-violet-container",
+    btn: "from-accent-violet to-accent-violet-container",
+    tile: "bg-accent-violet-container",
+    icon: "text-accent-violet",
+    text: "text-accent-violet",
+  },
+  {
+    card: "hover:border-accent-rose/40",
+    bar: "bg-gradient-to-r from-accent-rose to-accent-rose-container",
+    btn: "from-accent-rose to-accent-rose-container",
+    tile: "bg-accent-rose-container",
+    icon: "text-accent-rose",
+    text: "text-accent-rose",
+  },
+] as const;
+
 // Nine subjects promoted on the homepage; every subject page stays reachable
 // from /subjects.
 const HOMEPAGE_SUBJECTS = [
@@ -292,31 +353,31 @@ export default async function HomePage() {
       />
 
       {/* Trust Banner */}
-      <div className="bg-surface-container-high border-b border-outline-variant/50">
+      <div className="bg-gradient-to-r from-accent-teal-container/70 via-surface-container-high to-accent-violet-container/70 border-b border-outline-variant/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-center gap-x-5 gap-y-1 text-xs font-medium text-on-surface-variant flex-wrap">
           <span className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-sm text-primary">verified</span>
+            <span className="material-symbols-outlined text-sm text-accent-teal">verified</span>
             Verified subject helpers
           </span>
           <span className="text-outline-variant" aria-hidden="true">
             |
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-sm text-primary">request_quote</span>
+            <span className="material-symbols-outlined text-sm text-accent-amber">request_quote</span>
             Quote before you pay
           </span>
           <span className="hidden sm:inline text-outline-variant" aria-hidden="true">
             |
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-sm text-primary">replay</span>
+            <span className="material-symbols-outlined text-sm text-accent-violet">replay</span>
             Unlimited revisions in scope
           </span>
         </div>
       </div>
 
       {/* Services Marquee */}
-      <div className="bg-primary overflow-hidden py-3 select-none">
+      <div className="bg-gradient-to-r from-ink-900 via-primary to-accent-violet overflow-hidden py-3 select-none">
         <div className="flex w-max animate-[marquee_38s_linear_infinite] hover:[animation-play-state:paused]">
           {[0, 1].map((dup) => (
             <div key={dup} className="flex items-center" aria-hidden={dup === 1}>
@@ -335,18 +396,24 @@ export default async function HomePage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-container/5 via-transparent to-secondary-container/5" />
+      <section className="relative overflow-hidden wash-split">
+        <div
+          className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-surface-container-low"
+          aria-hidden="true"
+        />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20">
           <div className="grid lg:grid-cols-[1fr_minmax(0,640px)] gap-8 lg:gap-10 items-start">
             {/* Left Column */}
             <div className="space-y-5">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container/10 text-primary text-sm font-semibold">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent-amber-container border border-accent-amber/25 text-accent-amber text-sm font-semibold">
                 <span className="material-symbols-outlined text-sm">emoji_objects</span>
                 Independent Peer Guidance
               </span>
               <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-on-surface leading-tight">
-                Find the Right Assignment Helper
+                Find the Right{" "}
+                <span className="bg-gradient-to-r from-accent-amber via-accent-violet to-accent-teal bg-clip-text text-transparent">
+                  Assignment Helper
+                </span>
               </h1>
               <p className="text-lg text-on-surface-variant leading-relaxed max-w-xl">
                 Tell us what you&apos;re working on, browse relevant helpers, choose who you want to work with,
@@ -356,17 +423,17 @@ export default async function HomePage() {
               </p>
 
               {/* Trust Checkmarks */}
-              <div className="flex flex-col sm:flex-row gap-4 text-sm text-on-surface-variant">
+              <div className="flex flex-col sm:flex-row gap-4 text-sm text-on-surface-variant font-medium">
                 <span className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+                  <CheckCircle className="w-5 h-5 text-accent-teal shrink-0" />
                   Original support
                 </span>
                 <span className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+                  <CheckCircle className="w-5 h-5 text-accent-teal shrink-0" />
                   Verified subject experts
                 </span>
                 <span className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+                  <CheckCircle className="w-5 h-5 text-accent-teal shrink-0" />
                   Satisfaction guaranteed
                 </span>
               </div>
@@ -379,7 +446,7 @@ export default async function HomePage() {
                       key={h.id}
                       name={h.name}
                       src={h.avatar_url ?? undefined}
-                      className="border-2 border-surface-container-lowest"
+                      className="border-2 border-white ring-2 ring-accent-teal/25"
                     />
                   ))}
                 </div>
@@ -397,11 +464,11 @@ export default async function HomePage() {
             {/* Right Column - Price Estimate Form */}
             <div
               id="estimate"
-              className="scroll-mt-24 bg-surface-container-lowest rounded-2xl shadow-lg border border-outline-variant/30 p-6 sm:p-7"
+              className="scroll-mt-24 bg-surface-container-lowest rounded-2xl shadow-xl shadow-primary-container/15 ring-1 ring-outline-variant/50 border border-outline-variant/50 p-6 sm:p-7"
             >
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 bg-primary-container/10 rounded-xl flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-primary">calculate</span>
+                <div className="w-10 h-10 bg-accent-teal-container rounded-xl flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-accent-teal">calculate</span>
                 </div>
                 <div>
                   <h2 className="font-display font-bold text-on-surface leading-tight">
@@ -417,10 +484,10 @@ export default async function HomePage() {
       </section>
 
       {/* Core Academic Services */}
-      <section className="py-20 bg-surface-container-low">
+      <section className="py-20 bg-white wash-teal">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary-container text-on-secondary-container text-sm font-semibold mb-4">
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent-teal-container text-accent-teal text-sm font-semibold mb-4">
               <span className="material-symbols-outlined text-sm">auto_stories</span>
               Our Services
             </span>
@@ -428,11 +495,17 @@ export default async function HomePage() {
             <p className="text-on-surface-variant max-w-2xl mx-auto text-lg">Comprehensive academic guidance across every stage of your coursework</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((service) => (
-              <div key={service.title} className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 hover:shadow-md hover:border-primary-container/30 transition-all group flex flex-col">
+            {services.map((service, i) => {
+              const accent = SERVICE_ACCENTS[i % SERVICE_ACCENTS.length];
+              return (
+              <div
+                key={service.title}
+                className={`group relative overflow-hidden rounded-2xl bg-white p-6 pt-8 border border-outline-variant/30 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all ${accent.card}`}
+              >
+                <span className={`absolute inset-x-0 top-0 h-1 ${accent.bar}`} aria-hidden="true" />
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-primary-container/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-primary-container/20 transition-colors">
-                    <span className="material-symbols-outlined text-primary">{service.icon}</span>
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${accent.tile}`}>
+                    <span className={`material-symbols-outlined ${accent.icon}`}>{service.icon}</span>
                   </div>
                   <h3 className="font-display font-bold text-lg text-on-surface leading-tight">{service.title}</h3>
                 </div>
@@ -440,20 +513,21 @@ export default async function HomePage() {
                 <ul className="space-y-2 mb-5">
                   {service.items.map((item) => (
                     <li key={item} className="flex items-start gap-2 text-sm text-on-surface-variant">
-                      <CheckCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                      <CheckCircle className={`w-4 h-4 shrink-0 mt-0.5 ${accent.icon}`} />
                       {item}
                     </li>
                   ))}
                 </ul>
                 <Link
                   href={service.guide.href}
-                  className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                  className={`mt-auto inline-flex items-center gap-1.5 text-sm font-semibold hover:underline ${accent.text}`}
                 >
                   {service.guide.label}
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="text-center mt-10">
@@ -472,7 +546,7 @@ export default async function HomePage() {
       <section className="py-14" aria-labelledby="how-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-8">
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container/10 text-primary text-sm font-semibold mb-3">
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent-violet-container text-accent-violet text-sm font-semibold mb-3">
               <span className="material-symbols-outlined text-sm">route</span>
               Simple Process
             </span>
@@ -495,14 +569,16 @@ export default async function HomePage() {
                   />
                 )}
                 <span
-                  className="absolute -top-4 left-6 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-primary font-display text-base font-bold text-on-primary shadow-md shadow-primary/25 ring-4 ring-surface transition-transform group-hover:scale-105"
+                  className={`absolute -top-4 left-6 z-10 flex h-9 w-9 items-center justify-center rounded-full ${STEP_ACCENTS[i % STEP_ACCENTS.length].badge} font-display text-base font-bold shadow-md ring-4 ring-background transition-transform group-hover:scale-105`}
                   aria-hidden="true"
                 >
                   {step.num}
                 </span>
-                <div className="h-full rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6 pt-7 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary-container/40 hover:shadow-lg">
+                <div
+                  className={`h-full rounded-2xl border border-outline-variant/30 bg-white p-6 pt-7 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg ${STEP_ACCENTS[i % STEP_ACCENTS.length].card}`}
+                >
                   <div className="mb-3 flex items-center gap-3">
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-container/12 text-primary">
+                    <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${STEP_ACCENTS[i % STEP_ACCENTS.length].tile}`}>
                       <span className="material-symbols-outlined text-xl">{step.icon}</span>
                     </span>
                     <h3 className="font-display text-lg font-bold leading-snug text-on-surface">
@@ -516,7 +592,7 @@ export default async function HomePage() {
                         key={point}
                         className="flex items-start gap-2 text-sm leading-snug text-on-surface-variant"
                       >
-                        <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                        <CheckCircle className={`mt-0.5 h-4 w-4 shrink-0 ${STEP_ACCENTS[i % STEP_ACCENTS.length].icon}`} />
                         {point}
                       </li>
                     ))}
@@ -534,7 +610,7 @@ export default async function HomePage() {
             ].map((item) => (
               <div
                 key={item.label}
-                className="flex items-center justify-between gap-3 bg-surface-container-lowest rounded-xl border border-outline-variant/30 px-4 py-3"
+                className="flex items-center justify-between gap-3 bg-white rounded-xl border border-outline-variant/30 px-4 py-3 shadow-sm"
               >
                 <span className="text-sm text-on-surface-variant">{item.label}</span>
                 <span className="text-sm font-semibold text-on-surface text-right">{item.value}</span>
@@ -545,7 +621,7 @@ export default async function HomePage() {
           <div className="mt-8 text-center">
             <Link
               href="/sign-up"
-              className="inline-flex items-center gap-2 px-7 py-3 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors shadow-sm shadow-primary-container/40"
+              className="inline-flex items-center gap-2 px-7 py-3 bg-gradient-to-r from-primary-container to-accent-violet text-on-primary rounded-xl font-semibold text-sm hover:from-primary hover:to-primary transition-all shadow-md shadow-primary-container/30"
             >
               Start Your First Request
               <ArrowRight className="w-4 h-4" />
@@ -558,11 +634,11 @@ export default async function HomePage() {
       </section>
 
       {/* Meet The Helpers */}
-      <section className="py-14 bg-surface-container-low" aria-labelledby="helpers-heading">
+      <section className="py-14 bg-white wash-amber" aria-labelledby="helpers-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
             <div className="max-w-2xl">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container/10 text-primary text-sm font-semibold mb-3">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent-amber-container text-accent-amber text-sm font-semibold mb-3">
                 <span className="material-symbols-outlined text-sm">groups</span>
                 Our Helpers
               </span>
@@ -579,7 +655,7 @@ export default async function HomePage() {
             </div>
             <Link
               href="/browse-helpers"
-              className="inline-flex items-center gap-2 shrink-0 px-5 py-2.5 text-sm font-medium border border-outline-variant rounded-xl text-on-surface hover:bg-surface-container-lowest transition-colors"
+              className="inline-flex items-center gap-2 shrink-0 px-5 py-2.5 text-sm font-semibold border border-accent-amber/40 bg-white rounded-xl text-accent-amber hover:bg-accent-amber-container transition-colors"
             >
               Browse all helpers
               <ArrowRight className="w-4 h-4" />
@@ -603,7 +679,8 @@ export default async function HomePage() {
           ) : (
             <>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {featuredHelpers.map((helper) => {
+                {featuredHelpers.map((helper, i) => {
+                  const accent = SERVICE_ACCENTS[i % SERVICE_ACCENTS.length];
                   const focus = helperFocus(helper.subjects);
                   const subjectTags = helper.subjects.filter((s) =>
                     SUBJECT_PAGE_BY_NAME.has(s),
@@ -612,7 +689,7 @@ export default async function HomePage() {
                   return (
                     <article
                       key={helper.id}
-                      className="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/30 hover:shadow-md hover:border-primary-container/40 transition-all flex flex-col"
+                      className={`group bg-white rounded-2xl p-5 border border-outline-variant/30 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col ${accent.card}`}
                     >
                       <div className="flex items-start gap-3 mb-4">
                         <Avatar name={helper.name} src={helper.avatar_url ?? undefined} size="lg" />
@@ -622,13 +699,13 @@ export default async function HomePage() {
                               {helper.name}
                             </h3>
                             <span
-                              className="material-symbols-outlined text-primary text-base"
+                              className={`material-symbols-outlined ${accent.icon} text-base`}
                               title="Verified helper"
                             >
                               verified
                             </span>
                           </div>
-                          <p className="text-xs uppercase tracking-wide text-primary font-semibold">
+                          <p className={`text-xs uppercase tracking-wide font-semibold ${accent.text}`}>
                             {focus.label}
                           </p>
                           <div className="flex items-center gap-1 mt-1">
@@ -677,7 +754,7 @@ export default async function HomePage() {
                         </Link>
                         <Link
                           href={`/contact?helper=${helper.id}`}
-                          className="flex-1 text-center px-3 py-2.5 text-sm font-medium bg-primary-container text-on-primary rounded-xl hover:bg-primary transition-colors"
+                          className={`flex-1 text-center px-3 py-2.5 text-sm font-semibold text-white rounded-xl bg-gradient-to-r ${accent.btn} hover:opacity-95 transition-opacity`}
                         >
                           Request Help
                         </Link>
@@ -687,7 +764,7 @@ export default async function HomePage() {
                 })}
               </div>
 
-              <div className="mt-6 bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-5">
+              <div className="mt-6 bg-accent-amber-container/50 rounded-2xl border border-accent-amber/30 p-5">
                 <div className="flex flex-col lg:flex-row lg:items-center gap-3">
                   <p className="text-base text-on-surface-variant">
                     <span className="font-semibold text-on-surface">Subjects with helpers live today:</span>{" "}
@@ -696,7 +773,7 @@ export default async function HomePage() {
                       <>
                         {" "}
                         Working in {uncoveredSubjects.join(" or ")}?{" "}
-                        <Link href="/contact" className="font-semibold text-primary hover:underline">
+                        <Link href="/contact" className="font-semibold text-accent-amber hover:underline">
                           Send your brief
                         </Link>{" "}
                         and we&apos;ll match you.
@@ -705,7 +782,7 @@ export default async function HomePage() {
                   </p>
                   <Link
                     href="/subjects"
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline shrink-0"
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent-amber hover:underline shrink-0"
                   >
                     See every subject we cover
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -721,7 +798,7 @@ export default async function HomePage() {
       <section className="py-14" aria-labelledby="why-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-8">
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-sm font-semibold mb-3">
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent-teal-container text-accent-teal text-sm font-semibold mb-3">
               <span className="material-symbols-outlined text-sm">thumb_up</span>
               Why Acadivo
             </span>
@@ -736,14 +813,16 @@ export default async function HomePage() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {BENEFITS.map((benefit) => (
+            {BENEFITS.map((benefit, i) => {
+              const accent = STEP_ACCENTS[i % STEP_ACCENTS.length];
+              return (
               <div
                 key={benefit.title}
-                className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 hover:border-primary-container/30 transition-colors"
+                className={`bg-white rounded-2xl p-6 border border-outline-variant/30 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all ${accent.card}`}
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="w-11 h-11 bg-primary-container/10 rounded-xl flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-xl text-primary">
+                  <span className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${accent.tile}`}>
+                    <span className={`material-symbols-outlined text-xl ${accent.icon}`}>
                       {benefit.icon}
                     </span>
                   </span>
@@ -758,27 +837,28 @@ export default async function HomePage() {
                       key={point}
                       className="flex items-start gap-2 text-sm leading-snug text-on-surface-variant"
                     >
-                      <CheckCircle className="mt-0.5 h-4 w-4 text-primary shrink-0" />
+                      <CheckCircle className={`mt-0.5 h-4 w-4 shrink-0 ${accent.icon}`} />
                       {point}
                     </li>
                   ))}
                 </ul>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Comparison */}
           <div className="mt-8 overflow-x-auto">
-            <table className="w-full min-w-[640px] text-sm border-collapse bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/30">
+            <table className="w-full min-w-[640px] text-sm border-collapse bg-white rounded-2xl overflow-hidden border border-outline-variant/30 shadow-sm">
               <caption className="sr-only">
                 Acadivo compared with hiring a freelance writer and using an AI writing tool
               </caption>
               <thead>
-                <tr className="bg-surface-container-low text-left">
+                <tr className="bg-gradient-to-r from-accent-teal-container/70 via-surface-container-low to-accent-violet-container/70 text-left">
                   <th scope="col" className="px-4 py-3 font-display font-bold text-on-surface text-sm">
                     What matters
                   </th>
-                  <th scope="col" className="px-4 py-3 font-display font-bold text-primary text-sm">
+                  <th scope="col" className="px-4 py-3 font-display font-bold text-accent-teal text-sm">
                     Acadivo
                   </th>
                   <th scope="col" className="px-4 py-3 font-display font-bold text-on-surface text-sm">
@@ -795,7 +875,7 @@ export default async function HomePage() {
                     <th scope="row" className="px-4 py-3 text-left font-medium text-on-surface text-sm">
                       {row.criterion}
                     </th>
-                    <td className="px-4 py-3 text-sm text-on-surface bg-primary-container/5">{row.acadivo}</td>
+                    <td className="px-4 py-3 text-sm text-on-surface bg-accent-teal-container/30 font-medium">{row.acadivo}</td>
                     <td className="px-4 py-3 text-sm text-on-surface-variant">{row.freelancer}</td>
                     <td className="px-4 py-3 text-sm text-on-surface-variant">{row.aiTool}</td>
                   </tr>
@@ -807,11 +887,11 @@ export default async function HomePage() {
       </section>
 
       {/* Subjects We Cover */}
-      <section className="py-14 bg-surface-container-low" aria-labelledby="subjects-heading">
+      <section className="py-14 bg-surface-container-low wash-violet" aria-labelledby="subjects-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
             <div className="max-w-2xl">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary-container text-on-secondary-container text-xs font-semibold mb-3">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent-violet-container text-accent-violet text-xs font-semibold mb-3">
                 <span className="material-symbols-outlined text-sm">category</span>
                 All Subjects
               </span>
@@ -829,7 +909,7 @@ export default async function HomePage() {
             </div>
             <Link
               href="/subjects"
-              className="inline-flex items-center gap-2 shrink-0 text-sm font-semibold text-primary hover:underline"
+              className="inline-flex items-center gap-2 shrink-0 px-5 py-2.5 text-sm font-semibold border border-accent-violet/40 bg-white rounded-xl text-accent-violet hover:bg-accent-violet-container transition-colors"
             >
               View all subjects
               <ArrowRight className="w-4 h-4" />
@@ -837,17 +917,19 @@ export default async function HomePage() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {homepageSubjects.map((s) => (
+            {homepageSubjects.map((s, i) => {
+              const accent = SUBJECT_ACCENTS[i % SUBJECT_ACCENTS.length];
+              return (
               <Link
                 key={s.slug}
                 href={`/subjects/${s.slug}`}
-                className="group flex flex-col bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/30 hover:border-primary-container/40 hover:shadow-md transition-all"
+                className={`group flex flex-col bg-white rounded-2xl p-5 border border-outline-variant/30 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all ${accent.card}`}
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="w-10 h-10 rounded-xl bg-primary-container/10 flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-primary text-xl">{s.icon}</span>
+                  <span className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${accent.tile}`}>
+                    <span className={`material-symbols-outlined text-xl ${accent.icon}`}>{s.icon}</span>
                   </span>
-                  <h3 className="font-display text-base font-bold text-on-surface group-hover:text-primary transition-colors leading-snug">
+                  <h3 className={`font-display text-base font-bold text-on-surface transition-colors leading-snug ${accent.text}`}>
                     {s.name}
                   </h3>
                 </div>
@@ -855,22 +937,23 @@ export default async function HomePage() {
                 {s.detail && (
                   <p className="mt-2 text-sm text-on-surface-variant/90 leading-relaxed">{s.detail}</p>
                 )}
-                <p className="mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold text-primary">
+                <p className={`mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold ${accent.text}`}>
                   {s.name} help topics
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </p>
               </Link>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Free Study Guides */}
-      <section className="py-14" aria-labelledby="guides-heading">
+      <section className="py-14 bg-white wash-rose" aria-labelledby="guides-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
             <div className="max-w-2xl">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container/10 text-primary text-sm font-semibold mb-3">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent-rose-container text-accent-rose text-sm font-semibold mb-3">
                 <span className="material-symbols-outlined text-sm">menu_book</span>
                 Free Study Guides
               </span>
@@ -887,7 +970,7 @@ export default async function HomePage() {
             </div>
             <Link
               href="/resources"
-              className="inline-flex items-center gap-2 shrink-0 px-5 py-2.5 text-sm font-medium border border-outline-variant rounded-xl text-on-surface hover:bg-surface-container-low transition-colors"
+              className="inline-flex items-center gap-2 shrink-0 px-5 py-2.5 text-sm font-semibold border border-accent-rose/40 bg-white rounded-xl text-accent-rose hover:bg-accent-rose-container transition-colors"
             >
               Browse all guides
               <ArrowRight className="w-4 h-4" />
@@ -895,42 +978,48 @@ export default async function HomePage() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {homepageGuides.map((guide) => (
+            {homepageGuides.map((guide, i) => {
+              const accent = GUIDE_ACCENTS[i % GUIDE_ACCENTS.length];
+              return (
               <Link
                 key={guide.key}
                 href={guide.href}
-                className="group flex flex-col rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-5 transition-all hover:border-primary-container/40 hover:shadow-md"
+                className={`group flex flex-col rounded-2xl border border-outline-variant/30 bg-white p-5 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 ${accent.card}`}
               >
                 <div className="mb-3 flex items-start justify-between gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-container/10">
-                    <span className="material-symbols-outlined text-xl text-primary">{guide.icon}</span>
+                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${accent.tile}`}>
+                    <span className={`material-symbols-outlined text-xl ${accent.icon}`}>{guide.icon}</span>
                   </span>
-                  <span className="rounded-full bg-surface-container-high px-2.5 py-1 text-xs font-medium text-on-surface-variant">
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${accent.chip}`}>
                     {guide.meta}
                   </span>
                 </div>
-                <h3 className="font-display text-base font-bold leading-snug text-on-surface transition-colors group-hover:text-primary">
+                <h3 className={`font-display text-base font-bold leading-snug text-on-surface transition-colors ${accent.text}`}>
                   {guide.title}
                 </h3>
                 <p className="mt-2 text-base leading-relaxed text-on-surface-variant">{guide.description}</p>
                 {guide.detail && (
                   <p className="mt-2 text-sm leading-relaxed text-on-surface-variant/90">{guide.detail}</p>
                 )}
-                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+                <span className={`mt-4 inline-flex items-center gap-1.5 text-sm font-semibold ${accent.text}`}>
                   Read the guide
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </span>
               </Link>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <section className="py-14 bg-surface-container-low" aria-labelledby="testimonials-heading">
+      <section
+        className="py-14 bg-gradient-to-br from-accent-teal-container/55 via-surface-container-low to-accent-violet-container/55"
+        aria-labelledby="testimonials-heading"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl mx-auto text-center mb-8">
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 text-sm font-semibold mb-3">
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent-amber-container text-accent-amber text-sm font-semibold mb-3">
               <span className="material-symbols-outlined text-sm">format_quote</span>
               Testimonials
             </span>
@@ -967,10 +1056,10 @@ export default async function HomePage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-14" aria-labelledby="faq-heading">
+      <section className="py-14 bg-white wash-violet" aria-labelledby="faq-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-8">
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container/10 text-primary text-sm font-semibold mb-3">
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent-violet-container text-accent-violet text-sm font-semibold mb-3">
               <span className="material-symbols-outlined text-sm">help</span>
               FAQ
             </span>
@@ -980,7 +1069,7 @@ export default async function HomePage() {
             <p className="text-base text-on-surface-variant leading-relaxed">
               The short version of how matching, pricing, revisions and academic integrity work on Acadivo.
               More detail on the{" "}
-              <Link href="/faq" className="text-primary font-medium hover:underline">
+              <Link href="/faq" className="text-accent-violet font-semibold hover:underline">
                 full FAQ page
               </Link>
               .
@@ -992,19 +1081,20 @@ export default async function HomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-14 bg-surface-container-high" aria-labelledby="cta-heading">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden py-20 band-ink" aria-labelledby="cta-heading">
+        <div className="absolute inset-0 band-ink-grid" aria-hidden="true" />
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="w-14 h-14 bg-primary-container rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <span className="material-symbols-outlined text-on-primary text-2xl">school</span>
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 bg-white/12 ring-1 ring-white/25">
+              <span className="material-symbols-outlined text-accent-amber-container text-2xl">school</span>
             </div>
             <h2
               id="cta-heading"
-              className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-on-surface mb-3"
+              className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3"
             >
               Ready to get help with your next assignment?
             </h2>
-            <p className="text-on-surface-variant mb-6 max-w-2xl mx-auto leading-relaxed text-base">
+            <p className="on-band-muted mb-7 max-w-2xl mx-auto leading-relaxed text-base">
               Work one-on-one with verified peer helpers across {SUBJECTS.length} subjects and{" "}
               {HOME_SERVICE_COUNT} types of assignment help. You choose the helper, agree the scope and price
               in writing, and only pay once it looks right.
@@ -1012,21 +1102,21 @@ export default async function HomePage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/browse-helpers"
-                className="px-7 py-3 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors shadow-sm inline-flex items-center gap-2"
+                className="px-7 py-3 bg-white text-ink-900 rounded-xl font-semibold text-sm hover:bg-accent-amber-container transition-colors shadow-lg shadow-ink-900/40 inline-flex items-center gap-2"
               >
                 Browse Helpers
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href="/sign-up"
-                className="px-7 py-3 border border-outline-variant rounded-xl font-semibold text-sm text-on-surface hover:bg-surface-container-low transition-colors"
+                className="px-7 py-3 border border-white/35 rounded-xl font-semibold text-sm text-white hover:bg-white/10 transition-colors"
               >
                 Create Free Account
               </Link>
             </div>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-outline-variant/40 grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-center">
+          <div className="mt-10 pt-7 border-t border-white/15 grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-center">
             {[
               { label: "Read the process", href: "/how-it-works", note: "Four steps, no surprises" },
               { label: "Compare services", href: "/services", note: `${HOME_SERVICE_COUNT} help types` },
@@ -1036,12 +1126,12 @@ export default async function HomePage() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="group rounded-xl px-3 py-3 hover:bg-surface-container-low transition-colors"
+                className="group rounded-xl px-3 py-3 border border-white/10 hover:border-white/30 hover:bg-white/5 transition-colors"
               >
-                <span className="block text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
+                <span className="block text-sm font-semibold text-white group-hover:text-accent-amber-container transition-colors">
                   {item.label}
                 </span>
-                <span className="block text-xs text-on-surface-variant mt-0.5">{item.note}</span>
+                <span className="block text-xs on-band-muted mt-0.5">{item.note}</span>
               </Link>
             ))}
           </div>

@@ -97,30 +97,32 @@ export default async function HelperProfilePage({
 
   return (
     <>
-      <div className="bg-surface-container-high border-b border-outline-variant/50">
+      <div className="bg-gradient-to-r from-accent-teal-container/90 via-surface-container-high to-surface-container-low border-b border-outline-variant/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <nav className="flex items-center gap-2 text-sm text-on-surface-variant mb-4">
-            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+            <Link href="/" className="hover:text-accent-teal transition-colors">Home</Link>
             <ChevronRight className="w-3.5 h-3.5" />
-            <Link href="/browse-helpers" className="hover:text-primary transition-colors">Helpers</Link>
+            <Link href="/browse-helpers" className="hover:text-accent-teal transition-colors">Helpers</Link>
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-on-surface font-medium">{helper.name ?? "Helper"}</span>
           </nav>
         </div>
       </div>
 
+      <section className="bg-white wash-split">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid lg:grid-cols-3 gap-10">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Profile Header */}
-            <div className="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/30">
+            <div className="relative overflow-hidden bg-white rounded-2xl p-8 pt-9 border border-outline-variant/30 shadow-sm">
+              <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-accent-teal to-accent-teal-container" aria-hidden="true" />
               <div className="flex flex-col sm:flex-row gap-6">
                 <Avatar name={helper.name ?? "Helper"} src={helper.avatar_url ?? undefined} size="lg" className="w-24 h-24" />
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <h1 className="font-display text-2xl font-bold text-on-surface">{helper.name ?? "Helper"}</h1>
-                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-container/10 text-primary text-xs font-semibold">
+                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent-teal-container text-accent-teal text-xs font-semibold">
                       <span className="material-symbols-outlined text-sm">verified</span>
                       Verified
                     </span>
@@ -147,7 +149,7 @@ export default async function HelperProfilePage({
 
             {/* About */}
             {bio && (
-              <div className="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/30">
+              <div className="bg-white rounded-2xl p-8 border border-accent-teal/25 shadow-sm">
                 <h2 className="font-display text-lg font-bold text-on-surface mb-4">About {helper.name}</h2>
                 <p className="text-sm text-on-surface-variant leading-relaxed">{bio}</p>
               </div>
@@ -155,18 +157,18 @@ export default async function HelperProfilePage({
 
             {/* Specialties */}
             {skills.length > 0 && (
-              <div className="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/30">
+              <div className="bg-white rounded-2xl p-8 border border-accent-violet/25 shadow-sm">
                 <h2 className="font-display text-lg font-bold text-on-surface mb-4">Specialties</h2>
                 <div className="flex flex-wrap gap-2">
                   {skills.map((s) => (
-                    <span key={s} className="px-3 py-1.5 rounded-full bg-secondary-container text-on-secondary-container text-sm font-medium">{s}</span>
+                    <span key={s} className="px-3 py-1.5 rounded-full bg-accent-violet-container text-accent-violet text-sm font-medium">{s}</span>
                   ))}
                 </div>
               </div>
             )}
 
             {/* Reviews */}
-            <div className="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/30">
+            <div className="bg-white rounded-2xl p-8 border border-accent-amber/25 shadow-sm">
               <h2 className="font-display text-lg font-bold text-on-surface mb-6">Reviews</h2>
               {reviews.length === 0 ? (
                 <p className="text-sm text-on-surface-variant">
@@ -203,7 +205,7 @@ export default async function HelperProfilePage({
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Stats */}
-            <div className="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30">
+            <div className="bg-white rounded-2xl p-6 border border-accent-amber/30 shadow-sm">
               <h3 className="font-display font-bold text-on-surface mb-4">Stats</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -260,35 +262,35 @@ export default async function HelperProfilePage({
 
             {/* Subjects */}
             {subjects.length > 0 && (
-              <div className="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30">
+              <div className="bg-white rounded-2xl p-6 border border-accent-violet/30 shadow-sm">
                 <h3 className="font-display font-bold text-on-surface mb-3">Subjects</h3>
                 <div className="flex flex-wrap gap-1.5">
                   {subjects.map((s) => (
-                    <span key={s} className="px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container text-xs font-medium">{s}</span>
+                    <span key={s} className="px-2.5 py-1 rounded-full bg-accent-violet-container text-accent-violet text-xs font-medium">{s}</span>
                   ))}
                 </div>
               </div>
             )}
 
-            <div className="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30">
+            <div className="bg-white rounded-2xl p-6 border border-accent-teal/30 shadow-sm">
               <h3 className="font-display font-bold text-on-surface mb-4">Verification</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="text-primary">✓</span>
+                  <span className="text-accent-teal font-bold">✓</span>
                   <span className="text-on-surface">Identity verified</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-primary">✓</span>
+                  <span className="text-accent-teal font-bold">✓</span>
                   <span className="text-on-surface">Academic credentials verified</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-primary">✓</span>
+                  <span className="text-accent-teal font-bold">✓</span>
                   <span className="text-on-surface">Subject verified</span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30">
+            <div className="bg-white rounded-2xl p-6 border border-outline-variant/30 shadow-sm">
               <h3 className="font-display font-bold text-on-surface mb-4">Experience</h3>
               <div className="space-y-3 text-sm">
                 <div>
@@ -306,18 +308,18 @@ export default async function HelperProfilePage({
               </div>
             </div>
 
-            <div className="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30">
+            <div className="bg-white rounded-2xl p-6 border border-accent-rose/30 shadow-sm">
               <h3 className="font-display font-bold text-on-surface mb-4">Expertise</h3>
               <div className="flex flex-wrap gap-1.5">
                 {skills.length > 0 ? skills.map(s => (
-                  <span key={s} className="px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container text-xs font-medium">{s}</span>
+                  <span key={s} className="px-2.5 py-1 rounded-full bg-accent-rose-container text-accent-rose text-xs font-medium">{s}</span>
                 )) : subjects.map(s => (
-                  <span key={s} className="px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container text-xs font-medium">{s}</span>
+                  <span key={s} className="px-2.5 py-1 rounded-full bg-accent-rose-container text-accent-rose text-xs font-medium">{s}</span>
                 ))}
               </div>
             </div>
 
-            <div className="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30">
+            <div className="bg-white rounded-2xl p-6 border border-accent-teal/30 shadow-sm">
               <h3 className="font-display font-bold text-on-surface mb-4">Availability</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
@@ -332,8 +334,8 @@ export default async function HelperProfilePage({
             </div>
 
             {/* CTA */}
-            <div className="bg-primary-container/5 rounded-2xl p-6 border border-primary-container/20 space-y-3">
-              <Link href="/contact" className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors">
+            <div className="bg-gradient-to-br from-accent-teal-container/70 to-accent-violet-container/60 rounded-2xl p-6 border border-outline-variant/30 space-y-3">
+              <Link href="/contact" className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-accent-teal to-primary-container text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-accent-teal/25">
                 Request Help
               </Link>
               <Link href="/browse-helpers" className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-outline-variant rounded-xl text-sm font-medium text-on-surface hover:bg-surface-container-low transition-colors">
@@ -343,6 +345,7 @@ export default async function HelperProfilePage({
           </div>
         </div>
       </div>
+      </section>
     </>
   );
 }

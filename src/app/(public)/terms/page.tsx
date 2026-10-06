@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { PageHeader } from "@/components/marketing/page-shell";
 
 const sections = [
   { title: "1. Acceptance of Terms", content: "By accessing or using Acadivo (\"the Platform\"), you agree to be bound by these Terms of Service. If you do not agree, please do not use our services. These terms apply to all users, including students seeking help and helpers providing guidance." },
@@ -19,28 +18,27 @@ const sections = [
 export default function TermsPage() {
   return (
     <>
-      <div className="bg-surface-container-high border-b border-outline-variant/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <nav className="flex items-center gap-2 text-sm text-on-surface-variant mb-4">
-            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-on-surface font-medium">Terms of Service</span>
-          </nav>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-2">Terms of Service</h1>
-          <p className="text-on-surface-variant">Last updated: September 10, 2026</p>
-        </div>
-      </div>
+      <PageHeader
+        tone="indigo"
+        icon="gavel"
+        eyebrow="Legal"
+        title="Terms of Service"
+        subtitle="Last updated: September 10, 2026"
+        crumbs={[{ label: "Home", href: "/" }, { label: "Terms of Service" }]}
+      />
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="prose-custom space-y-8">
-          {sections.map((s) => (
-            <div key={s.title}>
-              <h2 className="font-display text-lg font-bold text-on-surface mb-2">{s.title}</h2>
-              <p className="text-sm text-on-surface-variant leading-relaxed">{s.content}</p>
-            </div>
-          ))}
+      <section className="bg-white wash-violet">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="prose-custom space-y-6">
+            {sections.map((section) => (
+              <div key={section.title} className="bg-white rounded-2xl border border-outline-variant/30 p-6 shadow-sm hover:border-primary-container/40 transition-colors">
+                <h2 className="font-display text-lg font-bold text-on-surface mb-2">{section.title}</h2>
+                <p className="text-sm text-on-surface-variant leading-relaxed">{section.content}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

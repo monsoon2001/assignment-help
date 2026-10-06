@@ -6,6 +6,15 @@ import { useSearchParams } from "next/navigation";
 import { Search, Star, ChevronRight } from "lucide-react";
 import { fetchHelperCandidates, type HelperCandidate } from "@/lib/requests";
 import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
+import { PAGE_TONES } from "@/components/marketing/page-shell";
+
+// Cards cycle accents so a six-helper grid doesn't read as six white boxes.
+const HELPER_TONES = [
+  PAGE_TONES.teal,
+  PAGE_TONES.amber,
+  PAGE_TONES.violet,
+  PAGE_TONES.rose,
+];
 
 const ratings = ["Any Rating", "4.5+", "4.7+", "4.9+"];
 
@@ -55,10 +64,10 @@ export default function BrowseHelpersPage() {
   return (
     <>
       {/* Page Header */}
-      <div className="bg-surface-container-high border-b border-outline-variant/50">
+      <div className="bg-gradient-to-r from-accent-teal-container/90 via-surface-container-high to-surface-container-low border-b border-outline-variant/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <nav className="flex items-center gap-2 text-sm text-on-surface-variant mb-4">
-            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+            <Link href="/" className="hover:text-accent-teal transition-colors">Home</Link>
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-on-surface font-medium">Browse Helpers</span>
           </nav>
@@ -72,7 +81,7 @@ export default function BrowseHelpersPage() {
       </div>
 
       {/* Search & Filters */}
-      <div className="sticky top-16 z-40 bg-surface-container-lowest border-b border-outline-variant/50">
+      <div className="sticky top-16 z-40 bg-white/95 backdrop-blur border-b border-outline-variant/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col lg:flex-row gap-3">
             <div className="relative flex-1">
@@ -154,27 +163,29 @@ export default function BrowseHelpersPage() {
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((h) => {
+            {filtered.map((h, hi) => {
               const name = h.user?.name ?? "Acadivo Helper";
               const avatar = h.user?.avatar_url ?? null;
               const initials = name.split(/\s+/).map((p) => p[0]).join("").toUpperCase().slice(0, 2);
+              const tone = HELPER_TONES[hi % HELPER_TONES.length];
               return (
                 <div
                   key={h.user_id}
-                  className="bg-surface-container-lowest rounded-2xl border border-outline-variant p-6 flex flex-col gap-4 hover:shadow-lg transition-all"
+                  className={`relative overflow-hidden bg-white rounded-2xl border ${tone.card} p-6 pt-7 flex flex-col gap-4 shadow-sm ${tone.cardHover} transition-all`}
                 >
+                  <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${tone.hairline}`} aria-hidden="true" />
                   <div className="flex items-center gap-4">
                     {avatar ? (
-                      <img src={avatar} alt={name} className="w-14 h-14 rounded-full object-cover" />
+                      <img src={avatar} alt={name} className={`w-14 h-14 rounded-full object-cover ring-2 ring-white shadow-sm shadow-ink-900/15`} />
                     ) : (
-                      <div className="w-14 h-14 rounded-full bg-primary-container/20 flex items-center justify-center text-sm font-bold text-primary shrink-0">
+                      <div className={`w-14 h-14 rounded-full ${tone.iconTile} flex items-center justify-center text-sm font-bold ${tone.icon} shrink-0`}>
                         {initials}
                       </div>
                     )}
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           <h2 className="font-display font-bold text-on-surface truncate">{name}</h2>
-                          <span className="material-symbols-outlined text-primary text-sm shrink-0">verified</span>
+                          <span className={`material-symbols-outlined ${tone.icon} text-sm shrink-0`}>verified</span>
                         </div>
                         <div className="flex items-center gap-1 mt-0.5">
                           <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
@@ -222,7 +233,7 @@ export default function BrowseHelpersPage() {
                     <Link href={`/helpers/${h.user_id}`} className="flex-1 text-center px-4 py-2 text-sm font-medium border border-outline-variant rounded-xl text-on-surface hover:bg-surface-container-low transition-colors">
                       View profile
                     </Link>
-                    <Link href={`/requests/new?helper=${h.user_id}`} className="flex-1 text-center px-4 py-2 text-sm font-medium bg-primary-container text-on-primary rounded-xl hover:bg-primary transition-colors">
+                    <Link href={`/requests/new?helper=${h.user_id}`} className={`flex-1 text-center px-4 py-2 text-sm font-semibold bg-gradient-to-r ${tone.btn} text-white rounded-xl hover:opacity-95 transition-opacity`}>
                       Request Help
                     </Link>
                   </div>

@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { PageHeader } from "@/components/marketing/page-shell";
 
 const sections = [
   { title: "1. Information We Collect", content: "We collect information you provide directly: name, email address, academic details, payment information, and communication content. We also collect usage data including device information, IP addresses, browsing patterns, and interaction data to improve our services." },
@@ -18,28 +17,32 @@ const sections = [
 export default function PrivacyPage() {
   return (
     <>
-      <div className="bg-surface-container-high border-b border-outline-variant/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <nav className="flex items-center gap-2 text-sm text-on-surface-variant mb-4">
-            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-on-surface font-medium">Privacy Policy</span>
-          </nav>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-2">Privacy Policy</h1>
-          <p className="text-on-surface-variant">Last updated: September 10, 2026</p>
-        </div>
-      </div>
+      <PageHeader
+        tone="violet"
+        icon="lock"
+        eyebrow="Legal"
+        title="Privacy Policy"
+        subtitle="Last updated: September 10, 2026"
+        crumbs={[{ label: "Home", href: "/" }, { label: "Privacy Policy" }]}
+      />
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="space-y-8">
-          {sections.map((s) => (
-            <div key={s.title}>
-              <h2 className="font-display text-lg font-bold text-on-surface mb-2">{s.title}</h2>
-              <p className="text-sm text-on-surface-variant leading-relaxed">{s.content}</p>
-            </div>
-          ))}
+      <section className="bg-white wash-violet">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="space-y-6">
+            {sections.map((section, i) => (
+              <div key={section.title} className="bg-white rounded-2xl border border-outline-variant/30 p-6 shadow-sm hover:border-accent-violet/40 transition-colors">
+                <div className="flex items-start gap-3 mb-2">
+                  <span className="w-8 h-8 rounded-lg bg-accent-violet-container text-accent-violet flex items-center justify-center text-sm font-bold shrink-0">
+                    {i + 1}
+                  </span>
+                  <h2 className="font-display text-lg font-bold text-on-surface">{section.title}</h2>
+                </div>
+                <p className="text-sm text-on-surface-variant leading-relaxed">{section.content}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

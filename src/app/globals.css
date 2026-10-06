@@ -60,6 +60,21 @@
   --color-warning: #d97706;
   --color-danger: #dc2626;
 
+  /* Section accents. Cousins of the indigo primary rather than random hues, so
+     a banded homepage still reads as one brand: teal for trust, amber for free
+     and value, violet for guidance, rose for highlights. */
+  --color-accent-teal: #0f766e;
+  --color-accent-teal-container: #ccfbf1;
+  --color-accent-amber: #b45309;
+  --color-accent-amber-container: #fdf0cd;
+  --color-accent-violet: #6d28d9;
+  --color-accent-violet-container: #ede7fd;
+  --color-accent-rose: #be123c;
+  --color-accent-rose-container: #ffe0e4;
+  --color-ink-900: #120f3d;
+  --color-ink-800: #1c1757;
+  --color-ink-700: #2a2178;
+
   --font-sans: var(--font-inter);
   --font-display: var(--font-plus-jakarta-sans);
 }
@@ -140,4 +155,91 @@ body {
   to {
     transform: translateX(-50%);
   }
+}
+
+/* Homepage colour washes -----------------------------------------------------
+   A soft two-tone wash keeps long sections from reading as one flat sheet of
+   background while staying light enough for `text-on-surface`. */
+
+@utility wash-teal {
+  background-image: linear-gradient(
+    180deg,
+    var(--color-accent-teal-container) 0%,
+    color-mix(in oklab, var(--color-accent-teal-container) 35%, white) 45%,
+    transparent 100%
+  );
+}
+
+@utility wash-amber {
+  background-image: linear-gradient(
+    180deg,
+    var(--color-accent-amber-container) 0%,
+    color-mix(in oklab, var(--color-accent-amber-container) 30%, white) 45%,
+    transparent 100%
+  );
+}
+
+@utility wash-violet {
+  background-image: linear-gradient(
+    180deg,
+    var(--color-accent-violet-container) 0%,
+    color-mix(in oklab, var(--color-accent-violet-container) 32%, white) 45%,
+    transparent 100%
+  );
+}
+
+@utility wash-rose {
+  background-image: linear-gradient(
+    180deg,
+    var(--color-accent-rose-container) 0%,
+    color-mix(in oklab, var(--color-accent-rose-container) 30%, white) 45%,
+    transparent 100%
+  );
+}
+
+/* The hero keeps a light background but splits its tint: teal behind the
+   headline, violet behind the estimate card, both fading to white. */
+@utility wash-split {
+  background-color: var(--color-surface-container-lowest);
+  background-image:
+    radial-gradient(52rem 26rem at 8% -6%, color-mix(in oklab, var(--color-accent-teal-container) 85%, transparent), transparent 68%),
+    radial-gradient(48rem 24rem at 96% 4%, color-mix(in oklab, var(--color-accent-violet-container) 85%, transparent), transparent 66%),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-surface-container-low) 70%, white) 0%,
+      var(--color-surface-container-lowest) 62%
+    );
+}
+
+/* The dark hero and closing CTA bands: a deep indigo wash, a soft corner glow
+   and a barely-there grid so the flat fill still has depth. */
+@utility band-ink {
+  background-color: var(--color-ink-900);
+  background-image:
+    radial-gradient(70rem 32rem at 88% -12%, color-mix(in oklab, var(--color-primary-container) 55%, transparent), transparent 62%),
+    radial-gradient(46rem 26rem at 2% 108%, color-mix(in oklab, var(--color-accent-violet) 42%, transparent), transparent 60%),
+    linear-gradient(160deg, var(--color-ink-900) 0%, var(--color-ink-700) 52%, #4f46e5 128%);
+}
+
+@utility band-ink-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.07) 1px, transparent 1px);
+  background-size: 68px 68px;
+  -webkit-mask-image: radial-gradient(75% 60% at 50% 0%, black, transparent 78%);
+  mask-image: radial-gradient(75% 60% at 50% 0%, black, transparent 78%);
+}
+
+@utility on-band {
+  color: var(--color-on-primary);
+}
+
+@utility on-band-muted {
+  color: rgb(226 232 255 / 0.78);
+}
+
+@utility on-band-chip {
+  background-color: rgb(255 255 255 / 0.1);
+  border-color: rgb(255 255 255 / 0.18);
+  color: var(--color-on-primary);
 }

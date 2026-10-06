@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { ChevronRight, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { PAGE_TONES, PageHeader } from "@/components/marketing/page-shell";
 import { CATEGORY_BY_SLUG, RESOURCE_CATEGORIES, guidesByCategory } from "@/lib/resources";
 
 type Params = { category: string };
@@ -39,55 +40,60 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
 
   return (
     <>
-      <div className="bg-surface-container-high border-b border-outline-variant/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <nav className="flex items-center gap-2 text-sm text-on-surface-variant mb-4">
-            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <Link href="/resources" className="hover:text-primary transition-colors">Resources</Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-on-surface font-medium">{known.name}</span>
-          </nav>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-2">{known.name} Guides</h1>
-          <p className="text-on-surface-variant max-w-2xl">{known.description}</p>
-        </div>
-      </div>
+      <PageHeader
+        tone="amber"
+        icon={known.icon}
+        eyebrow="Guides"
+        title={`${known.name} Guides`}
+        subtitle={known.description}
+        crumbs={[
+          { label: "Home", href: "/" },
+          { label: "Resources", href: "/resources" },
+          { label: known.name },
+        ]}
+      />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {guides.map((guide) => (
+      <section className="py-16 bg-white wash-amber">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {guides.map((guide, i) => {
+              const tone = [PAGE_TONES.amber, PAGE_TONES.teal, PAGE_TONES.violet, PAGE_TONES.rose][i % 4];
+              return (
+              <Link
+                key={guide.slug}
+                href={`/resources/${guide.category}/${guide.slug}`}
+                className={`group relative overflow-hidden bg-white rounded-2xl p-6 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}
+              >
+                <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${tone.hairline}`} aria-hidden="true" />
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`text-xs font-semibold ${tone.text}`}>{guide.readingMinutes} min read</span>
+                </div>
+                <h2 className={`font-display font-bold text-on-surface mb-2 transition-colors ${tone.text}`}>
+                  {guide.title}
+                </h2>
+                <p className="text-sm text-on-surface-variant leading-relaxed line-clamp-3">{guide.description}</p>
+              </Link>
+              );
+            })}
+          </div>
+
+          <div className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              key={guide.slug}
-              href={`/resources/${guide.category}/${guide.slug}`}
-              className="group bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 hover:shadow-md hover:border-primary-container/40 transition-all"
+              href="/resources"
+              className="inline-flex items-center gap-2 px-6 py-3 border border-outline-variant bg-white rounded-xl font-semibold text-sm text-on-surface hover:bg-surface-container-low transition-colors"
             >
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs text-on-surface-variant">{guide.readingMinutes} min read</span>
-              </div>
-              <h2 className="font-display font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">
-                {guide.title}
-              </h2>
-              <p className="text-sm text-on-surface-variant leading-relaxed line-clamp-3">{guide.description}</p>
+              All guides
             </Link>
-          ))}
+            <Link
+              href="/browse-helpers"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent-amber to-accent-rose text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-accent-amber/25"
+            >
+              Looking for one-to-one help?
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
-
-        <div className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link
-            href="/resources"
-            className="inline-flex items-center gap-2 px-6 py-3 border border-outline-variant rounded-xl font-semibold text-sm text-on-surface hover:bg-surface-container-low transition-colors"
-          >
-            All guides
-          </Link>
-          <Link
-            href="/browse-helpers"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors"
-          >
-            Looking for one-to-one help?
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-      </div>
+      </section>
     </>
   );
 }

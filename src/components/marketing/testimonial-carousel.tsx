@@ -95,7 +95,7 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
                 return (
                   <figure
                     key={t.id}
-                    className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-outline-variant/40 bg-surface-container-lowest p-6 sm:p-7 transition-all duration-300 hover:shadow-xl hover:shadow-primary-container/20 hover:-translate-y-0.5"
+                    className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-outline-variant/40 bg-white p-6 sm:p-7 shadow-md shadow-ink-900/5 transition-all duration-300 hover:shadow-2xl hover:shadow-accent-amber/20 hover:-translate-y-1"
                   >
                     <span
                       className="material-symbols-outlined pointer-events-none absolute -top-1 -right-1 text-7xl leading-none text-primary/10"
@@ -119,7 +119,7 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
                         ))}
                       </div>
                       {t.subject && (
-                        <span className="shrink-0 rounded-full bg-primary-container/10 px-2.5 py-1 text-[11px] font-semibold text-primary">
+                        <span className="shrink-0 rounded-full bg-accent-violet-container px-2.5 py-1 text-[11px] font-semibold text-accent-violet">
                           {t.subject}
                         </span>
                       )}
@@ -162,7 +162,7 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
             type="button"
             onClick={() => go(activePage - 1)}
             aria-label="Previous testimonials"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant text-on-surface-variant transition-colors hover:border-primary-container hover:text-primary"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant bg-white text-on-surface-variant transition-colors hover:border-accent-amber hover:text-accent-amber"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -175,7 +175,7 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
                 aria-label={`Show testimonials ${i + 1}`}
                 aria-current={i === activePage}
                 className={`h-2 rounded-full transition-all ${
-                  i === activePage ? "w-7 bg-primary" : "w-2 bg-outline-variant hover:bg-on-surface-variant/50"
+                  i === activePage ? "w-7 bg-gradient-to-r from-accent-amber to-accent-violet" : "w-2 bg-outline-variant hover:bg-on-surface-variant/50"
                 }`}
               />
             ))}
@@ -184,7 +184,7 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
             type="button"
             onClick={() => go(activePage + 1)}
             aria-label="Next testimonials"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant text-on-surface-variant transition-colors hover:border-primary-container hover:text-primary"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant bg-white text-on-surface-variant transition-colors hover:border-accent-amber hover:text-accent-amber"
           >
             <ChevronRight className="h-5 w-5" />
           </button>

@@ -26,7 +26,7 @@ export default function FaqAccordion({
           <div
             key={faq.q}
             className={`bg-surface-container-lowest rounded-xl border transition-colors ${
-              open ? "border-primary-container/40" : "border-outline-variant/30"
+              open ? "border-accent-violet/50 shadow-sm shadow-accent-violet/10" : "border-outline-variant/30 bg-white"
             }`}
           >
             <h3>
@@ -36,7 +36,7 @@ export default function FaqAccordion({
                 aria-expanded={open}
                 aria-controls={`faq-panel-${i}`}
                 onClick={() => setOpenIndex(open ? null : i)}
-                className="w-full flex items-start justify-between gap-4 p-5 cursor-pointer text-left font-display text-base font-bold text-on-surface hover:text-primary transition-colors"
+                className={`w-full flex items-start justify-between gap-4 p-5 cursor-pointer text-left font-display text-base font-bold text-on-surface transition-colors ${open ? "text-accent-violet" : "hover:text-accent-violet"}`}
               >
                 <span>{faq.q}</span>
                 <span

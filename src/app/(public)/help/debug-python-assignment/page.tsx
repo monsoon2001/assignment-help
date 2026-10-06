@@ -16,12 +16,12 @@ export const metadata = {
 export default function DebugPythonPage() {
   return (
     <>
-      <div className="bg-surface-container-high border-b border-outline-variant/50">
+      <div className="bg-gradient-to-r from-accent-teal-container/90 via-surface-container-high to-surface-container-low border-b border-outline-variant/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <nav className="flex items-center gap-2 text-sm text-on-surface-variant mb-4">
-            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+            <Link href="/" className="hover:text-accent-teal transition-colors">Home</Link>
             <ChevronRight className="w-3.5 h-3.5" />
-            <Link href="/help" className="hover:text-primary transition-colors">Help</Link>
+            <Link href="/browse-helpers" className="hover:text-accent-teal transition-colors">Help</Link>
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-on-surface font-medium">Debug a Python Assignment</span>
           </nav>
@@ -33,6 +33,7 @@ export default function DebugPythonPage() {
           </p>
         </div>
       </div>
+      <div className="bg-white wash-teal">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 prose">
         <h2>Step-by-step debugging</h2>
         <ol>
@@ -43,9 +44,10 @@ export default function DebugPythonPage() {
           <li>Fix one issue at a time</li>
         </ol>
         <p>Still stuck? Get personalized help from a verified Python tutor.</p>
-        <Link href="/browse-helpers" className="inline-flex items-center gap-2 px-6 py-3 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors no-underline">
+        <Link href="/browse-helpers" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent-teal to-primary-container text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity no-underline">
           Get Python Help
         </Link>
+      </div>
       </div>
     </>
   )

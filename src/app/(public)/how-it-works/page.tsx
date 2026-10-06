@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { CtaBand, PAGE_TONES, PageHeader } from "@/components/marketing/page-shell";
 
 const steps = [
   { num: "1", title: "Tell us what you need", desc: "Describe your assignment, select the subject, academic level, deadline, and any specific requirements. Upload files like rubrics, lecture notes, or drafts if you have them.", icon: "edit_note", details: ["Select subject and help type", "Describe your requirements", "Set your deadline", "Upload reference files"] },
@@ -11,39 +11,39 @@ const steps = [
 export default function HowItWorksPage() {
   return (
     <>
-      <div className="bg-surface-container-high border-b border-outline-variant/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <nav className="flex items-center gap-2 text-sm text-on-surface-variant mb-4">
-            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-on-surface font-medium">How It Works</span>
-          </nav>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-2">How It Works</h1>
-          <p className="text-on-surface-variant max-w-2xl">Get academic help in four simple steps — from description to delivery.</p>
-        </div>
-      </div>
+      <PageHeader
+        tone="violet"
+        icon="route"
+        eyebrow="Simple Process"
+        title="How It Works"
+        subtitle="Get academic help in four simple steps — from description to delivery."
+        crumbs={[{ label: "Home", href: "/" }, { label: "How It Works" }]}
+      />
 
+      <div className="bg-white wash-violet">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="space-y-12">
-          {steps.map((step, i) => (
+          {steps.map((step, i) => {
+            const tone = [PAGE_TONES.violet, PAGE_TONES.teal, PAGE_TONES.amber, PAGE_TONES.rose][i % 4];
+            return (
             <div key={step.num} className="relative">
               {i < steps.length - 1 && (
-                <div className="absolute left-6 top-14 bottom-0 w-px bg-outline-variant/50 hidden sm:block" />
+                <div className="absolute left-6 top-14 bottom-0 w-px bg-gradient-to-b from-outline-variant via-outline-variant/40 to-transparent hidden sm:block" />
               )}
               <div className="flex gap-6">
-                <div className="w-12 h-12 bg-primary-container text-on-primary rounded-full flex items-center justify-center font-display font-bold text-lg shrink-0 relative z-10">
+                <div className={`w-12 h-12 ${tone.icon} ${tone.iconTile} rounded-full flex items-center justify-center font-display font-bold text-lg shrink-0 relative z-10 shadow-md`}>
                   {step.num}
                 </div>
-                <div className="flex-1 bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30">
+                <div className={`flex-1 bg-white rounded-2xl p-6 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}>
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="material-symbols-outlined text-primary">{step.icon}</span>
+                    <span className={`material-symbols-outlined ${tone.icon}`}>{step.icon}</span>
                     <h2 className="font-display text-xl font-bold text-on-surface">{step.title}</h2>
                   </div>
                   <p className="text-on-surface-variant leading-relaxed mb-4">{step.desc}</p>
                   <ul className="grid grid-cols-2 gap-2">
                     {step.details.map((d) => (
                       <li key={d} className="flex items-center gap-2 text-sm text-on-surface-variant">
-                        <span className="material-symbols-outlined text-emerald-500 text-sm">check_circle</span>
+                        <span className={`material-symbols-outlined ${tone.text} text-sm`}>check_circle</span>
                         {d}
                       </li>
                     ))}
@@ -51,17 +51,27 @@ export default function HowItWorksPage() {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
-        <div className="mt-16 text-center bg-surface-container-high rounded-2xl p-10">
+        <div className="mt-16 text-center bg-white rounded-2xl p-10 border border-outline-variant/30 shadow-sm">
           <h2 className="font-display text-2xl font-bold text-on-surface mb-3">Ready to get started?</h2>
           <p className="text-on-surface-variant mb-6 max-w-lg mx-auto">Get matched with a verified helper in your subject and start improving your grades with Acadivo.</p>
-          <Link href="/browse-helpers" className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors">
+          <Link href="/browse-helpers" className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-primary-container to-accent-violet text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-primary-container/30">
             Browse Helpers
           </Link>
         </div>
       </div>
+      </div>
+
+      <CtaBand
+        eyebrow="tips_and_updates"
+        title="Prefer to read first?"
+        body="Every service page links to a free guide that walks through the same process, so you can learn the approach before you pay anyone."
+        primary={{ label: "Browse Student Guides", href: "/resources" }}
+        secondary={{ label: "Talk to Us", href: "/contact" }}
+      />
     </>
   );
 }
