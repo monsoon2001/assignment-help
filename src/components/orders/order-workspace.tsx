@@ -53,6 +53,7 @@ type DeliveryRow = {
   id: string;
   message: string | null;
   file_urls: string[];
+  revision_note?: string | null;
   created_at: string;
 };
 
@@ -97,6 +98,10 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
   const [deliveryFiles, setDeliveryFiles] = useState<File[]>([]);
   const [submittingDelivery, setSubmittingDelivery] = useState(false);
   const [deliveryError, setDeliveryError] = useState<string | null>(null);
+  const [revisionOpen, setRevisionOpen] = useState(false);
+  const [revisionNote, setRevisionNote] = useState("");
+  const [sendingRevision, setSendingRevision] = useState(false);
+  const [revisionError, setRevisionError] = useState<string | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const requestIdRef = useRef<string | null>(null);
@@ -176,7 +181,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
   const loadDeliveries = useCallback(async () => {
     const { data } = await supabase.current
       .from("deliveries")
-      .select("id, message, file_urls, created_at")
+      .select("id, message, file_urls, revision_note, created_at")
       .eq("order_id", orderId)
       .order("created_at", { ascending: true });
     setDeliveries((data ?? []) as DeliveryRow[]);
@@ -314,6 +319,10 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
     }
   }
 
+  const latestRevisionNotes = [...deliveries]
+    .filter((d) => !!d.revision_note)
+    .reverse();
+
   async function submitDelivery() {
     if (!deliveryMessage.trim() && deliveryFiles.length === 0) {
       setDeliveryError("Add a message or at least one file.");
@@ -346,6 +355,39 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
       setDeliveryError(e instanceof Error ? e.message : "Delivery failed.");
     } finally {
       setSubmittingDelivery(false);
+    }
+  }
+
+  // Sending the delivery back records what has to change, so the helper knows
+  // exactly what to fix instead of guessing.
+  async function submitRevisionRequest() {
+    const note = revisionNote.trim();
+    if (note.length < 10) {
+      setRevisionError("Tell your helper what needs correcting — at least a sentence.");
+      return;
+    }
+    setSendingRevision(true);
+    setRevisionError(null);
+    try {
+      const { error } = await supabase.current.from("deliveries").insert({
+        order_id: orderId,
+        revision_note: note,
+      });
+      if (error) throw new Error(error.message);
+
+      const { error: statusError } = await supabase.current
+        .from("orders")
+        .update({ status: "revision_requested" })
+        .eq("id", orderId);
+      if (statusError) throw new Error(statusError.message);
+
+      setRevisionNote("");
+      setRevisionOpen(false);
+      await Promise.all([loadDeliveries(), loadOrder()]);
+    } catch (e) {
+      setRevisionError(e instanceof Error ? e.message : "Could not send your change request.");
+    } finally {
+      setSendingRevision(false);
     }
   }
 
@@ -651,12 +693,30 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
 
               <div className="flex flex-col gap-3">
                 {deliveries.map((d) => (
-                  <div key={d.id} className="p-4 rounded-xl border border-outline-variant">
+                  <div
+                    key={d.id}
+                    className={`p-4 rounded-xl border ${
+                      d.revision_note ? "border-warning/50 bg-warning-container/10" : "border-outline-variant"
+                    }`}
+                  >
                     <div className="flex items-center gap-2 text-xs text-on-surface-variant mb-2">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-                      Delivered {timeLabel(d.created_at)}
+                      <span
+                        className={`w-2 h-2 rounded-full inline-block ${
+                          d.revision_note ? "bg-warning" : "bg-emerald-500"
+                        }`}
+                      />
+                      {d.revision_note ? "Changes requested" : "Delivered"} {timeLabel(d.created_at)}
                     </div>
-                    {d.message && <p className="text-sm text-on-surface mb-3">{d.message}</p>}
+                    {d.revision_note ? (
+                      <>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-warning mb-1">
+                          What needs to be corrected
+                        </p>
+                        <p className="text-sm text-on-surface whitespace-pre-line">{d.revision_note}</p>
+                      </>
+                    ) : (
+                      d.message && <p className="text-sm text-on-surface mb-3">{d.message}</p>
+                    )}
                     {d.file_urls.length > 0 && (
                       <div className="flex flex-col gap-2">
                         {d.file_urls.map((url, i) => (
@@ -686,14 +746,57 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
             {isStudent && order.status === "delivered" && (
               <Card className="p-5 flex flex-col gap-3">
                 <h3 className="font-semibold text-on-surface">How did the delivery look?</h3>
-                <div className="flex flex-col gap-2">
-                  <Button variant="outline" onClick={() => setOrderStatus("revision_requested")}>
-                    <RotateCcw size={15} /> Request a Change
-                  </Button>
-                  <Button onClick={() => setOrderStatus("completed")} className="w-full">
-                    <Check size={15} /> Accept &amp; Complete
-                  </Button>
-                </div>
+
+                {revisionOpen ? (
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="revision-note" className="text-sm font-medium text-on-surface">
+                        What needs to be corrected?
+                      </label>
+                      <textarea
+                        id="revision-note"
+                        rows={4}
+                        value={revisionNote}
+                        onChange={(e) => {
+                          setRevisionNote(e.target.value);
+                          setRevisionError(null);
+                        }}
+                        placeholder="e.g. Section 2 still needs the regression output explained in your own words, and the reference list is missing two sources."
+                        className="w-full p-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all resize-none"
+                      />
+                      <p className="text-xs text-on-surface-variant">
+                        Your helper sees this note and works through it before delivering again.
+                      </p>
+                    </div>
+                    {revisionError && <p className="text-sm text-error">{revisionError}</p>}
+                    <div className="flex items-center gap-2">
+                      <Button onClick={submitRevisionRequest} disabled={sendingRevision}>
+                        {sendingRevision ? <Loader2 size={15} className="animate-spin" /> : <RotateCcw size={15} />}
+                        Send change request
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          setRevisionOpen(false);
+                          setRevisionNote("");
+                          setRevisionError(null);
+                        }}
+                        disabled={sendingRevision}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <Button variant="outline" onClick={() => setRevisionOpen(true)}>
+                      <RotateCcw size={15} /> Request a Change
+                    </Button>
+                    <Button onClick={() => setOrderStatus("completed")} className="w-full">
+                      <Check size={15} /> Accept &amp; Complete
+                    </Button>
+                  </div>
+                )}
                 {deliveryError && <p className="text-sm text-error">{deliveryError}</p>}
               </Card>
             )}
@@ -705,8 +808,15 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                   <p className="text-sm font-medium text-on-surface">Revision requested</p>
                 </div>
                 <p className="text-xs text-on-surface-variant mt-1">
-                  Your helper is working on a revised version — you&apos;ll see it here when delivered.
+                  Your helper is working through the notes below — you&apos;ll see the revised delivery here.
                 </p>
+                <ul className="mt-3 flex flex-col gap-2">
+                  {latestRevisionNotes.map((d) => (
+                    <li key={d.id} className="text-sm text-on-surface border-l-2 border-warning pl-3">
+                      {d.revision_note}
+                    </li>
+                  ))}
+                </ul>
               </Card>
             )}
 
@@ -728,6 +838,20 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
 
           {isHelper && (
             <Card className="p-5 sticky top-6">
+              {order.status === "revision_requested" && latestRevisionNotes.length > 0 && (
+                <div className="mb-4 rounded-xl border border-warning/50 bg-warning-container/10 p-3">
+                  <p className="text-sm font-semibold text-on-surface flex items-center gap-1.5">
+                    <RotateCcw size={14} className="text-warning" /> Changes requested
+                  </p>
+                  <ul className="mt-2 flex flex-col gap-1.5">
+                    {latestRevisionNotes.map((d) => (
+                      <li key={d.id} className="text-xs text-on-surface leading-relaxed">
+                        &bull; {d.revision_note}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <h2 className="font-display font-semibold text-on-surface mb-1">Submit Delivery</h2>
               <p className="text-sm text-on-surface-variant mb-4">
                 Include a summary note and any files for the student.
