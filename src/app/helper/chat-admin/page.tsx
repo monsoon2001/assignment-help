@@ -6,7 +6,7 @@ import HelperAdminChat from "@/components/chat/helper-admin-chat";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Chat with Admin | Acadibo",
+  title: "Chat with Admin | Acadivo",
 };
 
 export default async function HelperChatAdminPage() {

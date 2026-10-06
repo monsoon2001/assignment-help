@@ -7,12 +7,12 @@ const subject = SUBJECT_CONTENT_BY_SLUG.get("computer-science")!;
 export const metadata: Metadata = {
   title: subject.title,
   description: subject.description,
-  alternates: { canonical: `https://acadibo.com/subjects/computer-science` },
+  alternates: { canonical: `https://acadivo.com/subjects/computer-science` },
   openGraph: {
     title: subject.title,
     description: subject.ogDescription,
     type: "website",
-    url: `https://acadibo.com/subjects/computer-science`,
+    url: `https://acadivo.com/subjects/computer-science`,
   },
 };
 

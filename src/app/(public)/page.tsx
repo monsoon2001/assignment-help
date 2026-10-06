@@ -21,12 +21,12 @@ import {
 
 export const dynamic = "force-dynamic";
 
-const SITE_URL = "https://acadibo.com";
+const SITE_URL = "https://acadivo.com";
 
 // Subject names helpers pick from -> the matching public subject page.
 const SUBJECT_PAGE_BY_NAME = new Map(SUBJECT_CONTENT.map((s) => [s.name, `/subjects/${s.slug}`]));
 
-const HERO_TITLE = "Assignment Help Online | Choose a Verified Assignment Helper | Acadibo";
+const HERO_TITLE = "Assignment Help Online | Choose a Verified Assignment Helper | Acadivo";
 
 const HERO_DESCRIPTION = `Get assignment help online from verified peer helpers across ${SUBJECTS.length} subjects. Post your brief, compare helpers by subject, rating and price, agree a personalized proposal, and pay only after you approve — essay help, lab reports, citations, programming, data analysis and more.`;
 
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     title: HERO_TITLE,
     description: HERO_DESCRIPTION,
     url: SITE_URL,
-    siteName: "Acadibo",
+    siteName: "Acadivo",
     type: "website",
   },
 };
@@ -257,7 +257,7 @@ export default async function HomePage() {
   const siteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Acadibo",
+    name: "Acadivo",
     url: SITE_URL,
     description: HERO_DESCRIPTION,
     potentialAction: {
@@ -325,7 +325,7 @@ export default async function HomePage() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-container/5 via-transparent to-secondary-container/5" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20">
-          <div className="grid lg:grid-cols-[1fr_minmax(0,470px)] gap-8 lg:gap-10 items-start">
+          <div className="grid lg:grid-cols-[1fr_minmax(0,640px)] gap-8 lg:gap-10 items-start">
             {/* Left Column */}
             <div className="space-y-5">
               <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container/10 text-primary text-sm font-semibold">
@@ -710,10 +710,10 @@ export default async function HomePage() {
           <div className="max-w-3xl mb-8">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-sm font-semibold mb-3">
               <span className="material-symbols-outlined text-sm">thumb_up</span>
-              Why Acadibo
+              Why Acadivo
             </span>
             <h2 id="why-heading" className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-2">
-              Why students choose Acadibo
+              Why students choose Acadivo
             </h2>
             <p className="text-base text-on-surface-variant leading-relaxed">
               We&apos;re built around the parts of assignment help that usually go wrong: unclear scope,
@@ -758,7 +758,7 @@ export default async function HomePage() {
           <div className="mt-8 overflow-x-auto">
             <table className="w-full min-w-[640px] text-sm border-collapse bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/30">
               <caption className="sr-only">
-                Acadibo compared with hiring a freelance writer and using an AI writing tool
+                Acadivo compared with hiring a freelance writer and using an AI writing tool
               </caption>
               <thead>
                 <tr className="bg-surface-container-low text-left">
@@ -766,7 +766,7 @@ export default async function HomePage() {
                     What matters
                   </th>
                   <th scope="col" className="px-4 py-3 font-display font-bold text-primary text-sm">
-                    Acadibo
+                    Acadivo
                   </th>
                   <th scope="col" className="px-4 py-3 font-display font-bold text-on-surface text-sm">
                     Freelance writer
@@ -782,7 +782,7 @@ export default async function HomePage() {
                     <th scope="row" className="px-4 py-3 text-left font-medium text-on-surface text-sm">
                       {row.criterion}
                     </th>
-                    <td className="px-4 py-3 text-sm text-on-surface bg-primary-container/5">{row.acadibo}</td>
+                    <td className="px-4 py-3 text-sm text-on-surface bg-primary-container/5">{row.acadivo}</td>
                     <td className="px-4 py-3 text-sm text-on-surface-variant">{row.freelancer}</td>
                     <td className="px-4 py-3 text-sm text-on-surface-variant">{row.aiTool}</td>
                   </tr>
@@ -929,8 +929,8 @@ export default async function HomePage() {
             </h2>
             <p className="text-base text-on-surface-variant leading-relaxed">
               {testimonials.length > 0
-                ? "Real feedback from students who used Acadibo for their assignments."
-                : "We’re just getting started. Become one of our first students and help shape Acadibo."}
+                ? "Real feedback from students who used Acadivo for their assignments."
+                : "We’re just getting started. Become one of our first students and help shape Acadivo."}
             </p>
           </div>
           {testimonials.length > 0 ? (
@@ -957,7 +957,7 @@ export default async function HomePage() {
               Assignment help questions, answered
             </h2>
             <p className="text-base text-on-surface-variant leading-relaxed">
-              The short version of how matching, pricing, revisions and academic integrity work on Acadibo.
+              The short version of how matching, pricing, revisions and academic integrity work on Acadivo.
               More detail on the{" "}
               <Link href="/faq" className="text-primary font-medium hover:underline">
                 full FAQ page

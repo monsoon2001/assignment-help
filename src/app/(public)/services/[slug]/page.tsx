@@ -10,7 +10,7 @@ import {
 import { STEPS } from "@/lib/home-content";
 import { ALL_RESOURCES, resourcePath } from "@/lib/resources";
 
-const SITE_URL = "https://acadibo.com";
+const SITE_URL = "https://acadivo.com";
 
 export const dynamicParams = false;
 
@@ -26,7 +26,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const service = getServicePage(slug);
   if (!service) return {};
-  const title = `${service.name} Assignment Help | Acadibo`;
+  const title = `${service.name} Assignment Help | Acadivo`;
   const description = `${service.desc} Compare verified helpers, agree the scope and price in writing, and pay only once the proposal looks right.`;
   return {
     title,

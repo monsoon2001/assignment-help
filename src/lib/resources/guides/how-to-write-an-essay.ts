@@ -5,7 +5,7 @@ const howToWriteAnEssay: Resource = {
   category: "writing",
   title: "How to Write an Essay: A Step-by-Step Guide",
   h1: "How to Write an Essay: A Step-by-Step Guide",
-  seoTitle: "How to Write an Essay: Step-by-Step Guide | Acadibo",
+  seoTitle: "How to Write an Essay: Step-by-Step Guide | Acadivo",
   description:
     "Learn how to write an academic essay: understanding the question, researching your topic, developing an argument, outlining, writing paragraphs, citing sources, and proofreading.",
   ogDescription:

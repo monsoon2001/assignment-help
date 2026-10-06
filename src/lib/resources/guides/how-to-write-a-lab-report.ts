@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "research",
   title: "How to Write a Lab Report: Step-by-Step Guide",
   h1: "How to Write a Lab Report: Step-by-Step Guide",
-  seoTitle: "How to Write a Lab Report: Step-by-Step Guide | Acadibo",
+  seoTitle: "How to Write a Lab Report: Step-by-Step Guide | Acadivo",
   description:
     "How to write a lab report: the purpose, method, results, and discussion sections explained, with guidance on tables, figures, uncertainty, and common mistakes.",
   ogDescription:

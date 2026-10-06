@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "writing",
   title: "How to Paraphrase Without Changing the Meaning",
   h1: "How to Paraphrase Without Changing the Meaning",
-  seoTitle: "How to Paraphrase Without Changing the Meaning | Acadibo",
+  seoTitle: "How to Paraphrase Without Changing the Meaning | Acadivo",
   description:
     "Learn how to paraphrase accurately: why it differs from summarising and quoting, how to restructure sentences, and how to avoid accidentally changing the author's meaning.",
   ogDescription:

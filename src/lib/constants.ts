@@ -48,9 +48,14 @@ export const SERVICE_TYPES = [
 
 export const ACADEMIC_LEVELS = [
   "High School",
+  "Community College",
   "Undergraduate",
   "Graduate",
   "Postgraduate",
+  "Doctorate / PhD",
+  "Professional (Law, Medicine, Nursing)",
+  "Certificate / Diploma Program",
+  "Test Preparation",
 ] as const;
 
 export const OTHER_OPTION = "Other";

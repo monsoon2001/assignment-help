@@ -218,7 +218,7 @@ export default async function HelperEarnings() {
                   {rows.map((txn) => {
                     const title =
                       unwrapRow<{ request: { title: string | null } | null }>(txn.order?.proposal)?.request?.title ??
-                      "Acadibo order";
+                      "Acadivo order";
                     return (
                       <tr key={txn.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
                         <td className="px-6 py-4">

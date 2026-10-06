@@ -28,6 +28,7 @@ function SignInForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const expired = searchParams.get("expired") === "1";
+  const verified = searchParams.get("verified") === "1";
 
   function nextPath(): string {
     if (typeof window === "undefined") return "/";
@@ -71,7 +72,12 @@ function SignInForm() {
       .eq("id", userId)
       .maybeSingle();
     const home = roleToHome(profile?.role);
-    await router.replace(nextPath() === "/" ? home : nextPath());
+    // nextPath() is "/" unless the page was reached with an explicit ?next, so
+    // an explicit target (e.g. /requests/new with a saved draft) wins over the
+    // role landing page.
+    const next = nextPath();
+    const destination = next !== "/" && next !== home ? next : home;
+    await router.replace(destination);
   }
 
   async function handleGoogle() {
@@ -92,7 +98,7 @@ function SignInForm() {
             <span className="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">
               <GraduationCap size={18} />
             </span>
-            <span className="font-display font-bold text-on-surface text-lg">Acadibo</span>
+            <span className="font-display font-bold text-on-surface text-lg">Acadivo</span>
           </Link>
           <Link
             href="/"
@@ -118,6 +124,11 @@ function SignInForm() {
               </p>
             </div>
 
+            {verified && (
+              <div className="mb-5 rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm text-on-surface">
+                Email verified. You can now sign in to your account.
+              </div>
+            )}
             {expired && (
               <div className="mb-5 rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-on-surface">
                 Your session has expired. Please sign in again to continue.
@@ -179,7 +190,10 @@ function SignInForm() {
 
             <p className="text-center text-sm text-on-surface-variant mt-5">
               Don&apos;t have an account?{" "}
-              <Link href="/sign-up" className="font-semibold text-primary hover:underline">
+              <Link
+                href={nextPath() === "/" ? "/sign-up" : `/sign-up?next=${encodeURIComponent(nextPath())}`}
+                className="font-semibold text-primary hover:underline"
+              >
                 Sign Up
               </Link>
             </p>
@@ -187,7 +201,7 @@ function SignInForm() {
         </main>
 
         <footer className="shrink-0 py-4 px-6 text-center text-xs text-on-surface-variant border-t border-outline-variant sm:px-10">
-          © {new Date().getFullYear()} Acadibo Academic Network. All rights reserved.
+          © {new Date().getFullYear()} Acadivo Academic Network. All rights reserved.
         </footer>
       </div>
 

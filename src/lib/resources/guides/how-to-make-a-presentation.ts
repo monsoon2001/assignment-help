@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "presentations",
   title: "How to Make an Effective Academic Presentation",
   h1: "How to Make an Effective Academic Presentation",
-  seoTitle: "How to Make an Effective Academic Presentation | Acadibo",
+  seoTitle: "How to Make an Effective Academic Presentation | Acadivo",
   description:
     "How to prepare an academic presentation: planning your argument, designing slides that support it, managing delivery, and handling questions.",
   ogDescription:

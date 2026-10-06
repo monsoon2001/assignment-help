@@ -43,7 +43,7 @@ export default function StudentProfileForm({
     { ok: false, message: "" }
   );
 
-  const displayName = name || (email ? email.split("@")[0] : "Acadibo Student");
+  const displayName = name || (email ? email.split("@")[0] : "Acadivo Student");
 
   return (
     <div className="w-full max-w-6xl mx-auto flex flex-col gap-6">
@@ -105,7 +105,7 @@ export default function StudentProfileForm({
                 <label className="text-sm font-medium text-on-surface">Institution</label>
                 <Input
                   name="institution"
-                  placeholder="e.g. Eastview University"
+                  placeholder="e.g. University of Melbourne"
                   defaultValue={institution}
                 />
               </div>

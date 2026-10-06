@@ -29,7 +29,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "code",
     cardDesc: "Programming, algorithms, data structures, and software engineering",
     h1: "Computer Science Assignment Help",
-    title: "Computer Science Assignment Help | Python, Java, SQL & More | Acadibo",
+    title: "Computer Science Assignment Help | Python, Java, SQL & More | Acadivo",
     description:
       "Get computer science assignment help for Python, Java, SQL, databases, machine learning, data structures, and programming projects. Choose a helper and get a proposal before you pay.",
     ogDescription:
@@ -59,7 +59,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "bar_chart",
     cardDesc: "Probability, data analysis, hypothesis testing, and regression",
     h1: "Statistics Assignment Help",
-    title: "Statistics Assignment Help | SPSS, R, Data Analysis | Acadibo",
+    title: "Statistics Assignment Help | SPSS, R, Data Analysis | Acadivo",
     description:
       "Get statistics assignment help, statistics homework help, SPSS assignment help, R programming assignment help, data analysis help, hypothesis testing help, and regression analysis help.",
     ogDescription:
@@ -87,7 +87,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "calculate",
     cardDesc: "Algebra, calculus, geometry, number theory, and applied math",
     h1: "Mathematics Assignment Help",
-    title: "Mathematics Assignment Help | Algebra, Calculus & More | Acadibo",
+    title: "Mathematics Assignment Help | Algebra, Calculus & More | Acadivo",
     description:
       "Get mathematics assignment help for algebra, calculus, geometry, linear algebra, discrete math, and applied mathematics from verified tutors who explain every step.",
     ogDescription:
@@ -116,7 +116,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "business_center",
     cardDesc: "Management, marketing, finance, and strategic planning",
     h1: "Business Assignment Help",
-    title: "Business Assignment Help | Marketing, Finance & Case Studies | Acadibo",
+    title: "Business Assignment Help | Marketing, Finance & Case Studies | Acadivo",
     description:
       "Get business assignment help, marketing assignment help, finance assignment help, accounting assignment help, case study help, and MBA assignment help from verified tutors.",
     ogDescription:
@@ -145,7 +145,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "edit_note",
     cardDesc: "Essays, research papers, reports, editing, and proofreading",
     h1: "Essay Help & Academic Writing Support",
-    title: "Essay Help & Academic Writing Support | Acadibo",
+    title: "Essay Help & Academic Writing Support | Acadivo",
     description:
       "Get essay help, research paper help, report writing help, proofreading assignment support, and academic editing from verified writing tutors.",
     ogDescription:
@@ -174,7 +174,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "menu_book",
     cardDesc: "Literary analysis, critical essays, poetry, and prose interpretation",
     h1: "English Literature Assignment Help",
-    title: "English Literature Assignment Help | Essay & Analysis Support | Acadibo",
+    title: "English Literature Assignment Help | Essay & Analysis Support | Acadivo",
     description:
       "Get English literature assignment help with literary analysis, poetry and prose interpretation, close reading, and critical essay structure from verified tutors.",
     ogDescription:
@@ -200,7 +200,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "biotech",
     cardDesc: "Cell biology, genetics, ecology, anatomy, and lab reports",
     h1: "Biology Assignment Help",
-    title: "Biology Assignment Help | Genetics, Ecology & Lab Reports | Acadibo",
+    title: "Biology Assignment Help | Genetics, Ecology & Lab Reports | Acadivo",
     description:
       "Get biology assignment help with genetics, cell biology, ecology, anatomy, physiology, and lab report writing from verified science tutors.",
     ogDescription:
@@ -226,7 +226,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "science",
     cardDesc: "Organic, inorganic, physical chemistry, and lab methodology",
     h1: "Chemistry Assignment Help",
-    title: "Chemistry Assignment Help | Organic, Physical & Lab Work | Acadibo",
+    title: "Chemistry Assignment Help | Organic, Physical & Lab Work | Acadivo",
     description:
       "Get chemistry assignment help with organic chemistry mechanisms, physical chemistry calculations, spectroscopy, and laboratory methodology.",
     ogDescription:
@@ -252,7 +252,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "settings_input_antenna",
     cardDesc: "Mechanics, thermodynamics, electromagnetism, and quantum theory",
     h1: "Physics Assignment Help",
-    title: "Physics Assignment Help | Mechanics, E&M & More | Acadibo",
+    title: "Physics Assignment Help | Mechanics, E&M & More | Acadivo",
     description:
       "Get physics assignment help with mechanics, thermodynamics, electromagnetism, optics, and quantum physics from verified tutors who show the reasoning.",
     ogDescription:
@@ -278,7 +278,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "precision_manufacturing",
     cardDesc: "Mechanical, civil, and electrical engineering principles and design",
     h1: "Engineering Assignment Help",
-    title: "Engineering Assignment Help | Mechanical, Civil & Electrical | Acadibo",
+    title: "Engineering Assignment Help | Mechanical, Civil & Electrical | Acadivo",
     description:
       "Get engineering assignment help with mechanics, circuits, thermodynamics, structures, and design projects from verified engineering tutors.",
     ogDescription:
@@ -304,7 +304,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "psychology_alt",
     cardDesc: "Cognitive, developmental, clinical, and social psychology",
     h1: "Psychology Assignment Help",
-    title: "Psychology Assignment Help | Research, Essays & Concepts | Acadibo",
+    title: "Psychology Assignment Help | Research, Essays & Concepts | Acadivo",
     description:
       "Get psychology assignment help with research papers, case studies, APA referencing, and core psychological concepts from verified tutors.",
     ogDescription:
@@ -331,7 +331,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "trending_up",
     cardDesc: "Microeconomics, macroeconomics, econometrics, and policy analysis",
     h1: "Economics Assignment Help",
-    title: "Economics Assignment Help | Micro, Macro & Econometrics | Acadibo",
+    title: "Economics Assignment Help | Micro, Macro & Econometrics | Acadivo",
     description:
       "Get economics assignment help with microeconomics, macroeconomics, econometrics, and policy analysis from verified economics tutors.",
     ogDescription:
@@ -357,7 +357,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "history_edu",
     cardDesc: "World history, historiography, and source analysis",
     h1: "History Assignment Help",
-    title: "History Assignment Help | Analysis, Sources & Essays | Acadibo",
+    title: "History Assignment Help | Analysis, Sources & Essays | Acadivo",
     description:
       "Get history assignment help with source analysis, historiography, essays, and period-specific context from verified tutors.",
     ogDescription:
@@ -382,7 +382,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "psychology",
     cardDesc: "Ethics, logic, political philosophy, and critical thinking",
     h1: "Philosophy Assignment Help",
-    title: "Philosophy Assignment Help | Ethics, Logic & Arguments | Acadibo",
+    title: "Philosophy Assignment Help | Ethics, Logic & Arguments | Acadivo",
     description:
       "Get philosophy assignment help with ethics, formal and informal logic, political philosophy, and argument analysis from verified tutors.",
     ogDescription:
@@ -408,7 +408,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "groups",
     cardDesc: "Social theory, research methods, and contemporary social issues",
     h1: "Sociology Assignment Help",
-    title: "Sociology Assignment Help | Theory, Methods & Social Issues | Acadibo",
+    title: "Sociology Assignment Help | Theory, Methods & Social Issues | Acadivo",
     description:
       "Get sociology assignment help with social theory, research methods, and contemporary social issues from verified tutors.",
     ogDescription:
@@ -433,7 +433,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "gavel",
     cardDesc: "Political theory, international relations, and public policy",
     h1: "Political Science Assignment Help",
-    title: "Political Science Assignment Help | Theory, IR & Policy | Acadibo",
+    title: "Political Science Assignment Help | Theory, IR & Policy | Acadivo",
     description:
       "Get political science assignment help with political theory, international relations, comparative politics, and public policy analysis.",
     ogDescription:
@@ -458,7 +458,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     icon: "local_hospital",
     cardDesc: "Nursing theory, patient care, pharmacology, and clinical practice",
     h1: "Nursing Assignment Help",
-    title: "Nursing Assignment Help | Care Plans, Pharmacology & Theory | Acadibo",
+    title: "Nursing Assignment Help | Care Plans, Pharmacology & Theory | Acadivo",
     description:
       "Get nursing assignment help with care plans, pharmacology, nursing theory, evidence-based practice, and clinical reflections from verified tutors.",
     ogDescription:

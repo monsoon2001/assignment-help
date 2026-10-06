@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "citations",
   title: "MLA Citation Guide: In-Text Citations & Works Cited",
   h1: "MLA Citation Guide: In-Text Citations & Works Cited",
-  seoTitle: "MLA Citation Guide: In-Text Citations & Works Cited | Acadibo",
+  seoTitle: "MLA Citation Guide: In-Text Citations & Works Cited | Acadivo",
   description:
     "An MLA 9th edition citation guide: parenthetical citations, Works Cited entries for books, articles, and websites, and how to cite with page numbers.",
   ogDescription:

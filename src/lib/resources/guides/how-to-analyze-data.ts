@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "technical",
   title: "How to Approach a Data Analysis Assignment",
   h1: "How to Approach a Data Analysis Assignment",
-  seoTitle: "How to Approach a Data Analysis Assignment | Acadibo",
+  seoTitle: "How to Approach a Data Analysis Assignment | Acadivo",
   description:
     "How to approach a data analysis assignment: checking your data, choosing appropriate tests, visualising results, and writing up what you found.",
   ogDescription:

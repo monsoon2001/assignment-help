@@ -7,8 +7,8 @@ import Input from "@/components/ui/input";
 import { Save } from "lucide-react";
 
 export default function AdminSettings() {
-  const [platformName, setPlatformName] = useState("Acadibo");
-  const [supportEmail, setSupportEmail] = useState("support@acadibo.com");
+  const [platformName, setPlatformName] = useState("Acadivo");
+  const [supportEmail, setSupportEmail] = useState("support@acadivo.com");
   const [minRate, setMinRate] = useState("15");
   const [maxRate, setMaxRate] = useState("80");
   const [platformFee, setPlatformFee] = useState("12");

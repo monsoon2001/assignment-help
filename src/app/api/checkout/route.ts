@@ -117,7 +117,7 @@ export async function POST(request: Request) {
 
   const origin = new URL(request.url).origin;
   const requestTitle = unwrapRow<{ title: string }>(proposal.request)?.title ?? null;
-  const title = requestTitle || "Acadibo Order";
+  const title = requestTitle || "Acadivo Order";
 
   const orderCurrency = normalizeCurrency(proposal.currency);
   const amountInPayCurrency = convertCurrency(
@@ -144,7 +144,7 @@ export async function POST(request: Request) {
             currency: payCurrency.toLowerCase(),
             product_data: {
               name: title,
-              description: proposal.description ?? "Acadibo academic order",
+              description: proposal.description ?? "Acadivo academic order",
             },
             unit_amount: priceCents,
           },

@@ -7,12 +7,12 @@ const subject = SUBJECT_CONTENT_BY_SLUG.get("philosophy")!;
 export const metadata: Metadata = {
   title: subject.title,
   description: subject.description,
-  alternates: { canonical: `https://acadibo.com/subjects/philosophy` },
+  alternates: { canonical: `https://acadivo.com/subjects/philosophy` },
   openGraph: {
     title: subject.title,
     description: subject.ogDescription,
     type: "website",
-    url: `https://acadibo.com/subjects/philosophy`,
+    url: `https://acadivo.com/subjects/philosophy`,
   },
 };
 

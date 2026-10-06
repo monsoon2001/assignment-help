@@ -73,7 +73,7 @@ export default function MessagesInbox({
   }, [refresh, isHelper]);
 
   const container = "w-full max-w-7xl mx-auto";
-  const fallbackName = isHelper ? "Student" : "Acadibo Helper";
+  const fallbackName = isHelper ? "Student" : "Acadivo Helper";
 
   return (
     <div className={container}>

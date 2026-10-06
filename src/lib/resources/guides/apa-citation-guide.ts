@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "citations",
   title: "APA Citation Guide: In-Text Citations & References",
   h1: "APA Citation Guide: In-Text Citations & References",
-  seoTitle: "APA Citation Guide: In-Text Citations & References | Acadibo",
+  seoTitle: "APA Citation Guide: In-Text Citations & References | Acadivo",
   description:
     "A practical APA 7th edition citation guide: in-text citation forms, journal, book, and webpage reference entries, and how to format author names and DOIs.",
   ogDescription:

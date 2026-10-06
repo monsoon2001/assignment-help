@@ -3,7 +3,7 @@ import { SUBJECT_CONTENT } from "@/lib/subject-content";
 import { ALL_RESOURCES, RESOURCE_CATEGORIES, resourcePath } from "@/lib/resources";
 import { SERVICE_PAGES } from "@/lib/services";
 
-const BASE_URL = "https://acadibo.com";
+const BASE_URL = "https://acadivo.com";
 
 const STATIC_ROUTES = [
   "",

@@ -10,7 +10,7 @@ import ReviewForm from "@/components/orders/review-form";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Leave a Review | Acadibo",
+  title: "Leave a Review | Acadivo",
 };
 
 export default async function OrderReviewPage({
@@ -75,7 +75,7 @@ export default async function OrderReviewPage({
         <div className="flex items-center gap-3 mb-4">
           <Avatar name={helper?.name || "Helper"} size="lg" online />
           <div className="min-w-0 flex-1">
-            <p className="font-display font-semibold text-on-surface">{helper?.name || "Acadibo Helper"}</p>
+            <p className="font-display font-semibold text-on-surface">{helper?.name || "Acadivo Helper"}</p>
             <p className="text-xs text-on-surface-variant truncate">{title}</p>
           </div>
           <div className="hidden sm:flex items-center gap-2 text-xs text-on-surface-variant">

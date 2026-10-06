@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "citations",
   title: "How to Avoid Plagiarism in Academic Writing",
   h1: "How to Avoid Plagiarism in Academic Writing",
-  seoTitle: "How to Avoid Plagiarism in Academic Writing | Acadibo",
+  seoTitle: "How to Avoid Plagiarism in Academic Writing | Acadivo",
   description:
     "What plagiarism is, the difference from misattribution and poor paraphrasing, and a practical process for citing correctly and keeping track of sources while you write.",
   ogDescription:

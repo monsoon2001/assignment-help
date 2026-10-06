@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "writing",
   title: "How to Proofread an Essay Before Submission",
   h1: "How to Proofread an Essay Before Submission",
-  seoTitle: "How to Proofread an Essay Before Submission | Acadibo",
+  seoTitle: "How to Proofread an Essay Before Submission | Acadivo",
   description:
     "A practical proofreading method for essays: how to proofread in separate passes, what to check at each stage, and how to catch errors that reading normally hides.",
   ogDescription:

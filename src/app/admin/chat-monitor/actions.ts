@@ -73,7 +73,7 @@ export async function issueWarning(formData: FormData): Promise<ActionResult> {
   await adminClient.from("notifications").insert({
     user_id: userId,
     type: "warning",
-    message: "You received a warning from Acadibo support.",
+    message: "You received a warning from Acadivo support.",
     link: null,
   });
 

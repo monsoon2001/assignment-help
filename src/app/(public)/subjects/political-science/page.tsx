@@ -7,12 +7,12 @@ const subject = SUBJECT_CONTENT_BY_SLUG.get("political-science")!;
 export const metadata: Metadata = {
   title: subject.title,
   description: subject.description,
-  alternates: { canonical: `https://acadibo.com/subjects/political-science` },
+  alternates: { canonical: `https://acadivo.com/subjects/political-science` },
   openGraph: {
     title: subject.title,
     description: subject.ogDescription,
     type: "website",
-    url: `https://acadibo.com/subjects/political-science`,
+    url: `https://acadivo.com/subjects/political-science`,
   },
 };
 

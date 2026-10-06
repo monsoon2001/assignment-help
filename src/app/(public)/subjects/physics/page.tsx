@@ -7,12 +7,12 @@ const subject = SUBJECT_CONTENT_BY_SLUG.get("physics")!;
 export const metadata: Metadata = {
   title: subject.title,
   description: subject.description,
-  alternates: { canonical: `https://acadibo.com/subjects/physics` },
+  alternates: { canonical: `https://acadivo.com/subjects/physics` },
   openGraph: {
     title: subject.title,
     description: subject.ogDescription,
     type: "website",
-    url: `https://acadibo.com/subjects/physics`,
+    url: `https://acadivo.com/subjects/physics`,
   },
 };
 

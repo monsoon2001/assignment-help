@@ -7,12 +7,12 @@ const subject = SUBJECT_CONTENT_BY_SLUG.get("engineering")!;
 export const metadata: Metadata = {
   title: subject.title,
   description: subject.description,
-  alternates: { canonical: `https://acadibo.com/subjects/engineering` },
+  alternates: { canonical: `https://acadivo.com/subjects/engineering` },
   openGraph: {
     title: subject.title,
     description: subject.ogDescription,
     type: "website",
-    url: `https://acadibo.com/subjects/engineering`,
+    url: `https://acadivo.com/subjects/engineering`,
   },
 };
 

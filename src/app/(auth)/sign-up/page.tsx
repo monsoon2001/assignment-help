@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   GraduationCap,
@@ -23,6 +23,10 @@ import { stampAuthAtCookie } from "@/lib/session-timebox";
 export default function SignUpPage() {
   const router = useRouter();
   const supabase = createClient();
+  // Preserved so a visitor who started the request form before signing up lands
+  // back on it with their saved draft.
+  const nextParam = useSearchParams().get("next");
+  const next = nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -62,7 +66,9 @@ export default function SignUpPage() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: next
+          ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
+          : `${window.location.origin}/auth/callback`,
         data: { name, role: "student" },
       },
     });
@@ -81,7 +87,11 @@ export default function SignUpPage() {
     setError(null);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: {
+        redirectTo: next
+          ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
+          : `${window.location.origin}/auth/callback`,
+      },
     });
     if (error) setError(error.message);
   }
@@ -94,7 +104,7 @@ export default function SignUpPage() {
             <span className="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">
               <GraduationCap size={18} />
             </span>
-            <span className="font-display font-bold text-on-surface text-lg">Acadibo</span>
+            <span className="font-display font-bold text-on-surface text-lg">Acadivo</span>
           </Link>
           <Link
             href="/"
@@ -104,52 +114,48 @@ export default function SignUpPage() {
           </Link>
         </header>
 
-        <main className="flex flex-1 items-center justify-center px-6 py-2 sm:px-10">
+        <main className="flex flex-1 items-center justify-center px-6 py-4 sm:px-10">
           <div className="w-full max-w-[420px]">
-            <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant overflow-hidden">
-              <div className="h-1.5 bg-gradient-to-r from-primary-container via-secondary-container to-tertiary-container" />
+            <div className="flex flex-col items-center text-center mb-5">
+              <span className="w-14 h-14 rounded-2xl bg-primary-container text-on-primary flex items-center justify-center mb-4 shadow-md shadow-primary-container/30">
+                <GraduationCap size={28} />
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-xs font-semibold mb-3">
+                <BadgeCheck size={12} />
+                Academic Network
+              </span>
+              <h1 className="font-display font-bold text-2xl text-on-surface">
+                Create your student account
+              </h1>
+              <p className="text-sm text-on-surface-variant mt-1.5">
+                Sign up with Google or get a verification link by email
+              </p>
+            </div>
 
-              <div className="px-7 pt-4 pb-2 flex flex-col items-center text-center">
-                <span className="w-12 h-12 rounded-2xl bg-primary-container text-on-primary flex items-center justify-center mb-3 shadow-md shadow-primary-container/30">
-                  <GraduationCap size={24} />
+            <div className="flex flex-col gap-4">
+              <button
+                type="button"
+                onClick={handleGoogle}
+                className="w-full h-11 flex items-center justify-center gap-2 border border-outline-variant rounded-lg text-sm font-medium text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                </svg>
+                Continue with Google
+              </button>
+
+              <div className="flex items-center gap-3 my-1">
+                <div className="flex-1 h-px bg-outline-variant" />
+                <span className="text-xs text-on-surface-variant font-medium">
+                  or register with email
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-xs font-semibold mb-2.5">
-                  <BadgeCheck size={12} />
-                  Academic Network
-                </span>
-                <h1 className="font-display font-bold text-xl text-on-surface">
-                  {stage === "email" ? "Create your student account" : "Verify your email"}
-                </h1>
-                <p className="text-sm text-on-surface-variant mt-1">
-                  {stage === "email"
-                    ? "Sign up with Google or get a verification link by email"
-                    : `Check your email for the verification link sent to ${email}`}
-                </p>
+                <div className="flex-1 h-px bg-outline-variant" />
               </div>
 
-              <div className="px-7 pb-7">
-                <button
-                  onClick={handleGoogle}
-                  className="w-full h-11 flex items-center justify-center gap-2 border border-outline-variant rounded-lg text-sm font-medium text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer mb-4"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                  </svg>
-                  Continue with Google
-                </button>
-
-                <div className="flex items-center gap-3 my-4">
-                  <div className="flex-1 h-px bg-outline-variant" />
-                  <span className="text-xs text-on-surface-variant font-medium">
-                    or register with email
-                  </span>
-                  <div className="flex-1 h-px bg-outline-variant" />
-                </div>
-
-                {stage === "email" ? (
+              {!sent ? (
                   <form className="flex flex-col gap-3.5" onSubmit={handleEmailSubmit}>
                     <Input
                       label="Full Name"
@@ -239,7 +245,7 @@ export default function SignUpPage() {
                       <ArrowRight size={18} />
                     </Button>
                   </form>
-                                ) : (
+                ) : (
                   <div className="flex flex-col gap-4">
                     <div className="rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm text-on-surface">
                       We&apos;ve sent you a verification link. Please check your email and click the link to verify your account. If you don&apos;t see it, check your spam folder.
@@ -256,3 +262,24 @@ export default function SignUpPage() {
                     </Button>
                   </div>
                 )}
+
+                <p className="text-center text-sm text-on-surface-variant mt-4">
+                  Already have an account?{" "}
+                  <Link
+                    href={next ? `/sign-in?next=${encodeURIComponent(next)}` : "/sign-in"}
+                    className="font-semibold text-primary hover:underline"
+                  >
+                    Sign In
+                  </Link>
+                </p>
+            </div>
+          </div>
+        </main>
+        <footer className="shrink-0 py-4 px-6 text-center text-xs text-on-surface-variant border-t border-outline-variant sm:px-10">
+          © {new Date().getFullYear()} Acadivo Academic Network. All rights reserved.
+        </footer>
+      </div>
+      <AuthShowcase />
+    </div>
+  );
+}

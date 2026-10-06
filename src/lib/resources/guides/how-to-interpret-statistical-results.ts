@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "technical",
   title: "How to Interpret Statistical Results in Academic Work",
   h1: "How to Interpret Statistical Results in Academic Work",
-  seoTitle: "How to Interpret Statistical Results in Academic Work | Acadibo",
+  seoTitle: "How to Interpret Statistical Results in Academic Work | Acadivo",
   description:
     "How to interpret statistical results for academic writing: what p-values, confidence intervals, effect sizes, and correlation coefficients actually tell you.",
   ogDescription:

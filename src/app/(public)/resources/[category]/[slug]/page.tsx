@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const resource = getResource(category, slug);
   if (!resource) return {};
 
-  const url = `https://acadibo.com/resources/${resource.category}/${resource.slug}`;
+  const url = `https://acadivo.com/resources/${resource.category}/${resource.slug}`;
 
   return {
     title: resource.seoTitle,
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       description: resource.ogDescription,
       type: "article",
       url,
-      siteName: "Acadibo",
+      siteName: "Acadivo",
     },
     twitter: {
       card: "summary_large_image",

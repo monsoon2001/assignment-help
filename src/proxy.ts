@@ -89,11 +89,6 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(home, request.url));
   }
 
-  // Signed-in users always land on their own dashboard, never the public homepage.
-  if (pathname === "/") {
-    return NextResponse.redirect(new URL(home, request.url));
-  }
-
   if (protectedArea === "student" && role !== "student") {
     return NextResponse.redirect(new URL(home, request.url));
   }

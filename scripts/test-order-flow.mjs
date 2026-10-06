@@ -25,8 +25,8 @@ const admin = createClient(url, secretKey, {
 });
 
 const password = "TestPass123!";
-const emailStudent = `p4.student.${Date.now()}@acadibo.test`;
-const emailHelper = `p4.helper.${Date.now()}@acadibo.test`;
+const emailStudent = `p4.student.${Date.now()}@acadivo.test`;
+const emailHelper = `p4.helper.${Date.now()}@acadivo.test`;
 
 let studentCreated, helperCreated, thirdCreated, requestId, proposalId, orderId;
 
@@ -265,7 +265,7 @@ let studentCreated, helperCreated, thirdCreated, requestId, proposalId, orderId;
 
   // 13. RLS: an unrelated third party cannot read order chat/deliveries/review the order again
   const { data: third, error: thirdErr } = await admin.auth.admin.createUser({
-    email: `p4.third.${Date.now()}@acadibo.test`, password, email_confirm: true,
+    email: `p4.third.${Date.now()}@acadivo.test`, password, email_confirm: true,
     user_metadata: { name: "P4 Third", role: "student" },
   });
   if (thirdErr) throw new Error(`create third user: ${thirdErr.message}`);

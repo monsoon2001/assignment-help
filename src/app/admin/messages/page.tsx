@@ -5,7 +5,7 @@ import AdminMessages from "@/app/admin/components/admin-messages";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Messages | Acadibo Admin",
+  title: "Messages | Acadivo Admin",
 };
 
 export default async function AdminMessagesPage() {

@@ -14,7 +14,7 @@ import CheckoutPanel from "@/components/orders/checkout-panel";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Payment | Acadibo",
+  title: "Payment | Acadivo",
 };
 
 export default async function OrderPaymentPage({
@@ -53,9 +53,9 @@ export default async function OrderPaymentPage({
     currency: typeof orderRow.currency === "string" ? orderRow.currency : "USD",
     status: orderRow.status,
     deadline: orderRow.deadline as string | null,
-    title: request?.title ?? "Acadibo Order",
+    title: request?.title ?? "Acadivo Order",
     country: request?.country ?? null,
-    helperName: helper?.name ?? "Acadibo Helper",
+    helperName: helper?.name ?? "Acadivo Helper",
   };
 
   if (order.status !== "payment_pending") {
@@ -109,7 +109,7 @@ export default async function OrderPaymentPage({
               <p className="font-semibold text-on-surface truncate">{order.helperName}</p>
               <ShieldCheck size={15} className="text-primary shrink-0" />
             </div>
-            <p className="text-xs text-on-surface-variant">Acadibo verified mentor</p>
+            <p className="text-xs text-on-surface-variant">Acadivo verified mentor</p>
           </div>
         </div>
 

@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "presentations",
   title: "How to Write a Personal Statement",
   h1: "How to Write a Personal Statement",
-  seoTitle: "How to Write a Personal Statement | Acadibo",
+  seoTitle: "How to Write a Personal Statement | Acadivo",
   description:
     "How to write a personal statement for university or job applications: selecting material, structuring it, showing motivation honestly, and proofreading.",
   ogDescription:

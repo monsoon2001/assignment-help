@@ -16,7 +16,7 @@ import { normalizeCurrency, formatCurrency } from "@/lib/currency";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Payment Confirmed | Acadibo",
+  title: "Payment Confirmed | Acadivo",
 };
 
 export default async function OrderConfirmedPage({
@@ -52,7 +52,7 @@ export default async function OrderConfirmedPage({
 
   const proposal = unwrapRow<{ request: { title: string }[] | { title: string } | null; helper: { id: string; name: string }[] | { id: string; name: string } | null }>(orderRow.proposal);
   const helper = unwrapRow<{ id: string; name: string }>(proposal?.helper);
-  const title = unwrapRow<{ title: string }>(proposal?.request)?.title ?? "Acadibo Order";
+  const title = unwrapRow<{ title: string }>(proposal?.request)?.title ?? "Acadivo Order";
 
   // Confirm the checkout session is genuinely bound to this order before
   // showing any "paid" state. The webhook performs the authoritative write.
@@ -140,7 +140,7 @@ export default async function OrderConfirmedPage({
             <p className="text-[11px] text-on-surface-variant uppercase tracking-wide">Helper</p>
             <div className="flex items-center gap-2 mt-1">
               <Avatar name={helper?.name || "Helper"} size="sm" />
-              <p className="text-sm font-semibold text-on-surface truncate">{helper?.name || "Acadibo Helper"}</p>
+              <p className="text-sm font-semibold text-on-surface truncate">{helper?.name || "Acadivo Helper"}</p>
             </div>
           </div>
         </div>
@@ -181,7 +181,7 @@ export default async function OrderConfirmedPage({
       <div className="flex items-start gap-2 p-4 rounded-xl bg-surface-container-low">
         <ShieldCheck size={17} className="text-primary shrink-0 mt-0.5" />
         <p className="text-xs leading-relaxed text-on-surface-variant">
-          Protected by the <span className="font-semibold text-on-surface">Acadibo Academic Guarantee</span>:{" "}
+          Protected by the <span className="font-semibold text-on-surface">Acadivo Academic Guarantee</span>:{" "}
           <span className="font-semibold text-on-surface inline-flex items-center gap-1"><Timer size={11} /> unlimited revisions</span>{" "}
           until you&apos;re satisfied. Funds release to the mentor only after your review.
         </p>

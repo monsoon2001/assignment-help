@@ -156,15 +156,15 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://acadibo.com" },
-      { "@type": "ListItem", position: 2, name: "Resources", item: "https://acadibo.com/resources" },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://acadivo.com" },
+      { "@type": "ListItem", position: 2, name: "Resources", item: "https://acadivo.com/resources" },
       {
         "@type": "ListItem",
         position: 3,
         name: category?.name ?? "Guides",
-        item: `https://acadibo.com/resources/${resource.category}`,
+        item: `https://acadivo.com/resources/${resource.category}`,
       },
-      { "@type": "ListItem", position: 4, name: resource.title, item: `https://acadibo.com${path}` },
+      { "@type": "ListItem", position: 4, name: resource.title, item: `https://acadivo.com${path}` },
     ],
   };
 

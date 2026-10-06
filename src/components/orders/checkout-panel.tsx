@@ -79,7 +79,7 @@ export default function CheckoutPanel({
               <span className="font-medium text-on-surface">{formatCurrency(helperReceives, currency)}</span>
             </div>
             <div className="flex items-center justify-between px-4 py-3 border-b border-outline-variant/80 text-sm">
-              <span className="text-on-surface-variant">Acadibo service fee</span>
+              <span className="text-on-surface-variant">Acadivo service fee</span>
               <span className="font-medium text-on-surface">{formatCurrency(fee, currency)}</span>
             </div>
             <div className="flex items-center justify-between px-4 py-3 bg-primary-container/10 text-sm">

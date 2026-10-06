@@ -21,7 +21,7 @@ export default function AdminSidebar() {
       <div className="flex items-center gap-3 mb-4 px-3">
         <div className="flex items-center gap-2">
           <span className="text-primary-container text-xl">◆</span>
-          <span className="font-display text-lg font-semibold tracking-tight text-on-surface">Acadibo</span>
+          <span className="font-display text-lg font-semibold tracking-tight text-on-surface">Acadivo</span>
         </div>
         <span className="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-xs font-semibold uppercase tracking-wider">Admin</span>
       </div>

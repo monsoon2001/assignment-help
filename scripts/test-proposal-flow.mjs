@@ -25,8 +25,8 @@ const admin = createClient(url, secretKey, {
 });
 
 const password = "TestPass123!";
-const emailStudent = `p3.student.${Date.now()}@acadibo.test`;
-const emailHelper = `p3.helper.${Date.now()}@acadibo.test`;
+const emailStudent = `p3.student.${Date.now()}@acadivo.test`;
+const emailHelper = `p3.helper.${Date.now()}@acadivo.test`;
 
 let studentCreated;
 let helperCreated;

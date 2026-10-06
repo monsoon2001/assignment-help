@@ -38,7 +38,7 @@ export default function WarningsBannerClient() {
         <ShieldAlert size={18} className="text-error shrink-0 mt-0.5" />
         <div className="text-sm text-on-surface">
           <span className="font-semibold">
-            You have {warnings.length} warning{warnings.length !== 1 ? "s" : ""} from Acadibo support.
+            You have {warnings.length} warning{warnings.length !== 1 ? "s" : ""} from Acadivo support.
           </span>
           <ul className="mt-1 list-disc list-inside text-on-surface-variant text-xs space-y-0.5">
             {warnings.map((w) => (

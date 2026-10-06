@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "projects",
   title: "How to Write a Research Paper",
   h1: "How to Write a Research Paper",
-  seoTitle: "How to Write a Research Paper | Acadibo",
+  seoTitle: "How to Write a Research Paper | Acadivo",
   description:
     "How to write a research paper: the standard IMRaD structure, how to turn a question into a paper, planning chapters, and writing a results section that supports your argument.",
   ogDescription:

@@ -12,6 +12,6 @@ export default function robots(): MetadataRoute.Robots {
         '/api/',
       ],
     },
-    sitemap: 'https://acadibo.com/sitemap.xml',
+    sitemap: 'https://acadivo.com/sitemap.xml',
   }
 }

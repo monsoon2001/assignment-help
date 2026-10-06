@@ -64,7 +64,7 @@ export default function AuthShowcase() {
             from someone who has done it.
           </h2>
           <p className="mt-4 max-w-lg text-sm leading-relaxed text-inverse-on-surface/70">
-            Acadibo connects students with verified peer helpers across {SUBJECTS.length} subjects
+            Acadivo connects students with verified peer helpers across {SUBJECTS.length} subjects
             and {SERVICE_TYPES.length} types of help. Helpers teach and review — they never write
             your submission for you.
           </p>

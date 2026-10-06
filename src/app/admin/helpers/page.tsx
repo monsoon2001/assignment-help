@@ -13,7 +13,7 @@ import { EmptyState } from "@/components/ui/states";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Helpers | Acadibo Admin",
+  title: "Helpers | Acadivo Admin",
 };
 
 function formatDate(iso: string | null | undefined): string {

@@ -24,7 +24,7 @@ const admin = createClient(url, secretKey, {
   realtime: { transport: WebSocket },
 });
 
-const email = `test.student.${Date.now()}@acadibo.test`;
+const email = `test.student.${Date.now()}@acadivo.test`;
 
 (async () => {
   // 1. Create a user directly with confirmed email (service role), role defaults to student via trigger

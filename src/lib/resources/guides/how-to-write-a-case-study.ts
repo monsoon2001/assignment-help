@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "research",
   title: "How to Write a Case Study: A Step-by-Step Guide",
   h1: "How to Write a Case Study: A Step-by-Step Guide",
-  seoTitle: "How to Write a Case Study: Step-by-Step Guide | Acadibo",
+  seoTitle: "How to Write a Case Study: Step-by-Step Guide | Acadivo",
   description:
     "How to write a case study: choosing a case, gathering evidence, applying analytical frameworks, and structuring the write-up so the analysis drives the narrative.",
   ogDescription:

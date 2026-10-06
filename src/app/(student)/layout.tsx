@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Home, Plus } from "lucide-react";
 import Header from "@/components/layout/header";
 import StudentNav from "@/components/layout/student-nav";
 import RoleBottomNav from "@/components/layout/role-bottom-nav";
@@ -52,13 +52,20 @@ export default async function StudentLayout({ children }: { children: React.Reac
           </p>
           <StudentNav items={navItems} />
 
-          <div className="mt-auto pt-4">
+          <div className="mt-auto pt-4 flex flex-col gap-2">
             <Link
               href="/requests/new"
               className="flex items-center justify-center gap-2 w-full px-3 py-2.5 rounded-lg bg-primary text-on-primary text-sm font-semibold hover:bg-primary/90 transition-colors"
             >
               <Plus size={16} />
               Request Help
+            </Link>
+            <Link
+              href="/"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors"
+            >
+              <Home size={16} />
+              Back to homepage
             </Link>
           </div>
         </aside>
@@ -79,11 +86,12 @@ export default async function StudentLayout({ children }: { children: React.Reac
           { href: "/notifications", label: "Notifications", icon: "notifications", badge: notifCount > 0 ? notifCount : undefined },
           { href: "/profile", label: "Profile", icon: "profile" },
           { href: "/requests/new", label: "Request Help", icon: "new_request" },
+          { href: "/", label: "Home", icon: "home" },
         ]}
       />
 
       <footer className="py-5 text-center text-xs text-on-surface-variant border-t border-outline-variant bg-surface-container-lowest pb-24 md:pb-5">
-        © {new Date().getFullYear()} Acadibo Academic Network for Eastview University. Connect with your academic
+        © {new Date().getFullYear()} Acadivo Academic Network. Students worldwide — connect with your academic
         integrity office for questions.
       </footer>
     </div>

@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "research",
   title: "How to Write a Literature Review",
   h1: "How to Write a Literature Review",
-  seoTitle: "How to Write a Literature Review | Acadibo",
+  seoTitle: "How to Write a Literature Review | Acadivo",
   description:
     "How to write a literature review: searching the field, organising sources thematically, writing a critical synthesis rather than a summary, and structuring your critique.",
   ogDescription:

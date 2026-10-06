@@ -1,21 +1,26 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { FileText, Upload, Info, CheckCircle2, ShieldCheck, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
-import Button from "@/components/ui/button";
+import { FileText, Info, CheckCircle2, ShieldCheck, Loader2, ArrowLeft } from "lucide-react";
 import Card from "@/components/ui/card";
-import Select from "@/components/ui/select";
-import Input from "@/components/ui/input";
-import Textarea from "@/components/ui/textarea";
 import HelperPicker from "@/components/requests/helper-picker";
+import TaskRequestForm, {
+  HELP_TYPE_OPTIONS,
+  LAST_DUE_TIME,
+  WORDS_PER_PAGE,
+  normalizePages,
+  SUBJECT_OPTIONS,
+  type TaskRequestField,
+  type TaskRequestFormValues,
+} from "@/components/requests/task-request-form";
 import {
   submitRequest, loadPendingDraft, clearPendingDraft, loadDraftFiles, clearDraftFiles,
   type HelperCandidate,
 } from "@/lib/requests";
 
-import { SUBJECTS, SERVICE_TYPES, ACADEMIC_LEVELS, OTHER_OPTION, withCustom } from "@/lib/constants";
-import { COUNTRIES, defaultCurrencyForCountry, convertCurrency, formatCurrency } from "@/lib/currency";
+import { OTHER_OPTION, withCustom } from "@/lib/constants";
+import { DEFAULT_COUNTRY, convertCurrency, formatCurrency, defaultCurrencyForCountry } from "@/lib/currency";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Indicative bands, quoted in USD and converted to the student's currency.
@@ -26,31 +31,18 @@ const PRICING_BANDS = [
   { label: "Research help (per hour)", from: 20, to: 40 },
 ];
 
-const SERVICES = [
-  ...SERVICE_TYPES.map((label, i) => ({ value: `service-${i}`, label })),
-  { value: OTHER_OPTION, label: OTHER_OPTION },
-];
-
-const SUBJECT_OPTIONS = [
-  ...SUBJECTS.map((label, i) => ({ value: `subject-${i}`, label })),
-  { value: OTHER_OPTION, label: OTHER_OPTION },
-];
-
-const LEVEL_OPTIONS = ACADEMIC_LEVELS.map((label) => ({ value: label, label }));
-
-const COUNTRY_OPTIONS = COUNTRIES.map((label) => ({ value: label, label }));
-
-function resolveDraftSelection(options: { value: string; label: string }[], value?: string): { value: string; custom: string } {
-  if (!value) return { value: options[0].value, custom: "" };
+function resolveDraftSelection(options: readonly string[], value?: string): { value: string; custom: string } {
+  if (!value) return { value: "", custom: "" };
   const parsed = withCustom(value);
   if (parsed.isOther) return { value: OTHER_OPTION, custom: parsed.raw };
   const match =
-    options.find((o) => o.label === parsed.value) ??
-    options.find((o) =>
-      o.label.toLowerCase().includes(parsed.value.toLowerCase()) ||
-      parsed.value.toLowerCase().includes(o.label.toLowerCase())
+    options.find((o) => o.toLowerCase() === parsed.value.toLowerCase()) ??
+    options.find(
+      (o) =>
+        o.toLowerCase().includes(parsed.value.toLowerCase()) ||
+        parsed.value.toLowerCase().includes(o.toLowerCase())
     );
-  if (match) return { value: match.value, custom: "" };
+  if (match) return { value: match, custom: "" };
   return { value: OTHER_OPTION, custom: parsed.value };
 }
 
@@ -70,21 +62,33 @@ function deadlineFromKey(key?: string): string {
 export default function NewRequestPage() {
   const router = useRouter();
   const [ready, setReady] = useState(false);
-  const [service, setService] = useState(SERVICES[0].value);
-  const [customService, setCustomService] = useState("");
-  const [subject, setSubject] = useState(SUBJECT_OPTIONS[0].value);
-  const [customSubject, setCustomSubject] = useState("");
-  const [wordCount, setWordCount] = useState("");
-  const [deadline, setDeadline] = useState("");
-  const [description, setDescription] = useState("");
-  const [files, setFiles] = useState<File[]>([]);
-  const [completedLevel, setCompletedLevel] = useState("");
-  const [country, setCountry] = useState("United States");
+  const [values, setValues] = useState<TaskRequestFormValues>({
+    subject: "",
+    customSubject: "",
+    helpType: "",
+    customHelpType: "",
+    level: "",
+    deadline: "",
+    dueTime: "",
+    pages: "",
+    details: "",
+    files: [],
+  });
   const [step, setStep] = useState<"details" | "helper">("details");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const set = useCallback(<K extends TaskRequestField>(
+    key: K,
+    value: TaskRequestFormValues[K]
+  ) => {
+    setValues((prev) => ({ ...prev, [key]: value }));
+    setError("");
+  }, []);
+
+  // Restores the draft the homepage estimate form saved across sign-in/sign-up.
+  // The details step stays on screen (filled in) so the student can review it
+  // before choosing a helper.
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -93,19 +97,22 @@ export default function NewRequestPage() {
       if (cancelled) return;
       if (d) clearPendingDraft();
       if (d) {
-        const dd = resolveDraftSelection(SERVICES, d.service);
-        setService(dd.value);
-        setCustomService(dd.custom);
+        const dd = resolveDraftSelection(HELP_TYPE_OPTIONS, d.service);
         const ds = resolveDraftSelection(SUBJECT_OPTIONS, d.subject);
-        setSubject(ds.value);
-        setCustomSubject(ds.custom);
-        setWordCount(d.wordCount ?? "");
-        setDeadline(d.deadline ?? (d.deadlineKey ? deadlineFromKey(d.deadlineKey) : ""));
-        setDescription(d.details ?? "");
-        setCompletedLevel(d.level ?? "");
-        setStep("helper");
+        setValues((prev) => ({
+          ...prev,
+          helpType: dd.value,
+          customHelpType: dd.custom,
+          subject: ds.value,
+          customSubject: ds.custom,
+          pages: normalizePages(d.wordCount),
+          deadline: d.deadline ?? (d.deadlineKey ? deadlineFromKey(d.deadlineKey) : prev.deadline),
+          dueTime: d.dueTime ?? prev.dueTime,
+          details: d.details ?? prev.details,
+          level: d.level ?? prev.level,
+        }));
       }
-      if (saved.length > 0) setFiles(saved);
+      if (saved.length > 0) setValues((prev) => ({ ...prev, files: saved }));
       setReady(true);
     })();
     return () => {
@@ -113,45 +120,46 @@ export default function NewRequestPage() {
     };
   }, []);
 
-  const today = new Date().toISOString().slice(0, 10);
+  const resolvedHelpType =
+    values.helpType === OTHER_OPTION && values.customHelpType.trim()
+      ? values.customHelpType.trim()
+      : values.helpType;
 
-  const handleFiles = (selected: FileList | null) => {
-    if (!selected) return;
-    setFiles(Array.from(selected));
-  };
+  const resolvedSubject =
+    values.subject === OTHER_OPTION && values.customSubject.trim()
+      ? values.customSubject.trim()
+      : values.subject;
 
-  const resolvedServiceLabel =
-    service === OTHER_OPTION && customService.trim()
-      ? customService.trim()
-      : (SERVICES.find((s) => s.value === service)?.label ?? service);
-
-  const resolvedSubjectLabel =
-    subject === OTHER_OPTION && customSubject.trim()
-      ? customSubject.trim()
-      : (SUBJECT_OPTIONS.find((s) => s.value === subject)?.label ?? subject);
-
-  const quoteCurrency = defaultCurrencyForCountry(country);
+  const quoteCurrency = defaultCurrencyForCountry(DEFAULT_COUNTRY);
 
   const handleContinue = () => {
     setError("");
-    if (service === OTHER_OPTION && !customService.trim()) {
-      setError("Enter the type of help you need.");
+    if (values.helpType === OTHER_OPTION && !values.customHelpType.trim()) {
+      setError("Please select the type of help you need.");
       return;
     }
-    if (subject === OTHER_OPTION && !customSubject.trim()) {
-      setError("Enter the subject or course you need help with.");
+    if (!resolvedHelpType) {
+      setError("Please select the type of help you need.");
       return;
     }
-    if (!completedLevel) {
-      setError("Select your academic level.");
+    if (values.subject === OTHER_OPTION && !values.customSubject.trim()) {
+      setError("Please select a subject.");
       return;
     }
-    if (!country) {
-      setError("Select your country so we can bill you in the right currency.");
+    if (!resolvedSubject) {
+      setError("Please select a subject.");
       return;
     }
-    if (!description.trim() && !wordCount.trim()) {
-      setError("Add a short description or a word count so a helper can assess the scope.");
+    if (!values.level) {
+      setError("Please select your academic level.");
+      return;
+    }
+    if (!values.deadline) {
+      setError("Please choose a deadline.");
+      return;
+    }
+    if (!values.details.trim() && !values.pages.trim()) {
+      setError("Add pages/words or a short description so a helper can assess the scope.");
       return;
     }
     setStep("helper");
@@ -161,13 +169,14 @@ export default function NewRequestPage() {
     setSubmitting(true);
     setError("");
 
-    const serviceLabel = resolvedServiceLabel;
-    const title = `${serviceLabel} — ${resolvedSubjectLabel}`;
+    const title = `${resolvedHelpType} — ${resolvedSubject}`;
     const descriptionWithMeta = [
-      description,
-      completedLevel ? `Academic level: ${completedLevel}` : "",
-      wordCount ? `Expected length: ${wordCount}` : "",
-      country ? `Country: ${country} (bills in ${defaultCurrencyForCountry(country)})` : "",
+      values.details,
+      values.level ? `Academic level: ${values.level}` : "",
+      values.pages
+        ? `Expected length: ${values.pages} page${Number(values.pages) === 1 ? "" : "s"} (approx ${(Number(values.pages) || 0) * WORDS_PER_PAGE} words)`
+        : "",
+      `Country: ${DEFAULT_COUNTRY} (bills in ${defaultCurrencyForCountry(DEFAULT_COUNTRY)})`,
     ]
       .filter(Boolean)
       .join("\n\n");
@@ -175,10 +184,12 @@ export default function NewRequestPage() {
     const result = await submitRequest({
       title,
       description: descriptionWithMeta || undefined,
-      subject: resolvedSubjectLabel,
-      country,
-      deadline: deadline ? new Date(`${deadline}T23:59:59`).toISOString() : null,
-      files,
+      subject: resolvedSubject,
+      country: DEFAULT_COUNTRY,
+      deadline: values.deadline
+        ? new Date(`${values.deadline}T${values.dueTime || LAST_DUE_TIME}:00`).toISOString()
+        : null,
+      files: values.files,
       helper_id: helper.user_id,
     });
 
@@ -230,161 +241,43 @@ export default function NewRequestPage() {
           </div>
 
           {!ready ? (
-            <div className="flex flex-col gap-5" aria-busy="true" aria-live="polite">
+            <div className="flex flex-col gap-3" aria-busy="true" aria-live="polite">
               <span className="sr-only">Preparing your request…</span>
-              <div className="grid gap-5 sm:grid-cols-2">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="flex flex-col gap-2">
-                    <Skeleton className="h-3.5 w-28" />
-                    <Skeleton className="h-10 w-full rounded-xl" />
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {Array.from({ length: 2 }).map((_, i) => (
+                  <div key={i} className="flex flex-col gap-1">
+                    <Skeleton className="h-3 w-24" />
+                    <Skeleton className="h-10 w-full rounded-lg" />
                   </div>
                 ))}
               </div>
-              <div className="flex flex-col gap-2">
-                <Skeleton className="h-3.5 w-32" />
-                <Skeleton className="h-28 w-full rounded-xl" />
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="flex flex-col gap-1">
+                    <Skeleton className="h-3 w-24" />
+                    <Skeleton className="h-10 w-full rounded-lg" />
+                  </div>
+                ))}
               </div>
-              <Skeleton className="h-11 w-40 rounded-xl" />
+              <div className="flex flex-col gap-1">
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="h-10 w-full rounded-lg" />
+              </div>
+              <Skeleton className="h-16 w-full rounded-lg" />
+              <Skeleton className="h-11 w-full rounded-xl" />
             </div>
           ) : step === "details" ? (
-            <form className="flex flex-col gap-5" onSubmit={(e) => { e.preventDefault(); handleContinue(); }}>
-              <div className="flex flex-col gap-3">
-                <Select
-                  label="Type of Help"
-                  value={service}
-                  onChange={(e) => setService(e.target.value)}
-                  options={SERVICES}
-                />
-                {service === OTHER_OPTION && (
-                  <Input
-                    label="Type of help needed"
-                    type="text"
-                    placeholder="e.g. Lab Report"
-                    value={customService}
-                    onChange={(e) => setCustomService(e.target.value)}
-                  />
-                )}
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <Select
-                  label="Subject"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  options={SUBJECT_OPTIONS}
-                />
-                {subject === OTHER_OPTION && (
-                  <Input
-                    label="Subject or course name"
-                    type="text"
-                    placeholder="e.g. Communications 101"
-                    value={customSubject}
-                    onChange={(e) => setCustomSubject(e.target.value)}
-                  />
-                )}
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <Select
-                  label="Academic Level"
-                  value={completedLevel}
-                  onChange={(e) => setCompletedLevel(e.target.value)}
-                  options={LEVEL_OPTIONS}
-                />
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <Select
-                  label="Your Country"
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value)}
-                  options={COUNTRY_OPTIONS}
-                />
-                <p className="text-xs text-on-surface-variant -mt-1">
-                  Sets your default payment currency to{" "}
-                  <span className="font-semibold text-on-surface">
-                    {defaultCurrencyForCountry(country)}
-                  </span>{" "}
-                  once you accept a helper&apos;s offer. You can still change it at checkout.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <Input
-                  label="Word Count"
-                  type="text"
-                  placeholder="e.g. 1500"
-                  value={wordCount}
-                  onChange={(e) => setWordCount(e.target.value)}
-                />
-                <Input
-                  label="Deadline"
-                  type="date"
-                  min={today}
-                  value={deadline}
-                  onChange={(e) => setDeadline(e.target.value)}
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-on-surface">Assignment Details</label>
-                <Textarea
-                  rows={7}
-                  placeholder="Describe the assignment prompt, required format, sources, and any rubric or expectations from your course..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-                <p className="text-xs text-on-surface-variant">
-                  Share the full prompt so your helper can match scope. Never share account credentials.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-on-surface">Attachments</label>
-                <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-outline-variant bg-surface-container-low px-6 py-8 text-center cursor-pointer hover:border-primary-container hover:bg-surface-container-lowest transition-colors">
-                  <span className="w-11 h-11 rounded-xl bg-surface-container-lowest border border-outline-variant flex items-center justify-center text-on-surface-variant">
-                    <Upload size={20} />
-                  </span>
-                  <p className="text-sm font-medium text-on-surface">
-                    {files.length > 0 ? (
-                      <>
-                        {files.length} file{files.length > 1 ? "s" : ""} selected —{" "}
-                        <span className="text-primary font-semibold">choose more</span>
-                      </>
-                    ) : (
-                      <>
-                        Drop files here or <span className="text-primary font-semibold">browse</span>
-                      </>
-                    )}
-                  </p>
-                  <p className="text-xs text-on-surface-variant">
-                    PDF, DOCX, XLSX up to 25MB each. Prompt PDFs, rubrics, and data sets welcome.
-                  </p>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    multiple
-                    className="hidden"
-                    onChange={(e) => handleFiles(e.target.files)}
-                  />
-                </label>
-              </div>
-
-              {error && (
-                <p className="text-sm text-error bg-error-container/40 border border-error/30 rounded-lg px-3 py-2">
-                  {error}
-                </p>
-              )}
-
-              <div className="flex items-center justify-between pt-3 border-t border-outline-variant">
-                <p className="text-xs text-on-surface-variant">
-                  Next you&apos;ll choose a helper. No charge until a bid is accepted.
-                </p>
-                <Button type="submit" size="lg">
-                  Continue to Choose Helper <ArrowRight size={16} className="ml-1.5" />
-                </Button>
-              </div>
-            </form>
+            <TaskRequestForm
+              values={values}
+              set={set}
+              error={error}
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleContinue();
+              }}
+              submitLabel="Continue to Choose Helper"
+              note="Next you’ll choose a helper. No charge until a bid is accepted."
+            />
           ) : (
             <div className="flex flex-col gap-5">
               <div className="rounded-xl border border-outline-variant bg-surface-container-low p-4">
@@ -398,28 +291,34 @@ export default function NewRequestPage() {
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-on-surface-variant">
-                  <span><strong className="text-on-surface">{resolvedServiceLabel}</strong></span>
-                  <span>{resolvedSubjectLabel}</span>
-                  {completedLevel && <span>{completedLevel}</span>}
-                  {wordCount && <span>{wordCount}</span>}
-                  {country && (
+                  <span><strong className="text-on-surface">{resolvedHelpType}</strong></span>
+                  <span>{resolvedSubject}</span>
+                  {values.level && <span>{values.level}</span>}
+                  {values.pages && (
                     <span>
-                      {country} · pays in {defaultCurrencyForCountry(country)}
+                      {values.pages} page{Number(values.pages) === 1 ? "" : "s"} · approx{" "}
+                      {((Number(values.pages) || 0) * WORDS_PER_PAGE).toLocaleString()} words
                     </span>
                   )}
-                  {deadline && (
+                  {values.deadline && (
                     <span>
-                      Due {new Date(`${deadline}T23:59:59`).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      Due{" "}
+                      {new Date(`${values.deadline}T${values.dueTime || LAST_DUE_TIME}:00`).toLocaleString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
                     </span>
                   )}
-                  {files.length > 0 && <span>{files.length} attachment{files.length > 1 ? "s" : ""}</span>}
+                  {values.files.length > 0 && <span>{values.files.length} attachment{values.files.length > 1 ? "s" : ""}</span>}
                 </div>
               </div>
 
               <HelperPicker
-                subject={resolvedSubjectLabel}
+                subject={resolvedSubject}
                 onSelect={handlePick}
-                heading={`Helpers for ${resolvedSubjectLabel}`}
+                heading={`Helpers for ${resolvedSubject}`}
               />
 
               {error && (
@@ -454,7 +353,7 @@ export default function NewRequestPage() {
               ))}
             </div>
             <p className="text-xs text-on-surface-variant mt-3 leading-relaxed">
-              Shown in <span className="font-semibold">{quoteCurrency}</span> for {country}. Your
+              Shown in <span className="font-semibold">{quoteCurrency}</span>. Your
               helper responds in the request chat within <span className="font-semibold">2 hours</span> or you can
               choose someone else. Rush orders under 12 hours carry a <span className="font-semibold">+25%</span> premium.
             </p>
@@ -463,7 +362,7 @@ export default function NewRequestPage() {
           <Card className="p-5 bg-surface-container-low border border-outline-variant">
             <div className="flex items-center gap-2 mb-2">
               <ShieldCheck size={16} className="text-success" />
-              <h3 className="font-semibold text-sm text-on-surface">Why students trust Acadibo</h3>
+              <h3 className="font-semibold text-sm text-on-surface">Why students trust Acadivo</h3>
             </div>
             <ul className="space-y-2 text-xs text-on-surface-variant leading-relaxed">
               <li className="flex items-start gap-2">

@@ -104,7 +104,7 @@ export default function HelperPicker({
       <h3 className="font-display font-semibold text-on-surface mb-3">{heading}</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {helpers.map((helper) => {
-          const name = helper.user?.name || "Acadibo Helper";
+          const name = helper.user?.name || "Acadivo Helper";
           const initials = name
             .split(/\s+/)
             .map((p) => p[0])

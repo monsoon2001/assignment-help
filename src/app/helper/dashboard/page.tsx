@@ -2,7 +2,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
-import Avatar from "@/components/ui/avatar";
 import {
   Briefcase,
   DollarSign,
@@ -10,7 +9,6 @@ import {
   Star,
   ArrowUpRight,
   FileText,
-  Send,
   Settings,
   Inbox,
 } from "lucide-react";
@@ -94,7 +92,6 @@ export default async function HelperDashboard() {
 
   const activeOrders = orders.filter((o) => o.status !== "completed");
   const awaitingReview = orders.filter((o) => o.status === "delivered").length;
-  const completed = orders.filter((o) => o.status === "completed").length;
   const incoming = reqRows ?? [];
 
   const monthPaid = (payRows ?? []).filter(
@@ -286,18 +283,6 @@ export default async function HelperDashboard() {
         </div>
       </div>
 
-      <Card className="p-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <Avatar name={firstName} size="sm" />
-          <div>
-            <p className="text-sm font-medium text-on-surface">{completed} completed order{completed === 1 ? "" : "s"}</p>
-            <p className="text-xs text-on-surface-variant">{activeOrders.length} order{activeOrders.length === 1 ? "" : "s"} currently active</p>
-          </div>
-        </div>
-        <Link href="/helper/profile">
-          <Button size="sm" variant="outline"><Send size={14} /> Edit profile</Button>
-        </Link>
-      </Card>
     </div>
   );
 }

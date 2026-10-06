@@ -170,7 +170,7 @@ export default function ProposalCard({
         <Avatar name={proposal.helper?.name || "Helper"} size="sm" />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold text-on-surface truncate">
-            {proposal.helper?.name || "Acadibo Helper"}
+            {proposal.helper?.name || "Acadivo Helper"}
           </p>
           <p className="text-[11px] text-on-surface-variant">
             Proposed {new Date(proposal.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}

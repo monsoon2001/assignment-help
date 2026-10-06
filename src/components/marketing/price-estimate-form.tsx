@@ -1,39 +1,85 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { ArrowRight, Upload } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import TaskRequestForm, {
+  normalizePages,
+  type TaskRequestField,
+  type TaskRequestFormValues,
+} from "@/components/requests/task-request-form";
 import { createClient } from "@/lib/supabase/client";
-import { savePendingDraft, saveDraftFiles } from "@/lib/requests";
-import { SUBJECTS, SERVICE_TYPES, ACADEMIC_LEVELS, OTHER_OPTION, composeSelection } from "@/lib/constants";
+import { savePendingDraft, saveDraftFiles, loadPendingDraft } from "@/lib/requests";
+import { OTHER_OPTION, composeSelection } from "@/lib/constants";
 
-const SUBJECT_OPTIONS = [...SUBJECTS, OTHER_OPTION];
-const HELP_TYPE_OPTIONS = [...SERVICE_TYPES, OTHER_OPTION];
+const BLANK: TaskRequestFormValues = {
+  subject: "",
+  customSubject: "",
+  helpType: "",
+  customHelpType: "",
+  level: "",
+  deadline: "",
+  dueTime: "",
+  pages: "",
+  details: "",
+  files: [],
+};
 
 export default function PriceEstimateForm() {
   const router = useRouter();
-  const [subject, setSubject] = useState("");
-  const [customSubject, setCustomSubject] = useState("");
-  const [helpType, setHelpType] = useState("");
-  const [customHelpType, setCustomHelpType] = useState("");
-  const [level, setLevel] = useState("");
-  const [deadline, setDeadline] = useState("");
-  const [pagesWords, setPagesWords] = useState("");
-  const [details, setDetails] = useState("");
-  const [files, setFiles] = useState<File[]>([]);
+  const searchParams = useSearchParams();
+  const [values, setValues] = useState<TaskRequestFormValues>(BLANK);
   const [error, setError] = useState("");
+  const restoredRef = useRef(false);
 
-  const handleFiles = (selected: FileList | null) => {
-    if (!selected) return;
-    setFiles(Array.from(selected));
-  };
+  const set = useCallback(<K extends TaskRequestField>(
+    key: K,
+    value: TaskRequestFormValues[K]
+  ) => {
+    setValues((prev) => ({ ...prev, [key]: value }));
+    setError("");
+  }, []);
+
+  // If the user was redirected back here after sign-in (?draft=1), restore the draft
+  useEffect(() => {
+    if (restoredRef.current) return;
+    if (searchParams.get("draft") !== "1") return;
+    restoredRef.current = true;
+    queueMicrotask(() => {
+      const draft = loadPendingDraft();
+      if (!draft) return;
+      setValues({
+        subject: draft.subject ?? BLANK.subject,
+        helpType: draft.service ?? BLANK.helpType,
+        level: draft.level ?? BLANK.level,
+        deadline: draft.deadlineKey ?? draft.deadline ?? BLANK.deadline,
+        dueTime: draft.dueTime ?? BLANK.dueTime,
+        pages: normalizePages(draft.wordCount),
+        details: draft.details ?? BLANK.details,
+        customSubject: BLANK.customSubject,
+        customHelpType: BLANK.customHelpType,
+        files: BLANK.files,
+      });
+      // Remove the ?draft=1 param from the URL without a reload
+      const url = new URL(window.location.href);
+      url.searchParams.delete("draft");
+      window.history.replaceState({}, "", url.toString());
+    });
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    const subjectRaw = composeSelection(subject, subject === OTHER_OPTION, customSubject);
-    const helpTypeRaw = composeSelection(helpType, helpType === OTHER_OPTION, customHelpType);
+    const subjectRaw = composeSelection(
+      values.subject,
+      values.subject === OTHER_OPTION,
+      values.customSubject
+    );
+    const helpTypeRaw = composeSelection(
+      values.helpType,
+      values.helpType === OTHER_OPTION,
+      values.customHelpType
+    );
 
     if (!subjectRaw) {
       setError("Please select a subject.");
@@ -43,15 +89,15 @@ export default function PriceEstimateForm() {
       setError("Please select the type of help you need.");
       return;
     }
-    if (!level) {
+    if (!values.level) {
       setError("Please select your academic level.");
       return;
     }
-    if (!deadline) {
+    if (!values.deadline) {
       setError("Please choose a deadline.");
       return;
     }
-    if (!pagesWords.trim() && !details.trim()) {
+    if (!values.pages.trim() && !values.details.trim()) {
       setError("Add pages/words or a short description so a helper can assess the scope.");
       return;
     }
@@ -59,17 +105,20 @@ export default function PriceEstimateForm() {
     savePendingDraft({
       service: helpTypeRaw,
       subject: subjectRaw,
-      level,
-      deadline,
-      wordCount: pagesWords,
-      details,
+      level: values.level,
+      deadline: values.deadline,
+      dueTime: values.dueTime || undefined,
+      wordCount: values.pages,
+      details: values.details,
     });
-    await saveDraftFiles(files);
+    await saveDraftFiles(values.files);
 
     const supabase = createClient();
     const {
       data: { session },
     } = await supabase.auth.getSession();
+    // The draft (fields + files) is already saved, so anonymous visitors resume
+    // straight on the request page once they have an account.
     if (!session) {
       router.push("/sign-in?next=/requests/new");
       return;
@@ -77,134 +126,14 @@ export default function PriceEstimateForm() {
     router.push("/requests/new");
   };
 
-  const today = new Date().toISOString().slice(0, 10);
-
   return (
-    <form className="space-y-3" onSubmit={handleSubmit}>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-semibold text-on-surface">What subject?</label>
-        <select
-          value={subject}
-          onChange={(e) => {
-            setSubject(e.target.value);
-            setError("");
-          }}
-          className="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
-        >
-          <option value="">Select subject</option>
-          {SUBJECT_OPTIONS.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
-        {subject === OTHER_OPTION && (
-          <input
-            type="text"
-            placeholder="Type your subject, e.g. Music Theory"
-            value={customSubject}
-            onChange={(e) => setCustomSubject(e.target.value)}
-            className="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
-          />
-        )}
-      </div>
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-semibold text-on-surface">What are you working on?</label>
-        <select
-          value={helpType}
-          onChange={(e) => {
-            setHelpType(e.target.value);
-            setError("");
-          }}
-          className="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
-        >
-          <option value="">Select type</option>
-          {HELP_TYPE_OPTIONS.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </select>
-        {helpType === OTHER_OPTION && (
-          <input
-            type="text"
-            placeholder="Type the help you need, e.g. Lab Report"
-            value={customHelpType}
-            onChange={(e) => setCustomHelpType(e.target.value)}
-            className="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
-          />
-        )}
-      </div>
-      </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-semibold text-on-surface">Academic level</label>
-        <select
-          value={level}
-          onChange={(e) => setLevel(e.target.value)}
-          className="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer"
-        >
-          <option value="">Select level</option>
-          {ACADEMIC_LEVELS.map((l) => (
-            <option key={l} value={l}>{l}</option>
-          ))}
-        </select>
-      </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-on-surface">When is it due?</label>
-          <input
-            type="date"
-            min={today}
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
-            className="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-on-surface">Pages / words</label>
-          <input
-            type="text"
-            placeholder="e.g. 5 pages"
-            value={pagesWords}
-            onChange={(e) => setPagesWords(e.target.value)}
-            className="w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
-          />
-        </div>
-      </div>
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-semibold text-on-surface">Tell us about your assignment</label>
-        <textarea
-          placeholder="Describe what you need help with..."
-          rows={2}
-          value={details}
-          onChange={(e) => setDetails(e.target.value)}
-          className="w-full p-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all resize-none"
-        />
-      </div>
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-semibold text-on-surface">Files</label>
-        <label className="flex items-center justify-center gap-2 w-full py-2 border border-dashed border-outline-variant rounded-xl cursor-pointer hover:border-primary-container hover:bg-primary-container/5 transition-all text-on-surface-variant">
-          <Upload className="w-4 h-4" />
-          <span className="text-sm font-medium">
-            {files.length > 0
-              ? `${files.length} file${files.length > 1 ? "s" : ""} attached`
-              : "+ Upload assignment instructions"}
-          </span>
-          <input type="file" className="hidden" multiple accept=".pdf,.docx,.doc,.png,.jpg,.jpeg" onChange={(e) => handleFiles(e.target.files)} />
-        </label>
-      </div>
-      {error && (
-        <p className="text-sm text-error bg-error-container/40 border border-error/30 rounded-lg px-3 py-2">
-          {error}
-        </p>
-      )}
-      <button
-        type="submit"
-        className="w-full h-11 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer"
-      >
-        Find Matching Helpers →
-        <ArrowRight className="w-4 h-4" />
-      </button>
-      <p className="text-xs text-on-surface-variant text-center">
-        Free estimate — no commitment required
-      </p>
-    </form>
+    <TaskRequestForm
+      values={values}
+      set={set}
+      error={error}
+      onSubmit={handleSubmit}
+      submitLabel="Find Matching Helpers"
+      note="Free estimate — no commitment required"
+    />
   );
 }

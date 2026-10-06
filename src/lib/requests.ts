@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
 
-const DRAFT_KEY = "acadibo:pending-request";
+const DRAFT_KEY = "acadivo:pending-request";
 
 export interface NewRequestInput {
   title: string;
@@ -18,6 +18,7 @@ export type PendingRequestDraft = {
   level?: string;
   deadlineKey?: string;
   deadline?: string;
+  dueTime?: string;
   wordCount?: string;
   details?: string;
 };
@@ -43,7 +44,7 @@ export function clearPendingDraft() {
   window.localStorage.removeItem(DRAFT_KEY);
 }
 
-const DRAFT_FILES_DB = "acadibo:draft-files";
+const DRAFT_FILES_DB = "acadivo:draft-files";
 const DRAFT_FILES_STORE = "files";
 const DRAFT_FILES_KEY = "pending";
 

@@ -24,7 +24,7 @@ const admin = createClient(url, secretKey, {
   realtime: { transport: WebSocket },
 });
 
-const email = `test.student.${Date.now()}@acadibo.test`;
+const email = `test.student.${Date.now()}@acadivo.test`;
 const password = "TestPass123!";
 
 (async () => {
@@ -87,7 +87,7 @@ const password = "TestPass123!";
   console.log("5. read back:", readBack.title, "| status:", readBack.status, "| deadline:", readBack.deadline);
 
   // 6. Verify helper-listing policy allows viewing open requests (not owner)
-  const helperEmail = `test.helper.${Date.now()}@acadibo.test`;
+  const helperEmail = `test.helper.${Date.now()}@acadivo.test`;
   const { data: helper, error: helperErr } = await admin.auth.admin.createUser({
     email: helperEmail,
     password,

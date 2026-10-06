@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "research",
   title: "How to Write a Report: Structure, Format & Examples",
   h1: "How to Write a Report: Structure, Format & Examples",
-  seoTitle: "How to Write a Report: Structure & Format | Acadibo",
+  seoTitle: "How to Write a Report: Structure & Format | Acadivo",
   description:
     "Learn the standard structure of an academic report, how it differs from an essay, what each section should contain, and how to format the finished document.",
   ogDescription:

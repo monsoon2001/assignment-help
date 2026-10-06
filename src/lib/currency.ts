@@ -1,6 +1,6 @@
 export const SUPPORTED_CURRENCIES = ["USD", "AUD", "CAD", "GBP", "NZD"] as const;
 
-// Acadibo's platform fee, deducted from the helper's share of an order.
+// Acadivo's platform fee, deducted from the helper's share of an order.
 // The student always pays the agreed price; the helper receives (1 - fee) of it.
 export const PLATFORM_FEE_RATE = 0.2;
 
@@ -87,6 +87,9 @@ export const COUNTRIES = [
 ] as const;
 
 export type CountryName = (typeof COUNTRIES)[number];
+
+/** Used whenever a country is needed but the student never picked one. */
+export const DEFAULT_COUNTRY = "United States";
 
 /** Default payment currency for a student's chosen country. */
 export const COUNTRY_CURRENCY: Record<string, CurrencyCode> = {

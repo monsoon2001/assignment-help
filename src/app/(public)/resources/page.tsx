@@ -12,16 +12,16 @@ import {
 } from "@/lib/resources";
 
 export const metadata: Metadata = {
-  title: "Student Guides & Academic Writing Resources | Acadibo",
+  title: "Student Guides & Academic Writing Resources | Acadivo",
   description:
     "Free student guides for essays, reports, research, citations, presentations, and technical coursework. Step-by-step explanations with practical examples and checklists.",
-  alternates: { canonical: "https://acadibo.com/resources" },
+  alternates: { canonical: "https://acadivo.com/resources" },
   openGraph: {
-    title: "Student Guides & Academic Writing Resources | Acadibo",
+    title: "Student Guides & Academic Writing Resources | Acadivo",
     description:
       "Practical guides for essays, reports, research, citations, presentations, and technical coursework.",
     type: "website",
-    url: "https://acadibo.com/resources",
+    url: "https://acadivo.com/resources",
   },
 };
 

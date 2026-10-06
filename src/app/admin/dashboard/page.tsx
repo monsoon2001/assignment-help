@@ -21,7 +21,7 @@ import { EmptyState } from "@/components/ui/states";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Admin Dashboard | Acadibo",
+  title: "Admin Dashboard | Acadivo",
 };
 
 const STATUS_VARIANT: Record<string, "primary" | "warning" | "success" | "secondary" | "danger"> = {

@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "writing",
   title: "How to Write an Effective Essay Introduction",
   h1: "How to Write an Effective Essay Introduction",
-  seoTitle: "How to Write an Effective Essay Introduction | Acadibo",
+  seoTitle: "How to Write an Effective Essay Introduction | Acadivo",
   description:
     "Learn how to write an essay introduction that hooks the reader, narrows to your topic, and ends with a clear thesis statement. Includes the funnel structure and common mistakes.",
   ogDescription:

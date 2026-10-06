@@ -3,16 +3,16 @@ import { ChevronRight, ArrowRight } from "lucide-react";
 import { SUBJECT_GROUPS, SUBJECT_CONTENT } from "@/lib/subject-content";
 
 export const metadata = {
-  title: "Assignment Help by Subject | Browse All Subjects | Acadibo",
+  title: "Assignment Help by Subject | Browse All Subjects | Acadivo",
   description:
     "Explore assignment help by subject. Choose a specific helper for computer science, statistics, mathematics, business, academic writing, science, engineering, and more.",
-  alternates: { canonical: "https://acadibo.com/subjects" },
+  alternates: { canonical: "https://acadivo.com/subjects" },
   openGraph: {
-    title: "Assignment Help by Subject | Acadibo",
+    title: "Assignment Help by Subject | Acadivo",
     description:
       "Browse assignment help by subject, see topics covered, and choose a specific helper before you pay.",
     type: "website",
-    url: "https://acadibo.com/subjects",
+    url: "https://acadivo.com/subjects",
   },
 };
 

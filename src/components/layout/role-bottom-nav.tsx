@@ -7,6 +7,7 @@ import {
   Menu,
   X,
   GraduationCap,
+  Home,
   LayoutDashboard,
   FileText,
   MessageSquare,
@@ -28,6 +29,7 @@ import type { LucideIcon } from "lucide-react";
 
 const ICONS: Record<string, LucideIcon> = {
   dashboard: LayoutDashboard,
+  home: Home,
   requests: FileText,
   messages: MessageSquare,
   notifications: Bell,
@@ -124,7 +126,7 @@ export default function RoleBottomNav({
                 <span className="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">
                   <GraduationCap size={18} />
                 </span>
-                <span className="font-display font-bold text-on-surface">Acadibo</span>
+                <span className="font-display font-bold text-on-surface">Acadivo</span>
                 <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-primary-container text-on-primary rounded-md uppercase">
                   {roleLabel}
                 </span>

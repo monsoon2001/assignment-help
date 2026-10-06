@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Search, Bell, MessageSquare, GraduationCap, Menu, X, LogOut, User, LayoutDashboard, ChevronDown } from "lucide-react";
+import { Search, Bell, MessageSquare, GraduationCap, Menu, X, LogOut, User, LayoutDashboard, ChevronDown, Home } from "lucide-react";
 import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/client";
@@ -206,7 +206,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
             <GraduationCap size={20} />
           </span>
           <div className="leading-tight hidden sm:block">
-            <p className="font-display font-bold text-on-surface text-lg">Acadibo</p>
+            <p className="font-display font-bold text-on-surface text-lg">Acadivo</p>
             <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">Academic Network</p>
           </div>
         </Link>
@@ -269,10 +269,18 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
           )}
           {userId ? (
             <>
+              {pathname !== "/" && (
+                <Link href="/">
+                  <Button variant="ghost" size="sm" aria-label="Back to homepage" className="hidden md:inline-flex">
+                    <Home size={16} />
+                    Home
+                  </Button>
+                </Link>
+              )}
               <Link href={dashboardHref}>
-                <Button variant="ghost" size="sm" className="hidden md:inline-flex">
+                <Button variant="ghost" size="sm" aria-label="Dashboard">
                   <LayoutDashboard size={16} />
-                  Dashboard
+                  <span className="hidden md:inline">Dashboard</span>
                 </Button>
               </Link>
               <Link href={notificationsHref}>

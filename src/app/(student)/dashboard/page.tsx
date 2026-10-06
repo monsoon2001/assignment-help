@@ -122,7 +122,7 @@ export default async function DashboardPage() {
 
   const helpers = (helperRows ?? []).map((h) => ({
     id: h.id,
-    name: h.name ?? "Acadibo Helper",
+    name: h.name ?? "Acadivo Helper",
     avatar_url: h.avatar_url,
     rating_avg: Number(unwrapRow<{ rating_avg: number }>(h.helper_profiles)?.rating_avg ?? 0),
     reviewCount: 0,
@@ -289,7 +289,7 @@ export default async function DashboardPage() {
                     <Avatar name={m.name} size="md" src={m.avatar_url ?? undefined} />
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-on-surface truncate">{m.name}</p>
-                      <p className="text-xs text-on-surface-variant truncate">Acadibo verified helper</p>
+                      <p className="text-xs text-on-surface-variant truncate">Acadivo verified helper</p>
                     </div>
                   </div>
                   <div className="mt-2 flex items-center justify-between">

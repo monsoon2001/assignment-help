@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "writing",
   title: "How to Write a Strong Essay Conclusion",
   h1: "How to Write a Strong Essay Conclusion",
-  seoTitle: "How to Write a Strong Essay Conclusion | Acadibo",
+  seoTitle: "How to Write a Strong Essay Conclusion | Acadivo",
   description:
     "How to write an essay conclusion that returns to your thesis, shows significance, and avoids introducing new arguments. With examples and a checklist.",
   ogDescription:

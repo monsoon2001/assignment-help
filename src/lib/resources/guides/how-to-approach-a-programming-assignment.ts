@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "technical",
   title: "How to Approach a Programming Assignment",
   h1: "How to Approach a Programming Assignment",
-  seoTitle: "How to Approach a Programming Assignment | Acadibo",
+  seoTitle: "How to Approach a Programming Assignment | Acadivo",
   description:
     "A process for tackling a programming assignment: reading the brief, decomposing the problem, choosing data structures, testing, and documenting your work.",
   ogDescription:

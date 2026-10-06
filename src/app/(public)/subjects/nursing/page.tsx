@@ -7,12 +7,12 @@ const subject = SUBJECT_CONTENT_BY_SLUG.get("nursing")!;
 export const metadata: Metadata = {
   title: subject.title,
   description: subject.description,
-  alternates: { canonical: `https://acadibo.com/subjects/nursing` },
+  alternates: { canonical: `https://acadivo.com/subjects/nursing` },
   openGraph: {
     title: subject.title,
     description: subject.ogDescription,
     type: "website",
-    url: `https://acadibo.com/subjects/nursing`,
+    url: `https://acadivo.com/subjects/nursing`,
   },
 };
 

@@ -87,7 +87,7 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-on-surface mb-4">How Acadibo Works</h2>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-on-surface mb-4">How Acadivo Works</h2>
             <p className="text-on-surface-variant max-w-3xl mx-auto">
               Choose a specific helper, communicate before paying, receive a personalized proposal, and manage
               your order in one workspace.

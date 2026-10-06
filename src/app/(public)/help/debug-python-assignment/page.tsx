@@ -2,14 +2,14 @@ import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 
 export const metadata = {
-  title: "How to Debug a Python Assignment | Acadibo",
+  title: "How to Debug a Python Assignment | Acadivo",
   description: "Learn practical steps to debug your Python assignment with tips, tools, and strategies. Get help when you're stuck.",
-  alternates: { canonical: "https://acadibo.com/help/debug-python-assignment" },
+  alternates: { canonical: "https://acadivo.com/help/debug-python-assignment" },
   openGraph: {
-    title: "How to Debug a Python Assignment | Acadibo",
+    title: "How to Debug a Python Assignment | Acadivo",
     description: "Practical debugging tips for Python assignments to help you fix errors faster.",
     type: "article",
-    url: "https://acadibo.com/help/debug-python-assignment",
+    url: "https://acadivo.com/help/debug-python-assignment",
   },
 }
 

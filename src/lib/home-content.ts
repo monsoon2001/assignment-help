@@ -98,14 +98,14 @@ export const BENEFITS: Benefit[] = [
   {
     icon: "lock",
     title: "Private by default",
-    desc: "Briefs, files and messages stay inside the platform. Payment is handled by Acadibo so card details are never shared with helpers.",
+    desc: "Briefs, files and messages stay inside the platform. Payment is handled by Acadivo so card details are never shared with helpers.",
     points: ["Secure payments", "Private threads and files", "No card details shared"],
   },
 ];
 
 export type ComparisonRow = {
   criterion: string;
-  acadibo: string;
+  acadivo: string;
   freelancer: string;
   aiTool: string;
 };
@@ -113,31 +113,31 @@ export type ComparisonRow = {
 export const COMPARISON: ComparisonRow[] = [
   {
     criterion: "Who does the work",
-    acadibo: "A verified human helper in your subject",
+    acadivo: "A verified human helper in your subject",
     freelancer: "Any bidder, credentials often unverified",
     aiTool: "A model — no subject accountability",
   },
   {
     criterion: "Price visibility",
-    acadibo: "Quoted in writing before you pay",
+    acadivo: "Quoted in writing before you pay",
     freelancer: "Often negotiated privately, scope unclear",
     aiTool: "Subscription, with unclear limits",
   },
   {
     criterion: "Academic authorship",
-    acadibo: "Guidance and feedback you build on",
+    acadivo: "Guidance and feedback you build on",
     freelancer: "Often written for submission as-is",
     aiTool: "Generated text you own the risk of",
   },
   {
     criterion: "Revisions",
-    acadibo: "Unlimited within the agreed scope",
+    acadivo: "Unlimited within the agreed scope",
     freelancer: "Depends on the individual",
     aiTool: "Re-prompting, no accountability",
   },
   {
     criterion: "Dispute handling",
-    acadibo: "Mediated by our academic integrity team",
+    acadivo: "Mediated by our academic integrity team",
     freelancer: "Effectively none once paid",
     aiTool: "None",
   },
@@ -147,8 +147,8 @@ export type Faq = { q: string; a: string };
 
 export const HOME_FAQS: Faq[] = [
   {
-    q: "What is Acadibo and how is it different from a writing service?",
-    a: `Acadibo is an assignment help marketplace where students choose a verified helper for guidance, feedback and tutoring. Helpers are not ghostwriters: they explain, review and coach, and you stay the author of the work. You choose the helper, agree the scope in a proposal and pay only after you approve it.`,
+    q: "What is Acadivo and how is it different from a writing service?",
+    a: `Acadivo is an assignment help marketplace where students choose a verified helper for guidance, feedback and tutoring. Helpers are not ghostwriters: they explain, review and coach, and you stay the author of the work. You choose the helper, agree the scope in a proposal and pay only after you approve it.`,
   },
   {
     q: `How many subjects and types of assignment help do you cover?`,
@@ -171,8 +171,8 @@ export const HOME_FAQS: Faq[] = [
     a: `Browse matched helpers and compare their subjects, specialisms, ratings and bios. Message them with your brief before you commit. Every helper profile lists what they cover, so you can pick someone for your subject and help type.`,
   },
   {
-    q: "Is it allowed to use Acadibo for my assignment?",
-    a: "Acadibo is a tutoring and academic support platform. Helpers coach, review and give feedback rather than writing your work for submission. Your institution's rules still apply to you, so check your academic integrity policy and use the platform the way you would use a tutor.",
+    q: "Is it allowed to use Acadivo for my assignment?",
+    a: "Acadivo is a tutoring and academic support platform. Helpers coach, review and give feedback rather than writing your work for submission. Your institution's rules still apply to you, so check your academic integrity policy and use the platform the way you would use a tutor.",
   },
   {
     q: "What happens if I am not satisfied?",

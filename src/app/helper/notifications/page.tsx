@@ -7,7 +7,7 @@ import { ErrorState } from "@/components/ui/states";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Notifications | Acadibo",
+  title: "Notifications | Acadivo",
 };
 
 export default async function HelperNotificationsPage() {

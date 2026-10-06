@@ -4,7 +4,7 @@ import RequestWorkspace from "@/components/requests/request-workspace";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Request Conversation | Acadibo",
+  title: "Request Conversation | Acadivo",
 };
 
 export default async function StudentRequestDetailPage({

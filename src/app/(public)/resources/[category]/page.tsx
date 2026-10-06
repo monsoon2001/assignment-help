@@ -18,14 +18,14 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!known) return {};
 
   return {
-    title: `${known.name} Guides | Acadibo`,
-    description: `${known.description} Browse all ${known.name.toLowerCase()} guides on Acadibo.`,
-    alternates: { canonical: `https://acadibo.com/resources/${known.slug}` },
+    title: `${known.name} Guides | Acadivo`,
+    description: `${known.description} Browse all ${known.name.toLowerCase()} guides on Acadivo.`,
+    alternates: { canonical: `https://acadivo.com/resources/${known.slug}` },
     openGraph: {
-      title: `${known.name} Guides | Acadibo`,
+      title: `${known.name} Guides | Acadivo`,
       description: known.description,
       type: "website",
-      url: `https://acadibo.com/resources/${known.slug}`,
+      url: `https://acadivo.com/resources/${known.slug}`,
     },
   };
 }

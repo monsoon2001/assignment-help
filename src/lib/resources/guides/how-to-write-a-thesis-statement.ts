@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "writing",
   title: "How to Write a Strong Thesis Statement",
   h1: "How to Write a Strong Thesis Statement",
-  seoTitle: "How to Write a Strong Thesis Statement | Acadibo",
+  seoTitle: "How to Write a Strong Thesis Statement | Acadivo",
   description:
     "Learn what a thesis statement is, the four features of a strong one, and how to turn a research topic into an arguable claim with worked examples.",
   ogDescription:

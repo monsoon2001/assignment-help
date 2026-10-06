@@ -67,9 +67,9 @@ export default function HelperProfile({
       <form action={formAction} className="space-y-6">
         <Card className="p-6 space-y-6">
           <div className="flex items-center gap-4 pb-5 border-b border-outline-variant">
-            <Avatar name={name || firstName || "Acadibo Helper"} size="lg" src={avatarUrl ?? undefined} />
+            <Avatar name={name || firstName || "Acadivo Helper"} size="lg" src={avatarUrl ?? undefined} />
             <div>
-              <h2 className="font-display text-lg font-semibold text-on-surface">{name || `${firstName} ${lastName}` || "Acadibo Helper"}</h2>
+              <h2 className="font-display text-lg font-semibold text-on-surface">{name || `${firstName} ${lastName}` || "Acadivo Helper"}</h2>
               <StarRating rating={rating} reviewCount={reviewCount} />
             </div>
           </div>

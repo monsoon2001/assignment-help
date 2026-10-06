@@ -5,7 +5,7 @@ const guide: Resource = {
   category: "citations",
   title: "How to Cite Sources in Academic Writing",
   h1: "How to Cite Sources in Academic Writing",
-  seoTitle: "How to Cite Sources in Academic Writing | Acadibo",
+  seoTitle: "How to Cite Sources in Academic Writing | Acadivo",
   description:
     "When to cite, how to choose between in-text citations and footnotes, how to build a reference list, and how to cite sources you found in a secondary source.",
   ogDescription:
