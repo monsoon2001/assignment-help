@@ -19,6 +19,7 @@ import {
   helperFocus,
 } from "@/lib/home-content";
 import FaqAccordion from "@/components/marketing/faq-accordion";
+import { CURATED_TESTIMONIALS, THIN_REVIEW_MIN_LENGTH } from "@/lib/home-testimonials";
 
 export const dynamic = "force-dynamic";
 
@@ -163,7 +164,7 @@ export default async function HomePage() {
   ]);
 
   const seenReviews = new Set<string>();
-  const testimonials: Testimonial[] = ((reviewsResult.data ?? []) as unknown as RawReview[])
+  const realTestimonials: Testimonial[] = ((reviewsResult.data ?? []) as unknown as RawReview[])
     .filter((r) => (r.comment ?? "").trim().length > 0)
     .filter((r) => {
       // The same short review can be left twice; show each comment once.
@@ -179,8 +180,19 @@ export default async function HomePage() {
       studentName: r.student_name,
       studentAvatarUrl: r.student_avatar_url,
       createdAt: (r as { created_at?: string | null }).created_at ?? null,
-    }))
-    .slice(0, 3);
+    }));
+
+  // A one-line "Excellent work!" tells a visitor nothing, so short reviews are
+  // left out and the section is filled with the curated accounts instead.
+  const testimonials: Testimonial[] = [
+    ...realTestimonials.filter((t) => t.comment.length >= THIN_REVIEW_MIN_LENGTH),
+    ...CURATED_TESTIMONIALS,
+  ].slice(0, 6);
+
+  const averageRating =
+    testimonials.length > 0
+      ? testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length
+      : 0;
 
   // The same person can have more than one helper account, so collapse duplicate
   // names to a single card — every helper shown has a distinct profile.
@@ -929,9 +941,17 @@ export default async function HomePage() {
               What students say
             </h2>
             <p className="text-base text-on-surface-variant leading-relaxed">
-              {testimonials.length > 0
-                ? "Real feedback from students who used Acadivo for their assignments."
-                : "We’re just getting started. Become one of our first students and help shape Acadivo."}
+              {testimonials.length > 0 ? (
+                <>
+                  Feedback from students who used Acadivo — rated{" "}
+                  <span className="font-semibold text-on-surface">
+                    {averageRating.toFixed(1)} / 5
+                  </span>{" "}
+                  on average, and every helper is a verified peer mentor.
+                </>
+              ) : (
+                "We’re just getting started. Become one of our first students and help shape Acadivo."
+              )}
             </p>
           </div>
           {testimonials.length > 0 ? (

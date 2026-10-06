@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
-import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { BadgeCheck, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import Avatar from "@/components/ui/avatar";
 
 export type Testimonial = {
@@ -9,7 +9,7 @@ export type Testimonial = {
   rating: number;
   comment: string;
   studentName: string | null;
-  studentAvatarUrl: string | null;
+  studentAvatarUrl?: string | null;
   subject?: string | null;
   service?: string | null;
   createdAt?: string | null;
@@ -72,7 +72,7 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
 
   return (
     <div
-      className="mx-auto max-w-6xl"
+      className="mx-auto max-w-7xl"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -86,91 +86,71 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
           {pages.map((group, groupIndex) => (
             <div
               key={groupIndex}
-              className="grid w-full shrink-0 grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2"
+              className="grid w-full shrink-0 grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
               aria-hidden={groupIndex !== activePage}
             >
-              {group.map((t) => (
-                <figure
-                  key={t.id}
-                  className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-outline-variant/40 bg-surface-container-lowest p-6 sm:p-7 transition-all duration-300 hover:shadow-xl hover:shadow-primary-container/20 hover:-translate-y-0.5"
-                >
-                  <span
-                    className="material-symbols-outlined pointer-events-none absolute -top-1 -right-1 text-7xl leading-none text-primary/10"
-                    aria-hidden="true"
+              {group.map((t) => {
+                const name = t.studentName?.trim() || "Acadivo student";
+                const firstName = name.split(/\s+/)[0];
+                return (
+                  <figure
+                    key={t.id}
+                    className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-outline-variant/40 bg-surface-container-lowest p-6 sm:p-7 transition-all duration-300 hover:shadow-xl hover:shadow-primary-container/20 hover:-translate-y-0.5"
                   >
-                    format_quote
-                  </span>
-
-                  <div className="relative flex items-center gap-2">
-                    <div className="flex items-center gap-0.5">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          aria-hidden="true"
-                          className={
-                            i < Math.round(t.rating)
-                              ? "h-4 w-4 fill-amber-400 text-amber-400"
-                              : "h-4 w-4 text-outline-variant"
-                          }
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm font-semibold text-on-surface-variant">
-                      {t.rating.toFixed(1)}
+                    <span
+                      className="material-symbols-outlined pointer-events-none absolute -top-1 -right-1 text-7xl leading-none text-primary/10"
+                      aria-hidden="true"
+                    >
+                      format_quote
                     </span>
-                  </div>
 
-                  <div className="relative mt-4 flex-1"></div>
-
-                  <figcaption className="mt-6 border-t border-outline-variant/30 pt-5">
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-container/15 text-sm font-semibold text-primary">
-                        {(() => {
-                          const name = t.studentName ?? "Student";
-                          const parts = name.trim().split(/\s+/);
-                          return parts.length === 1 ? parts[0].slice(0, 1).toUpperCase() : (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-                        })()}
+                    <div className="relative flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-0.5" aria-label={`${t.rating.toFixed(1)} out of 5`}>
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            aria-hidden="true"
+                            className={
+                              i < Math.round(t.rating)
+                                ? "h-4 w-4 fill-amber-400 text-amber-400"
+                                : "h-4 w-4 text-outline-variant"
+                            }
+                          />
+                        ))}
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <p className="font-semibold text-on-surface">
-                            Verified student
-                          </p>
-                          {t.createdAt && (
-                            <span className="text-xs text-on-surface-variant">
-                              • {new Date(t.createdAt).toLocaleDateString()}
-                            </span>
-                          )}
-                        </div>
-                        {(t.subject || t.service || t.length) && (
-                          <p className="mt-1 text-xs text-on-surface-variant">
-                            {[t.subject, t.service, t.length].filter(Boolean).join(" • ")}
-                          </p>
-                        )}
-                        <div className="mt-2 flex items-center gap-1">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star
-                              key={i}
-                              aria-hidden="true"
-                              className={
-                                i < Math.round(t.rating)
-                                  ? "h-3.5 w-3.5 fill-amber-400 text-amber-400"
-                                  : "h-3.5 w-3.5 text-outline-variant"
-                              }
-                            />
-                          ))}
-                          <span className="ml-0.5 text-xs font-medium text-on-surface-variant">
-                            {t.rating.toFixed(1)}
-                          </span>
-                        </div>
-                        <blockquote className="mt-3 text-base leading-relaxed text-on-surface">
-                          {t.comment}
-                        </blockquote>
-                      </div>
+                      {t.subject && (
+                        <span className="shrink-0 rounded-full bg-primary-container/10 px-2.5 py-1 text-[11px] font-semibold text-primary">
+                          {t.subject}
+                        </span>
+                      )}
                     </div>
-                  </figcaption>
-                </figure>
-              ))}
+
+                    <blockquote className="relative mt-4 flex-1 text-[15px] leading-relaxed text-on-surface">
+                      {t.comment}
+                    </blockquote>
+
+                    <figcaption className="mt-6 border-t border-outline-variant/30 pt-4">
+                      <div className="flex items-center gap-3">
+                        <Avatar
+                          name={name}
+                          src={t.studentAvatarUrl ?? undefined}
+                          size="md"
+                          className="shrink-0"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold text-on-surface truncate">{firstName}</p>
+                          <p className="text-xs text-on-surface-variant">
+                            {[t.service, t.length].filter(Boolean).join(" · ") || "Verified student"}
+                          </p>
+                        </div>
+                        <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700">
+                          <BadgeCheck size={11} /> Verified
+                        </span>
+                      </div>
+                    </figcaption>
+                  </figure>
+                );
+              })}
             </div>
           ))}
         </div>
