@@ -68,6 +68,10 @@ html {
   /* Tailwind's rem-based type scale is built on this, so bumping it here
      enlarges text across every page without touching individual classes. */
   font-size: 17px;
+  /* Safari boosts font sizes on wide viewports ("text autosizing") on top of
+     the rem scale above, which overflows dense bars like the navbar. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {

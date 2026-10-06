@@ -207,12 +207,12 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
           </span>
           <div className="leading-tight hidden sm:block">
             <p className="font-display font-bold text-on-surface text-lg">Acadivo</p>
-            <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">Academic Network</p>
+            <p className="text-[9px] xl:text-[10px] uppercase tracking-[0.18em] xl:tracking-widest text-on-surface-variant">Academic Network</p>
           </div>
         </Link>
 
         {showSearch && (
-          <div className="hidden md:flex items-center gap-1 text-sm rounded-lg bg-surface-container-low px-3 py-2 flex-1 max-w-md border border-transparent focus-within:border-primary-container">
+          <div className="hidden 2xl:flex items-center gap-1 text-sm rounded-lg bg-surface-container-low px-3 py-2 flex-1 max-w-xs 2xl:min-w-0 border border-transparent focus-within:border-primary-container">
             <Search size={16} className="text-on-surface-variant mr-2" />
             <input
               placeholder="Search helpers, requests, courses..."
@@ -222,7 +222,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
         )}
 
         {menuItems.length > 0 && (
-          <nav className="hidden lg:flex items-center gap-6 flex-1 justify-center">
+          <nav className="hidden xl:flex items-center gap-4 2xl:gap-5 flex-1 min-w-0 justify-center">
             {menuItems.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
               const hasDropdown = (item.groups?.length ?? 0) > 0;
@@ -240,7 +240,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                     href={item.href}
                     aria-haspopup={hasDropdown ? "true" : undefined}
                     aria-expanded={hasDropdown ? isOpen : undefined}
-                    className={`flex items-center gap-1 py-1.5 text-sm font-medium transition-colors ${
+                    className={`flex items-center gap-1 py-1.5 whitespace-nowrap text-[13px] 2xl:text-sm font-medium transition-colors ${
                       isActive || isOpen
                         ? "text-primary"
                         : "text-on-surface-variant hover:text-on-surface"
@@ -271,16 +271,16 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
             <>
               {pathname !== "/" && (
                 <Link href="/">
-                  <Button variant="ghost" size="sm" aria-label="Back to homepage" className="hidden md:inline-flex">
+                  <Button variant="ghost" size="sm" aria-label="Back to homepage" className="hidden xl:inline-flex">
                     <Home size={16} />
-                    Home
+                    <span className="hidden 2xl:inline">Home</span>
                   </Button>
                 </Link>
               )}
               <Link href={dashboardHref}>
                 <Button variant="ghost" size="sm" aria-label="Dashboard">
                   <LayoutDashboard size={16} />
-                  <span className="hidden md:inline">Dashboard</span>
+                  <span className="hidden 2xl:inline">Dashboard</span>
                 </Button>
               </Link>
               <Link href={notificationsHref}>
@@ -305,7 +305,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                 href={profileHref}
                 className="flex items-center gap-2 pl-1 group"
               >
-                <span className="hidden md:block text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
+                <span className="hidden 2xl:block text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
                   {firstName}
                 </span>
                 <Avatar name={userName ?? "User"} src={avatarUrl ?? undefined} size="md" online className="cursor-pointer" />
@@ -336,7 +336,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
             <Button
               variant="ghost"
               size="sm"
-              className="lg:hidden"
+              className="xl:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -349,13 +349,13 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
         <>
           {createPortal(
             <div
-              className="fixed inset-0 z-40 bg-black/50 animate-[fade-in_0.18s_ease-out] hidden lg:block"
+              className="fixed inset-0 z-40 bg-black/50 animate-[fade-in_0.18s_ease-out] hidden xl:block"
               onClick={closeNow}
               aria-hidden="true"
             />,
             document.body
           )}
-          <div className="absolute inset-x-0 top-full hidden lg:block">
+          <div className="absolute inset-x-0 top-full hidden xl:block">
             <div className="mx-auto max-w-[1440px] px-6 pt-3">
               <div
                 className="max-h-[72vh] overflow-y-auto rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-5 shadow-2xl shadow-black/20 animate-[sheet-up_0.18s_ease-out]"
@@ -429,7 +429,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
       )}
 
       {menuItems.length > 0 && mobileMenuOpen && (
-        <div className="lg:hidden border-t border-outline-variant bg-surface-container-lowest">
+        <div className="xl:hidden border-t border-outline-variant bg-surface-container-lowest">
           <nav className="max-w-[1440px] mx-auto px-6 py-4 flex flex-col gap-3">
             {menuItems.map((item) => {
               const isActive = pathname === item.href;
