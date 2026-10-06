@@ -18,6 +18,7 @@ import {
   STEPS,
   helperFocus,
 } from "@/lib/home-content";
+import FaqAccordion from "@/components/marketing/faq-accordion";
 
 export const dynamic = "force-dynamic";
 
@@ -966,22 +967,7 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-3">
-            {HOME_FAQS.map((faq) => (
-              <details
-                key={faq.q}
-                className="group bg-surface-container-lowest rounded-xl border border-outline-variant/30 open:border-primary-container/40"
-              >
-                <summary className="flex items-start justify-between gap-4 p-5 cursor-pointer list-none font-display text-base font-bold text-on-surface hover:text-primary transition-colors">
-                  {faq.q}
-                  <span className="material-symbols-outlined text-on-surface-variant group-open:rotate-180 transition-transform shrink-0">
-                    expand_more
-                  </span>
-                </summary>
-                <p className="px-5 pb-5 text-base text-on-surface-variant leading-relaxed">{faq.a}</p>
-              </details>
-            ))}
-          </div>
+          <FaqAccordion items={HOME_FAQS} />
         </div>
       </section>
 
