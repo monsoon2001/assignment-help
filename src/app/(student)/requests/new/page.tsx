@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FileText, Info, CheckCircle2, ShieldCheck, Loader2, ArrowLeft } from "lucide-react";
 import Card from "@/components/ui/card";
 import HelperPicker from "@/components/requests/helper-picker";
@@ -69,12 +69,16 @@ export default function NewRequestPage() {
     customHelpType: "",
     level: "",
     deadline: "",
-    dueTime: "",
+    dueTime: LAST_DUE_TIME,
     pages: "",
     details: "",
     files: [],
   });
   const [step, setStep] = useState<"details" | "helper">("details");
+  // /requests/new?helper=<id> (from "Request Help" on a helper card) keeps the
+  // chosen helper selected once the student reaches the helper step.
+  const searchParams = useSearchParams();
+  const preselectedHelper = searchParams.get("helper");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -107,7 +111,7 @@ export default function NewRequestPage() {
           customSubject: ds.custom,
           pages: normalizePages(d.wordCount),
           deadline: d.deadline ?? (d.deadlineKey ? deadlineFromKey(d.deadlineKey) : prev.deadline),
-          dueTime: d.dueTime ?? prev.dueTime,
+          dueTime: d.dueTime || LAST_DUE_TIME,
           details: d.details ?? prev.details,
           level: d.level ?? prev.level,
         }));
@@ -315,10 +319,19 @@ export default function NewRequestPage() {
                 </div>
               </div>
 
+              {preselectedHelper && (
+                <p className="text-xs text-on-surface-variant">
+                  You picked a helper from the directory — press{" "}
+                  <span className="font-semibold text-on-surface">Send Request</span> on their card to post
+                  your request to them.
+                </p>
+              )}
+
               <HelperPicker
                 subject={resolvedSubject}
                 onSelect={handlePick}
                 heading={`Helpers for ${resolvedSubject}`}
+                preselectedId={preselectedHelper}
               />
 
               {error && (

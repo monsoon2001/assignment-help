@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Loader2, Send, Star } from "lucide-react";
+import { Loader2, Send, Star, BadgeCheck, CircleDollarSign } from "lucide-react";
 import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
 import Badge from "@/components/ui/badge";
@@ -14,13 +14,16 @@ export default function HelperPicker({
   onSelect,
   pickLabel = "Send Request",
   heading = "Choose your helper",
+  preselectedId,
 }: {
   subject?: string | null;
   onSelect: (helper: HelperCandidate) => Promise<void> | void;
   pickLabel?: string;
   heading?: string;
+  preselectedId?: string | null;
 }) {
   const [helpers, setHelpers] = useState<HelperCandidate[]>([]);
+  const [exactMatch, setExactMatch] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [working, setWorking] = useState<string | null>(null);
@@ -35,6 +38,7 @@ export default function HelperPicker({
         setError(result.error);
       } else {
         setHelpers(result.helpers);
+        setExactMatch(result.exactMatch);
       }
       setLoading(false);
     })();
@@ -105,60 +109,94 @@ export default function HelperPicker({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {helpers.map((helper) => {
           const name = helper.user?.name || "Acadivo Helper";
-          const initials = name
-            .split(/\s+/)
-            .map((p) => p[0])
-            .slice(0, 2)
-            .join("")
-            .toUpperCase();
+          const firstName = name.split(" ")[0];
+          const selected = preselectedId === helper.user_id;
           return (
             <div
               key={helper.user_id}
-              className="p-4 rounded-2xl border border-outline-variant bg-surface-container-lowest hover:border-primary-container hover:shadow-lg transition-all flex flex-col gap-3"
+              className={`p-4 rounded-2xl border bg-surface-container-lowest flex flex-col gap-3 transition-all ${
+                selected
+                  ? "border-primary ring-2 ring-primary/30 shadow-lg"
+                  : "border-outline-variant hover:border-primary-container hover:shadow-lg"
+              }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-start gap-3">
                 <Avatar name={name} size="lg" src={helper.user?.avatar_url ?? undefined} />
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-on-surface truncate">{name}</p>
-                  <div className="flex items-center gap-1 text-xs text-on-surface-variant">
-                    <Star size={12} className="fill-amber-400 text-amber-400" />
-                    <span className="font-medium">
-                      {helper.rating_avg > 0 ? helper.rating_avg.toFixed(1) : "New"}
+                  <div className="flex items-center gap-1.5">
+                    <p className="font-semibold text-on-surface truncate">{name}</p>
+                    <BadgeCheck size={14} className="text-primary shrink-0" />
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap mt-1 text-xs text-on-surface-variant">
+                    <span className="inline-flex items-center gap-1">
+                      <Star size={12} className="fill-amber-400 text-amber-400" />
+                      <span className="font-medium text-on-surface">
+                        {helper.rating_avg > 0 ? helper.rating_avg.toFixed(1) : "New"}
+                      </span>
+                      {helper.rating_avg > 0 && <span>· Peer mentor</span>}
                     </span>
-                    <span className="text-on-surface-variant/60">· {initials} Helped students</span>
+                    {helper.hourly_rate != null && (
+                      <span className="inline-flex items-center gap-1">
+                        <CircleDollarSign size={12} />
+                        ${helper.hourly_rate}/hr
+                      </span>
+                    )}
                   </div>
                 </div>
+                {selected && <Badge variant="primary">Selected</Badge>}
               </div>
 
-              {helper.subjects.length > 0 && (
+              {helper.subjects.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5">
-                  {helper.subjects.slice(0, 3).map((s) => (
+                  {helper.subjects.slice(0, 4).map((s) => (
                     <Badge key={s} variant="outline">{s}</Badge>
                   ))}
+                  {helper.subjects.length > 4 && (
+                    <span className="text-xs text-on-surface-variant self-center">
+                      +{helper.subjects.length - 4} more
+                    </span>
+                  )}
                 </div>
+              ) : (
+                <p className="text-xs text-on-surface-variant">Subjects not listed yet.</p>
               )}
 
-              {helper.bio && (
-                <p className="text-sm text-on-surface-variant line-clamp-2">{helper.bio}</p>
+              {helper.bio ? (
+                <p className="text-sm text-on-surface-variant line-clamp-3">{helper.bio}</p>
+              ) : (
+                <p className="text-sm text-on-surface-variant italic">This helper hasn&apos;t added a bio yet.</p>
               )}
 
-              <Button
-                size="sm"
-                disabled={working !== null}
-                onClick={() => handleSelect(helper)}
-                className="justify-center"
-              >
-                {working === helper.user_id ? (
-                  <Loader2 size={15} className="animate-spin" />
-                ) : (
-                  <Send size={15} />
-                )}
-                {pickLabel === "Send Request" ? `Send Request to ${name.split(" ")[0]}` : pickLabel}
-              </Button>
+              <div className="flex items-center gap-2 mt-auto pt-1">
+                <Link
+                  href={`/helpers/${helper.user_id}`}
+                  className="px-3 py-2 text-xs font-medium border border-outline-variant rounded-lg text-on-surface hover:bg-surface-container-low transition-colors shrink-0"
+                >
+                  View profile
+                </Link>
+                <Button
+                  size="sm"
+                  disabled={working !== null}
+                  onClick={() => handleSelect(helper)}
+                  className="flex-1 justify-center"
+                >
+                  {working === helper.user_id ? (
+                    <Loader2 size={15} className="animate-spin" />
+                  ) : (
+                    <Send size={15} />
+                  )}
+                  {pickLabel === "Send Request" ? `Send Request to ${firstName}` : pickLabel}
+                </Button>
+              </div>
             </div>
           );
         })}
       </div>
+      {!exactMatch && subject && (
+        <p className="text-xs text-on-surface-variant mt-3">
+          No helper lists {subject} exactly, so these are the closest matches.
+        </p>
+      )}
       <p className="text-xs text-on-surface-variant mt-4">
         Not sure?{" "}
         <Link href="/browse-helpers" className="text-primary font-medium hover:underline">

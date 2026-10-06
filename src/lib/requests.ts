@@ -175,52 +175,78 @@ export type HelperCandidate = {
   rating_avg: number;
   bio: string | null;
   subjects: string[];
+  hourly_rate: number | null;
   user: { id: string; name: string | null; avatar_url: string | null } | null;
 };
 
+type HelperProfileRow = {
+  user_id: string;
+  rating_avg: number | null;
+  bio: string | null;
+  subjects: string[] | null;
+  hourly_rate: number | null;
+  user:
+    | { id: string; name: string | null; avatar_url: string | null }
+    | { id: string; name: string | null; avatar_url: string | null }[]
+    | null;
+};
+
+/**
+ * Loads helpers from `helper_profiles` rather than from `users`, because
+ * PostgREST ignores filters on an embedded column: `.contains("helper_profiles.subjects")`
+ * used to return every helper account (profile included or not), which is why
+ * helper cards could show nothing but a name. Subject matching is done here
+ * instead of in the query so it is case-insensitive and forgiving; when nothing
+ * matches, every helper is returned so the student is never stuck.
+ */
 export async function fetchHelperCandidates(
   subject?: string | null
-): Promise<{ helpers: HelperCandidate[] } | { error: string }> {
+): Promise<{ helpers: HelperCandidate[]; exactMatch: boolean } | { error: string }> {
   const supabase = createClient();
 
-  let query = supabase
-    .from("users")
-    .select("id, name, avatar_url, helper_profiles(user_id, rating_avg, bio, subjects)")
-    .eq("role", "helper")
-    .limit(50);
-
-  if (subject) {
-    query = query.contains("helper_profiles.subjects", [subject]);
-  }
-
-  const { data, error } = await query.order("name", { ascending: true });
+  const { data, error } = await supabase
+    .from("helper_profiles")
+    .select("user_id, rating_avg, bio, subjects, hourly_rate, user:users!inner(id, name, avatar_url)")
+    .limit(50)
+    .order("rating_avg", { ascending: false });
 
   if (error) {
     return { error: error.message };
   }
 
-  const raw = (data ?? []) as unknown as {
-    id: string;
-    name: string | null;
-    avatar_url: string | null;
-    helper_profiles:
-      | { user_id: string; rating_avg: number; bio: string | null; subjects: string[] }[]
-      | { user_id: string; rating_avg: number; bio: string | null; subjects: string[] }
-      | null;
-  }[];
+  const rows = (data ?? []) as unknown as HelperProfileRow[];
 
-  const helpers: HelperCandidate[] = raw.map((u) => {
-    const profile = Array.isArray(u.helper_profiles)
-      ? (u.helper_profiles[0] ?? null)
-      : (u.helper_profiles ?? null);
+  const all: HelperCandidate[] = rows.map((row) => {
+    const user = Array.isArray(row.user) ? (row.user[0] ?? null) : row.user;
     return {
-      user_id: u.id,
-      user: { id: u.id, name: u.name, avatar_url: u.avatar_url },
-      rating_avg: profile?.rating_avg ?? 0,
-      bio: profile?.bio ?? null,
-      subjects: profile?.subjects ?? [],
+      user_id: row.user_id,
+      user: user ? { id: user.id, name: user.name, avatar_url: user.avatar_url } : null,
+      rating_avg: Number(row.rating_avg ?? 0),
+      bio: row.bio ?? null,
+      subjects: row.subjects ?? [],
+      hourly_rate: row.hourly_rate ?? null,
     };
   });
 
-  return { helpers };
+  const needle = subject?.trim().toLowerCase();
+  if (!needle) {
+    return { helpers: all, exactMatch: true };
+  }
+
+  const scored = all
+    .map((helper) => {
+      const subjects = helper.subjects.map((s) => s.trim().toLowerCase());
+      const exact = subjects.some((s) => s === needle);
+      const partial = subjects.some((s) => s.includes(needle) || needle.includes(s));
+      return { helper, exact, partial };
+    })
+    .filter((entry) => entry.exact || entry.partial)
+    // Exact subject matches first, then the highest rated.
+    .sort((a, b) => Number(b.exact) - Number(a.exact) || b.helper.rating_avg - a.helper.rating_avg);
+
+  if (scored.length === 0) {
+    return { helpers: all, exactMatch: false };
+  }
+
+  return { helpers: scored.map((entry) => entry.helper), exactMatch: true };
 }

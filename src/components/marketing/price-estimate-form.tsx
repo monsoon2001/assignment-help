@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import TaskRequestForm, {
+  LAST_DUE_TIME,
   normalizePages,
   type TaskRequestField,
   type TaskRequestFormValues,
@@ -18,7 +19,7 @@ const BLANK: TaskRequestFormValues = {
   customHelpType: "",
   level: "",
   deadline: "",
-  dueTime: "",
+  dueTime: LAST_DUE_TIME,
   pages: "",
   details: "",
   files: [],
@@ -52,7 +53,7 @@ export default function PriceEstimateForm() {
         helpType: draft.service ?? BLANK.helpType,
         level: draft.level ?? BLANK.level,
         deadline: draft.deadlineKey ?? draft.deadline ?? BLANK.deadline,
-        dueTime: draft.dueTime ?? BLANK.dueTime,
+        dueTime: draft.dueTime || BLANK.dueTime,
         pages: normalizePages(draft.wordCount),
         details: draft.details ?? BLANK.details,
         customSubject: BLANK.customSubject,

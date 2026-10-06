@@ -45,11 +45,14 @@ export async function proxy(request: NextRequest) {
     isAdminRoute(pathname) ? "admin" :
     null;
 
+  // The query string matters: /requests/new?helper=<id> must survive sign-in.
+  const returnTo = pathname + request.nextUrl.search;
+
   if (!user) {
     if (protectedArea) {
       const url = request.nextUrl.clone();
       url.pathname = "/sign-in";
-      url.searchParams.set("next", pathname);
+      url.searchParams.set("next", returnTo);
       return NextResponse.redirect(url);
     }
     return supabaseResponse;
@@ -62,7 +65,7 @@ export async function proxy(request: NextRequest) {
   } else if (Date.now() - authAt > SESSION_TIMEBOX_MS) {
     const url = request.nextUrl.clone();
     url.pathname = "/sign-in";
-    url.searchParams.set("next", pathname);
+    url.searchParams.set("next", returnTo);
     url.searchParams.set("expired", "1");
     const prefix = supabaseCookiePrefix(process.env.NEXT_PUBLIC_SUPABASE_URL!);
     const response = NextResponse.redirect(url);

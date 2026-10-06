@@ -183,7 +183,9 @@ export default function BrowseHelpersPage() {
                           </span>
                           {h.rating_avg > 0 && <span className="text-xs text-on-surface-variant">({Math.floor(h.rating_avg*10)})</span>}
                         </div>
-                        <p className="text-xs text-on-surface-variant mt-0.5">Verified Mentor</p>
+                        <p className="text-xs text-on-surface-variant mt-0.5">
+                          {h.subjects.slice(0, 2).join(" · ") || "Peer mentor"}
+                        </p>
                       </div>
                   </div>
 
@@ -201,20 +203,18 @@ export default function BrowseHelpersPage() {
 
                   <div className="flex flex-col gap-2 text-xs text-on-surface-variant">
                     <div className="flex items-center justify-between">
-                      <span>Students helped</span>
-                      <span className="font-medium text-on-surface">{h.rating_avg > 0 ? Math.floor(h.rating_avg * 30) + 50 : 5}</span>
+                      <span>Rating</span>
+                      <span className="font-medium text-on-surface">{h.rating_avg > 0 ? `${h.rating_avg.toFixed(1)} / 5` : "No reviews yet"}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span>Response rate</span>
-                      <span className="font-medium text-on-surface">96%</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Usually replies</span>
-                      <span className="font-medium text-on-surface">within 12 min</span>
+                      <span>Subjects</span>
+                      <span className="font-medium text-on-surface">{h.subjects.length || "—"}</span>
                     </div>
                     <div className="flex items-center justify-between border-t border-outline-variant/30 pt-2 mt-1">
                       <span>Rate</span>
-                      <span className="font-semibold text-on-surface">$25/hr</span>
+                      <span className="font-semibold text-on-surface">
+                        {h.hourly_rate != null ? `$${h.hourly_rate}/hr` : "Set per request"}
+                      </span>
                     </div>
                   </div>
 
@@ -222,7 +222,7 @@ export default function BrowseHelpersPage() {
                     <Link href={`/helpers/${h.user_id}`} className="flex-1 text-center px-4 py-2 text-sm font-medium border border-outline-variant rounded-xl text-on-surface hover:bg-surface-container-low transition-colors">
                       View profile
                     </Link>
-                    <Link href={`/helpers/${h.user_id}`} className="flex-1 text-center px-4 py-2 text-sm font-medium bg-primary-container text-on-primary rounded-xl hover:bg-primary transition-colors">
+                    <Link href={`/requests/new?helper=${h.user_id}`} className="flex-1 text-center px-4 py-2 text-sm font-medium bg-primary-container text-on-primary rounded-xl hover:bg-primary transition-colors">
                       Request Help
                     </Link>
                   </div>

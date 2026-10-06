@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowRight, ChevronUp, ChevronDown, FileText, Trash2, Upload, X } from "lucide-react";
+import { ArrowRight, CalendarDays, Clock, ChevronUp, ChevronDown, FileText, Trash2, Upload, X } from "lucide-react";
 import { SUBJECTS, SERVICE_TYPES, ACADEMIC_LEVELS, OTHER_OPTION } from "@/lib/constants";
 
 export const SUBJECT_OPTIONS = [...SUBJECTS, OTHER_OPTION];
@@ -11,6 +11,11 @@ export const LEVEL_OPTIONS = [...ACADEMIC_LEVELS];
 
 const FIELD_CLASS =
   "w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all";
+// Safari renders native date/time widgets tiny and hides the time value when it
+// is empty, so these fields are styled as plain inputs and open the picker from
+// their own icon button.
+const PICKER_CLASS =
+  `${FIELD_CLASS} h-11 text-[15px] appearance-none pr-10 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-date-and-time-value]:w-full [&::-webkit-date-and-time-value]:text-left`;
 const SELECT_CLASS = `${FIELD_CLASS} appearance-none cursor-pointer`;
 export const LAST_DUE_TIME = "23:59";
 export const WORDS_PER_PAGE = 250;
@@ -59,6 +64,73 @@ interface TaskRequestFormProps {
   onSubmit: (e: React.FormEvent) => void;
   submitLabel: string;
   note?: string;
+}
+
+/**
+ * A date or time input that stays readable in Safari: the native widget is
+ * hidden behind an icon button that opens the real picker, so the value is
+ * always visible instead of collapsing to a tiny segmented control.
+ */
+function PickerField({
+  label,
+  kind,
+  value,
+  min,
+  max,
+  onChange,
+}: {
+  label: string;
+  kind: "date" | "time";
+  value: string;
+  min?: string;
+  max?: string;
+  onChange: (value: string) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const Icon = kind === "date" ? CalendarDays : Clock;
+
+  const openPicker = () => {
+    const input = inputRef.current;
+    if (!input) return;
+    if (typeof input.showPicker === "function") {
+      try {
+        input.showPicker();
+        return;
+      } catch {
+        // Safari rejects showPicker in some states; focusing still opens it.
+      }
+    }
+    input.focus();
+    input.click();
+  };
+
+  return (
+    <div className="flex flex-col gap-1">
+      <label className="text-xs font-semibold text-on-surface" htmlFor={`field-${kind}`}>
+        {label}
+      </label>
+      <div className="relative flex items-center">
+        <input
+          id={`field-${kind}`}
+          ref={inputRef}
+          type={kind}
+          min={min}
+          max={max}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={PICKER_CLASS}
+        />
+        <button
+          type="button"
+          onClick={openPicker}
+          aria-label={`Open ${label.toLowerCase()} picker`}
+          className="absolute right-3 flex items-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
+        >
+          <Icon size={16} />
+        </button>
+      </div>
+    </div>
+  );
 }
 
 /**
@@ -244,26 +316,20 @@ export default function TaskRequestForm({
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-on-surface">When is it due?</label>
-          <input
-            type="date"
-            min={today}
-            value={values.deadline}
-            onChange={(e) => set("deadline", e.target.value)}
-            className={FIELD_CLASS}
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-on-surface">Due time</label>
-          <input
-            type="time"
-            max={LAST_DUE_TIME}
-            value={values.dueTime}
-            onChange={(e) => handleDueTime(e.target.value)}
-            className={FIELD_CLASS}
-          />
-        </div>
+        <PickerField
+          label="When is it due?"
+          kind="date"
+          value={values.deadline}
+          min={today}
+          onChange={(value) => set("deadline", value)}
+        />
+        <PickerField
+          label="Due time"
+          kind="time"
+          value={values.dueTime}
+          max={LAST_DUE_TIME}
+          onChange={handleDueTime}
+        />
       </div>
 
       <div className="flex flex-col gap-1">
