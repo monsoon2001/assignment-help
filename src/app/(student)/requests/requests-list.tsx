@@ -20,6 +20,7 @@ import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import Avatar from "@/components/ui/avatar";
+import { requestStatusVariant } from "@/lib/status-meta";
 import ProposalCard, { type RequestProposal } from "@/components/requests/proposal-card";
 
 export type StudentRequestRow = {
@@ -35,15 +36,12 @@ export type StudentRequestRow = {
   helper: { id: string; name: string | null } | null;
 };
 
-const STATUS_META: Record<
-  string,
-  { label: string; variant: "primary" | "secondary" | "success" | "warning" | "danger" | "outline" }
-> = {
-  requested: { label: "Requested", variant: "primary" },
-  proposal_sent: { label: "Reviewing Proposals", variant: "warning" },
-  accepted: { label: "Hired", variant: "success" },
-  declined: { label: "Declined", variant: "outline" },
-  cancelled: { label: "Cancelled", variant: "outline" },
+const STATUS_LABEL: Record<string, string> = {
+  requested: "Requested",
+  proposal_sent: "Reviewing Proposals",
+  accepted: "Hired",
+  declined: "Declined",
+  cancelled: "Cancelled",
 };
 
 const TABS = [
@@ -339,7 +337,7 @@ export default function RequestsList({
       {pageItems.length > 0 && (
         <section className="flex flex-col gap-4">
           {pageItems.map((r) => {
-            const meta = STATUS_META[r.status] ?? { label: r.status, variant: "outline" as const };
+            const meta = { label: STATUS_LABEL[r.status] ?? r.status, variant: requestStatusVariant(r.status) };
             const proposals = proposalsByRequest[r.id] ?? [];
             const overdue = r.status === "requested" && isPastResponseWindow(r.sent_at);
             return (
@@ -376,7 +374,7 @@ export default function RequestsList({
                         <p className="text-xs text-on-surface-variant mt-1 truncate">
                           {refCode(r.id)} · {r.subject || "General"} · Requested {formatDate(r.created_at)}
                         </p>
-                        <div className="flex items-center gap-3 mt-2 text-[11px] text-on-surface-variant">
+                        <div className="flex items-center gap-3 mt-2 text-xs text-on-surface-variant">
                           <span className="inline-flex items-center gap-1">
                             <CalendarDays size={11} /> Due {formatDate(r.deadline)}
                           </span>
@@ -393,7 +391,7 @@ export default function RequestsList({
                     </div>
                     <div className="flex items-center gap-5 lg:ml-auto shrink-0">
                       {r.description && (
-                        <div className="hidden md:block max-w-[280px]">
+                        <div className="hidden md:block max-w-70">
                           <p className="text-xs text-on-surface-variant line-clamp-2">{r.description}</p>
                         </div>
                       )}

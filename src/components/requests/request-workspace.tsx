@@ -27,6 +27,7 @@ import { fetchRequestMessages, sendRequestMessage } from "@/lib/request-chat";
 import { reassignRequest, type HelperCandidate } from "@/lib/requests";
 import { submitProposal } from "@/lib/proposals";
 import { markThreadNotificationsRead } from "@/lib/notifications";
+import { requestStatusVariant } from "@/lib/status-meta";
 import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
 
 const RESPONSE_WINDOW_MS = 2 * 60 * 60 * 1000;
@@ -50,12 +51,12 @@ type RequestData = {
   student: { id: string; name: string | null } | null;
 };
 
-const STATUS_META: Record<string, { label: string; variant: "primary" | "success" | "warning" | "outline" }> = {
-  requested: { label: "Awaiting Response", variant: "warning" },
-  proposal_sent: { label: "Proposal Received", variant: "primary" },
-  accepted: { label: "Accepted", variant: "success" },
-  declined: { label: "Declined", variant: "outline" },
-  cancelled: { label: "Cancelled", variant: "outline" },
+const STATUS_LABEL: Record<string, string> = {
+  requested: "Awaiting Response",
+  proposal_sent: "Proposal Received",
+  accepted: "Accepted",
+  declined: "Declined",
+  cancelled: "Cancelled",
 };
 
 export default function RequestWorkspace({
@@ -210,10 +211,10 @@ export default function RequestWorkspace({
     return (
       <div className="w-full" aria-busy="true" aria-live="polite">
         <span className="sr-only">Loading request…</span>
-        <div className="w-full rounded-2xl border border-outline-variant p-5 sm:p-6">
+        <div className="w-full rounded-2xl border border-outline-variant p-6">
           <div className="flex flex-wrap items-center gap-4">
             <SkeletonCircle className="w-12 h-12" />
-            <div className="flex-1 min-w-[12rem] space-y-2">
+            <div className="flex-1 min-w-48 space-y-2">
               <Skeleton className="h-5 w-56" />
               <Skeleton className="h-3.5 w-40" />
             </div>
@@ -251,7 +252,7 @@ export default function RequestWorkspace({
   }
 
   const isHelper = mode === "helper";
-  const meta = STATUS_META[request.status] ?? { label: request.status, variant: "outline" as const };
+  const meta = { label: STATUS_LABEL[request.status] ?? request.status, variant: requestStatusVariant(request.status) };
   const otherParty = isHelper ? request.student : request.helper;
   const overdue =
     !isHelper && request.status === "requested" && isPastResponseWindow(request.sent_at);
@@ -381,7 +382,7 @@ export default function RequestWorkspace({
       {!overdue && resendOpen && (
         <Card className="p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-display font-semibold text-on-surface">Choose a different helper</h3>
+            <h2 className="font-display font-semibold text-on-surface">Choose a different helper</h2>
             <Button size="sm" variant="ghost" onClick={() => setResendOpen(false)}>Close</Button>
           </div>
           <HelperPicker subject={request.subject} onSelect={handleReassign} pickLabel="Send to this helper instead" heading="" />

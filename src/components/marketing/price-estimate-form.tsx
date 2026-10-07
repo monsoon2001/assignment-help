@@ -30,6 +30,7 @@ export default function PriceEstimateForm() {
   const searchParams = useSearchParams();
   const [values, setValues] = useState<TaskRequestFormValues>(BLANK);
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const restoredRef = useRef(false);
 
   const set = useCallback(<K extends TaskRequestField>(
@@ -112,6 +113,7 @@ export default function PriceEstimateForm() {
       wordCount: values.pages,
       details: values.details,
     });
+    setSubmitting(true);
     await saveDraftFiles(values.files);
 
     const supabase = createClient();
@@ -135,6 +137,7 @@ export default function PriceEstimateForm() {
       onSubmit={handleSubmit}
       submitLabel="Find Matching Helpers"
       note="Free estimate — no commitment required"
+      submitting={submitting}
     />
   );
 }

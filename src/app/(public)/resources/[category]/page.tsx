@@ -53,11 +53,11 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
         ]}
       />
 
-      <section className="py-16 bg-white wash-amber">
+      <section className="py-16 band-soft">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {guides.map((guide, i) => {
-              const tone = [PAGE_TONES.amber, PAGE_TONES.teal, PAGE_TONES.violet, PAGE_TONES.rose][i % 4];
+            {guides.map((guide) => {
+              const tone = PAGE_TONES.blue;
               return (
               <Link
                 key={guide.slug}
@@ -71,7 +71,7 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
                 <h2 className={`font-display font-bold text-on-surface mb-2 transition-colors ${tone.text}`}>
                   {guide.title}
                 </h2>
-                <p className="text-sm text-on-surface-variant leading-relaxed line-clamp-3">{guide.description}</p>
+                <p className="text-base text-on-surface-variant leading-relaxed line-clamp-3">{guide.description}</p>
               </Link>
               );
             })}
@@ -86,7 +86,7 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
             </Link>
             <Link
               href="/browse-helpers"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent-amber to-accent-rose text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-accent-amber/25"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-container text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-primary-container/20"
             >
               Looking for one-to-one help?
               <ArrowRight className="w-4 h-4" />

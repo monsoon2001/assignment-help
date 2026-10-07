@@ -2,15 +2,16 @@ import Link from "next/link";
 import { ChevronRight, ArrowRight } from "lucide-react";
 
 /**
- * Every marketing page shares the same page-header band, section washes and
- * closing call-to-action, so the tone lives in one place: `teal`, `amber`,
- * `violet` or `rose` are cousins of the indigo primary, which keeps a
- * multi-page site looking like one brand instead of a single blue sheet.
+ * Every public page shares the same page-header band, section bands and
+ * closing call-to-action. Sections stay neutral (white / soft grey); each page
+ * carries one non-purple accent (blue, teal, green, amber or rose) used only
+ * in small touches — icon tiles, chips, hairlines, links and hover states —
+ * so a long marketing page reads as one calm sheet of colour, never washes.
  */
-export type PageTone = "teal" | "amber" | "violet" | "rose" | "indigo";
+export type PageTone = "blue" | "teal" | "green" | "amber" | "rose";
 
 type ToneTokens = {
-  /** Page-header band: a tinted gradient rather than one flat blue. */
+  /** Page-header band: white with a faint tint of the page's accent at the left. */
   header: string;
   /** Accent name used for links, chips and icons in this page's header. */
   text: string;
@@ -22,87 +23,100 @@ type ToneTokens = {
   /** Soft tile behind a material-symbols icon. */
   card: string;
   cardHover: string;
-  /** Section background: white with a coloured wash fading out. */
+  /** Section background: soft neutral grey (pairs with plain `bg-white`). */
   band: string;
-  /** Gradient for primary buttons on this page. */
+  /** Primary buttons stay one brand blue across every page for cohesion. */
   button: string;
   /** `from-* to-*` only, for buttons that add their own gradient utility. */
   btn: string;
   hairline: string;
 };
 
-export const PAGE_TONES: Record<PageTone, ToneTokens> = {
-  teal: {
-    header: "bg-gradient-to-r from-accent-teal-container/90 via-surface-container-high to-surface-container-low",
-    text: "text-accent-teal",
-    hoverText: "hover:text-accent-teal",
-    chip: "bg-accent-teal-container text-accent-teal",
-    iconTile: "bg-accent-teal-container",
-    icon: "text-accent-teal",
-    card: "border-outline-variant/30",
-    cardHover: "hover:border-accent-teal/40 hover:shadow-lg",
-    band: "bg-white wash-teal",
-    button: "bg-gradient-to-r from-accent-teal to-primary-container text-white hover:opacity-95",
-    btn: "from-accent-teal to-primary-container",
-    hairline: "from-accent-teal to-accent-teal-container",
-  },
-  amber: {
-    header: "bg-gradient-to-r from-accent-amber-container/90 via-surface-container-high to-surface-container-low",
-    text: "text-accent-amber",
-    hoverText: "hover:text-accent-amber",
-    chip: "bg-accent-amber-container text-accent-amber",
-    iconTile: "bg-accent-amber-container",
-    icon: "text-accent-amber",
-    card: "border-outline-variant/30",
-    cardHover: "hover:border-accent-amber/40 hover:shadow-lg",
-    band: "bg-white wash-amber",
-    button: "bg-gradient-to-r from-accent-amber to-accent-rose text-white hover:opacity-95",
-    btn: "from-accent-amber to-accent-rose",
-    hairline: "from-accent-amber to-accent-amber-container",
-  },
-  violet: {
-    header: "bg-gradient-to-r from-accent-violet-container/90 via-surface-container-high to-surface-container-low",
-    text: "text-accent-violet",
-    hoverText: "hover:text-accent-violet",
-    chip: "bg-accent-violet-container text-accent-violet",
-    iconTile: "bg-accent-violet-container",
-    icon: "text-accent-violet",
-    card: "border-outline-variant/30",
-    cardHover: "hover:border-accent-violet/40 hover:shadow-lg",
-    band: "bg-white wash-violet",
-    button: "bg-gradient-to-r from-accent-violet to-primary-container text-white hover:opacity-95",
-    btn: "from-accent-violet to-primary-container",
-    hairline: "from-accent-violet to-accent-violet-container",
-  },
-  rose: {
-    header: "bg-gradient-to-r from-accent-rose-container/90 via-surface-container-high to-surface-container-low",
-    text: "text-accent-rose",
-    hoverText: "hover:text-accent-rose",
-    chip: "bg-accent-rose-container text-accent-rose",
-    iconTile: "bg-accent-rose-container",
-    icon: "text-accent-rose",
-    card: "border-outline-variant/30",
-    cardHover: "hover:border-accent-rose/40 hover:shadow-lg",
-    band: "bg-white wash-rose",
-    button: "bg-gradient-to-r from-accent-rose to-accent-violet text-white hover:opacity-95",
-    btn: "from-accent-rose to-accent-violet",
-    hairline: "from-accent-rose to-accent-rose-container",
-  },
-  indigo: {
-    header: "bg-gradient-to-r from-primary-fixed via-surface-container-high to-surface-container-low",
-    text: "text-primary",
-    hoverText: "hover:text-primary",
-    chip: "bg-primary-fixed text-on-primary-fixed",
-    iconTile: "bg-primary-fixed",
-    icon: "text-primary",
-    card: "border-outline-variant/30",
-    cardHover: "hover:border-primary-container/40 hover:shadow-lg",
-    band: "bg-surface-container-low wash-violet",
-    button: "bg-gradient-to-r from-primary-container to-accent-violet text-white hover:opacity-95",
-    btn: "from-primary-container to-accent-violet",
-    hairline: "from-primary-container to-primary-fixed",
-  },
+const BLUE_TONE: ToneTokens = {
+  header: "bg-gradient-to-r from-primary-fixed/60 via-white to-white",
+  text: "text-primary",
+  hoverText: "hover:text-primary",
+  chip: "bg-primary-fixed text-on-primary-fixed",
+  iconTile: "bg-primary-fixed",
+  icon: "text-primary",
+  card: "border-outline-variant/40",
+  cardHover: "hover:border-primary-container/50 hover:shadow-md",
+  band: "band-soft",
+  button: "bg-primary hover:bg-primary-container text-white transition-colors",
+  btn: "from-primary-container to-primary",
+  hairline: "from-primary-container to-primary-fixed",
 };
+
+const TEAL_TONE: ToneTokens = {
+  header: "bg-gradient-to-r from-accent-teal-container/80 via-white to-white",
+  text: "text-accent-teal",
+  hoverText: "hover:text-accent-teal",
+  chip: "bg-accent-teal-container text-accent-teal",
+  iconTile: "bg-accent-teal-container",
+  icon: "text-accent-teal",
+  card: "border-outline-variant/40",
+  cardHover: "hover:border-accent-teal/35 hover:shadow-md",
+  band: "band-soft",
+  button: "bg-primary hover:bg-primary-container text-white transition-colors",
+  btn: "from-primary-container to-primary",
+  hairline: "from-accent-teal to-accent-teal-container",
+};
+
+const GREEN_TONE: ToneTokens = {
+  header: "bg-gradient-to-r from-accent-green-container/80 via-white to-white",
+  text: "text-accent-green",
+  hoverText: "hover:text-accent-green",
+  chip: "bg-accent-green-container text-accent-green",
+  iconTile: "bg-accent-green-container",
+  icon: "text-accent-green",
+  card: "border-outline-variant/40",
+  cardHover: "hover:border-accent-green/35 hover:shadow-md",
+  band: "band-soft",
+  button: "bg-primary hover:bg-primary-container text-white transition-colors",
+  btn: "from-primary-container to-primary",
+  hairline: "from-accent-green to-accent-green-container",
+};
+
+const AMBER_TONE: ToneTokens = {
+  header: "bg-gradient-to-r from-accent-amber-container/80 via-white to-white",
+  text: "text-accent-amber",
+  hoverText: "hover:text-accent-amber",
+  chip: "bg-accent-amber-container text-accent-amber",
+  iconTile: "bg-accent-amber-container",
+  icon: "text-accent-amber",
+  card: "border-outline-variant/40",
+  cardHover: "hover:border-accent-amber/40 hover:shadow-md",
+  band: "band-soft",
+  button: "bg-primary hover:bg-primary-container text-white transition-colors",
+  btn: "from-primary-container to-primary",
+  hairline: "from-accent-amber to-accent-amber-container",
+};
+
+const ROSE_TONE: ToneTokens = {
+  header: "bg-gradient-to-r from-accent-rose-container/80 via-white to-white",
+  text: "text-accent-rose",
+  hoverText: "hover:text-accent-rose",
+  chip: "bg-accent-rose-container text-accent-rose",
+  iconTile: "bg-accent-rose-container",
+  icon: "text-accent-rose",
+  card: "border-outline-variant/40",
+  cardHover: "hover:border-accent-rose/35 hover:shadow-md",
+  band: "band-soft",
+  button: "bg-primary hover:bg-primary-container text-white transition-colors",
+  btn: "from-primary-container to-primary",
+  hairline: "from-accent-rose to-accent-rose-container",
+};
+
+export const PAGE_TONES: Record<PageTone, ToneTokens> = {
+  blue: BLUE_TONE,
+  teal: TEAL_TONE,
+  green: GREEN_TONE,
+  amber: AMBER_TONE,
+  rose: ROSE_TONE,
+};
+
+/** Non-purple accents in rotation, so list cards pick up varied colour. */
+export const TONE_CYCLE: PageTone[] = ["blue", "teal", "green", "amber", "rose"];
 
 export type Crumb = { label: string; href?: string };
 
@@ -111,7 +125,7 @@ export function PageHeader({
   title,
   subtitle,
   crumbs = [{ label: "Home", href: "/" }],
-  tone = "indigo",
+  tone = "blue",
   icon,
   eyebrow,
 }: {
@@ -181,7 +195,7 @@ export function CtaBand({
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {eyebrow && (
           <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full on-band-chip border text-xs font-semibold mb-4">
-            <span className="material-symbols-outlined text-sm text-accent-amber-container">{eyebrow}</span>
+            <span className="material-symbols-outlined text-sm text-white/70">{eyebrow}</span>
           </span>
         )}
         <h2 id="cta-heading" className="font-display text-2xl sm:text-3xl font-bold text-white mb-3">
@@ -191,7 +205,7 @@ export function CtaBand({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href={primary.href}
-            className="inline-flex items-center gap-2 px-7 py-3 bg-white text-ink-900 rounded-xl font-semibold text-sm hover:bg-accent-amber-container transition-colors shadow-lg shadow-ink-900/40"
+            className="inline-flex items-center gap-2 px-7 py-3 bg-white text-ink-900 rounded-xl font-semibold text-sm hover:bg-white/90 transition-colors shadow-lg shadow-ink-900/40"
           >
             {primary.label}
             <ArrowRight className="w-4 h-4" />

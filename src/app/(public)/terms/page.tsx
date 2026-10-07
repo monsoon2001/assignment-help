@@ -19,7 +19,7 @@ export default function TermsPage() {
   return (
     <>
       <PageHeader
-        tone="indigo"
+        tone="blue"
         icon="gavel"
         eyebrow="Legal"
         title="Terms of Service"
@@ -27,13 +27,13 @@ export default function TermsPage() {
         crumbs={[{ label: "Home", href: "/" }, { label: "Terms of Service" }]}
       />
 
-      <section className="bg-white wash-violet">
+      <section className="band-soft">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="prose-custom space-y-6">
             {sections.map((section) => (
               <div key={section.title} className="bg-white rounded-2xl border border-outline-variant/30 p-6 shadow-sm hover:border-primary-container/40 transition-colors">
                 <h2 className="font-display text-lg font-bold text-on-surface mb-2">{section.title}</h2>
-                <p className="text-sm text-on-surface-variant leading-relaxed">{section.content}</p>
+                <p className="text-base text-on-surface-variant leading-relaxed">{section.content}</p>
               </div>
             ))}
           </div>

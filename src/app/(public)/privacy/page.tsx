@@ -18,7 +18,7 @@ export default function PrivacyPage() {
   return (
     <>
       <PageHeader
-        tone="violet"
+        tone="green"
         icon="lock"
         eyebrow="Legal"
         title="Privacy Policy"
@@ -26,18 +26,13 @@ export default function PrivacyPage() {
         crumbs={[{ label: "Home", href: "/" }, { label: "Privacy Policy" }]}
       />
 
-      <section className="bg-white wash-violet">
+      <section className="band-soft">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="space-y-6">
-            {sections.map((section, i) => (
-              <div key={section.title} className="bg-white rounded-2xl border border-outline-variant/30 p-6 shadow-sm hover:border-accent-violet/40 transition-colors">
-                <div className="flex items-start gap-3 mb-2">
-                  <span className="w-8 h-8 rounded-lg bg-accent-violet-container text-accent-violet flex items-center justify-center text-sm font-bold shrink-0">
-                    {i + 1}
-                  </span>
-                  <h2 className="font-display text-lg font-bold text-on-surface">{section.title}</h2>
-                </div>
-                <p className="text-sm text-on-surface-variant leading-relaxed">{section.content}</p>
+            {sections.map((section) => (
+              <div key={section.title} className="bg-white rounded-2xl border border-outline-variant/30 p-6 shadow-sm hover:border-primary-container/60 transition-colors">
+                <h2 className="font-display text-lg font-bold text-on-surface mb-2">{section.title}</h2>
+                <p className="text-base text-on-surface-variant leading-relaxed">{section.content}</p>
               </div>
             ))}
           </div>

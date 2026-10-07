@@ -7,6 +7,7 @@ import { Briefcase, Eye } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
 import { formatCurrency, normalizeCurrency } from "@/lib/currency";
+import { orderStatusVariant } from "@/lib/status-meta";
 import { EmptyState } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
@@ -19,15 +20,6 @@ function formatDate(iso: string | null | undefined): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
-
-const STATUS_VARIANT: Record<string, "primary" | "warning" | "success" | "secondary" | "danger" | "outline"> = {
-  payment_pending: "warning",
-  in_progress: "secondary",
-  delivered: "primary",
-  revision_requested: "warning",
-  completed: "success",
-  disputed: "danger",
-};
 
 export default async function AdminOrdersPage() {
   await requireAdmin();
@@ -81,7 +73,7 @@ export default async function AdminOrdersPage() {
                     </td>
                     <td className="px-6 py-4 text-sm font-semibold text-on-surface">{formatCurrency(Number(order.price), normalizeCurrency(order.currency))}</td>
                     <td className="px-6 py-4">
-                      <Badge variant={STATUS_VARIANT[order.status] ?? "outline"}>
+                      <Badge variant={orderStatusVariant(order.status)}>
                         {order.status.replaceAll("_", " ")}
                       </Badge>
                     </td>

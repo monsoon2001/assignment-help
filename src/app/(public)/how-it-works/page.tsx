@@ -12,7 +12,7 @@ export default function HowItWorksPage() {
   return (
     <>
       <PageHeader
-        tone="violet"
+        tone="green"
         icon="route"
         eyebrow="Simple Process"
         title="How It Works"
@@ -20,11 +20,11 @@ export default function HowItWorksPage() {
         crumbs={[{ label: "Home", href: "/" }, { label: "How It Works" }]}
       />
 
-      <div className="bg-white wash-violet">
+      <div className="band-soft">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="space-y-12">
           {steps.map((step, i) => {
-            const tone = [PAGE_TONES.violet, PAGE_TONES.teal, PAGE_TONES.amber, PAGE_TONES.rose][i % 4];
+            const tone = PAGE_TONES.blue;
             return (
             <div key={step.num} className="relative">
               {i < steps.length - 1 && (
@@ -40,9 +40,9 @@ export default function HowItWorksPage() {
                     <h2 className="font-display text-xl font-bold text-on-surface">{step.title}</h2>
                   </div>
                   <p className="text-on-surface-variant leading-relaxed mb-4">{step.desc}</p>
-                  <ul className="grid grid-cols-2 gap-2">
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {step.details.map((d) => (
-                      <li key={d} className="flex items-center gap-2 text-sm text-on-surface-variant">
+                      <li key={d} className="flex items-center gap-2 text-base text-on-surface-variant leading-relaxed">
                         <span className={`material-symbols-outlined ${tone.text} text-sm`}>check_circle</span>
                         {d}
                       </li>
@@ -55,10 +55,10 @@ export default function HowItWorksPage() {
           })}
         </div>
 
-        <div className="mt-16 text-center bg-white rounded-2xl p-10 border border-outline-variant/30 shadow-sm">
+        <div className="mt-16 text-center bg-white rounded-2xl p-6 sm:p-10 border border-outline-variant/30 shadow-sm">
           <h2 className="font-display text-2xl font-bold text-on-surface mb-3">Ready to get started?</h2>
           <p className="text-on-surface-variant mb-6 max-w-lg mx-auto">Get matched with a verified helper in your subject and start improving your grades with Acadivo.</p>
-          <Link href="/browse-helpers" className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-primary-container to-accent-violet text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-primary-container/30">
+          <Link href="/browse-helpers" className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary hover:bg-primary-container text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-primary-container/30">
             Browse Helpers
           </Link>
         </div>

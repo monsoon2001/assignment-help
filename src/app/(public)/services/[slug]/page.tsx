@@ -59,20 +59,20 @@ export default async function ServiceDetailPage({
 
   return (
     <>
-      <div className="bg-gradient-to-r from-accent-teal-container/90 via-surface-container-high to-surface-container-low border-b border-outline-variant/50">
+      <div className="bg-gradient-to-r from-primary-fixed/50 via-white to-white border-b border-outline-variant/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <nav className="flex flex-wrap items-center gap-2 text-sm text-on-surface-variant mb-4">
-            <Link href="/" className="hover:text-accent-teal transition-colors">
+            <Link href="/" className="text-primary transition-colors">
               Home
             </Link>
             <ChevronRight className="h-3.5 w-3.5" />
-            <Link href="/services" className="hover:text-accent-teal transition-colors">
+            <Link href="/services" className="text-primary transition-colors">
               Services
             </Link>
             <ChevronRight className="h-3.5 w-3.5" />
             <Link
               href={`/services#${service.group.id}`}
-              className="hover:text-accent-teal transition-colors"
+              className="text-primary transition-colors"
             >
               {service.group.title}
             </Link>
@@ -81,7 +81,7 @@ export default async function ServiceDetailPage({
           </nav>
 
           <div className="flex items-start gap-4">
-            <span className="w-12 h-12 rounded-xl bg-white text-accent-teal ring-1 ring-accent-teal/25 flex items-center justify-center shrink-0">
+            <span className="w-12 h-12 rounded-xl bg-white text-primary ring-1 ring-primary-container/40 flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined">{service.group.icon}</span>
             </span>
             <div>
@@ -95,7 +95,7 @@ export default async function ServiceDetailPage({
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
             <Link
               href="/#estimate"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-accent-teal to-primary-container text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-accent-teal/25"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-primary-container text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-primary-container/20"
             >
               Get matched with helpers
               <ArrowRight className="h-4 w-4" />
@@ -110,8 +110,8 @@ export default async function ServiceDetailPage({
         </div>
       </div>
 
-      <div className="bg-white wash-split">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid lg:grid-cols-3 gap-10">
+      <div className="bg-white band-hero">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid lg:grid-cols-3 gap-10">
         <div className="lg:col-span-2 space-y-12">
           <section aria-labelledby="included-heading">
             <h2
@@ -124,9 +124,9 @@ export default async function ServiceDetailPage({
               {INCLUDED.map((point) => (
                 <li
                   key={point}
-                  className="flex items-start gap-2.5 rounded-xl border border-accent-teal/25 bg-accent-teal-container/30 p-4 text-on-surface-variant"
+                  className="flex items-start gap-2.5 rounded-xl border border-outline-variant/50 bg-primary-fixed/30 p-4 text-on-surface-variant"
                 >
-                  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-accent-teal" />
+                  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                   {point}
                 </li>
               ))}
@@ -192,7 +192,7 @@ export default async function ServiceDetailPage({
                   href={`/services/${item.slug}`}
                   className="group rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-4 transition-all hover:border-primary-container/40 hover:shadow-md"
                 >
-                  <span className="font-semibold text-on-surface group-hover:text-accent-teal transition-colors">
+                  <span className="font-semibold text-primary transition-colors">
                     {item.name}
                   </span>
                   <span className="mt-1 block text-on-surface-variant leading-relaxed">{item.desc}</span>
@@ -219,7 +219,7 @@ export default async function ServiceDetailPage({
                   <li key={resource.slug}>
                     <Link
                       href={resourcePath(resource)}
-                      className="text-on-surface-variant hover:text-accent-teal transition-colors leading-snug"
+                      className="text-primary transition-colors leading-snug"
                     >
                       {resource.title}
                     </Link>
@@ -228,12 +228,12 @@ export default async function ServiceDetailPage({
             </ul>
           </div>
 
-          <div className="rounded-2xl border border-accent-amber/30 bg-accent-amber-container/50 p-5">
+          <div className="rounded-2xl border border-outline-variant/50 bg-primary-fixed/50 p-5">
             <h2 className="font-display text-lg font-bold text-on-surface mb-2">About this category</h2>
             <p className="text-on-surface-variant leading-relaxed mb-4">{service.group.description}</p>
             <Link
               href={`/services#${service.group.id}`}
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent-amber hover:underline"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
             >
               All {service.group.title.toLowerCase()} services
               <ArrowRight className="h-4 w-4" />

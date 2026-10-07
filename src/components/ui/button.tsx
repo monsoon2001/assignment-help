@@ -1,12 +1,14 @@
 import { forwardRef } from "react";
+import Link from "next/link";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
   size?: "sm" | "md" | "lg";
+  href?: string;
 }
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className = "", variant = "primary", size = "md", ...props }, ref) => {
+const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
+  ({ className = "", variant = "primary", size = "md", href, ...props }, ref) => {
     const base = "inline-flex items-center justify-center font-medium transition-colors rounded-xl disabled:opacity-50 disabled:pointer-events-none cursor-pointer";
     const variants: Record<string, string> = {
       primary: "bg-primary-container text-on-primary hover:bg-primary shadow-sm",
@@ -20,9 +22,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       md: "px-4 py-2 text-sm gap-2",
       lg: "px-6 py-3 text-base gap-2",
     };
-    return (
-      <button ref={ref} className={`${base} ${variants[variant]} ${sizes[size]} ${className}`} {...props} />
-    );
+    const classes = `${base} ${variants[variant]} ${sizes[size]} ${className}`;
+    if (href) {
+      return (
+        <Link ref={ref as React.Ref<HTMLAnchorElement>} href={href} className={classes} {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement> & ButtonProps)} />
+      );
+    }
+    return <button ref={ref as React.Ref<HTMLButtonElement>} className={classes} {...props} />;
   }
 );
 Button.displayName = "Button";

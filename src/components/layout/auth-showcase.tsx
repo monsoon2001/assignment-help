@@ -112,7 +112,7 @@ export default function AuthShowcase() {
             {SUBJECTS.map((subject) => (
               <span
                 key={subject}
-                className="rounded-md bg-inverse-on-surface/10 px-2 py-1 text-[11px] font-medium text-inverse-on-surface/80"
+                className="rounded-md bg-inverse-on-surface/10 px-2 py-1 text-xs font-medium text-inverse-on-surface/80"
               >
                 {subject}
               </span>

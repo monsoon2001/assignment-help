@@ -9,6 +9,7 @@ import {
   SmilePlus,
 } from "lucide-react";
 import Avatar from "@/components/ui/avatar";
+import Button from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { ADMIN_MESSAGES_CHANNEL } from "@/lib/supabase/realtime";
 import { useVoiceCall } from "@/components/call/voice-call";
@@ -183,33 +184,31 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-on-surface">Chat with Admin</p>
           {logs.length > 0 && (
-            <p className="text-[11px] text-on-surface-variant">
+            <p className="text-xs text-on-surface-variant">
               {logs.length} call{logs.length !== 1 ? "s" : ""}
               {totalSeconds > 0 ? ` · ${formatDuration(totalSeconds)} talk time` : ""}
               {missedCount > 0 ? ` · ${missedCount} missed` : ""}
             </p>
           )}
           {logs.length === 0 && (
-            <p className="text-[11px] text-emerald-600 inline-flex items-center gap-1">
+            <p className="text-xs text-emerald-600 inline-flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
               Support desk · messages sync live
             </p>
           )}
         </div>
-        <button
+        <Button
           type="button"
+          size="sm"
+          variant="primary"
           disabled={callBusy}
           onClick={() => startCall(admin)}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
-            callBusy
-              ? "bg-surface-container-high text-on-surface-variant opacity-50 cursor-not-allowed"
-              : "bg-primary text-on-primary hover:bg-primary/90"
-          }`}
+          className="rounded-full"
           aria-label={`Call ${admin.name}`}
         >
           <Phone size={13} />
           Call
-        </button>
+        </Button>
       </div>
 
       <div ref={listRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-3 bg-surface-container-low/40 overscroll-contain pb-6">
@@ -236,7 +235,7 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
                   }`}
                 >
                   <p className="whitespace-pre-wrap break-words">{m.body}</p>
-                  <p className={`text-[10px] mt-1 ${mine ? "text-on-primary/70" : "text-on-surface-variant"}`}>
+                  <p className={`text-xs mt-1 ${mine ? "text-on-primary/70" : "text-on-surface-variant"}`}>
                     {timeLabel(m.created_at)}
                   </p>
                 </div>
@@ -258,7 +257,7 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
                     ? ` \u00b7 ${formatDuration(l.duration_seconds)}`
                     : ""}
                 </span>
-                <span className="text-[10px] opacity-60 ml-1">{timeLabel(l.started_at)}</span>
+                <span className="text-xs opacity-60 ml-1">{timeLabel(l.started_at)}</span>
               </div>
             </div>
           );
@@ -307,7 +306,7 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Write a message…"
-                className="w-full resize-none outline-none bg-transparent text-sm text-on-surface placeholder:text-outline min-h-[24px] max-h-32"
+                className="w-full resize-none outline-none bg-transparent text-sm text-on-surface placeholder:text-outline min-h-6 max-h-32"
                 style={{ height: "auto" }}
               />
             </div>

@@ -13,6 +13,7 @@ import { createClient } from "@/lib/supabase/server";
 import { unwrapRow } from "@/lib/embedded";
 import { Receipt } from "lucide-react";
 import { formatCurrency, normalizeCurrency, convertCurrency, type CurrencyCode } from "@/lib/currency";
+import { ErrorState, PanelEmpty } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
 
@@ -122,7 +123,10 @@ export default async function HelperEarnings() {
       </div>
 
       {error ? (
-        <Card className="p-6 text-sm text-error">{error.message}</Card>
+        <ErrorState
+          title="Couldn't load your earnings"
+          message="We hit a snag fetching your payment history. Please try again in a moment."
+        />
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -199,11 +203,13 @@ export default async function HelperEarnings() {
               </h2>
             </div>
             {rows.length === 0 ? (
-              <div className="p-8 text-center">
-                <p className="text-sm text-on-surface-variant">
-                  No payments yet. Paid orders will appear here as earnings.
-                </p>
-              </div>
+              <PanelEmpty
+                icon={<Receipt size={18} className="text-primary" />}
+                title="No payments yet"
+                message="Paid orders will appear here as earnings once a student completes checkout."
+                actionHref="/helper/orders"
+                actionLabel="View your orders"
+              />
             ) : (
               <table className="w-full">
                 <thead>
@@ -223,7 +229,7 @@ export default async function HelperEarnings() {
                       <tr key={txn.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
                         <td className="px-6 py-4">
                           <div>
-                            <p className="text-sm font-medium text-on-surface truncate max-w-[320px]">{title}</p>
+                            <p className="text-sm font-medium text-on-surface truncate max-w-80">{title}</p>
                             <p className="text-xs text-on-surface-variant font-mono">{txn.id.slice(0, 8).toUpperCase()}</p>
                             {txn.receipt_url && (
                               <a

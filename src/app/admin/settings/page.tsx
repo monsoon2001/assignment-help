@@ -56,7 +56,7 @@ export default function AdminSettings() {
             </div>
             <div className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" checked={autoMatch} onChange={(e) => setAutoMatch(e.target.checked)} className="sr-only peer" />
-              <div className="w-9 h-5 bg-outline-variant rounded-full peer peer-checked:bg-primary-container transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4" />
+              <div className="w-9 h-5 bg-outline-variant rounded-full peer peer-checked:bg-primary-container transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-primary/40 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4" />
             </div>
           </label>
 
@@ -67,7 +67,7 @@ export default function AdminSettings() {
             </div>
             <div className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" checked={emailNotifications} onChange={(e) => setEmailNotifications(e.target.checked)} className="sr-only peer" />
-              <div className="w-9 h-5 bg-outline-variant rounded-full peer peer-checked:bg-primary-container transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4" />
+              <div className="w-9 h-5 bg-outline-variant rounded-full peer peer-checked:bg-primary-container transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-primary/40 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4" />
             </div>
           </label>
 
@@ -78,7 +78,7 @@ export default function AdminSettings() {
             </div>
             <div className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" checked={maintenanceMode} onChange={(e) => setMaintenanceMode(e.target.checked)} className="sr-only peer" />
-              <div className="w-9 h-5 bg-outline-variant rounded-full peer peer-checked:bg-error transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4" />
+              <div className="w-9 h-5 bg-outline-variant rounded-full peer peer-checked:bg-error transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-error/40 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4" />
             </div>
           </label>
         </div>

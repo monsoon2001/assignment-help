@@ -16,21 +16,13 @@ import {
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
 import { formatCurrency, normalizeCurrency } from "@/lib/currency";
+import { orderStatusVariant } from "@/lib/status-meta";
 import { EmptyState } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard | Acadivo",
-};
-
-const STATUS_VARIANT: Record<string, "primary" | "warning" | "success" | "secondary" | "danger"> = {
-  payment_pending: "warning",
-  in_progress: "secondary",
-  delivered: "primary",
-  revision_requested: "warning",
-  completed: "success",
-  disputed: "danger",
 };
 
 function formatDate(iso: string | null | undefined): string {
@@ -134,7 +126,7 @@ export default async function AdminDashboardPage() {
               </div>
               <p className="text-2xl font-bold text-on-surface">{metric.value}</p>
               <p className="text-xs text-on-surface-variant mt-1">{metric.label}</p>
-              {metric.sub && <p className="text-[11px] text-on-surface-variant mt-0.5">{metric.sub}</p>}
+              {metric.sub && <p className="text-xs text-on-surface-variant mt-0.5">{metric.sub}</p>}
             </Card>
           );
           return metric.href ? (
@@ -188,7 +180,7 @@ export default async function AdminDashboardPage() {
                       </td>
                       <td className="px-6 py-4 text-sm font-semibold text-on-surface">{formatCurrency(Number(order.price), normalizeCurrency(order.currency))}</td>
                       <td className="px-6 py-4">
-                        <Badge variant={STATUS_VARIANT[order.status] ?? "outline"}>
+                        <Badge variant={orderStatusVariant(order.status)}>
                           {order.status.replaceAll("_", " ")}
                         </Badge>
                       </td>
@@ -210,6 +202,8 @@ export default async function AdminDashboardPage() {
               icon={<Briefcase size={24} className="text-primary" />}
               title="No orders yet"
               message="Orders appear here once students pay for approved proposals."
+              actionHref="/admin/requests"
+              actionLabel="Review requests"
             />
           </div>
         )}

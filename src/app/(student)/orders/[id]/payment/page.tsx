@@ -114,7 +114,7 @@ export default async function OrderPaymentPage({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="flex items-center gap-3 p-3.5 rounded-xl border border-outline-variant bg-surface-container-lowest cursor-pointer">
+          <div className="flex items-center gap-3 p-3.5 rounded-xl border border-outline-variant bg-surface-container-lowest cursor-pointer hover:border-primary-container hover:shadow-sm transition-all">
             <CreditCard size={18} className="text-primary" />
             <div>
               <p className="text-sm font-medium text-on-surface">Card</p>

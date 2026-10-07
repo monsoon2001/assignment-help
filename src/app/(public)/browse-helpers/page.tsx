@@ -7,14 +7,11 @@ import { Search, Star, ChevronRight } from "lucide-react";
 import { fetchHelperCandidates, type HelperCandidate } from "@/lib/requests";
 import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
 import { PAGE_TONES } from "@/components/marketing/page-shell";
+import Button from "@/components/ui/button";
+import Input from "@/components/ui/input";
+import Select from "@/components/ui/select";
 
-// Cards cycle accents so a six-helper grid doesn't read as six white boxes.
-const HELPER_TONES = [
-  PAGE_TONES.teal,
-  PAGE_TONES.amber,
-  PAGE_TONES.violet,
-  PAGE_TONES.rose,
-];
+const TONE = PAGE_TONES.blue;
 
 const ratings = ["Any Rating", "4.5+", "4.7+", "4.9+"];
 
@@ -64,10 +61,10 @@ export default function BrowseHelpersPage() {
   return (
     <>
       {/* Page Header */}
-      <div className="bg-gradient-to-r from-accent-teal-container/90 via-surface-container-high to-surface-container-low border-b border-outline-variant/50">
+      <div className="bg-gradient-to-r from-primary-fixed/50 via-white to-white border-b border-outline-variant/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <nav className="flex items-center gap-2 text-sm text-on-surface-variant mb-4">
-            <Link href="/" className="hover:text-accent-teal transition-colors">Home</Link>
+            <Link href="/" className="text-primary transition-colors">Home</Link>
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-on-surface font-medium">Browse Helpers</span>
           </nav>
@@ -84,27 +81,31 @@ export default function BrowseHelpersPage() {
       <div className="sticky top-16 z-40 bg-white/95 backdrop-blur border-b border-outline-variant/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col lg:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant" />
-              <input
+            <div className="flex-1">
+              <Input
                 type="text"
+                icon={<Search />}
                 placeholder="Search by name or subject..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full h-11 pl-11 pr-4 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all"
               />
             </div>
             <div className="flex gap-3 flex-wrap">
-              <select value={rating} onChange={(e) => setRating(e.target.value)} className="h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container appearance-none cursor-pointer">
-                {ratings.map((r) => <option key={r}>{r}</option>)}
-              </select>
-              <button
+              <Select
+                value={rating}
+                onChange={(e) => setRating(e.target.value)}
+                options={ratings.map((r) => ({ value: r, label: r }))}
+                className="shrink-0"
+              />
+              <Button
+                type="button"
                 onClick={() => setTopRated(!topRated)}
-                className={`h-11 px-4 rounded-lg text-sm font-medium border transition-all cursor-pointer flex items-center gap-1.5 ${topRated ? "bg-primary-container text-on-primary border-primary-container" : "bg-surface-container-lowest border-outline-variant text-on-surface hover:bg-surface-container-low"}`}
+                variant={topRated ? "primary" : "outline"}
+                className="h-11"
               >
                 <Star className="w-4 h-4" />
                 Top Rated
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -122,7 +123,7 @@ export default function BrowseHelpersPage() {
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="bg-surface-container-lowest rounded-2xl border border-outline-variant p-6 flex flex-col gap-4 min-h-[460px]"
+                className="bg-surface-container-lowest rounded-2xl border border-outline-variant p-6 flex flex-col gap-4 min-h-115"
               >
                 <div className="flex items-center gap-4">
                   <SkeletonCircle className="w-14 h-14" />
@@ -154,20 +155,44 @@ export default function BrowseHelpersPage() {
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-on-surface-variant">
+          <div className="text-center py-16 px-4 flex flex-col items-center gap-3">
+            <span className="w-14 h-14 rounded-2xl bg-primary-container/10 flex items-center justify-center">
+              <Search size={24} className="text-primary" />
+            </span>
+            <h2 className="font-display font-semibold text-on-surface">
+              {helpers.length === 0 ? "No helpers available yet" : "No helpers match your filters"}
+            </h2>
+            <p className="text-sm text-on-surface-variant max-w-md">
               {helpers.length === 0
-                ? "No helpers available yet. Check back soon."
-                : "No helpers match your filters."}
+                ? "Helpers are verified before they appear, so new profiles land here as they're approved."
+                : "Try a broader search or remove the rating filter to see more profiles."}
             </p>
+            {helpers.length === 0 ? (
+              <Link href="/requests/new" className="mt-1">
+                <Button size="sm" variant="outline">Post a request instead</Button>
+              </Link>
+            ) : (
+              <Button
+                size="sm"
+                variant="outline"
+                className="mt-1"
+                onClick={() => {
+                  setSearch("");
+                  setRating("Any Rating");
+                  setTopRated(false);
+                }}
+              >
+                Clear all filters
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((h, hi) => {
+            {filtered.map((h) => {
               const name = h.user?.name ?? "Acadivo Helper";
               const avatar = h.user?.avatar_url ?? null;
               const initials = name.split(/\s+/).map((p) => p[0]).join("").toUpperCase().slice(0, 2);
-              const tone = HELPER_TONES[hi % HELPER_TONES.length];
+              const tone = TONE;
               return (
                 <div
                   key={h.user_id}
@@ -201,13 +226,13 @@ export default function BrowseHelpersPage() {
                   </div>
 
                   {h.bio && (
-                    <p className="text-sm text-on-surface-variant line-clamp-3">{h.bio}</p>
+                    <p className="text-base text-on-surface-variant line-clamp-3 leading-relaxed">{h.bio}</p>
                   )}
 
                   {h.subjects.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
                       {h.subjects.map((s) => (
-                        <span key={s} className="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-xs font-medium">{s}</span>
+                        <span key={s} className="px-2 py-0.5 rounded-full bg-primary-fixed text-primary text-xs font-medium">{s}</span>
                       ))}
                     </div>
                   )}
@@ -233,7 +258,7 @@ export default function BrowseHelpersPage() {
                     <Link href={`/helpers/${h.user_id}`} className="flex-1 text-center px-4 py-2 text-sm font-medium border border-outline-variant rounded-xl text-on-surface hover:bg-surface-container-low transition-colors">
                       View profile
                     </Link>
-                    <Link href={`/requests/new?helper=${h.user_id}`} className={`flex-1 text-center px-4 py-2 text-sm font-semibold bg-gradient-to-r ${tone.btn} text-white rounded-xl hover:opacity-95 transition-opacity`}>
+                    <Link href={`/requests/new?helper=${h.user_id}`} className={`flex-1 text-center px-4 py-2 text-sm font-semibold bg-primary hover:bg-primary-container text-white rounded-xl transition-colors`}>
                       Request Help
                     </Link>
                   </div>

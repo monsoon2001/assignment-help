@@ -8,6 +8,7 @@ import { ArrowLeft, Mail, Package, Star } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
 import { formatCurrency, normalizeCurrency } from "@/lib/currency";
+import { orderStatusVariant, paymentStatusVariant } from "@/lib/status-meta";
 import { EmptyState } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
@@ -20,15 +21,6 @@ function formatDate(iso: string | null | undefined): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
-
-const STATUS_VARIANT: Record<string, "primary" | "warning" | "success" | "secondary" | "danger" | "outline"> = {
-  payment_pending: "warning",
-  in_progress: "secondary",
-  delivered: "primary",
-  revision_requested: "warning",
-  completed: "success",
-  disputed: "danger",
-};
 
 export default async function AdminOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();
@@ -62,7 +54,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
         </Link>
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="font-display text-2xl font-bold text-on-surface">Order</h1>
-          <Badge variant={STATUS_VARIANT[order.status] ?? "outline"}>{order.status.replaceAll("_", " ")}</Badge>
+          <Badge variant={orderStatusVariant(order.status)}>{order.status.replaceAll("_", " ")}</Badge>
         </div>
         <p className="text-sm text-on-surface-variant mt-1">
           <span className="font-mono text-xs">{order.id}</span> · Created {formatDate(order.created_at)}
@@ -122,7 +114,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                   </p>
                   <p className="text-xs text-on-surface-variant font-mono mt-0.5">{payment.stripe_payment_intent_id ?? "No payment intent"}</p>
                 </div>
-                <Badge variant={payment.status === "paid" ? "success" : payment.status === "refunded" ? "warning" : "outline"}>
+                <Badge variant={paymentStatusVariant(payment.status)}>
                   {payment.status}
                 </Badge>
               </div>
@@ -168,7 +160,11 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
         </div>
         {reviews.data ? (
           <div className="p-5 flex items-start gap-3">
-            <span className="text-sm font-bold text-amber-500">{"★".repeat(reviews.data.rating)}</span>
+            <span className="flex items-center gap-0.5 text-amber-500">
+              {Array.from({ length: reviews.data.rating }).map((_, i) => (
+                <Star key={i} size={15} className="fill-amber-500" />
+              ))}
+            </span>
             <div>
               <p className="text-sm text-on-surface">{reviews.data.comment || "No comment."}</p>
               <p className="text-xs text-on-surface-variant mt-1">{formatDate(reviews.data.created_at)}</p>

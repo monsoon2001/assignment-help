@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { unwrapRow } from "@/lib/embedded";
+import { orderStatusVariant, requestStatusVariant, type BadgeVariant } from "@/lib/status-meta";
 
 export type ThreadCounterpart = { id: string; name: string | null; avatar_url: string | null } | null;
 
@@ -9,31 +10,31 @@ export type Thread = {
   title: string;
   counterpart: ThreadCounterpart;
   statusLabel: string;
-  statusVariant: "primary" | "warning" | "success" | "secondary" | "outline";
+  statusVariant: BadgeVariant;
   link: string;
   lastAt: number;
   lastPreview: string | null;
 };
 
-const REQUEST_META: Record<string, { label: string; variant: "primary" | "warning" | "success" | "secondary" | "outline" }> = {
-  requested: { label: "Open", variant: "primary" },
-  proposal_sent: { label: "Reviewing", variant: "warning" },
-  accepted: { label: "Accepted", variant: "success" },
-  declined: { label: "Declined", variant: "secondary" },
+const REQUEST_LABEL: Record<string, string> = {
+  requested: "Open",
+  proposal_sent: "Reviewing",
+  accepted: "Accepted",
+  declined: "Declined",
 };
 
-const HELPER_REQUEST_META: Record<string, { label: string; variant: "primary" | "warning" | "secondary" | "outline" }> = {
-  requested: { label: "Open", variant: "primary" },
-  proposal_sent: { label: "Proposal Sent", variant: "warning" },
+const HELPER_REQUEST_LABEL: Record<string, string> = {
+  requested: "Open",
+  proposal_sent: "Proposal Sent",
 };
 
-const ORDER_META: Record<string, { label: string; variant: "primary" | "warning" | "success" | "danger" | "outline" }> = {
-  payment_pending: { label: "Payment Pending", variant: "warning" },
-  in_progress: { label: "In Progress", variant: "primary" },
-  delivered: { label: "Delivered", variant: "success" },
-  revision_requested: { label: "Revision", variant: "warning" },
-  completed: { label: "Completed", variant: "success" },
-  disputed: { label: "Under Review", variant: "danger" },
+const ORDER_LABEL: Record<string, string> = {
+  payment_pending: "Payment Pending",
+  in_progress: "In Progress",
+  delivered: "Delivered",
+  revision_requested: "Revision",
+  completed: "Completed",
+  disputed: "Under Review",
 };
 
 type MsgRow = { request_id?: string; order_id?: string; body: string; created_at: string };
@@ -142,7 +143,8 @@ export async function buildThreads(
     ...visibleRequests.map((r) => {
       const row = r as { id: string; title: string; status: string; created_at: string };
       const last = latestByRequest.get(row.id);
-      const meta = isHelper ? (HELPER_REQUEST_META[row.status] ?? null) : (REQUEST_META[row.status] ?? null);
+      const label = (isHelper ? HELPER_REQUEST_LABEL : REQUEST_LABEL)[row.status] ?? row.status;
+      const meta = { label, variant: requestStatusVariant(row.status) };
       return {
         key: `request-${row.id}`,
         kind: "request" as const,
@@ -158,7 +160,7 @@ export async function buildThreads(
     ...orders.map((o) => {
       const row = o as { id: string; status: string; created_at: string };
       const last = latestByOrder.get(row.id);
-      const meta = ORDER_META[row.status] ?? null;
+      const meta = { label: ORDER_LABEL[row.status] ?? row.status, variant: orderStatusVariant(row.status) };
       return {
         key: `order-${row.id}`,
         kind: "order" as const,

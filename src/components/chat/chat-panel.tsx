@@ -95,7 +95,7 @@ export default function ChatPanel({
       <div className="flex items-center gap-3 px-5 py-3.5 border-b border-outline-variant bg-surface-container-low/60">
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-on-surface">{title}</p>
-          <p className="text-[11px] text-emerald-600 inline-flex items-center gap-1">
+          <p className="text-xs text-emerald-600 inline-flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
             Live · messages sync instantly
           </p>
@@ -140,7 +140,7 @@ export default function ChatPanel({
                     </a>
                   )}
                 </div>
-                <div className="flex items-center gap-1.5 mt-1 text-[10px] text-on-surface-variant justify-end">
+                <div className="flex items-center gap-1.5 mt-1 text-xs text-on-surface-variant justify-end">
                   <span className="w-full flex justify-end">{timeLabel(m.created_at)}</span>
                   {isMine && (
                     <span className="inline-flex items-center">
@@ -193,11 +193,11 @@ export default function ChatPanel({
             </div>
           )}
           <div className="flex items-end gap-2">
-          <label className="w-9 h-9 shrink-0 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-low cursor-pointer">
+          <label className="w-9 h-9 shrink-0 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-low cursor-pointer has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary/40">
             <Paperclip size={17} />
             <input
               type="file"
-              className="hidden"
+              className="sr-only"
               onChange={(e) => {
                 const f = Array.from(e.target.files ?? []);
                 if (f.length) setFiles([...files, f[0]]);
@@ -220,7 +220,7 @@ export default function ChatPanel({
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Write a message…"
-              className="w-full resize-none outline-none bg-transparent text-sm text-on-surface placeholder:text-outline min-h-[24px] max-h-32"
+              className="w-full resize-none outline-none bg-transparent text-sm text-on-surface placeholder:text-outline min-h-6 max-h-32"
               style={{ height: "auto" }}
             />
           </div>

@@ -9,6 +9,7 @@ import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
 import { acceptProposal, declineProposal } from "@/lib/orders";
 import { normalizeCurrency, formatCurrency } from "@/lib/currency";
+import { proposalStatusMeta } from "@/lib/status-meta";
 
 export type RequestProposal = {
   id: string;
@@ -34,12 +35,6 @@ function expiryLabel(value: string | null): string {
   });
 }
 
-const ACTIONS: Record<string, { label: string; variant: "primary" | "success" | "outline" }> = {
-  pending: { label: "Pending", variant: "primary" },
-  accepted: { label: "Accepted", variant: "success" },
-  declined: { label: "Declined", variant: "outline" },
-};
-
 export default function ProposalCard({
   proposal,
   requestTitle,
@@ -58,7 +53,7 @@ export default function ProposalCard({
   const currency = normalizeCurrency(proposal.currency);
   const price = formatCurrency(Number(proposal.price), currency);
 
-  const statusMeta = ACTIONS[proposal.status] ?? { label: proposal.status, variant: "primary" as const };
+  const statusMeta = proposalStatusMeta(proposal.status);
 
   async function handleAccept() {
     setBusy("accept");
@@ -97,32 +92,32 @@ export default function ProposalCard({
         <div className="absolute -top-20 -right-16 h-40 w-40 rounded-full bg-primary-fixed/20 blur-3xl pointer-events-none" />
 
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-container/10 text-primary text-[11px] font-semibold uppercase tracking-wide">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-container/10 text-primary text-xs font-semibold uppercase tracking-wide">
             <ShieldCheck size={14} />
             Official Mentor Proposal
           </div>
-          <span className="text-[11px] text-on-surface-variant font-medium">
+          <span className="text-xs text-on-surface-variant font-medium">
             #{proposal.id.replace(/-/g, "").slice(0, 5).toUpperCase()}
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 rounded-lg bg-surface-container-low p-3">
           <div className="flex flex-col justify-center">
-            <span className="text-[11px] text-secondary uppercase font-semibold tracking-wider">
+            <span className="text-xs text-secondary uppercase font-semibold tracking-wider">
               Total Fixed Price
             </span>
             <div className="flex items-baseline gap-1.5 mt-0.5">
               <span className="font-display text-2xl font-bold text-primary tracking-tight">
                 {price}
               </span>
-              <span className="text-[11px] text-on-surface-variant font-medium">{currency}</span>
+              <span className="text-xs text-on-surface-variant font-medium">{currency}</span>
             </div>
-            <p className="text-[11px] text-on-surface-variant mt-0.5">
+            <p className="text-xs text-on-surface-variant mt-0.5">
               No hidden charges &middot; Pay securely on the platform
             </p>
           </div>
           <div className="flex flex-col justify-center sm:pl-3">
-            <span className="text-[11px] text-secondary uppercase font-semibold tracking-wider">
+            <span className="text-xs text-secondary uppercase font-semibold tracking-wider">
               Offer Details
             </span>
             <div className="flex items-center gap-2 mt-1">
@@ -131,7 +126,7 @@ export default function ProposalCard({
                 Expires {expiryLabel(proposal.expires_at)}
               </span>
             </div>
-            <div className="flex items-center gap-1.5 text-on-surface-variant text-[11px] mt-0.5">
+            <div className="flex items-center gap-1.5 text-on-surface-variant text-xs mt-0.5">
               <RotateCcw size={12} />
               Unlimited revisions until you&apos;re satisfied
             </div>
@@ -141,10 +136,10 @@ export default function ProposalCard({
         {proposal.description && (
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-semibold text-on-surface">
+              <p className="text-sm font-semibold text-on-surface">
                 Included in this Proposal
-              </h4>
-              <span className="text-[11px] text-primary font-medium">
+              </p>
+              <span className="text-xs text-primary font-medium">
                 Proposal Message
               </span>
             </div>
@@ -172,7 +167,7 @@ export default function ProposalCard({
           <p className="text-xs font-semibold text-on-surface truncate">
             {proposal.helper?.name || "Acadivo Helper"}
           </p>
-          <p className="text-[11px] text-on-surface-variant">
+          <p className="text-xs text-on-surface-variant">
             Proposed {new Date(proposal.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
           </p>
         </div>
@@ -212,7 +207,7 @@ export default function ProposalCard({
                 {busy === "accept" ? "Accepting..." : "Accept & Continue to Checkout"}
               </Button>
             </div>
-            <p className="text-[11px] text-on-surface-variant inline-flex items-center gap-1">
+            <p className="text-xs text-on-surface-variant inline-flex items-center gap-1">
               <ShieldCheck size={12} className="text-primary shrink-0" />
               Funds are released only after you review and approve the finalized draft.
             </p>

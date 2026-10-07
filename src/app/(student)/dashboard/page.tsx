@@ -6,20 +6,19 @@ import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import Avatar from "@/components/ui/avatar";
 import StarRating from "@/components/ui/star-rating";
+import { PanelEmpty } from "@/components/ui/states";
 import { createClient } from "@/lib/supabase/server";
 import { unwrapRow } from "@/lib/embedded";
+import { requestStatusVariant } from "@/lib/status-meta";
 
 export const dynamic = "force-dynamic";
 
-const STATUS_META: Record<
-  string,
-  { label: string; variant: "primary" | "warning" | "success" | "outline" }
-> = {
-  requested: { label: "Requested", variant: "primary" },
-  proposal_sent: { label: "Reviewing Proposals", variant: "warning" },
-  accepted: { label: "Hired", variant: "success" },
-  declined: { label: "Declined", variant: "outline" },
-  cancelled: { label: "Cancelled", variant: "outline" },
+const STATUS_LABEL: Record<string, string> = {
+  requested: "Requested",
+  proposal_sent: "Reviewing Proposals",
+  accepted: "Hired",
+  declined: "Declined",
+  cancelled: "Cancelled",
 };
 
 function isPastResponseWindow(sentAt: string | null): boolean {
@@ -135,7 +134,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="w-full max-w-7xl mx-auto flex flex-col gap-6">
-      <section className="rounded-2xl bg-gradient-to-br from-primary-container to-secondary-container text-on-primary p-8 relative overflow-hidden">
+      <section className="rounded-2xl bg-gradient-to-br from-primary-container to-secondary-container text-on-primary p-6 sm:p-8 relative overflow-hidden">
         <div className="absolute -right-10 -top-10 w-48 h-48 rounded-full bg-white/10" />
         <div className="absolute right-24 bottom-0 w-20 h-20 rounded-full bg-white/10" />
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-5">
@@ -146,7 +145,7 @@ export default async function DashboardPage() {
             <h1 className="font-display font-bold text-3xl">Welcome back, {firstName}</h1>
             <p className="text-on-primary/80 text-sm mt-1.5">
               {nextAction
-                ? `"${nextAction.title}" is ${STATUS_META[nextAction.status]?.label.toLowerCase() ?? "in progress"}.`
+                ? `"${nextAction.title}" is ${STATUS_LABEL[nextAction.status]?.toLowerCase() ?? "in progress"}.`
                 : "Submit a request to get matched with the right helper."}
             </p>
           </div>
@@ -203,7 +202,7 @@ export default async function DashboardPage() {
           )}
 
           {requests.map((r) => {
-            const meta = STATUS_META[r.status] ?? { label: r.status, variant: "outline" as const };
+            const meta = { label: STATUS_LABEL[r.status] ?? r.status, variant: requestStatusVariant(r.status) };
             const proposalId = acceptedByRequest.get(r.id);
             const orderId = proposalId ? orderByProposal.get(proposalId) : undefined;
             const overdue = r.status === "requested" && isPastResponseWindow(r.sent_at);
@@ -258,7 +257,13 @@ export default async function DashboardPage() {
             <h2 className="font-display font-bold text-lg text-on-surface mb-3">Recent Activity</h2>
             <Card className="divide-y divide-outline-variant/50 overflow-hidden">
               {notifications.length === 0 && (
-                <p className="text-sm text-on-surface-variant p-4">No notifications yet.</p>
+                <PanelEmpty
+                  icon={<Sparkles size={18} className="text-primary" />}
+                  title="No notifications yet"
+                  message="Request updates, proposal alerts and payment confirmations will show up here."
+                  actionHref="/requests/new"
+                  actionLabel="Start a request"
+                />
               )}
               {notifications.map((n) => (
                 <Link href={n.link ?? "/notifications"} key={n.id} className="flex items-start gap-3 p-4 hover:bg-surface-container-low transition-colors">
@@ -266,7 +271,7 @@ export default async function DashboardPage() {
                     <p className={`text-sm line-clamp-2 ${n.read ? "text-on-surface-variant" : "font-semibold text-on-surface"}`}>
                       {n.message}
                     </p>
-                    <p className="text-[11px] text-on-surface-variant mt-1">{timeAgo(n.created_at)}</p>
+                    <p className="text-xs text-on-surface-variant mt-1">{timeAgo(n.created_at)}</p>
                   </div>
                   {!n.read && <span className="w-2 h-2 rounded-full bg-primary-container shrink-0 mt-1.5" />}
                 </Link>
@@ -281,7 +286,13 @@ export default async function DashboardPage() {
             <h2 className="font-display font-bold text-lg text-on-surface mb-3">Top-Rated Helpers</h2>
             <Card className="divide-y divide-outline-variant/50 overflow-hidden">
               {helpers.length === 0 && (
-                <p className="text-sm text-on-surface-variant p-4">No helpers yet.</p>
+                <PanelEmpty
+                  icon={<Users size={18} className="text-primary" />}
+                  title="No helpers yet"
+                  message="Top-rated, verified helpers will appear here as they join Acadivo."
+                  actionHref="/browse-helpers"
+                  actionLabel="Browse helpers"
+                />
               )}
               {helpers.map((m) => (
                 <div key={m.id} className="p-4">

@@ -8,6 +8,7 @@ import { FileText, ArrowLeft } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
 import { formatCurrency, normalizeCurrency } from "@/lib/currency";
+import { requestStatusVariant, proposalStatusVariant } from "@/lib/status-meta";
 import { EmptyState } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
@@ -56,7 +57,7 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
         <h1 className="font-display text-2xl font-bold text-on-surface">{request.title}</h1>
         <div className="flex flex-wrap items-center gap-2 mt-2">
           <Badge variant="outline">{request.subject ?? "General"}</Badge>
-          <Badge variant="primary">{request.status.replaceAll("_", " ")}</Badge>
+          <Badge variant={requestStatusVariant(request.status)}>{request.status.replaceAll("_", " ")}</Badge>
           <span className="text-sm text-on-surface-variant">Posted {formatDate(request.created_at)}</span>
           {request.deadline && <span className="text-sm text-on-surface-variant">· Deadline {formatDate(request.deadline)}</span>}
         </div>
@@ -115,7 +116,7 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold text-on-surface">{helper?.name ?? "Helper"}</p>
-                    <Badge variant="outline">{proposal.status}</Badge>
+                    <Badge variant={proposalStatusVariant(proposal.status)}>{proposal.status}</Badge>
                   </div>
                   <p className="text-sm text-on-surface-variant mt-1">{proposal.description || "No description."}</p>
                   <p className="text-xs text-on-surface-variant mt-2">

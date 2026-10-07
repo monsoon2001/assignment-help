@@ -191,7 +191,7 @@ export default function ChatMonitor({
                               </span>
                             )}
                           </span>
-                          <span className="text-[11px] text-on-surface-variant shrink-0">
+                          <span className="text-xs text-on-surface-variant shrink-0">
                             {formatTime(msg.createdAt)}
                           </span>
                         </div>
@@ -200,7 +200,7 @@ export default function ChatMonitor({
                             <button
                               onClick={() => doFlag(msg.id)}
                               disabled={pending}
-                              className="text-[11px] inline-flex items-center gap-1 text-on-surface-variant hover:text-error transition-colors cursor-pointer"
+                              className="text-xs inline-flex items-center gap-1 text-on-surface-variant hover:text-error transition-colors cursor-pointer"
                             >
                               <Flag size={12} /> Flag
                             </button>
@@ -289,7 +289,7 @@ export default function ChatMonitor({
                   <span>
                     <span className="font-medium text-on-surface">{user?.name ?? "Unknown user"}</span> — {w.reason}
                   </span>
-                  <span className="text-[11px] shrink-0">{formatTime(w.created_at)}</span>
+                  <span className="text-xs shrink-0">{formatTime(w.created_at)}</span>
                 </div>
               );
             })}

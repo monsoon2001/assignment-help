@@ -94,14 +94,25 @@ export default function MessagesInbox({
       </div>
 
       {threads.length === 0 ? (
-        <Card className="p-12 text-center">
-          <MessageSquare size={28} className="mx-auto text-on-surface-variant/60 mb-3" />
-          <p className="text-on-surface-variant">No conversations yet.</p>
-          <p className="text-sm text-on-surface-variant mt-1">
+        <Card className="p-12 text-center flex flex-col items-center gap-3">
+          <span className="w-14 h-14 rounded-2xl bg-primary-container/20 flex items-center justify-center">
+            <MessageSquare size={26} className="text-primary" />
+          </span>
+          <h2 className="text-lg font-display font-semibold text-on-surface">No conversations yet</h2>
+          <p className="text-sm text-on-surface-variant max-w-md">
             {isHelper
-              ? "Students you work with will appear here."
-              : "Request help and chat with your helper here."}
+              ? "Students you work with will appear here once they send you a request or order message."
+              : "Request help to start a chat with your helper. Your conversations will live here."}
           </p>
+          {isHelper ? (
+            <Link href="/helper/requests" className="mt-2">
+              <Button size="sm">Check incoming requests <ArrowRight size={14} /></Button>
+            </Link>
+          ) : (
+            <Link href="/requests/new" className="mt-2">
+              <Button size="sm">Create your first request <ArrowRight size={14} /></Button>
+            </Link>
+          )}
         </Card>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
@@ -118,7 +129,7 @@ export default function MessagesInbox({
                     <p className="text-sm font-semibold text-on-surface truncate group-hover:underline">
                       {t.counterpart?.name ?? fallbackName}
                     </p>
-                    <span className="text-[11px] text-on-surface-variant shrink-0">
+                    <span className="text-xs text-on-surface-variant shrink-0">
                       {new Date(t.lastAt).toLocaleDateString([], { month: "short", day: "numeric" })}
                     </span>
                   </div>
@@ -131,7 +142,7 @@ export default function MessagesInbox({
           </Card>
 
           <div className="lg:col-span-2 flex flex-col gap-4">
-            <Card className="p-8 text-center flex flex-col items-center gap-3">
+            <Card className="p-6 sm:p-8 text-center flex flex-col items-center gap-3">
               <div className="w-14 h-14 rounded-2xl bg-primary-container/30 flex items-center justify-center">
                 <MessageSquare size={26} className="text-primary" />
               </div>

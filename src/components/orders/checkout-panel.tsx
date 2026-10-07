@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { BookOpen, Globe2 } from "lucide-react";
+import { BookOpen, Globe2, CreditCard, Lock } from "lucide-react";
 import Select from "@/components/ui/select";
 import PayButton from "@/components/orders/pay-button";
 import {
@@ -46,7 +46,7 @@ export default function CheckoutPanel({
     <div className="flex flex-col gap-4">
       <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest overflow-hidden shadow-sm">
         <div className="flex items-center gap-2 px-5 py-4 border-b border-outline-variant">
-          <span className="text-lg leading-none">💳</span>
+          <CreditCard size={20} className="text-primary" />
           <h2 className="font-display font-semibold text-on-surface text-lg">Confirm Payment</h2>
         </div>
 
@@ -89,7 +89,7 @@ export default function CheckoutPanel({
           </div>
 
           <div className="flex items-center justify-center gap-1.5 pt-1 text-xs text-on-surface-variant">
-            <span className="leading-none">🔒</span>
+            <Lock size={13} className="shrink-0" />
             <span>Payment protected by Stripe</span>
           </div>
         </div>

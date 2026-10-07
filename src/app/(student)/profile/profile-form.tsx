@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import Card from "@/components/ui/card";
 import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
+import Select from "@/components/ui/select";
 import Avatar from "@/components/ui/avatar";
 import StarRating from "@/components/ui/star-rating";
 import { Save, Mail, GraduationCap, MapPin } from "lucide-react";
@@ -71,7 +72,7 @@ export default function StudentProfileForm({
             <MapPin size={13} />{levelOfStudy ? <>{levelOfStudy}{memberSince ? ` · Member since ${memberSince}` : ""}</> : memberSince ? <>Member since {memberSince}</> : "Student member"}
           </p>
         </div>
-        <div className="flex sm:flex-col gap-2 sm:min-w-[120px]">
+        <div className="flex sm:flex-col gap-2 sm:min-w-30">
           <StarRating rating={4.6} reviewCount={21} />
           <p className="text-xs text-on-surface-variant">Students you&apos;ve worked with rate reliability</p>
         </div>
@@ -109,19 +110,13 @@ export default function StudentProfileForm({
                   defaultValue={institution}
                 />
               </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-on-surface">Level of Study</label>
-                <select
-                  name="levelOfStudy"
-                  defaultValue={levelOfStudy || ""}
-                  className="w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 appearance-none cursor-pointer"
-                >
-                  <option value="" disabled>Select your level</option>
-                  {LEVELS.map((l) => (
-                    <option key={l} value={l}>{l}</option>
-                  ))}
-                </select>
-              </div>
+              <Select
+                name="levelOfStudy"
+                label="Level of Study"
+                placeholder="Select your level"
+                defaultValue={levelOfStudy || ""}
+                options={LEVELS.map((l) => ({ value: l, label: l }))}
+              />
             </div>
           </Card>
 
@@ -147,14 +142,14 @@ export default function StudentProfileForm({
                 <span className="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0"><Mail size={16} /></span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-on-surface">Sign-in method</p>
-                  <p className="text-[11px] text-on-surface-variant">Google or email verification code</p>
+                  <p className="text-xs text-on-surface-variant">Google or email verification code</p>
                 </div>
               </button>
               <button className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant hover:bg-surface-container-low text-left transition-colors cursor-pointer w-full">
                 <span className="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0"><GraduationCap size={16} /></span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-on-surface">Academic information</p>
-                  <p className="text-[11px] text-on-surface-variant">{institution || "No institution set"} · {levelOfStudy || "No level set"}</p>
+                  <p className="text-xs text-on-surface-variant">{institution || "No institution set"} · {levelOfStudy || "No level set"}</p>
                 </div>
               </button>
             </div>

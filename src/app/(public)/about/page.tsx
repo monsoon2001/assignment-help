@@ -30,11 +30,11 @@ export default function AboutPage() {
       />
 
       {/* Mission */}
-      <section className="py-16 bg-white wash-split">
+      <section className="py-16 bg-white band-hero">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="w-16 h-16 mx-auto rounded-2xl bg-accent-amber-container flex items-center justify-center mb-5">
-              <span className="material-symbols-outlined text-accent-amber text-3xl">emoji_objects</span>
+            <span className="w-16 h-16 mx-auto rounded-2xl bg-primary-fixed flex items-center justify-center mb-5">
+              <span className="material-symbols-outlined text-primary text-3xl">emoji_objects</span>
             </span>
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-on-surface mb-4">Our Mission</h2>
             <p className="text-on-surface-variant text-lg leading-relaxed max-w-2xl mx-auto">
@@ -42,8 +42,8 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
-            {stats.map((s, i) => {
-              const tone = [PAGE_TONES.teal, PAGE_TONES.amber, PAGE_TONES.violet, PAGE_TONES.rose][i % 4];
+            {stats.map((s) => {
+              const tone = PAGE_TONES.blue;
               return (
               <div key={s.label} className="text-center bg-white rounded-2xl border border-outline-variant/30 shadow-sm px-4 py-6">
                 <div className={`font-display text-3xl font-bold mb-1 ${tone.text}`}>{s.value}</div>
@@ -56,18 +56,18 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="py-16 bg-white wash-teal">
+      <section className="py-16 band-soft">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent-teal-container text-accent-teal text-sm font-semibold mb-3">
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">
               <span className="material-symbols-outlined text-sm">volunteer_activism</span>
               Our Values
             </span>
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-on-surface">What we hold ourselves to</h2>
           </div>
           <div className="grid sm:grid-cols-2 gap-6">
-            {values.map((v, i) => {
-              const tone = [PAGE_TONES.teal, PAGE_TONES.amber, PAGE_TONES.violet, PAGE_TONES.rose][i % 4];
+            {values.map((v) => {
+              const tone = PAGE_TONES.blue;
               return (
               <div key={v.title} className={`relative overflow-hidden rounded-2xl bg-white p-6 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}>
                 <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${tone.hairline}`} aria-hidden="true" />
@@ -75,7 +75,7 @@ export default function AboutPage() {
                   <span className={`material-symbols-outlined ${tone.icon} text-3xl`}>{v.icon}</span>
                 </span>
                 <h3 className="font-display font-bold text-on-surface mb-2">{v.title}</h3>
-                <p className="text-sm text-on-surface-variant leading-relaxed">{v.desc}</p>
+                <p className="text-base text-on-surface-variant leading-relaxed">{v.desc}</p>
               </div>
               );
             })}

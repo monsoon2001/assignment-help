@@ -125,19 +125,19 @@ export default async function OrderConfirmedPage({
         </div>
         <div className="px-6 py-5 grid grid-cols-2 sm:grid-cols-3 gap-5">
           <div>
-            <p className="text-[11px] text-on-surface-variant uppercase tracking-wide">Amount</p>
+            <p className="text-xs text-on-surface-variant uppercase tracking-wide">Amount</p>
             <p className="font-display text-lg font-bold text-primary mt-0.5">{price}</p>
-            <p className="text-[11px] text-on-surface-variant">Paid via Card</p>
+            <p className="text-xs text-on-surface-variant">Paid via Card</p>
           </div>
           <div>
-            <p className="text-[11px] text-on-surface-variant uppercase tracking-wide">Milestone</p>
+            <p className="text-xs text-on-surface-variant uppercase tracking-wide">Milestone</p>
             <p className="text-sm font-semibold text-on-surface mt-0.5 inline-flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> In Progress
             </p>
-            <p className="text-[11px] text-on-surface-variant">Step 2 of 4</p>
+            <p className="text-xs text-on-surface-variant">Step 2 of 4</p>
           </div>
           <div>
-            <p className="text-[11px] text-on-surface-variant uppercase tracking-wide">Helper</p>
+            <p className="text-xs text-on-surface-variant uppercase tracking-wide">Helper</p>
             <div className="flex items-center gap-2 mt-1">
               <Avatar name={helper?.name || "Helper"} size="sm" />
               <p className="text-sm font-semibold text-on-surface truncate">{helper?.name || "Acadivo Helper"}</p>

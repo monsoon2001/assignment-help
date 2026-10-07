@@ -7,6 +7,7 @@ import Button from "@/components/ui/button";
 import { Star, UserCheck } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { setUserStatus } from "@/app/admin/actions";
+import { userStatusVariant } from "@/lib/status-meta";
 import EditUserForm from "@/app/admin/components/edit-user-form";
 import { EmptyState } from "@/components/ui/states";
 
@@ -20,12 +21,6 @@ function formatDate(iso: string | null | undefined): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
-
-const STATUS_VARIANT: Record<string, "success" | "warning" | "danger" | "outline"> = {
-  active: "success",
-  suspended: "danger",
-  pending: "warning",
-};
 
 export default async function AdminHelpersPage({
   searchParams,
@@ -100,7 +95,7 @@ export default async function AdminHelpersPage({
                     </td>
                     <td className="px-6 py-4 text-sm text-on-surface-variant">{formatDate(user.created_at)}</td>
                     <td className="px-6 py-4">
-                      <Badge variant={STATUS_VARIANT[user.status] ?? "outline"}>{user.status ?? "active"}</Badge>
+                      <Badge variant={userStatusVariant(user.status)}>{user.status ?? "active"}</Badge>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
@@ -134,6 +129,8 @@ export default async function AdminHelpersPage({
           icon={<UserCheck size={24} className="text-primary" />}
           title="No helpers yet"
           message="Helper accounts will appear here as helpers join the platform."
+          actionHref="/admin/students"
+          actionLabel="View students"
         />
       )}
     </div>

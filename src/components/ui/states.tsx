@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
@@ -52,5 +53,37 @@ export function EmptyState({
         </a>
       )}
     </Card>
+  );
+}
+
+/** Compact empty state for side panels and cards that sit inside a larger layout. */
+export function PanelEmpty({
+  icon,
+  title,
+  message,
+  actionHref,
+  actionLabel,
+}: {
+  icon?: React.ReactNode;
+  title: string;
+  message?: string;
+  actionHref?: string;
+  actionLabel?: string;
+}) {
+  return (
+    <div className="flex flex-col items-center gap-2 px-6 py-8 text-center">
+      {icon && (
+        <span className="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center text-on-surface-variant">
+          {icon}
+        </span>
+      )}
+      <p className="text-sm font-semibold text-on-surface">{title}</p>
+      {message && <p className="text-xs text-on-surface-variant max-w-xs leading-relaxed">{message}</p>}
+      {actionHref && actionLabel && (
+        <Link href={actionHref} className="mt-1 text-xs font-semibold text-primary inline-flex items-center gap-1 hover:underline">
+          {actionLabel}
+        </Link>
+      )}
+    </div>
   );
 }

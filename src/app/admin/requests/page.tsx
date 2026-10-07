@@ -6,6 +6,7 @@ import Avatar from "@/components/ui/avatar";
 import { FileText, Eye } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
+import { requestStatusVariant } from "@/lib/status-meta";
 import { EmptyState } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
@@ -18,14 +19,6 @@ function formatDate(iso: string | null | undefined): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
-
-const STATUS_VARIANT: Record<string, "primary" | "warning" | "success" | "danger" | "outline"> = {
-  requested: "primary",
-  proposal_sent: "warning",
-  accepted: "success",
-  declined: "danger",
-  cancelled: "outline",
-};
 
 export default async function AdminRequestsPage() {
   await requireAdmin();
@@ -50,7 +43,7 @@ export default async function AdminRequestsPage() {
 
       <div className="flex flex-wrap gap-2">
         {Object.entries(statusCounts).map(([status, count]) => (
-          <Badge key={status} variant={STATUS_VARIANT[status] ?? "outline"}>
+          <Badge key={status} variant={requestStatusVariant(status)}>
             {status.replaceAll("_", " ")} · {count}
           </Badge>
         ))}
@@ -91,7 +84,7 @@ export default async function AdminRequestsPage() {
                       {proposalRows.length}
                     </td>
                     <td className="px-6 py-4">
-                      <Badge variant={STATUS_VARIANT[request.status] ?? "outline"}>
+                      <Badge variant={requestStatusVariant(request.status)}>
                         {request.status.replaceAll("_", " ")}
                       </Badge>
                     </td>
@@ -112,6 +105,8 @@ export default async function AdminRequestsPage() {
           icon={<FileText size={24} className="text-primary" />}
           title="No requests yet"
           message="Help requests will appear here as students post them."
+          actionHref="/admin/orders"
+          actionLabel="Review orders"
         />
       )}
     </div>

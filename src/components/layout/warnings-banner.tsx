@@ -19,7 +19,7 @@ export default async function WarningsBanner() {
 
   return (
     <div className="w-full bg-error-container/20 border-b border-error/20 px-4 py-3">
-      <div className="w-full max-w-[1440px] mx-auto flex items-start gap-3">
+      <div className="w-full max-w-360 mx-auto flex items-start gap-3">
         <ShieldAlert size={18} className="text-error shrink-0 mt-0.5" />
         <div className="text-sm text-on-surface">
           <span className="font-semibold">You have {warnings.length} warning{warnings.length !== 1 ? "s" : ""} from Acadivo support.</span>

@@ -2,8 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowRight, CalendarDays, Clock, ChevronUp, ChevronDown, FileText, Trash2, Upload, X } from "lucide-react";
+import { ArrowRight, CalendarDays, Clock, ChevronUp, ChevronDown, FileText, Loader2, Trash2, Upload, X } from "lucide-react";
 import { SUBJECTS, SERVICE_TYPES, ACADEMIC_LEVELS, OTHER_OPTION } from "@/lib/constants";
+import Input from "@/components/ui/input";
+import Select from "@/components/ui/select";
+import Textarea from "@/components/ui/textarea";
+import Button from "@/components/ui/button";
 
 export const SUBJECT_OPTIONS = [...SUBJECTS, OTHER_OPTION];
 export const HELP_TYPE_OPTIONS = [...SERVICE_TYPES, OTHER_OPTION];
@@ -15,8 +19,7 @@ const FIELD_CLASS =
 // is empty, so these fields are styled as plain inputs and open the picker from
 // their own icon button.
 const PICKER_CLASS =
-  `${FIELD_CLASS} h-11 text-[15px] appearance-none pr-10 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-date-and-time-value]:w-full [&::-webkit-date-and-time-value]:text-left`;
-const SELECT_CLASS = `${FIELD_CLASS} appearance-none cursor-pointer`;
+  `${FIELD_CLASS} h-11 text-base appearance-none pr-10 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-date-and-time-value]:w-full [&::-webkit-date-and-time-value]:text-left`;
 export const LAST_DUE_TIME = "23:59";
 export const WORDS_PER_PAGE = 250;
 
@@ -64,6 +67,7 @@ interface TaskRequestFormProps {
   onSubmit: (e: React.FormEvent) => void;
   submitLabel: string;
   note?: string;
+  submitting?: boolean;
 }
 
 /**
@@ -145,6 +149,7 @@ export default function TaskRequestForm({
   onSubmit,
   submitLabel,
   note,
+  submitting = false,
 }: TaskRequestFormProps) {
   const today = new Date().toISOString().slice(0, 10);
   const [filesOpen, setFilesOpen] = useState(false);
@@ -207,50 +212,36 @@ export default function TaskRequestForm({
     <form className="space-y-3" onSubmit={onSubmit}>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-on-surface">What subject?</label>
-          <select
+          <Select
+            label="What subject?"
             value={values.subject}
             onChange={(e) => set("subject", e.target.value)}
-            className={SELECT_CLASS}
-          >
-            <option value="">Select subject</option>
-            {SUBJECT_OPTIONS.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
+            placeholder="Select subject"
+            options={SUBJECT_OPTIONS.map((s) => ({ value: s, label: s }))}
+          />
           {values.subject === OTHER_OPTION && (
-            <input
+            <Input
               type="text"
               placeholder="Type your subject, e.g. Music Theory"
               value={values.customSubject}
               onChange={(e) => set("customSubject", e.target.value)}
-              className={FIELD_CLASS}
             />
           )}
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-on-surface">What are you working on?</label>
-          <select
+          <Select
+            label="What are you working on?"
             value={values.helpType}
             onChange={(e) => set("helpType", e.target.value)}
-            className={SELECT_CLASS}
-          >
-            <option value="">Select type</option>
-            {HELP_TYPE_OPTIONS.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
+            placeholder="Select type"
+            options={HELP_TYPE_OPTIONS.map((t) => ({ value: t, label: t }))}
+          />
           {values.helpType === OTHER_OPTION && (
-            <input
+            <Input
               type="text"
               placeholder="Type the help you need, e.g. Lab Report"
               value={values.customHelpType}
               onChange={(e) => set("customHelpType", e.target.value)}
-              className={FIELD_CLASS}
             />
           )}
         </div>
@@ -258,19 +249,13 @@ export default function TaskRequestForm({
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-on-surface">Academic level</label>
-          <select
+          <Select
+            label="Academic level"
             value={values.level}
             onChange={(e) => set("level", e.target.value)}
-            className={SELECT_CLASS}
-          >
-            <option value="">Select level</option>
-            {LEVEL_OPTIONS.map((l) => (
-              <option key={l} value={l}>
-                {l}
-              </option>
-            ))}
-          </select>
+            placeholder="Select level"
+            options={LEVEL_OPTIONS.map((l) => ({ value: l, label: l }))}
+          />
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs font-semibold text-on-surface">Pages / words</label>
@@ -332,16 +317,13 @@ export default function TaskRequestForm({
         />
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-semibold text-on-surface">Tell us about your assignment</label>
-        <textarea
-          placeholder="Describe what you need help with..."
-          rows={2}
-          value={values.details}
-          onChange={(e) => set("details", e.target.value)}
-          className="w-full p-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all resize-none"
-        />
-      </div>
+      <Textarea
+        label="Tell us about your assignment"
+        rows={3}
+        placeholder="Describe what you need help with..."
+        value={values.details}
+        onChange={(e) => set("details", e.target.value)}
+      />
 
       <div className="flex flex-col gap-1">
         <span className="text-xs font-semibold text-on-surface">Files</span>
@@ -385,13 +367,14 @@ export default function TaskRequestForm({
         </p>
       )}
 
-      <button
+      <Button
         type="submit"
-        className="w-full h-11 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+        disabled={submitting}
+        className="w-full h-11"
       >
-        {submitLabel}
-        <ArrowRight className="w-4 h-4" />
-      </button>
+        {submitting ? <Loader2 size={16} className="animate-spin" /> : submitLabel}
+        {submitting ? <span className="sr-only">Submitting</span> : <ArrowRight className="w-4 h-4" />}
+      </Button>
 
       {note && <p className="text-xs text-on-surface-variant text-center">{note}</p>}
 

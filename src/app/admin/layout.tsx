@@ -86,7 +86,7 @@ export default function AdminLayout({
             <span className="material-symbols-outlined text-on-primary text-lg">school</span>
           </span>
           <span className="font-display font-bold text-lg text-on-surface">Acadivo</span>
-          <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-primary-container text-on-primary rounded-md">
+          <span className="px-1.5 py-0.5 text-xs font-semibold bg-primary-container text-on-primary rounded-md">
             Admin
           </span>
         </Link>

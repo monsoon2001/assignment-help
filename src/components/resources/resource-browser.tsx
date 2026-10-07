@@ -2,17 +2,12 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Search, Clock, X } from "lucide-react";
+import { ArrowRight, Search, Clock, X } from "lucide-react";
+import Button from "@/components/ui/button";
 import { ALL_RESOURCES, CATEGORY_BY_SLUG, resourcePath } from "@/lib/resources";
 import { PAGE_TONES } from "@/components/marketing/page-shell";
 
-// Cycling accents keep a long guide grid from reading as one flat white sheet.
-const RESOURCE_TONES = [
-  PAGE_TONES.amber,
-  PAGE_TONES.teal,
-  PAGE_TONES.violet,
-  PAGE_TONES.rose,
-];
+const TONE = PAGE_TONES.blue;
 
 export default function ResourceBrowser() {
   const [query, setQuery] = useState("");
@@ -59,8 +54,8 @@ export default function ResourceBrowser() {
           aria-pressed={active === null}
           className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
             active === null
-              ? "bg-primary text-on-primary"
-              : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high"
+              ? "bg-primary text-on-primary border border-primary"
+              : "bg-white border border-outline-variant/60 text-on-surface-variant hover:border-primary-container hover:text-primary"
           }`}
         >
           All
@@ -73,8 +68,8 @@ export default function ResourceBrowser() {
             aria-pressed={active === category.slug}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               active === category.slug
-                ? "bg-primary text-on-primary"
-                : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high"
+                ? "bg-primary text-on-primary border border-primary"
+                : "bg-white border border-outline-variant/60 text-on-surface-variant hover:border-primary-container hover:text-primary"
             }`}
           >
             {category.name}
@@ -82,7 +77,7 @@ export default function ResourceBrowser() {
         ))}
       </div>
 
-      <p className="text-sm text-on-surface-variant mb-6">
+      <p className="text-base text-on-surface-variant mb-6 leading-relaxed">
         {results.length} {results.length === 1 ? "guide" : "guides"}
       </p>
 
@@ -90,22 +85,21 @@ export default function ResourceBrowser() {
         <div className="text-center py-16 bg-surface-container-lowest rounded-2xl border border-outline-variant/30">
           <p className="font-display text-lg font-bold text-on-surface mb-2">No guides match that search</p>
           <p className="text-on-surface-variant mb-6">Try a different keyword, or clear the filters.</p>
-          <button
+          <Button
             type="button"
             onClick={() => {
               setQuery("");
               setActive(null);
             }}
-            className="px-5 py-2.5 bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:bg-primary transition-colors"
           >
             Reset search
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {results.map((guide, i) => {
+          {results.map((guide) => {
             const category = CATEGORY_BY_SLUG.get(guide.category);
-            const tone = RESOURCE_TONES[i % RESOURCE_TONES.length];
+            const tone = TONE;
             return (
               <Link
                 key={guide.slug}
@@ -121,14 +115,14 @@ export default function ResourceBrowser() {
                 <h3 className={`font-display font-bold text-on-surface mb-2 transition-colors ${tone.text}`}>
                   {guide.title}
                 </h3>
-                <p className="text-sm text-on-surface-variant leading-relaxed line-clamp-3 mb-4">{guide.description}</p>
+                <p className="text-base text-on-surface-variant leading-relaxed line-clamp-3 mb-4">{guide.description}</p>
                 <div className="mt-auto flex items-center justify-between">
                   <span className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant">
                     <Clock className="w-3.5 h-3.5" />
                     {guide.readingMinutes} min read
                   </span>
-                  <span className={`text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity ${tone.text}`}>
-                    Read Guide →
+                  <span className={`text-sm font-semibold sm:opacity-0 sm:group-hover:opacity-100 transition-opacity ${tone.text}`}>
+                    Read Guide <ArrowRight size={14} className="inline-block -mt-0.5" />
                   </span>
                 </div>
               </Link>

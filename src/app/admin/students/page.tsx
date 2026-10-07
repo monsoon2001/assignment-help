@@ -7,6 +7,7 @@ import Button from "@/components/ui/button";
 import { User } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { setUserStatus } from "@/app/admin/actions";
+import { userStatusVariant } from "@/lib/status-meta";
 import EditUserForm from "@/app/admin/components/edit-user-form";
 import { EmptyState } from "@/components/ui/states";
 
@@ -20,12 +21,6 @@ function formatDate(iso: string | null | undefined): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
-
-const STATUS_VARIANT: Record<string, "success" | "warning" | "danger" | "outline"> = {
-  active: "success",
-  suspended: "danger",
-  pending: "warning",
-};
 
 export default async function AdminStudentsPage({
   searchParams,
@@ -79,7 +74,7 @@ export default async function AdminStudentsPage({
                   <td className="px-6 py-4 text-sm text-on-surface-variant">{user.email}</td>
                   <td className="px-6 py-4 text-sm text-on-surface-variant">{formatDate(user.created_at)}</td>
                   <td className="px-6 py-4">
-                    <Badge variant={STATUS_VARIANT[user.status] ?? "outline"}>
+                    <Badge variant={userStatusVariant(user.status)}>
                       {user.status ?? "active"}
                     </Badge>
                   </td>
@@ -107,6 +102,8 @@ export default async function AdminStudentsPage({
           icon={<User size={24} className="text-primary" />}
           title="No students yet"
           message="Student accounts will appear here as people sign up."
+          actionHref="/admin/helpers"
+          actionLabel="View helpers"
         />
       )}
     </div>

@@ -52,10 +52,10 @@ export function WorkspaceSkeleton() {
   return (
     <div className="w-full" aria-busy="true" aria-live="polite">
       <span className="sr-only">Loading…</span>
-      <div className="w-full rounded-2xl border border-outline-variant p-5 sm:p-6">
+      <div className="w-full rounded-2xl border border-outline-variant p-6">
         <div className="flex flex-wrap items-center gap-4">
           <SkeletonCircle className="w-12 h-12" />
-          <div className="flex-1 min-w-[12rem] space-y-2">
+          <div className="flex-1 min-w-48 space-y-2">
             <Skeleton className="h-5 w-56" />
             <Skeleton className="h-3.5 w-40" />
           </div>

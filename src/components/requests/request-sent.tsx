@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   ArrowRight,
 } from "lucide-react";
+import Button from "@/components/ui/button";
 
 function formatDate(value: string | null): string {
   if (!value) return "Flexible";
@@ -49,7 +50,7 @@ export default function RequestSent({
   if (error) {
     return (
       <div className="w-full max-w-7xl mx-auto flex flex-col gap-6">
-        <div className="w-full max-w-xl mx-auto bg-surface-container-lowest rounded-2xl shadow-md p-8 text-center">
+        <div className="w-full max-w-xl mx-auto bg-surface-container-lowest rounded-2xl shadow-md p-6 sm:p-8 text-center">
           <h1 className="font-display font-bold text-2xl text-on-surface">Request not found</h1>
           <p className="text-sm text-on-surface-variant mt-2">{error}</p>
           <Link href="/requests" className="inline-block mt-6">
@@ -128,7 +129,7 @@ export default function RequestSent({
               <BookOpen size={16} />
               <span className="text-sm">Assignment</span>
             </div>
-            <span className="text-sm font-medium text-on-surface text-right max-w-[260px] truncate">
+            <span className="text-sm font-medium text-on-surface text-right max-w-65 truncate">
               {title}
             </span>
           </div>
@@ -176,19 +177,13 @@ export default function RequestSent({
 
       {/* Action Group */}
       <div className="w-full flex flex-col sm:flex-row items-center gap-3 mb-6">
-        <Link
-          href={`/requests/${id}`}
-          className="w-full sm:flex-1 py-3 px-5 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-medium text-sm flex items-center justify-center gap-2 shadow transition-all duration-150 text-center"
-        >
+        <Button href={`/requests/${id}`} className="w-full sm:flex-1">
           <span>Open Chat with Helper</span>
           <ArrowRight size={16} />
-        </Link>
-        <Link
-          href="/requests"
-          className="w-full sm:w-auto py-3 px-5 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-medium text-sm flex items-center justify-center gap-2 shadow-sm transition-all duration-150 text-center"
-        >
+        </Button>
+        <Button href="/requests" variant="outline" className="w-full sm:w-auto">
           <span>View in My Requests</span>
-        </Link>
+        </Button>
       </div>
 
       {/* Security / Payment Guarantee Reassurance Banner */}

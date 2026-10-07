@@ -83,19 +83,19 @@ export default function RoleBottomNav({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative flex flex-col items-center justify-center gap-0.5 py-2 px-1 min-w-[64px] text-[10px] font-medium transition-colors ${
+                className={`relative flex flex-col items-center justify-center gap-0.5 py-2 px-1 min-w-16 text-xs font-medium transition-colors ${
                   active ? "text-primary" : "text-on-surface-variant hover:text-on-surface"
                 }`}
               >
                 <span className="relative">
                   <Icon size={20} />
                   {item.badge ? (
-                    <span className="absolute -top-1 -right-1.5 min-w-[15px] h-[15px] px-0.5 rounded-full bg-error text-white text-[9px] font-bold flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1.5 min-w-5 h-5 px-0.5 rounded-full bg-error text-white text-xs font-bold flex items-center justify-center">
                       {item.badge > 9 ? "9+" : item.badge}
                     </span>
                   ) : null}
                 </span>
-                <span className="truncate max-w-[72px]">{item.label}</span>
+                <span className="truncate max-w-20">{item.label}</span>
                 {active && (
                   <span className="absolute top-0 inset-x-3 h-0.5 rounded-full bg-primary" />
                 )}
@@ -105,7 +105,7 @@ export default function RoleBottomNav({
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="relative flex flex-col items-center justify-center gap-0.5 py-2 px-1 min-w-[64px] text-[10px] font-medium text-on-surface-variant hover:text-on-surface cursor-pointer"
+            className="relative flex flex-col items-center justify-center gap-0.5 py-2 px-1 min-w-16 text-xs font-medium text-on-surface-variant hover:text-on-surface cursor-pointer"
             aria-label="More navigation options"
           >
             <Menu size={20} />
@@ -127,7 +127,7 @@ export default function RoleBottomNav({
                   <GraduationCap size={18} />
                 </span>
                 <span className="font-display font-bold text-on-surface">Acadivo</span>
-                <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-primary-container text-on-primary rounded-md uppercase">
+                <span className="px-1.5 py-0.5 text-xs font-semibold bg-primary-container text-on-primary rounded-md uppercase">
                   {roleLabel}
                 </span>
               </div>
@@ -158,7 +158,7 @@ export default function RoleBottomNav({
                     <Icon size={17} />
                     <span className="truncate">{item.label}</span>
                     {item.badge ? (
-                      <span className="ml-auto min-w-[18px] h-[18px] px-1 rounded-full bg-error text-white text-[10px] font-bold flex items-center justify-center">
+                      <span className="ml-auto min-w-5 h-5 px-1 rounded-full bg-error text-white text-xs font-bold flex items-center justify-center">
                         {item.badge}
                       </span>
                     ) : null}

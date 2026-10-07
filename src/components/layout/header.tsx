@@ -200,14 +200,14 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
 
   return (
     <header className="sticky top-0 z-50 bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant">
-      <div className="max-w-[1440px] mx-auto px-6 h-16 flex items-center gap-6">
+      <div className="max-w-360 mx-auto px-6 h-16 flex items-center gap-6">
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <span className="w-9 h-9 rounded-xl bg-primary-container text-on-primary flex items-center justify-center">
             <GraduationCap size={20} />
           </span>
           <div className="leading-tight hidden sm:block">
             <p className="font-display font-bold text-on-surface text-lg">Acadivo</p>
-            <p className="text-[9px] xl:text-[10px] uppercase tracking-[0.18em] xl:tracking-widest text-on-surface-variant">Academic Network</p>
+            <p className="text-xs uppercase tracking-widest xl:tracking-widest text-on-surface-variant">Academic Network</p>
           </div>
         </Link>
 
@@ -240,7 +240,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                     href={item.href}
                     aria-haspopup={hasDropdown ? "true" : undefined}
                     aria-expanded={hasDropdown ? isOpen : undefined}
-                    className={`flex items-center gap-1 py-1.5 whitespace-nowrap text-[13px] 2xl:text-sm font-medium transition-colors ${
+                    className={`flex items-center gap-1 py-1.5 whitespace-nowrap text-sm 2xl:text-sm font-medium transition-colors ${
                       isActive || isOpen
                         ? "text-primary"
                         : "text-on-surface-variant hover:text-on-surface"
@@ -287,7 +287,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                 <Button variant="ghost" size="sm" className="relative">
                   <Bell size={18} />
                   {unreadCount > 0 ? (
-                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-error text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-surface-container-lowest">
+                    <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-error text-white text-xs font-bold flex items-center justify-center ring-2 ring-surface-container-lowest">
                       {unreadCount > 9 ? "9+" : unreadCount}
                     </span>
                   ) : (
@@ -356,7 +356,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
             document.body
           )}
           <div className="absolute inset-x-0 top-full hidden xl:block">
-            <div className="mx-auto max-w-[1440px] px-6 pt-3">
+            <div className="mx-auto max-w-360 px-6 pt-3">
               <div
                 className="max-h-[72vh] overflow-y-auto rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-5 shadow-2xl shadow-black/20 animate-[sheet-up_0.18s_ease-out]"
                 onMouseEnter={() => openNow(activeMenu.href)}
@@ -430,7 +430,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
 
       {menuItems.length > 0 && mobileMenuOpen && (
         <div className="xl:hidden border-t border-outline-variant bg-surface-container-lowest">
-          <nav className="max-w-[1440px] mx-auto px-6 py-4 flex flex-col gap-3">
+          <nav className="max-w-360 mx-auto px-6 py-4 flex flex-col gap-3">
             {menuItems.map((item) => {
               const isActive = pathname === item.href;
               return (

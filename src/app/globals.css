@@ -11,20 +11,21 @@
   --color-surface-container-highest: #d3e4fe;
   --color-surface-container-lowest: #ffffff;
   --color-surface-variant: #d3e4fe;
-  --color-surface-tint: #4d44e3;
+  --color-surface-tint: #2b4bf0;
 
   --color-on-surface: #0b1c30;
   --color-on-surface-variant: #464555;
   --color-on-background: #0b1c30;
+  --color-section: #f3f5f9;
 
-  --color-primary: #3525cd;
-  --color-primary-container: #4f46e5;
+  --color-primary: #2b4bf0;
+  --color-primary-container: #466bf2;
   --color-on-primary: #ffffff;
-  --color-on-primary-container: #dad7ff;
-  --color-primary-fixed: #e2dfff;
-  --color-primary-fixed-dim: #c3c0ff;
-  --color-on-primary-fixed: #0f0069;
-  --color-on-primary-fixed-variant: #3323cc;
+  --color-on-primary-container: #ffffff;
+  --color-primary-fixed: #dbe5ff;
+  --color-primary-fixed-dim: #b6c8ff;
+  --color-on-primary-fixed: #0a1f5c;
+  --color-on-primary-fixed-variant: #2349cf;
 
   --color-secondary: #565e74;
   --color-secondary-container: #dae2fd;
@@ -54,23 +55,27 @@
 
   --color-inverse-surface: #213145;
   --color-inverse-on-surface: #eaf1ff;
-  --color-inverse-primary: #c3c0ff;
+  --color-inverse-primary: #a8c2ff;
 
   --color-success: #16a34a;
   --color-warning: #d97706;
   --color-danger: #dc2626;
 
-  /* Section accents. Cousins of the indigo primary rather than random hues, so
-     a banded homepage still reads as one brand: teal for trust, amber for free
-     and value, violet for guidance, rose for highlights. */
+  /* Non-purple page accents: teal, green, amber, rose. These live only in
+     small touches (icon tiles, chips, hairlines) — never as section fills. */
   --color-accent-teal: #0f766e;
   --color-accent-teal-container: #ccfbf1;
+  --color-accent-teal-fixed: #ccfbf1;
+  --color-accent-green: #047857;
+  --color-accent-green-container: #d1fae5;
+  --color-accent-green-fixed: #d1fae5;
   --color-accent-amber: #b45309;
   --color-accent-amber-container: #fdf0cd;
-  --color-accent-violet: #6d28d9;
-  --color-accent-violet-container: #ede7fd;
+  --color-accent-amber-fixed: #fdf0cd;
   --color-accent-rose: #be123c;
   --color-accent-rose-container: #ffe0e4;
+  --color-accent-rose-fixed: #ffe0e4;
+
   --color-ink-900: #120f3d;
   --color-ink-800: #1c1757;
   --color-ink-700: #2a2178;
@@ -95,6 +100,23 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Keyboard focus --------------------------------------------------------
+   One consistent focus ring for every interactive control. Form fields draw
+   their own :focus border/ring, so this covers links, buttons, accordions
+   and any tabbable element that doesn't already indicate focus. */
+:where(a, button, summary, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Plain CSS custom properties consumed by the public-band utilities below.
+   These are written directly (not via @theme) so they always ship to the
+   client — @theme-inline colours are only inlined into generated utilities. */
+:root {
+  --bp-section: #f3f5f9;
+  --bp-section-strong: #e4eaf4;
 }
 
 /* Material Symbols */
@@ -157,58 +179,22 @@ body {
   }
 }
 
-/* Homepage colour washes -----------------------------------------------------
-   A soft two-tone wash keeps long sections from reading as one flat sheet of
-   background while staying light enough for `text-on-surface`. */
+/* Public section bands -------------------------------------------------------
+   Colour lives in small accents (icon tiles, chips, the dark bands); section
+   backgrounds stay neutral so a long marketing page reads as one calm sheet. */
 
-@utility wash-teal {
-  background-image: linear-gradient(
-    180deg,
-    var(--color-accent-teal-container) 0%,
-    color-mix(in oklab, var(--color-accent-teal-container) 35%, white) 45%,
-    transparent 100%
-  );
+@utility band-soft {
+  background-color: var(--bp-section);
 }
 
-@utility wash-amber {
-  background-image: linear-gradient(
-    180deg,
-    var(--color-accent-amber-container) 0%,
-    color-mix(in oklab, var(--color-accent-amber-container) 30%, white) 45%,
-    transparent 100%
-  );
-}
-
-@utility wash-violet {
-  background-image: linear-gradient(
-    180deg,
-    var(--color-accent-violet-container) 0%,
-    color-mix(in oklab, var(--color-accent-violet-container) 32%, white) 45%,
-    transparent 100%
-  );
-}
-
-@utility wash-rose {
-  background-image: linear-gradient(
-    180deg,
-    var(--color-accent-rose-container) 0%,
-    color-mix(in oklab, var(--color-accent-rose-container) 30%, white) 45%,
-    transparent 100%
-  );
-}
-
-/* The hero keeps a light background but splits its tint: teal behind the
-   headline, violet behind the estimate card, both fading to white. */
-@utility wash-split {
+/* The hero: white with two barely-there corner tints so the estimate card and
+   the headline each sit on a slightly different plane. */
+@utility band-hero {
   background-color: var(--color-surface-container-lowest);
   background-image:
-    radial-gradient(52rem 26rem at 8% -6%, color-mix(in oklab, var(--color-accent-teal-container) 85%, transparent), transparent 68%),
-    radial-gradient(48rem 24rem at 96% 4%, color-mix(in oklab, var(--color-accent-violet-container) 85%, transparent), transparent 66%),
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--color-surface-container-low) 70%, white) 0%,
-      var(--color-surface-container-lowest) 62%
-    );
+    radial-gradient(52rem 26rem at 8% -6%, color-mix(in oklab, var(--color-primary-fixed) 75%, transparent), transparent 68%),
+    radial-gradient(46rem 24rem at 96% 4%, color-mix(in oklab, var(--bp-section-strong) 90%, transparent), transparent 66%),
+    linear-gradient(180deg, var(--bp-section) 0%, var(--color-surface-container-lowest) 55%);
 }
 
 /* The dark hero and closing CTA bands: a deep indigo wash, a soft corner glow
@@ -217,8 +203,8 @@ body {
   background-color: var(--color-ink-900);
   background-image:
     radial-gradient(70rem 32rem at 88% -12%, color-mix(in oklab, var(--color-primary-container) 55%, transparent), transparent 62%),
-    radial-gradient(46rem 26rem at 2% 108%, color-mix(in oklab, var(--color-accent-violet) 42%, transparent), transparent 60%),
-    linear-gradient(160deg, var(--color-ink-900) 0%, var(--color-ink-700) 52%, #4f46e5 128%);
+    radial-gradient(46rem 26rem at 2% 108%, color-mix(in oklab, var(--color-primary-container) 30%, transparent), transparent 60%),
+    linear-gradient(160deg, var(--color-ink-900) 0%, var(--color-ink-800) 55%, var(--color-ink-700) 100%);
 }
 
 @utility band-ink-grid {

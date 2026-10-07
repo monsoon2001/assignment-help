@@ -659,7 +659,7 @@ export function VoiceCallProvider({
             {!minimized && phase === "incoming" && (
               <DragWindow className="absolute pointer-events-auto cursor-grab active:cursor-grabbing touch-none select-none" pos={windowPos} onPosChange={setWindowPos}>
                 <div
-                  className="w-full max-w-sm bg-surface-container-lowest rounded-3xl border border-outline-variant shadow-2xl p-8 text-center animate-[dialog-in_0.2s_ease-out]"
+                  className="w-full max-w-sm bg-surface-container-lowest rounded-3xl border border-outline-variant shadow-2xl p-6 sm:p-8 text-center animate-[dialog-in_0.2s_ease-out]"
                   role="dialog"
                   aria-modal="true"
                   aria-label="Incoming call"
@@ -843,7 +843,7 @@ function MiniCallBubble({
       <Avatar name={name} src={avatarUrl} size="sm" />
       <div className="leading-tight">
         <p className="text-sm font-semibold text-on-surface">{name}</p>
-        <p className="text-[11px] text-on-surface-variant inline-flex items-center gap-1">
+        <p className="text-xs text-on-surface-variant inline-flex items-center gap-1">
           {live && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />}
           {live ? `In call · ${timer}` : "Calling…"}
           {muted && <MicOff size={11} className="text-warning ml-0.5" />}
@@ -892,7 +892,7 @@ function CallPanel({
 }) {
   return (
     <div
-      className="w-full max-w-md bg-surface-container-lowest rounded-3xl border border-outline-variant shadow-2xl p-8 text-center animate-[dialog-in_0.2s_ease-out] pointer-events-auto"
+      className="w-full max-w-md bg-surface-container-lowest rounded-3xl border border-outline-variant shadow-2xl p-6 sm:p-8 text-center animate-[dialog-in_0.2s_ease-out] pointer-events-auto"
       role="dialog"
       aria-modal="true"
       aria-label="Call"
@@ -935,13 +935,13 @@ function CallPanel({
           )}
         </p>
         {live && peerMuted && (
-          <p className="text-[11px] font-medium text-amber-600 mt-1.5 inline-flex items-center gap-1.5">
+          <p className="text-xs font-medium text-amber-600 mt-1.5 inline-flex items-center gap-1.5">
             <MicOff size={12} />
             {name} muted the call
           </p>
         )}
         {live && muted && (
-          <p className="text-[11px] font-medium text-warning mt-1.5 inline-flex items-center gap-1.5">
+          <p className="text-xs font-medium text-warning mt-1.5 inline-flex items-center gap-1.5">
             <MicOff size={12} />
             You muted the call
           </p>

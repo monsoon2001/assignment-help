@@ -14,10 +14,12 @@ import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import Avatar from "@/components/ui/avatar";
+import Textarea from "@/components/ui/textarea";
 import { createClient } from "@/lib/supabase/client";
 import { realtimeTopic } from "@/lib/supabase/realtime";
 import { uploadOrderFile } from "@/lib/order-files";
 import { normalizeCurrency, formatCurrency } from "@/lib/currency";
+import { orderStatusMeta, paymentStatusVariant } from "@/lib/status-meta";
 import { markThreadNotificationsRead } from "@/lib/notifications";
 import ChatPanel, { type ChatMessageRow, timeLabel, fileNameFromUrl } from "@/components/chat/chat-panel";
 import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
@@ -64,16 +66,6 @@ type PaymentRow = {
   receipt_url: string | null;
   created_at: string | null;
 };
-
-const STATUS_META: Record<OrderStatus, { label: string; variant: "primary" | "success" | "warning" | "outline" | "danger" }> = {
-  payment_pending: { label: "Payment Pending", variant: "warning" },
-  in_progress: { label: "In Progress", variant: "primary" },
-  delivered: { label: "Delivered", variant: "success" },
-  revision_requested: { label: "Revision Requested", variant: "warning" },
-  completed: { label: "Completed", variant: "success" },
-  disputed: { label: "Under Review", variant: "danger" },
-};
-
 
 export default function OrderWorkspace({ orderId }: { orderId: string }) {
   const supabase = useRef(createClient());
@@ -234,10 +226,10 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
     return (
       <div className="w-full" aria-busy="true" aria-live="polite">
         <span className="sr-only">Loading order…</span>
-        <div className="w-full rounded-2xl border border-outline-variant p-5 sm:p-6">
+        <div className="w-full rounded-2xl border border-outline-variant p-6">
           <div className="flex flex-wrap items-center gap-4">
             <SkeletonCircle className="w-12 h-12" />
-            <div className="flex-1 min-w-[12rem] space-y-2">
+            <div className="flex-1 min-w-48 space-y-2">
               <Skeleton className="h-5 w-56" />
               <Skeleton className="h-3.5 w-40" />
             </div>
@@ -274,7 +266,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
     );
   }
 
-  const meta = STATUS_META[order.status];
+  const meta = orderStatusMeta(order.status);
   const isHelper = role === "helper";
   const isStudent = role === "student";
   const title = order.proposal?.request?.title ?? "Order";
@@ -491,7 +483,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
               <Icon size={16} />
               {tab.label}
               {tab.id === "chat" && messages.length > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-gradient-to-br from-primary-container to-secondary-container text-white text-[10px] font-bold">
+                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-gradient-to-br from-primary-container to-secondary-container text-white text-xs font-bold">
                   {messages.length}
                 </span>
               )}
@@ -574,7 +566,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                 <h2 className="font-display font-semibold text-on-surface inline-flex items-center gap-2">
                   <Receipt size={16} className="text-primary" /> Payment
                 </h2>
-                <Badge variant={payment?.status === "paid" ? "success" : "warning"}>
+                <Badge variant={payment?.status ? paymentStatusVariant(payment.status) : "warning"}>
                   {payment?.status === "paid" ? "Paid" : "Awaiting Payment"}
                 </Badge>
               </div>
@@ -750,11 +742,9 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                 {revisionOpen ? (
                   <div className="flex flex-col gap-3">
                     <div className="flex flex-col gap-1.5">
-                      <label htmlFor="revision-note" className="text-sm font-medium text-on-surface">
-                        What needs to be corrected?
-                      </label>
-                      <textarea
+                      <Textarea
                         id="revision-note"
+                        label="What needs to be corrected?"
                         rows={4}
                         value={revisionNote}
                         onChange={(e) => {
@@ -762,7 +752,6 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                           setRevisionError(null);
                         }}
                         placeholder="e.g. Section 2 still needs the regression output explained in your own words, and the reference list is missing two sources."
-                        className="w-full p-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all resize-none"
                       />
                       <p className="text-xs text-on-surface-variant">
                         Your helper sees this note and works through it before delivering again.
@@ -859,13 +848,12 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
 
               <div className="flex flex-col gap-4">
                 <div>
-                  <label className="text-sm font-medium text-on-surface block mb-1.5">Delivery note</label>
-                  <textarea
+                  <Textarea
+                    label="Delivery note"
                     rows={3}
                     value={deliveryMessage}
                     onChange={(e) => setDeliveryMessage(e.target.value)}
                     placeholder="Summarize what you delivered and any notes for the student..."
-                    className="w-full p-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all resize-none"
                   />
                 </div>
 
@@ -873,14 +861,14 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                   <label className="text-sm font-medium text-on-surface block mb-1.5">
                     Files ({deliveryFiles.length} selected)
                   </label>
-                  <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-outline-variant rounded-xl p-6 cursor-pointer hover:bg-surface-container-low transition-colors">
+                  <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-outline-variant rounded-xl p-6 cursor-pointer hover:bg-surface-container-low transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary/40 has-[:focus-visible]:border-primary-container">
                     <Paperclip size={20} className="text-primary" />
                     <span className="text-sm font-medium text-on-surface">Click to browse</span>
                     <span className="text-xs text-on-surface-variant">PDF, DOCX, images — up to 25 MB</span>
                     <input
                       type="file"
                       multiple
-                      className="hidden"
+                      className="sr-only"
                       onChange={(e) =>
                         setDeliveryFiles(Array.from(e.target.files ?? []))
                       }

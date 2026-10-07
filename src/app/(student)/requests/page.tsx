@@ -138,7 +138,7 @@ export default async function RequestsPage() {
       <Card className="p-5 flex items-start gap-3 bg-surface-container-low border border-outline-variant">
         <RefreshCcw size={18} className="text-primary shrink-0 mt-0.5" />
         <div>
-          <h3 className="font-semibold text-sm text-on-surface">Revision policy</h3>
+          <h2 className="font-semibold text-sm text-on-surface">Revision policy</h2>
           <p className="text-xs leading-relaxed text-on-surface-variant mt-1">
             Revisions are <span className="font-semibold text-on-surface">unlimited until you&apos;re fully satisfied</span>{" "}
             with the delivered work. Helpers are expected to address scope-matching feedback; entirely new

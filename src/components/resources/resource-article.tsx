@@ -34,7 +34,7 @@ function contentSectionIds(headings: string[]): string[] {
 function BlockView({ block }: { block: ResourceBlock }) {
   switch (block.t) {
     case "p":
-      return <p className="mb-5 text-on-surface-variant leading-[1.75]">{block.v}</p>;
+      return <p className="mb-5 text-on-surface-variant leading-relaxed">{block.v}</p>;
     case "ul":
       return (
         <ul className="mb-6 space-y-2.5">
@@ -59,7 +59,7 @@ function BlockView({ block }: { block: ResourceBlock }) {
       );
     case "checklist":
       return (
-        <ul className="mb-6 bg-accent-teal-container/50 rounded-xl p-5 space-y-2.5">
+        <ul className="mb-6 bg-primary-fixed/50 rounded-xl p-5 space-y-2.5">
           {block.v.map((item) => (
             <li key={item} className="flex gap-3 text-on-surface-variant leading-relaxed">
               <span className="text-primary shrink-0 w-4">&#9744;</span>
@@ -70,8 +70,8 @@ function BlockView({ block }: { block: ResourceBlock }) {
       );
     case "example":
       return (
-        <div className="mb-6 border-l-2 border-accent-teal bg-accent-teal-container/35 rounded-r-xl p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-accent-teal mb-3">{block.label}</p>
+        <div className="mb-6 border-l-2 border-primary-container bg-primary-fixed/35 rounded-r-xl p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary mb-3">{block.label}</p>
           <div className="space-y-2.5">
             {block.v.map((para) => (
               <p key={para} className="text-on-surface-variant leading-relaxed">
@@ -83,7 +83,7 @@ function BlockView({ block }: { block: ResourceBlock }) {
       );
     case "note":
       return (
-        <div className="mb-6 bg-accent-violet-container/45 border border-accent-violet/30 rounded-xl p-5">
+        <div className="mb-6 bg-primary-fixed/45 border border-outline-variant/50 rounded-xl p-5">
           <p className="font-semibold text-on-surface mb-1.5">{block.title}</p>
           <p className="text-on-surface-variant leading-relaxed">{block.v}</p>
         </div>
@@ -183,14 +183,14 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
 
-      <div className="bg-gradient-to-r from-accent-amber-container/90 via-surface-container-high to-surface-container-low border-b border-outline-variant/50">
+      <div className="bg-gradient-to-r from-primary-fixed/50 via-white to-white border-b border-outline-variant/50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm text-on-surface-variant mb-5">
-            <Link href="/" className="hover:text-accent-amber transition-colors">Home</Link>
+            <Link href="/" className="text-primary transition-colors">Home</Link>
             <ChevronRight className="w-3.5 h-3.5" />
-            <Link href="/resources" className="hover:text-accent-amber transition-colors">Resources</Link>
+            <Link href="/resources" className="text-primary transition-colors">Resources</Link>
             <ChevronRight className="w-3.5 h-3.5" />
-            <span className="hover:text-accent-amber transition-colors">
+            <span className="text-primary transition-colors">
               {category ? (
                 <Link href={`/resources/${resource.category}`}>{category.name}</Link>
               ) : (
@@ -204,7 +204,7 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
           {category && (
             <Link
               href={`/resources/${resource.category}`}
-              className="inline-flex items-center gap-1.5 bg-accent-amber-container text-accent-amber rounded-full px-3 py-1 text-xs font-semibold mb-4 hover:bg-accent-amber-container/70 transition-colors"
+              className="inline-flex items-center gap-1.5 bg-primary-fixed text-primary rounded-full px-3 py-1 text-xs font-semibold mb-4 hover:bg-primary-fixed/70 transition-colors"
             >
               <span className="material-symbols-outlined text-sm">{category.icon}</span>
               {category.name}
@@ -222,10 +222,10 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
         </div>
       </div>
 
-      <div className="bg-white wash-amber">
+      <div className="band-soft">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="lg:hidden mb-8">
-          <details className="bg-accent-amber-container/60 rounded-xl p-4 border border-accent-amber/25">
+          <details className="bg-primary-fixed/60 rounded-xl p-4 border border-outline-variant/50">
             <summary className="font-semibold text-on-surface cursor-pointer text-sm">On this page</summary>
             <ul className="mt-3 space-y-2">
               {toc.map((item) => (
@@ -239,11 +239,11 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
           </details>
         </div>
 
-        <div className="grid lg:grid-cols-[1fr_240px] gap-12">
-          <article className="min-w-0">
+        <div className="grid lg:grid-cols-[1fr_240px] gap-8 lg:gap-12">
+          <article className="min-w-0 bg-white rounded-2xl border border-outline-variant/30 p-6 sm:p-8 shadow-sm">
             <div className="mb-8">
               {resource.intro.map((para) => (
-                <p key={para} className="text-lg text-on-surface leading-[1.75] mb-4">
+                <p key={para} className="text-lg text-on-surface leading-relaxed mb-4">
                   {para}
                 </p>
               ))}
@@ -264,7 +264,7 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
                   const target = RESOURCE_BY_SLUG.get(link.slug);
                   if (!target) return null;
                   return (
-                    <p key={link.slug} className="mt-4 text-sm text-on-surface-variant">
+                    <p key={link.slug} className="mt-4 text-base text-on-surface-variant leading-relaxed">
                       See also:{" "}
                       <Link href={resourcePath(target)} className="text-primary hover:underline font-medium">
                         {link.label}
@@ -311,12 +311,12 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
                     <Link
                       key={item.slug}
                       href={resourcePath(item)}
-                      className="group bg-white border border-outline-variant/30 rounded-xl p-4 shadow-sm hover:border-accent-amber/50 hover:shadow-md transition-all"
+                      className="group bg-white border border-outline-variant/30 rounded-xl p-4 shadow-sm hover:border-primary-container/60 hover:shadow-md transition-all"
                     >
-                      <p className="font-semibold text-on-surface mb-1 group-hover:text-accent-amber transition-colors">
+                      <p className="font-semibold text-on-surface mb-1 text-primary transition-colors">
                         {item.title}
                       </p>
-                      <p className="text-sm text-on-surface-variant">{item.readingMinutes} min read</p>
+                      <p className="text-base text-on-surface-variant leading-relaxed">{item.readingMinutes} min read</p>
                     </Link>
                   ))}
                 </div>
@@ -331,7 +331,7 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
                     <Link
                       key={subject.slug}
                       href={`/subjects/${subject.slug}`}
-                      className="bg-accent-violet-container text-accent-violet rounded-full px-4 py-1.5 text-sm font-medium hover:bg-accent-violet-container/70 transition-colors"
+                      className="bg-primary-fixed text-primary rounded-full px-4 py-1.5 text-sm font-medium hover:bg-primary-fixed/70 transition-colors"
                     >
                       {subject.label}
                     </Link>
@@ -340,17 +340,17 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
               </section>
             )}
 
-            <div className="bg-white rounded-2xl border border-accent-rose/25 p-6 sm:p-8 mb-12 shadow-sm">
+            <div className="bg-white rounded-2xl border border-outline-variant/50 p-6 sm:p-8 mb-12 shadow-sm">
               <div className="flex items-start gap-4">
-                <div className="w-11 h-11 bg-accent-rose-container rounded-xl flex items-center justify-center shrink-0">
-                  <BookOpen className="w-5 h-5 text-accent-rose" />
+                <div className="w-11 h-11 bg-primary-fixed rounded-xl flex items-center justify-center shrink-0">
+                  <BookOpen className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1">
                   <h2 className="font-display text-xl font-bold text-on-surface mb-2">{resource.service.title}</h2>
                   <p className="text-on-surface-variant mb-5">{resource.service.body}</p>
                   <Link
                     href={resource.service.href}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-accent-rose to-accent-violet text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-container text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity"
                   >
                     {resource.service.cta}
                     <ArrowRight className="w-4 h-4" />

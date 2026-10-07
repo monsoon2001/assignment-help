@@ -5,6 +5,8 @@ import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import Avatar from "@/components/ui/avatar";
 import Button from "@/components/ui/button";
+import Input from "@/components/ui/input";
+import { PanelEmpty } from "@/components/ui/states";
 import { MessageSquare, Phone, Send } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { ADMIN_MESSAGES_CHANNEL } from "@/lib/supabase/realtime";
@@ -174,7 +176,13 @@ const selectedIdRef = useRef<string | null>(null);
           <p className="text-xs text-on-surface-variant">Message any helper directly</p>
         </div>
         <div className="divide-y divide-outline-variant/20">
-          {helpers.length === 0 && <p className="p-4 text-sm text-on-surface-variant">No helpers yet.</p>}
+          {helpers.length === 0 && (
+            <PanelEmpty
+              icon={<MessageSquare size={18} className="text-primary" />}
+              title="No helpers yet"
+              message="Verified helper accounts will appear here so you can message them directly."
+            />
+          )}
           {helpers.map((helper) => (
             <button
               key={helper.id}
@@ -239,7 +247,7 @@ const selectedIdRef = useRef<string | null>(null);
                             ? ` \u00b7 ${formatDuration(l.duration_seconds)}`
                             : ""}
                         </span>
-                        <span className="text-[10px] opacity-60 ml-1">{formatTime(l.started_at)}</span>
+                        <span className="text-xs opacity-60 ml-1">{formatTime(l.started_at)}</span>
                       </div>
                     </div>
                   );
@@ -256,7 +264,7 @@ const selectedIdRef = useRef<string | null>(null);
                       }`}
                     >
                       <p>{m.body}</p>
-                      <p className={`text-[10px] mt-1 ${mine ? "text-on-primary/70" : "text-on-surface-variant"}`}>
+                      <p className={`text-xs mt-1 ${mine ? "text-on-primary/70" : "text-on-surface-variant"}`}>
                         {formatTime(m.created_at)}
                       </p>
                     </div>
@@ -267,11 +275,11 @@ const selectedIdRef = useRef<string | null>(null);
             </div>
 
             <form onSubmit={sendMessage} className="p-4 border-t border-outline-variant/30 flex items-center gap-3">
-              <input
+              <Input
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 placeholder="Type a message..."
-                className="flex-1 h-11 px-4 bg-surface-container-lowest border border-outline-variant rounded-xl text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container"
+                className="flex-1"
               />
               <Button type="submit" disabled={!draft.trim() || sending}>
                 <Send size={16} />
@@ -280,7 +288,7 @@ const selectedIdRef = useRef<string | null>(null);
             </form>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center gap-3 p-8 text-center">
+          <div className="flex-1 flex flex-col items-center justify-center gap-3 p-6 sm:p-8 text-center">
             <span className="w-14 h-14 rounded-2xl bg-primary-container/10 flex items-center justify-center">
               <MessageSquare size={26} className="text-primary" />
             </span>

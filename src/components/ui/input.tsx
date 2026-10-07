@@ -12,7 +12,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     // height, a larger value, and a visible picker button.
     const isDateField = type === "date" || type === "time" || type === "datetime-local";
     const sizeClass = isDateField
-      ? " h-11 text-[15px] [&::-webkit-date-and-time-value]:w-full [&::-webkit-date-and-time-value]:text-left [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+      ? " h-11 text-base [&::-webkit-date-and-time-value]:w-full [&::-webkit-date-and-time-value]:text-left [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
       : "";
 
     return (

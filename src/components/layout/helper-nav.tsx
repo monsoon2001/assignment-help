@@ -89,7 +89,7 @@ function CallAdminButton() {
         <Phone size={15} />
         Call Admin
       </Button>
-      <p className="mt-2 flex items-center justify-center gap-1 text-[10px] text-on-surface-variant">
+      <p className="mt-2 flex items-center justify-center gap-1 text-xs text-on-surface-variant">
         <Headset size={11} />
         Free voice with the support desk
       </p>

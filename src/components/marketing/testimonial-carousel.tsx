@@ -95,7 +95,7 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
                 return (
                   <figure
                     key={t.id}
-                    className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-outline-variant/40 bg-white p-6 sm:p-7 shadow-md shadow-ink-900/5 transition-all duration-300 hover:shadow-2xl hover:shadow-accent-amber/20 hover:-translate-y-1"
+                    className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-outline-variant/40 bg-white p-6 sm:p-8 shadow-md shadow-ink-900/5 transition-all duration-300 hover:shadow-2xl hover:shadow-primary-container/20 hover:-translate-y-1"
                   >
                     <span
                       className="material-symbols-outlined pointer-events-none absolute -top-1 -right-1 text-7xl leading-none text-primary/10"
@@ -119,13 +119,13 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
                         ))}
                       </div>
                       {t.subject && (
-                        <span className="shrink-0 rounded-full bg-accent-violet-container px-2.5 py-1 text-[11px] font-semibold text-accent-violet">
+                        <span className="shrink-0 rounded-full bg-primary-fixed px-2.5 py-1 text-xs font-semibold text-primary">
                           {t.subject}
                         </span>
                       )}
                     </div>
 
-                    <blockquote className="relative mt-4 flex-1 text-[15px] leading-relaxed text-on-surface">
+                    <blockquote className="relative mt-4 flex-1 text-base leading-relaxed text-on-surface">
                       {t.comment}
                     </blockquote>
 
@@ -138,12 +138,12 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
                           className="shrink-0"
                         />
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-semibold text-on-surface truncate">{firstName}</p>
+                          <p className="text-base font-semibold text-on-surface truncate leading-relaxed">{firstName}</p>
                           <p className="text-xs text-on-surface-variant">
                             {[t.service, t.length].filter(Boolean).join(" · ") || "Verified student"}
                           </p>
                         </div>
-                        <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700">
+                        <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">
                           <BadgeCheck size={11} /> Verified
                         </span>
                       </div>
@@ -162,7 +162,7 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
             type="button"
             onClick={() => go(activePage - 1)}
             aria-label="Previous testimonials"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant bg-white text-on-surface-variant transition-colors hover:border-accent-amber hover:text-accent-amber"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant bg-white text-on-surface-variant transition-colors hover:border-primary-container text-primary"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -175,7 +175,7 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
                 aria-label={`Show testimonials ${i + 1}`}
                 aria-current={i === activePage}
                 className={`h-2 rounded-full transition-all ${
-                  i === activePage ? "w-7 bg-gradient-to-r from-accent-amber to-accent-violet" : "w-2 bg-outline-variant hover:bg-on-surface-variant/50"
+                  i === activePage ? "w-7 bg-primary hover:bg-primary-container" : "w-2 bg-outline-variant hover:bg-on-surface-variant/50"
                 }`}
               />
             ))}
@@ -184,7 +184,7 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
             type="button"
             onClick={() => go(activePage + 1)}
             aria-label="Next testimonials"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant bg-white text-on-surface-variant transition-colors hover:border-accent-amber hover:text-accent-amber"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant bg-white text-on-surface-variant transition-colors hover:border-primary-container text-primary"
           >
             <ChevronRight className="h-5 w-5" />
           </button>

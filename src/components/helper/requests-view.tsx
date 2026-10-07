@@ -94,10 +94,18 @@ export default function HelperRequestsView({
       </div>
 
       {rows.length === 0 && (
-        <Card className="p-10 text-center">
-          <p className="text-on-surface-variant">
-            No assigned requests right now. You&apos;ll see requests here when a student picks you.
+        <Card className="p-10 text-center flex flex-col items-center gap-3">
+          <span className="w-14 h-14 rounded-2xl bg-primary-container/20 flex items-center justify-center">
+            <MessageSquare size={24} className="text-primary" />
+          </span>
+          <h2 className="font-display font-semibold text-on-surface">No requests here right now</h2>
+          <p className="text-sm text-on-surface-variant max-w-md">
+            Students reach out directly, so a request appears here once a student picks you. A complete
+            profile helps students find you in Browse Helpers.
           </p>
+          <Link href="/helper/profile" className="mt-1">
+            <Button size="sm" variant="outline">Complete your profile</Button>
+          </Link>
         </Card>
       )}
 
@@ -112,9 +120,9 @@ export default function HelperRequestsView({
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-on-surface">
+                        <h2 className="font-semibold text-on-surface">
                           {req.title}
-                        </h3>
+                        </h2>
                         <Badge variant={alreadyProposed ? "success" : "warning"} dot>
                           {alreadyProposed ? "Proposal Sent" : "New Request"}
                         </Badge>

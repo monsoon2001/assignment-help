@@ -13,20 +13,13 @@ import {
   Inbox,
 } from "lucide-react";
 import Button from "@/components/ui/button";
+import { EmptyState, PanelEmpty } from "@/components/ui/states";
 import { createClient } from "@/lib/supabase/server";
 import { unwrapRow } from "@/lib/embedded";
 import { formatCurrency, normalizeCurrency, type CurrencyCode } from "@/lib/currency";
+import { orderStatusMeta } from "@/lib/status-meta";
 
 export const dynamic = "force-dynamic";
-
-const STATUS_META: Record<string, { label: string; variant: "warning" | "primary" | "success" | "danger" | "outline" }> = {
-  payment_pending: { label: "Payment Pending", variant: "warning" },
-  in_progress: { label: "In Progress", variant: "primary" },
-  delivered: { label: "Delivered", variant: "success" },
-  revision_requested: { label: "Revision Requested", variant: "warning" },
-  completed: { label: "Completed", variant: "success" },
-  disputed: { label: "Under Review", variant: "danger" },
-};
 
 function timeAgo(value: string): string {
   const diff = Date.now() - new Date(value).getTime();
@@ -162,15 +155,17 @@ export default async function HelperDashboard() {
             </Link>
           </div>
           {activeOrders.length === 0 && (
-            <Card className="p-8 text-center">
-              <p className="text-sm text-on-surface-variant">
-                No active orders yet. New accepted proposals will appear here.
-              </p>
-            </Card>
+            <EmptyState
+              icon={<Briefcase size={24} className="text-primary" />}
+              title="No active orders yet"
+              message="Accepted proposals move here as orders. Send a few proposals to line up your next project."
+              actionHref="/helper/requests"
+              actionLabel="Check incoming requests"
+            />
           )}
           <div className="space-y-4">
             {activeOrders.map((order) => {
-              const meta = STATUS_META[order.status] ?? { label: order.status, variant: "outline" as const };
+              const meta = orderStatusMeta(order.status);
               return (
                 <Card key={order.id} className="p-5" hover>
                   <Link href={`/helper/orders/${order.id}`}>
@@ -211,18 +206,26 @@ export default async function HelperDashboard() {
                 View all <ArrowUpRight size={14} />
               </Link>
             </div>
-            <Card className="p-4">
+            <Card className="overflow-hidden">
               {incoming.length === 0 && (
-                <p className="text-sm text-on-surface-variant">No new requests right now.</p>
+                <PanelEmpty
+                  icon={<Inbox size={18} className="text-primary" />}
+                  title="No new requests right now"
+                  message="Assigned requests appear here as soon as a student picks you."
+                  actionHref="/helper/profile"
+                  actionLabel="Complete your profile"
+                />
               )}
-              <div className="flex flex-col divide-y divide-outline-variant/30">
-                {incoming.map((r) => (
-                  <Link key={r.id} href={`/helper/requests/${r.id}`} className="py-3 first:pt-0 last:pb-0 flex items-center gap-2 group">
+              {incoming.length > 0 && (
+                <div className="flex flex-col divide-y divide-outline-variant/30 px-4 py-3">
+                  {incoming.map((r) => (
+                    <Link key={r.id} href={`/helper/requests/${r.id}`} className="py-2 flex items-center gap-2 group">
                     <FileText size={15} className="text-primary shrink-0" />
                     <span className="text-sm font-medium text-on-surface truncate group-hover:underline">{r.title}</span>
                   </Link>
                 ))}
-              </div>
+                </div>
+              )}
             </Card>
           </div>
 
@@ -233,9 +236,15 @@ export default async function HelperDashboard() {
                 View all <ArrowUpRight size={14} />
               </Link>
             </div>
-            <Card className="divide-y divide-outline-variant/30">
+            <Card className="divide-y divide-outline-variant/30 overflow-hidden">
               {notifications.length === 0 && (
-                <p className="text-sm text-on-surface-variant p-4">No activity yet.</p>
+                <PanelEmpty
+                  icon={<ArrowUpRight size={18} className="text-primary" />}
+                  title="No activity yet"
+                  message="Payment, order and chat updates for your requests will show up here."
+                  actionHref="/helper/notifications"
+                  actionLabel="View notifications"
+                />
               )}
               {notifications.map((n) => (
                 <Link href={n.link ?? "/helper/notifications"} key={n.id} className="p-4 flex items-start gap-3 hover:bg-surface-container-low transition-colors">

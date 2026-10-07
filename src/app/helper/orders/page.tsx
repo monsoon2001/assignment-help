@@ -8,20 +8,12 @@ import Avatar from "@/components/ui/avatar";
 import { Eye, MessageSquare, Clock, DollarSign, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeCurrency, formatCurrency } from "@/lib/currency";
+import { orderStatusMeta } from "@/lib/status-meta";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Active Orders | Acadivo",
-};
-
-const STATUS: Record<string, { label: string; variant: "primary" | "warning" | "success" | "danger" }> = {
-  payment_pending: { label: "Payment Pending", variant: "warning" },
-  in_progress: { label: "In Progress", variant: "primary" },
-  delivered: { label: "Delivered", variant: "success" },
-  revision_requested: { label: "Revision Requested", variant: "warning" },
-  completed: { label: "Completed", variant: "success" },
-  disputed: { label: "Under Review", variant: "danger" },
 };
 
 function timeAgo(value: string): string {
@@ -77,16 +69,24 @@ export default async function HelperOrders() {
       </div>
 
       {orders.length === 0 && (
-        <Card className="p-10 text-center">
-          <p className="text-on-surface-variant">
-            No orders yet. Keep sending proposals — you&apos;ll see accepted work here.
+        <Card className="p-10 text-center flex flex-col items-center gap-3">
+          <span className="w-14 h-14 rounded-2xl bg-primary-container/20 flex items-center justify-center">
+            <DollarSign size={24} className="text-primary" />
+          </span>
+          <h2 className="font-display font-semibold text-on-surface">No orders yet</h2>
+          <p className="text-sm text-on-surface-variant max-w-md">
+            Accepted proposals become paid orders and appear here. Send proposals on incoming requests
+            to land your first one.
           </p>
+          <Link href="/helper/requests" className="mt-1">
+            <Button size="sm" variant="outline">Check incoming requests</Button>
+          </Link>
         </Card>
       )}
 
       <div className="space-y-4">
         {orders.map((order) => {
-          const meta = STATUS[order.status] ?? { label: order.status, variant: "primary" as const };
+          const meta = orderStatusMeta(order.status);
           const title = order.proposal?.request?.title ?? "Untitled Order";
           const subject = order.proposal?.request?.subject ?? "General";
           return (
@@ -97,9 +97,9 @@ export default async function HelperOrders() {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <h3 className="font-semibold text-on-surface">
+                        <h2 className="font-semibold text-on-surface">
                           {title}
-                        </h3>
+                        </h2>
                         <Badge variant={meta.variant} dot>{meta.label}</Badge>
                       </div>
                       <p className="text-sm text-on-surface-variant">

@@ -144,7 +144,7 @@ export default function NotificationsView({
           <span className="w-14 h-14 rounded-2xl bg-primary-container/10 flex items-center justify-center">
             <Bell size={26} className="text-primary" />
           </span>
-          <h3 className="font-semibold text-on-surface">You&apos;re all caught up</h3>
+          <h2 className="font-semibold text-on-surface">You&apos;re all caught up</h2>
           <p className="text-sm text-on-surface-variant max-w-sm">
             You don&apos;t have any notifications yet. You&apos;ll be notified here when a helper
             proposes, messages you, or delivers work.
@@ -181,7 +181,7 @@ export default function NotificationsView({
                   {n.message}
                 </p>
                 <div className="flex items-center gap-3 mt-2">
-                  <span className="text-[11px] text-on-surface-variant">{timeAgo(n.created_at)}</span>
+                  <span className="text-xs text-on-surface-variant">{timeAgo(n.created_at)}</span>
                   {n.link && (
                     <>
                       <span className="w-0.5 h-3 bg-outline-variant" />

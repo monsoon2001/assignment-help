@@ -6,6 +6,7 @@ import { CreditCard } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
 import { formatCurrency, normalizeCurrency } from "@/lib/currency";
+import { paymentStatusVariant, orderStatusVariant } from "@/lib/status-meta";
 import RefundButton from "@/app/admin/components/refund-button";
 import { EmptyState } from "@/components/ui/states";
 
@@ -19,12 +20,6 @@ function formatDate(iso: string | null | undefined): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
-
-const STATUS_VARIANT: Record<string, "success" | "warning" | "outline" | "danger"> = {
-  paid: "success",
-  pending: "warning",
-  refunded: "danger",
-};
 
 export default async function AdminPaymentsPage() {
   await requireAdmin();
@@ -84,11 +79,11 @@ export default async function AdminPaymentsPage() {
                     </td>
                     <td className="px-6 py-4 text-sm font-semibold text-on-surface">{formatCurrency(Number(payment.amount), normalizeCurrency(payment.currency))}</td>
                     <td className="px-6 py-4">
-                      <Badge variant="outline">{order?.status ?? "—"}</Badge>
+                      <Badge variant={orderStatusVariant(order?.status)}>{order?.status ?? "—"}</Badge>
                     </td>
                     <td className="px-6 py-4 text-sm text-on-surface-variant">{formatDate(payment.created_at)}</td>
                     <td className="px-6 py-4">
-                      <Badge variant={STATUS_VARIANT[payment.status] ?? "outline"}>{payment.status}</Badge>
+                      <Badge variant={paymentStatusVariant(payment.status)}>{payment.status}</Badge>
                     </td>
                     <td className="px-6 py-4 text-right">
                       {payment.status === "paid" ? (
@@ -108,6 +103,8 @@ export default async function AdminPaymentsPage() {
           icon={<CreditCard size={24} className="text-primary" />}
           title="No payments yet"
           message="Payments will appear here once students check out."
+          actionHref="/admin/orders"
+          actionLabel="Review orders"
         />
       )}
     </div>

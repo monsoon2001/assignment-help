@@ -34,11 +34,11 @@ export default function FAQPage() {
         crumbs={[{ label: "Home", href: "/" }, { label: "FAQ" }]}
       />
 
-      <div className="bg-white wash-rose">
+      <div className="band-soft">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid gap-3 md:grid-cols-2">
           {faqs.map((faq, i) => {
-            const tone = [PAGE_TONES.rose, PAGE_TONES.teal, PAGE_TONES.amber, PAGE_TONES.violet][i % 4];
+            const tone = PAGE_TONES.blue;
             const open = openIndex === i;
             return (
             <div key={i} className={`bg-white rounded-xl border overflow-hidden transition-all ${open ? `${tone.card} shadow-md` : `${tone.card} shadow-sm ${tone.cardHover}`}`}>

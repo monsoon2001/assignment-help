@@ -4,6 +4,7 @@ import Header from "@/components/layout/header";
 import StudentNav from "@/components/layout/student-nav";
 import RoleBottomNav from "@/components/layout/role-bottom-nav";
 import WarningsBanner from "@/components/layout/warnings-banner";
+import Button from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -45,21 +46,18 @@ export default async function StudentLayout({ children }: { children: React.Reac
       <Header />
       <WarningsBanner />
 
-      <div className="flex flex-1 w-full max-w-[1440px] mx-auto">
+      <div className="flex flex-1 w-full max-w-360 mx-auto">
         <aside className="hidden md:flex flex-col w-60 shrink-0 border-r border-outline-variant px-4 py-6 gap-1 sticky top-16 h-[calc(100vh-4rem)] bg-surface-container-lowest">
-          <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-widest text-on-surface-variant">
+          <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-widest text-on-surface-variant">
             Student
           </p>
           <StudentNav items={navItems} />
 
           <div className="mt-auto pt-4 flex flex-col gap-2">
-            <Link
-              href="/requests/new"
-              className="flex items-center justify-center gap-2 w-full px-3 py-2.5 rounded-lg bg-primary text-on-primary text-sm font-semibold hover:bg-primary/90 transition-colors"
-            >
+            <Button href="/requests/new" className="w-full" size="sm">
               <Plus size={16} />
               Request Help
-            </Link>
+            </Button>
             <Link
               href="/"
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors"

@@ -222,7 +222,7 @@ export default function NewRequestPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <Card className="lg:col-span-2 p-6 md:p-8">
+        <Card className="lg:col-span-2 p-6 sm:p-8">
           <div className="flex items-center gap-2 mb-6">
             {["details", "helper"].map((s, i) => {
               const active = step === s;
@@ -350,10 +350,10 @@ export default function NewRequestPage() {
 
         <div className="flex flex-col gap-4">
           <Card className="p-5">
-            <h3 className="font-semibold text-sm text-on-surface mb-3 flex items-center gap-2">
+            <h2 className="font-semibold text-sm text-on-surface mb-3 flex items-center gap-2">
               <Info size={15} className="text-primary" />
               Pricing &amp; Timeline
-            </h3>
+            </h2>
             <div className="space-y-2.5 text-sm">
               {PRICING_BANDS.map((band) => (
                 <div key={band.label} className="flex items-center justify-between">
