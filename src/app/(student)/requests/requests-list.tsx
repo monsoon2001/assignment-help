@@ -160,7 +160,7 @@ export default function RequestsList({
             key={t.key}
             onClick={() => applyFilter(setTab)(t.key)}
             aria-pressed={tab === t.key}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer ${
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer inline-flex items-center min-h-11 ${
               tab === t.key
                 ? "bg-primary-container text-on-primary"
                 : "bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:bg-surface-container-low"

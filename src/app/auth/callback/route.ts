@@ -58,9 +58,27 @@ export async function GET(request: Request) {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("role")
+    .select("role, name")
     .eq("id", user.id)
     .maybeSingle();
+
+  // Sync a Google profile picture (and a missing name) from the OAuth identity
+  // into the users table so every surface — helper listings, chats, admin —
+  // sees the real Google avatar instead of the initials fallback.
+  const metadata = (user.user_metadata ?? {}) as Record<string, unknown>;
+  const googleAvatar =
+    typeof metadata.avatar_url === "string"
+      ? metadata.avatar_url
+      : typeof metadata.picture === "string"
+        ? metadata.picture
+        : null;
+  const metaName = typeof metadata.name === "string" ? metadata.name : null;
+  if (googleAvatar || (metaName && !profile?.name)) {
+    const updates: Record<string, unknown> = {};
+    if (googleAvatar) updates.avatar_url = googleAvatar;
+    if (metaName && !profile?.name) updates.name = metaName;
+    await supabase.from("users").update(updates).eq("id", user.id);
+  }
 
   const home = roleToHome(profile?.role);
   const target =

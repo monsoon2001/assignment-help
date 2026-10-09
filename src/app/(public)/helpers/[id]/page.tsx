@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Check, ChevronRight, Star, Clock, MessageSquare, BookOpen, GraduationCap } from "lucide-react";
 import Avatar from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/server";
+import { MaterialIcon } from "@/lib/icons-map";
 
 export const dynamic = "force-dynamic";
 
@@ -97,14 +98,14 @@ export default async function HelperProfilePage({
 
   return (
     <>
-      <div className="bg-gradient-to-r from-primary-fixed/50 via-white to-white border-b border-outline-variant/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <nav className="flex items-center gap-2 text-sm text-on-surface-variant mb-4">
-            <Link href="/" className="text-primary transition-colors">Home</Link>
+      <div className="bg-white border-b border-outline-variant/40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+          <nav className="flex items-center gap-2 text-sm text-on-surface-variant">
+            <Link href="/" className="text-primary transition-colors inline-flex items-center min-h-11 min-w-11">Home</Link>
             <ChevronRight className="w-3.5 h-3.5" />
-            <Link href="/browse-helpers" className="text-primary transition-colors">Helpers</Link>
+            <Link href="/browse-helpers" className="text-primary transition-colors inline-flex items-center min-h-11 min-w-11">Helpers</Link>
             <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-on-surface font-medium">{helper.name ?? "Helper"}</span>
+            <span className="text-on-surface font-medium truncate max-w-xs">{helper.name ?? "Helper"}</span>
           </nav>
         </div>
       </div>
@@ -123,7 +124,7 @@ export default async function HelperProfilePage({
                   <div className="flex items-center gap-3 mb-2">
                     <h1 className="font-display text-2xl font-bold text-on-surface">{helper.name ?? "Helper"}</h1>
                     <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-fixed text-primary text-xs font-semibold">
-                      <span className="material-symbols-outlined text-sm">verified</span>
+                      <MaterialIcon name="verified" size={16} className="text-primary" />
                       Verified
                     </span>
                   </div>

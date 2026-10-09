@@ -111,21 +111,38 @@ body {
   outline-offset: 2px;
 }
 
+/* Typography ----------------------------------------------------------------
+   Headings avoid awkward widows/orphans: when a heading wraps, the last line
+   keeps at least two words instead of leaving one word alone on its own line.
+   Wide-but-not-full-width text is balanced so centred hero headings look calm. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+/* Touch targets ---------------------------------------------------------------
+   Structural navigation (sidebars, bottom tabs, footer columns) and list rows
+   all meet the 44x44px minimum hit area on touch devices. Inline links inside
+   running text are intentionally excluded so paragraphs keep their rhythm. */
+@media (pointer: coarse) {
+  nav li > a,
+  footer li > a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
 /* Plain CSS custom properties consumed by the public-band utilities below.
    These are written directly (not via @theme) so they always ship to the
    client — @theme-inline colours are only inlined into generated utilities. */
 :root {
   --bp-section: #f3f5f9;
   --bp-section-strong: #e4eaf4;
-}
-
-/* Material Symbols */
-.material-symbols-outlined {
-  font-variation-settings:
-    'FILL' 0,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24;
 }
 
 @keyframes toast-in {

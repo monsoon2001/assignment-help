@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { createClient } from "@/lib/supabase/client";
 import Button from "@/components/ui/button";
+import { MaterialIcon } from "@/lib/icons-map";
 import { VoiceCallProvider } from "@/components/call/voice-call";
 import RoleBottomNav from "@/components/layout/role-bottom-nav";
 import {
@@ -81,9 +82,9 @@ export default function AdminLayout({
     <VoiceCallProvider role="admin">
     <div className="min-h-screen flex flex-col bg-background">
       <div className="lg:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-2.5 bg-surface-container-lowest/95 backdrop-blur border-b border-outline-variant">
-        <Link href="/admin/dashboard" className="flex items-center gap-2">
+        <Link href="/admin/dashboard" className="flex items-center gap-2 min-h-11">
           <span className="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">
-            <span className="material-symbols-outlined text-on-primary text-lg">school</span>
+            <MaterialIcon name="school" size={18} className="text-on-primary" />
           </span>
           <span className="font-display font-bold text-lg text-on-surface">Acadivo</span>
           <span className="px-1.5 py-0.5 text-xs font-semibold bg-primary-container text-on-primary rounded-md">
@@ -99,9 +100,7 @@ export default function AdminLayout({
       <aside className="hidden lg:flex w-64 shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 min-h-screen p-4 flex-col sticky top-0 h-screen overflow-y-auto">
         <div className="flex items-center gap-2 px-3 py-3 mb-4">
           <div className="w-8 h-8 bg-primary-container rounded-lg flex items-center justify-center">
-            <span className="material-symbols-outlined text-on-primary text-lg">
-              school
-            </span>
+            <MaterialIcon name="school" size={18} className="text-on-primary" />
           </div>
           <span className="font-display font-bold text-xl text-on-surface">
             Acadivo
@@ -119,7 +118,7 @@ export default function AdminLayout({
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`flex items-center gap-3 px-3 py-2.5 min-h-11 rounded-xl text-sm font-medium transition-all ${
                   active
                     ? "bg-primary-container text-on-primary shadow-sm"
                     : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"

@@ -117,7 +117,7 @@ export default async function HelperEarnings() {
             Track your earnings and transaction history.
           </p>
         </div>
-        <Link href="/helper/orders" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+        <Link href="/helper/orders" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline min-h-11 -my-2">
           View orders <ArrowUpRight size={14} />
         </Link>
       </div>

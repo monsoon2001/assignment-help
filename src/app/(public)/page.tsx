@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Star, CheckCircle, ArrowRight } from "lucide-react";
+import { MaterialIcon } from "@/lib/icons-map";
 import PriceEstimateForm from "@/components/marketing/price-estimate-form";
 import TestimonialCarousel, { type Testimonial } from "@/components/marketing/testimonial-carousel";
 import Avatar from "@/components/ui/avatar";
@@ -304,21 +305,21 @@ export default async function HomePage() {
       <div className="bg-section border-b border-outline-variant/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-center gap-x-5 gap-y-1 text-xs font-medium text-on-surface-variant flex-wrap">
           <span className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-sm text-primary">verified</span>
+            <MaterialIcon name="verified" size={16} className="text-primary" />
             Verified subject helpers
           </span>
           <span className="text-outline-variant" aria-hidden="true">
             |
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-sm text-primary">request_quote</span>
+            <MaterialIcon name="request_quote" size={16} className="text-primary" />
             Quote before you pay
           </span>
           <span className="hidden sm:inline text-outline-variant" aria-hidden="true">
             |
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-sm text-primary">replay</span>
+            <MaterialIcon name="replay" size={16} className="text-primary" />
             Unlimited revisions in scope
           </span>
         </div>
@@ -354,7 +355,7 @@ export default async function HomePage() {
             {/* Left Column */}
             <div className="space-y-5">
               <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed border border-outline-variant/50 text-primary text-sm font-semibold">
-                <span className="material-symbols-outlined text-sm">emoji_objects</span>
+                <MaterialIcon name="emoji_objects" size={16} />
                 Independent Peer Guidance
               </span>
               <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-on-surface leading-tight">
@@ -416,7 +417,7 @@ export default async function HomePage() {
             >
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-10 h-10 bg-primary-fixed rounded-xl flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-primary">calculate</span>
+                  <MaterialIcon name="calculate" size={20} className="text-primary" />
                 </div>
                 <div>
                   <h2 className="font-display font-bold text-on-surface leading-tight">
@@ -436,7 +437,7 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-4">
-              <span className="material-symbols-outlined text-sm">auto_stories</span>
+              <MaterialIcon name="auto_stories" size={16} />
               Our Services
             </span>
             <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-4">Core Academic Services</h2>
@@ -452,7 +453,7 @@ export default async function HomePage() {
                 <span className={`absolute inset-x-0 top-0 h-1 ${BAR}`} aria-hidden="true" />
                 <div className="flex items-center gap-3 mb-4">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${TILE}`}>
-                    <span className={`material-symbols-outlined ${ICON}`}>{service.icon}</span>
+                    <MaterialIcon name={service.icon} size={24} className={ICON} />
                   </div>
                   <h3 className="font-display font-bold text-lg text-on-surface leading-tight">{service.title}</h3>
                 </div>
@@ -494,7 +495,7 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-8">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">
-              <span className="material-symbols-outlined text-sm">route</span>
+              <MaterialIcon name="route" size={16} />
               Simple Process
             </span>
             <h2 id="how-heading" className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-2">
@@ -526,7 +527,7 @@ export default async function HomePage() {
                 >
                   <div className="mb-3 flex items-center gap-3">
                     <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${TILE}`}>
-                      <span className="material-symbols-outlined text-xl">{step.icon}</span>
+                      <MaterialIcon name={step.icon} size={22} />
                     </span>
                     <h3 className="font-display text-lg font-bold leading-snug text-on-surface">
                       {step.title}
@@ -586,7 +587,7 @@ export default async function HomePage() {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
             <div className="max-w-2xl">
               <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">
-                <span className="material-symbols-outlined text-sm">groups</span>
+                <MaterialIcon name="groups" size={16} />
                 Our Helpers
               </span>
               <h2
@@ -644,11 +645,8 @@ export default async function HomePage() {
                             <h3 className="font-display text-base font-bold text-on-surface truncate">
                               {helper.name}
                             </h3>
-                            <span
-                              className={`material-symbols-outlined ${ICON} text-base`}
-                              title="Verified helper"
-                            >
-                              verified
+                            <span title="Verified helper">
+                              <MaterialIcon name="verified" size={18} className={ICON} />
                             </span>
                           </div>
                           <p className={`text-xs uppercase tracking-wide font-semibold ${LINK}`}>
@@ -745,7 +743,7 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-8">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">
-              <span className="material-symbols-outlined text-sm">thumb_up</span>
+              <MaterialIcon name="thumb_up" size={16} />
               Why Acadivo
             </span>
             <h2 id="why-heading" className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-2">
@@ -767,9 +765,7 @@ export default async function HomePage() {
               >
                 <div className="flex items-center gap-3 mb-3">
                   <span className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${TILE}`}>
-                    <span className={`material-symbols-outlined text-xl ${ICON}`}>
-                      {benefit.icon}
-                    </span>
+                    <MaterialIcon name={benefit.icon} size={22} className={ICON} />
                   </span>
                   <h3 className="font-display text-lg font-bold leading-snug text-on-surface">
                     {benefit.title}
@@ -837,7 +833,7 @@ export default async function HomePage() {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
             <div className="max-w-2xl">
               <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-xs font-semibold mb-3">
-                <span className="material-symbols-outlined text-sm">category</span>
+                <MaterialIcon name="category" size={16} />
                 All Subjects
               </span>
               <h2
@@ -871,7 +867,7 @@ export default async function HomePage() {
               >
                 <div className="flex items-center gap-3 mb-3">
                   <span className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${TILE}`}>
-                    <span className={`material-symbols-outlined text-xl ${ICON}`}>{s.icon}</span>
+                    <MaterialIcon name={s.icon} size={20} className={ICON} />
                   </span>
                   <h3 className={`font-display text-base font-bold text-on-surface transition-colors leading-snug ${LINK}`}>
                     {s.name}
@@ -898,7 +894,7 @@ export default async function HomePage() {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
             <div className="max-w-2xl">
               <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">
-                <span className="material-symbols-outlined text-sm">menu_book</span>
+                <MaterialIcon name="menu_book" size={16} />
                 Free Study Guides
               </span>
               <h2
@@ -931,7 +927,7 @@ export default async function HomePage() {
               >
                 <div className="mb-3 flex items-start justify-between gap-3">
                   <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${TILE}`}>
-                    <span className={`material-symbols-outlined text-xl ${ICON}`}>{guide.icon}</span>
+                    <MaterialIcon name={guide.icon} size={20} className={ICON} />
                   </span>
                   <span className={`rounded-full px-2.5 py-1 text-xs font-semibold bg-primary-fixed text-primary`}>
                     {guide.meta}
@@ -963,7 +959,7 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl mx-auto text-center mb-8">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">
-              <span className="material-symbols-outlined text-sm">format_quote</span>
+              <MaterialIcon name="format_quote" size={16} />
               Testimonials
             </span>
             <h2
@@ -1003,7 +999,7 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-8">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">
-              <span className="material-symbols-outlined text-sm">help</span>
+              <MaterialIcon name="help" size={16} />
               FAQ
             </span>
             <h2 id="faq-heading" className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-2">
@@ -1029,7 +1025,7 @@ export default async function HomePage() {
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 bg-white/12 ring-1 ring-white/25">
-              <span className="material-symbols-outlined text-white/80 text-2xl">school</span>
+              <MaterialIcon name="school" size={24} className="text-white/80" />
             </div>
             <h2
               id="cta-heading"

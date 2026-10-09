@@ -49,6 +49,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
   const router = useRouter();
@@ -74,16 +75,50 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
     setOpenMenu(null);
   }, []);
 
+  // Mobile menus always start closed; collapse the active accordion group too.
+  const closeMobileMenu = useCallback(() => {
+    setMobileMenuOpen(false);
+    setOpenMobileGroup(null);
+  }, []);
+
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") closeNow();
+      if (event.key === "Escape") {
+        closeNow();
+        closeMobileMenu();
+      }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       if (closeTimer.current) clearTimeout(closeTimer.current);
     };
-  }, [closeNow]);
+  }, [closeNow, closeMobileMenu]);
+
+  // Never leave a dropdown open across navigation: a stale openMenu would keep
+  // the full-screen overlaps in place, blocking taps and scrolling on the page
+  // you just landed on. Reset the menu state when the route changes (handles
+  // client-side navigation, back/forward, and programmatic redirects).
+  const [lastPathname, setLastPathname] = useState(pathname);
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname);
+    setOpenMenu(null);
+    setMobileMenuOpen(false);
+    setOpenMobileGroup(null);
+  }
+
+  // If the viewport crosses the xl breakpoint (e.g. a drop-down opened on a
+  // wide window, then the window is narrowed to mobile), close whatever is open
+  // so an invisible full-screen overlay can't trap the page.
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1280px)");
+    const onChange = (event: MediaQueryListEvent) => {
+      if (event.matches) closeMobileMenu();
+      else closeNow();
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, [closeNow, closeMobileMenu]);
 
   const activeMenu = menuItems.find((item) => item.href === openMenu && item.groups?.length);
 
@@ -149,6 +184,26 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
         setUserName((profile?.name as string) ?? session.user.email ?? null);
         setAvatarUrl((profile?.avatar_url as string) ?? (metaAvatar as string) ?? null);
 
+        // Backfill the Google avatar (and a missing display name) into the users
+        // table so server-rendered surfaces (listings, chats, admin) show the real
+        // profile picture instead of the default placeholder.
+        if (metaAvatar && !profile?.avatar_url) {
+          const metaName =
+            typeof session.user.user_metadata?.name === "string"
+              ? session.user.user_metadata.name
+              : null;
+          const patch: Record<string, string> = { avatar_url: metaAvatar };
+          if (metaName && !profile?.name) patch.name = metaName;
+          supabase
+            .from("users")
+            .update(patch)
+            .eq("id", session.user.id)
+            .then(
+              () => undefined,
+              () => undefined
+            );
+        }
+
         const { count } = await supabase
           .from("notifications")
           .select("id", { count: "exact", head: true })
@@ -201,7 +256,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
   return (
     <header className="sticky top-0 z-50 bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant">
       <div className="max-w-360 mx-auto px-6 h-16 flex items-center gap-6">
-        <Link href="/" className="flex items-center gap-2 shrink-0">
+        <Link href="/" className="flex items-center gap-2 shrink-0 min-h-11 min-w-11">
           <span className="w-9 h-9 rounded-xl bg-primary-container text-on-primary flex items-center justify-center">
             <GraduationCap size={20} />
           </span>
@@ -303,7 +358,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
               </Link>
               <Link
                 href={profileHref}
-                className="flex items-center gap-2 pl-1 group"
+                className="flex items-center gap-2 pl-1 pr-1 min-h-11 group"
               >
                 <span className="hidden 2xl:block text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
                   {firstName}
@@ -337,7 +392,13 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
               variant="ghost"
               size="sm"
               className="xl:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onClick={() => {
+                if (mobileMenuOpen) closeMobileMenu();
+                else {
+                  setOpenMobileGroup(null);
+                  setMobileMenuOpen(true);
+                }
+              }}
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </Button>
@@ -428,28 +489,50 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
         </>
       )}
 
-      {menuItems.length > 0 && mobileMenuOpen && (
-        <div className="xl:hidden border-t border-outline-variant bg-surface-container-lowest">
-          <nav className="max-w-360 mx-auto px-6 py-4 flex flex-col gap-3">
+      {menuItems.length > 0 &&
+        mobileMenuOpen &&
+        createPortal(
+          <div className="fixed inset-x-0 top-16 bottom-0 z-40 overflow-y-auto xl:hidden bg-surface-container-lowest border-t border-outline-variant">
+            <nav className="max-w-360 mx-auto px-6 py-4 pb-12 flex flex-col gap-3">
             {menuItems.map((item) => {
               const isActive = pathname === item.href;
+              const hasGroups = (item.groups?.length ?? 0) > 0;
+              const expanded = openMobileGroup === item.href;
               return (
-                <div key={item.href}>
-                  <Link
-                    href={item.href}
-                    className={`relative text-sm font-medium transition-colors py-2 ${
-                      isActive
-                        ? "text-primary"
-                        : "text-on-surface-variant hover:text-on-surface"
-                    }`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {item.label}
-                    {isActive && (
-                      <span className="absolute -bottom-0.5 left-0 right-0 h-0.5 rounded-full bg-primary" />
+                <div key={item.href} className="border-b border-outline-variant/30 last:border-b-0 pb-2">
+                  <div className="flex items-center justify-between gap-2 min-h-11">
+                    <Link
+                      href={item.href}
+                      className={`relative flex-1 min-w-0 py-2 text-sm font-medium transition-colors inline-flex items-center ${
+                        isActive
+                          ? "text-primary"
+                          : "text-on-surface-variant hover:text-on-surface"
+                      }`}
+                      onClick={closeMobileMenu}
+                    >
+                      {item.label}
+                      {isActive && (
+                        <span className="absolute -bottom-0.5 left-0 right-0 h-0.5 rounded-full bg-primary" />
+                      )}
+                    </Link>
+                    {hasGroups && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOpenMobileGroup((prev) => (prev === item.href ? null : item.href))
+                        }
+                        aria-expanded={expanded}
+                        aria-label={`${expanded ? "Close" : "Open"} ${item.label} menu`}
+                        className="flex items-center justify-center w-11 h-11 shrink-0 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface cursor-pointer transition-colors"
+                      >
+                        <ChevronDown
+                          size={20}
+                          className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+                        />
+                      </button>
                     )}
-                  </Link>
-                  {item.groups && item.groups.length > 0 && (
+                  </div>
+                  {expanded && item.groups && item.groups.length > 0 && (
                     <div className="mb-1 flex flex-col gap-3 border-l border-outline-variant/30 pl-4">
                       {item.groups.map((group, groupIndex) => (
                         <div key={group.title ?? groupIndex} className="min-w-0">
@@ -463,8 +546,8 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                               <Link
                                 key={`${group.title ?? groupIndex}-${child.href}-${child.label}`}
                                 href={child.href}
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="py-1.5 text-sm text-on-surface-variant transition-colors hover:text-primary"
+                                onClick={closeMobileMenu}
+                                className="py-1.5 text-sm text-on-surface-variant transition-colors hover:text-primary min-h-11 inline-flex items-center"
                               >
                                 {child.label}
                               </Link>
@@ -478,8 +561,9 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
               );
             })}
           </nav>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
 
       {signOutDialogOpen &&
         createPortal(

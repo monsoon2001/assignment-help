@@ -60,7 +60,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
             </Button>
             <Link
               href="/"
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors min-h-11"
             >
               <Home size={16} />
               Back to homepage

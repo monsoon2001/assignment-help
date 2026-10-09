@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { CtaBand, PAGE_TONES, PageHeader } from "@/components/marketing/page-shell";
+import { MaterialIcon } from "@/lib/icons-map";
 import { SUBJECT_GROUPS, SUBJECT_CONTENT } from "@/lib/subject-content";
 
 export const metadata = {
@@ -21,15 +22,12 @@ export default function SubjectsPage() {
   return (
     <>
       <PageHeader
-        tone="green"
-        icon="category"
-        eyebrow="All Subjects"
         title="Assignment Help by Subject"
         subtitle="Pick a subject to see the topics we cover, find relevant helpers, and choose who you want to work with before you pay."
         crumbs={[{ label: "Home", href: "/" }, { label: "Subjects" }]}
       />
 
-      <div className="bg-white band-hero">
+      <div className="band-soft">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {SUBJECT_GROUPS.map((group) => {
           const groupTone = PAGE_TONES.blue;
@@ -48,7 +46,7 @@ export default function SubjectsPage() {
                 >
                   <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${groupTone.hairline}`} aria-hidden="true" />
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${groupTone.iconTile}`}>
-                    <span className={`material-symbols-outlined ${groupTone.icon}`}>{s.icon}</span>
+                    <MaterialIcon name={s.icon} size={24} className={groupTone.icon} />
                   </div>
                   <h3 className={`font-display font-bold text-on-surface mb-2 transition-colors ${groupTone.text}`}>{s.name}</h3>
                   <p className="text-base text-on-surface-variant leading-relaxed mb-3">{s.cardDesc}</p>
@@ -63,6 +61,7 @@ export default function SubjectsPage() {
         })}
       </div>
       </div>
+
 
       <CtaBand
         eyebrow="travel_explore"

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, CheckCircle, ChevronRight } from "lucide-react";
+import { ArrowRight, CheckCircle } from "lucide-react";
 import {
   GUIDE_BY_SERVICE,
   SERVICE_PAGES,
@@ -9,7 +9,7 @@ import {
 } from "@/lib/services";
 import { STEPS } from "@/lib/home-content";
 import { ALL_RESOURCES, resourcePath } from "@/lib/resources";
-import { CtaBand } from "@/components/marketing/page-shell";
+import { CtaBand, PageHeader } from "@/components/marketing/page-shell";
 
 const SITE_URL = "https://acadivo.com";
 
@@ -59,40 +59,20 @@ export default async function ServiceDetailPage({
 
   return (
     <>
-      <div className="bg-gradient-to-r from-primary-fixed/50 via-white to-white border-b border-outline-variant/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <nav className="flex flex-wrap items-center gap-2 text-sm text-on-surface-variant mb-4">
-            <Link href="/" className="text-primary transition-colors">
-              Home
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5" />
-            <Link href="/services" className="text-primary transition-colors">
-              Services
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5" />
-            <Link
-              href={`/services#${service.group.id}`}
-              className="text-primary transition-colors"
-            >
-              {service.group.title}
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5" />
-            <span className="text-on-surface font-medium">{service.name}</span>
-          </nav>
+      <PageHeader
+        title={`${service.name} Assignment Help`}
+        subtitle={service.desc}
+        crumbs={[
+          { label: "Home", href: "/" },
+          { label: "Services", href: "/services" },
+          { label: service.group.title, href: `/services#${service.group.id}` },
+          { label: service.name },
+        ]}
+      />
 
-          <div className="flex items-start gap-4">
-            <span className="w-12 h-12 rounded-xl bg-white text-primary ring-1 ring-primary-container/40 flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined">{service.group.icon}</span>
-            </span>
-            <div>
-              <h1 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-3">
-                {service.name} Assignment Help
-              </h1>
-              <p className="text-lg text-on-surface-variant max-w-3xl leading-relaxed">{service.desc}</p>
-            </div>
-          </div>
-
-          <div className="mt-8 flex flex-col sm:flex-row gap-3">
+      <div className="bg-white border-b border-outline-variant/40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-7">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href="/#estimate"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-primary-container text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-primary-container/20"
@@ -172,7 +152,7 @@ export default async function ServiceDetailPage({
                 </p>
                 <Link
                   href={guideHref}
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline min-h-11 -my-2 px-2 -mx-2"
                 >
                   Read the guide
                   <ArrowRight className="h-4 w-4" />

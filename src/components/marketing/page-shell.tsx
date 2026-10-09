@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ChevronRight, ArrowRight } from "lucide-react";
+import { MaterialIcon } from "@/lib/icons-map";
 
 /**
  * Every public page shares the same page-header band, section bands and
@@ -11,7 +12,8 @@ import { ChevronRight, ArrowRight } from "lucide-react";
 export type PageTone = "blue" | "teal" | "green" | "amber" | "rose";
 
 type ToneTokens = {
-  /** Page-header band: white with a faint tint of the page's accent at the left. */
+  /** Page-header band: a quiet neutral sheet — colour stays in the hairline,
+   *  icon tile, chip and links, never a full-colour wash. */
   header: string;
   /** Accent name used for links, chips and icons in this page's header. */
   text: string;
@@ -20,7 +22,7 @@ type ToneTokens = {
   chip: string;
   iconTile: string;
   icon: string;
-  /** Soft tile behind a material-symbols icon. */
+  /** Soft tile behind the page's accent icon. */
   card: string;
   cardHover: string;
   /** Section background: soft neutral grey (pairs with plain `bg-white`). */
@@ -33,7 +35,7 @@ type ToneTokens = {
 };
 
 const BLUE_TONE: ToneTokens = {
-  header: "bg-gradient-to-r from-primary-fixed/60 via-white to-white",
+  header: "bg-gradient-to-b from-surface-container-low/60 to-surface-container-lowest",
   text: "text-primary",
   hoverText: "hover:text-primary",
   chip: "bg-primary-fixed text-on-primary-fixed",
@@ -48,7 +50,7 @@ const BLUE_TONE: ToneTokens = {
 };
 
 const TEAL_TONE: ToneTokens = {
-  header: "bg-gradient-to-r from-accent-teal-container/80 via-white to-white",
+  header: "bg-gradient-to-b from-surface-container-low/60 to-surface-container-lowest",
   text: "text-accent-teal",
   hoverText: "hover:text-accent-teal",
   chip: "bg-accent-teal-container text-accent-teal",
@@ -63,7 +65,7 @@ const TEAL_TONE: ToneTokens = {
 };
 
 const GREEN_TONE: ToneTokens = {
-  header: "bg-gradient-to-r from-accent-green-container/80 via-white to-white",
+  header: "bg-gradient-to-b from-surface-container-low/60 to-surface-container-lowest",
   text: "text-accent-green",
   hoverText: "hover:text-accent-green",
   chip: "bg-accent-green-container text-accent-green",
@@ -78,7 +80,7 @@ const GREEN_TONE: ToneTokens = {
 };
 
 const AMBER_TONE: ToneTokens = {
-  header: "bg-gradient-to-r from-accent-amber-container/80 via-white to-white",
+  header: "bg-gradient-to-b from-surface-container-low/60 to-surface-container-lowest",
   text: "text-accent-amber",
   hoverText: "hover:text-accent-amber",
   chip: "bg-accent-amber-container text-accent-amber",
@@ -93,7 +95,7 @@ const AMBER_TONE: ToneTokens = {
 };
 
 const ROSE_TONE: ToneTokens = {
-  header: "bg-gradient-to-r from-accent-rose-container/80 via-white to-white",
+  header: "bg-gradient-to-b from-surface-container-low/60 to-surface-container-lowest",
   text: "text-accent-rose",
   hoverText: "hover:text-accent-rose",
   chip: "bg-accent-rose-container text-accent-rose",
@@ -120,56 +122,43 @@ export const TONE_CYCLE: PageTone[] = ["blue", "teal", "green", "amber", "rose"]
 
 export type Crumb = { label: string; href?: string };
 
-/** Breadcrumb + title band shared by every public page. */
+/** Compact breadcrumb + title band shared by every public page (no hero). */
 export function PageHeader({
   title,
   subtitle,
   crumbs = [{ label: "Home", href: "/" }],
-  tone = "blue",
-  icon,
-  eyebrow,
 }: {
   title: string;
   subtitle?: string;
   crumbs?: Crumb[];
-  tone?: PageTone;
-  icon?: string;
-  eyebrow?: string;
 }) {
-  const t = PAGE_TONES[tone];
   return (
-    <div className={`${t.header} border-b border-outline-variant/50`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <nav className="flex items-center gap-2 text-sm text-on-surface-variant mb-4">
+    <div className="border-b border-outline-variant/40 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6">
+        <nav className="flex items-center gap-1.5 text-sm mb-3" aria-label="Breadcrumb">
           {crumbs.map((crumb, i) => (
-            <span key={`${crumb.label}-${i}`} className="flex items-center gap-2">
-              {i > 0 && <ChevronRight className="w-3.5 h-3.5" />}
+            <span key={`${crumb.label}-${i}`} className="flex items-center gap-1.5">
+              {i > 0 && <ChevronRight className="w-3 h-3 text-outline-variant" />}
               {crumb.href ? (
-                <Link href={crumb.href} className={`${t.hoverText} transition-colors`}>
+                <Link href={crumb.href} className={`text-on-surface-variant transition-colors inline-flex items-center min-h-11 min-w-11`}>
                   {crumb.label}
                 </Link>
               ) : (
-                <span className="text-on-surface font-medium">{crumb.label}</span>
+                <span className="text-on-surface font-medium truncate max-w-[14rem] inline-block">{crumb.label}</span>
               )}
             </span>
           ))}
         </nav>
-        {(icon || eyebrow) && (
-          <div className="flex items-center gap-3 mb-3">
-            {icon && (
-              <span className={`w-11 h-11 rounded-xl ${t.iconTile} flex items-center justify-center shrink-0`}>
-                <span className={`material-symbols-outlined ${t.icon} text-xl`}>{icon}</span>
-              </span>
-            )}
-            {eyebrow && (
-              <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${t.chip}`}>
-                {eyebrow}
-              </span>
-            )}
-          </div>
+
+        <h1 className="font-display text-2xl sm:text-3xl font-bold text-on-surface leading-tight max-w-3xl">
+          {title}
+        </h1>
+
+        {subtitle && (
+          <p className="mt-2 text-base text-on-surface-variant max-w-2xl leading-relaxed">
+            {subtitle}
+          </p>
         )}
-        <h1 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-2">{title}</h1>
-        {subtitle && <p className="text-on-surface-variant max-w-3xl">{subtitle}</p>}
       </div>
     </div>
   );
@@ -195,7 +184,7 @@ export function CtaBand({
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {eyebrow && (
           <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full on-band-chip border text-xs font-semibold mb-4">
-            <span className="material-symbols-outlined text-sm text-white/70">{eyebrow}</span>
+            <MaterialIcon name={eyebrow} size={14} className="text-white/70" />
           </span>
         )}
         <h2 id="cta-heading" className="font-display text-2xl sm:text-3xl font-bold text-white mb-3">

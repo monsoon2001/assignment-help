@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/client";
+import { createClient as createBrowserClient } from "@/lib/supabase/client";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 const DRAFT_KEY = "acadivo:pending-request";
 
@@ -104,7 +105,7 @@ export async function loadDraftFiles(): Promise<File[]> {
 export async function submitRequest(
   input: NewRequestInput
 ): Promise<{ id: string } | { error: string }> {
-  const supabase = createClient();
+  const supabase = createBrowserClient();
 
   const {
     data: { user },
@@ -157,7 +158,7 @@ export async function reassignRequest(
   requestId: string,
   helperId: string
 ): Promise<{ ok: true } | { error: string }> {
-  const supabase = createClient();
+  const supabase = createBrowserClient();
 
   const { error } = await supabase
     .from("requests")
@@ -198,13 +199,17 @@ type HelperProfileRow = {
  * `helper_profiles` row, and querying that table alone hid them completely.
  * Subject matching happens in code so it is case-insensitive and forgiving, and
  * when nothing matches the full list is returned so a student is never stuck.
+ *
+ * Pass a server Supabase client to fetch during SSR / in a Server Component;
+ * by default it uses the browser client.
  */
 export async function fetchHelperCandidates(
-  subject?: string | null
+  subject?: string | null,
+  supabase?: SupabaseClient | null
 ): Promise<{ helpers: HelperCandidate[]; exactMatch: boolean } | { error: string }> {
-  const supabase = createClient();
+  const client = supabase ?? createBrowserClient();
 
-  const { data: userRows, error } = await supabase
+  const { data: userRows, error } = await client
     .from("users")
     .select("id, name, avatar_url")
     .eq("role", "helper")
@@ -218,7 +223,7 @@ export async function fetchHelperCandidates(
   const helperUsers = (userRows ?? []) as { id: string; name: string | null; avatar_url: string | null }[];
 
   const { data: profileRows } = helperUsers.length
-    ? await supabase
+    ? await client
         .from("helper_profiles")
         .select("user_id, rating_avg, bio, subjects, hourly_rate")
         .in(

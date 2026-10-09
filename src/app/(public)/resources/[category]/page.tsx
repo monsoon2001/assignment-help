@@ -41,9 +41,6 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
   return (
     <>
       <PageHeader
-        tone="amber"
-        icon={known.icon}
-        eyebrow="Guides"
         title={`${known.name} Guides`}
         subtitle={known.description}
         crumbs={[

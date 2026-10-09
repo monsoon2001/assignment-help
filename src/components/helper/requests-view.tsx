@@ -76,7 +76,7 @@ export default function HelperRequestsView({
           <button
             key={tab.value}
             onClick={() => setActiveTab(tab.value)}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer ${
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer inline-flex items-center min-h-11 ${
               activeTab === tab.value
                 ? "bg-primary-container text-on-primary shadow-sm"
                 : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container"

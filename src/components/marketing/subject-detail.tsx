@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { ChevronRight, ArrowRight, CheckCircle } from "lucide-react";
+import { ArrowRight, CheckCircle } from "lucide-react";
+import { MaterialIcon } from "@/lib/icons-map";
 import type { SubjectContent } from "@/lib/subject-content";
-import { CtaBand, PAGE_TONES } from "./page-shell";
+import { CtaBand, PAGE_TONES, PageHeader } from "./page-shell";
 
 const TONE = PAGE_TONES.blue;
 
@@ -17,26 +18,21 @@ const STEPS = [
 export default function SubjectDetail({ subject }: { subject: SubjectContent }) {
   return (
     <>
-      <div className="bg-gradient-to-r from-primary-fixed/50 via-white to-white border-b border-outline-variant/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <nav className="flex items-center gap-2 text-sm text-on-surface-variant mb-4">
-            <Link href="/" className="text-primary transition-colors">Home</Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <Link href="/subjects" className="text-primary transition-colors">Subjects</Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-on-surface font-medium">{subject.name}</span>
-          </nav>
+      <PageHeader
+        title={subject.h1}
+        subtitle={subject.intro}
+        crumbs={[
+          { label: "Home", href: "/" },
+          { label: "Subjects", href: "/subjects" },
+          { label: subject.name },
+        ]}
+      />
 
-          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-4">
-            {subject.h1}
-          </h1>
-          <p className="text-lg text-on-surface-variant max-w-4xl leading-relaxed mb-6">
-            {subject.intro}
-          </p>
-
+      <div className="bg-white border-b border-outline-variant/40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-7">
           <div className="flex flex-col sm:flex-row gap-3 text-sm text-on-surface-variant mb-6">
             {["Choose a specific helper", "Discuss before you pay", "Personalized proposal"].map((item) => (
-              <span key={item} className="inline-flex items-center gap-2 bg-white/70 rounded-full px-3.5 py-1.5 ring-1 ring-primary-container/40">
+              <span key={item} className="inline-flex items-center gap-2 bg-white rounded-full px-3.5 py-1.5 ring-1 ring-primary-container/40">
                 <CheckCircle className="w-4 h-4 text-primary shrink-0" />
                 {item}
               </span>
@@ -53,7 +49,7 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
             </Link>
             <Link
               href="/how-it-works"
-              className="inline-flex items-center gap-2 px-6 py-3 border border-outline-variant bg-white/80 rounded-xl font-semibold text-sm text-on-surface hover:bg-white transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 border border-outline-variant bg-white rounded-xl font-semibold text-sm text-on-surface hover:bg-white transition-colors"
             >
               How It Works
             </Link>
@@ -127,9 +123,7 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
               <details key={i} className="bg-white rounded-xl border border-outline-variant/30 p-6 group hover:border-primary-container/60 transition-colors">
                 <summary className="cursor-pointer list-none flex items-center justify-between gap-4 text-on-surface font-medium">
                   {f.q}
-                  <span className="material-symbols-outlined group-open:rotate-180 transition-transform shrink-0">
-                    expand_more
-                  </span>
+                  <MaterialIcon name="expand_more" size={20} className="transition-transform shrink-0 group-open:rotate-180" />
                 </summary>
                 <p className="mt-3 text-base text-on-surface-variant leading-relaxed">{f.a}</p>
               </details>

@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { ChevronRight, Clock, ArrowRight, BookOpen } from "lucide-react";
+import { Clock, ArrowRight, BookOpen } from "lucide-react";
+import { MaterialIcon } from "@/lib/icons-map";
+import { PageHeader } from "@/components/marketing/page-shell";
 import type { Resource, ResourceBlock } from "@/lib/resources/types";
 import {
   CATEGORY_BY_SLUG,
@@ -183,41 +185,35 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
 
-      <div className="bg-gradient-to-r from-primary-fixed/50 via-white to-white border-b border-outline-variant/50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm text-on-surface-variant mb-5">
-            <Link href="/" className="text-primary transition-colors">Home</Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <Link href="/resources" className="text-primary transition-colors">Resources</Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-primary transition-colors">
-              {category ? (
-                <Link href={`/resources/${resource.category}`}>{category.name}</Link>
-              ) : (
-                "Guides"
-              )}
+      <PageHeader
+        title={resource.h1}
+        subtitle={resource.description}
+        crumbs={[
+          { label: "Home", href: "/" },
+          { label: "Resources", href: "/resources" },
+          ...(category
+            ? [{ label: category.name, href: `/resources/${resource.category}` }]
+            : [{ label: "Guides" }]),
+          { label: resource.title },
+        ]}
+      />
+
+      <div className="bg-white border-b border-outline-variant/40">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-on-surface-variant">
+            {category && (
+              <Link
+                href={`/resources/${resource.category}`}
+                className="inline-flex items-center gap-1.5 bg-primary-fixed text-primary rounded-full px-3 py-1 text-xs font-semibold hover:bg-primary-fixed/70 transition-colors"
+              >
+                <MaterialIcon name={category.icon} size={16} className="text-primary" />
+                {category.name}
+              </Link>
+            )}
+            <span className="inline-flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              {resource.readingMinutes} min read
             </span>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-on-surface font-medium truncate max-w-xs">{resource.title}</span>
-          </nav>
-
-          {category && (
-            <Link
-              href={`/resources/${resource.category}`}
-              className="inline-flex items-center gap-1.5 bg-primary-fixed text-primary rounded-full px-3 py-1 text-xs font-semibold mb-4 hover:bg-primary-fixed/70 transition-colors"
-            >
-              <span className="material-symbols-outlined text-sm">{category.icon}</span>
-              {category.name}
-            </Link>
-          )}
-
-          <h1 className="font-display text-3xl sm:text-4xl font-bold text-on-surface mb-4 max-w-3xl">
-            {resource.h1}
-          </h1>
-
-          <div className="flex items-center gap-2 text-sm text-on-surface-variant">
-            <Clock className="w-4 h-4" />
-            <span>{resource.readingMinutes} min read</span>
           </div>
         </div>
       </div>
@@ -280,7 +276,7 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
               <ul className="space-y-3">
                 {resource.takeaways.map((item) => (
                   <li key={item} className="flex gap-3 text-on-surface-variant leading-relaxed">
-                    <span className="material-symbols-outlined text-primary shrink-0">check_circle</span>
+                    <MaterialIcon name="check_circle" size={16} className="text-primary shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -296,7 +292,7 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
               <ul className="space-y-3">
                 {resource.mistakes.map((item) => (
                   <li key={item} className="flex gap-3 text-on-surface-variant leading-relaxed">
-                    <span className="material-symbols-outlined text-error shrink-0">error</span>
+                    <MaterialIcon name="error" size={16} className="text-error shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}

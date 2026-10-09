@@ -14,9 +14,6 @@ export default function RefundPolicyPage() {
   return (
     <>
       <PageHeader
-        tone="rose"
-        icon="receipt_long"
-        eyebrow="Legal"
         title="Refund Policy"
         subtitle="Last updated: September 10, 2026"
         crumbs={[{ label: "Home", href: "/" }, { label: "Refund Policy" }]}

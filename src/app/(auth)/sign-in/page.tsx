@@ -99,7 +99,7 @@ function SignInForm() {
     <div className="h-dvh w-full overflow-hidden bg-background lg:grid lg:grid-cols-2">
       <div className="flex h-full min-h-0 flex-col overflow-y-auto">
         <header className="flex shrink-0 items-center justify-between px-6 py-4 sm:px-10">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 min-h-11 min-w-11">
             <span className="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">
               <GraduationCap size={18} />
             </span>
@@ -107,7 +107,7 @@ function SignInForm() {
           </Link>
           <Link
             href="/"
-            className="text-sm text-on-surface-variant hover:text-on-surface font-medium inline-flex items-center gap-1.5"
+            className="text-sm text-on-surface-variant hover:text-on-surface font-medium inline-flex items-center gap-1.5 min-h-11"
           >
             Back to Platform
           </Link>
@@ -204,7 +204,7 @@ function SignInForm() {
               Don&apos;t have an account?{" "}
               <Link
                 href={nextPath() === "/" ? "/sign-up" : `/sign-up?next=${encodeURIComponent(nextPath())}`}
-                className="font-semibold text-primary hover:underline"
+                className="font-semibold text-primary hover:underline inline-flex items-center min-h-11"
               >
                 Sign Up
               </Link>

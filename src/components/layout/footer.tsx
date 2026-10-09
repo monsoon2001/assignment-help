@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MaterialIcon } from "@/lib/icons-map";
 
 const footerLinks = {
   Platform: [
@@ -29,7 +30,7 @@ export default function Footer() {
           <div className="sm:col-span-2 lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 bg-primary-container rounded-lg flex items-center justify-center">
-                <span className="material-symbols-outlined text-on-primary text-lg">school</span>
+                <MaterialIcon name="school" size={18} className="text-on-primary" />
               </div>
               <span className="font-display font-bold text-xl text-on-surface">Acadivo</span>
             </Link>

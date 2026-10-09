@@ -6,11 +6,10 @@ import {
   Briefcase,
   DollarSign,
   Clock,
-  Star,
   ArrowUpRight,
   FileText,
-  Settings,
   Inbox,
+  Sparkles,
 } from "lucide-react";
 import Button from "@/components/ui/button";
 import { EmptyState, PanelEmpty } from "@/components/ui/states";
@@ -45,13 +44,8 @@ export default async function HelperDashboard() {
   const today = new Date();
   const monthStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
 
-  const [{ data: profileRow }, { data: orderRows }, { data: reqRows }, { data: notifRows }, { data: payRows }] =
+  const [{ data: orderRows }, { data: reqRows }, { data: notifRows }, { data: payRows }] =
     await Promise.all([
-      supabase
-        .from("helper_profiles")
-        .select("rating_avg, subjects")
-        .eq("user_id", user.id)
-        .maybeSingle(),
       supabase
         .from("orders")
         .select("id, status, price, currency, deadline, created_at, student:users!orders_student_id_fkey(id, name), proposal:proposals(request:requests(title))")
@@ -102,55 +96,68 @@ export default async function HelperDashboard() {
           .map(([c, amt]) => formatCurrency(amt, c))
           .join(" · ");
 
-  const rating = Number(profileRow?.rating_avg ?? 0);
   const firstName = (user.user_metadata?.name ?? user.email ?? "helper").toString().trim().split(/\s+/)[0];
-
-  const stats = [
-    { label: "Active Projects", value: String(activeOrders.length), icon: Briefcase, color: "bg-primary-container text-on-primary" },
-    { label: "Earnings This Month", value: earningsThisMonth, icon: DollarSign, color: "bg-emerald-100 text-emerald-700", small: true },
-    { label: "Awaiting Review", value: String(awaitingReview), icon: Clock, color: "bg-amber-100 text-amber-700" },
-    { label: "Average Rating", value: rating > 0 ? rating.toFixed(1) : "New", icon: Star, color: "bg-secondary-container text-on-secondary-container" },
-  ];
 
   const notifications = (notifRows ?? []) as { id: string; message: string; link: string | null; read: boolean; created_at: string }[];
 
+  const stats = [
+    { label: "Active Projects", value: String(activeOrders.length), icon: Briefcase, href: "/helper/orders", color: "bg-primary-container text-on-primary" },
+    { label: "This Month", value: earningsThisMonth, icon: DollarSign, href: "/helper/earnings", color: "bg-emerald-100 text-emerald-700", small: true },
+    { label: "Awaiting Review", value: String(awaitingReview), icon: Clock, href: "/helper/orders", color: "bg-amber-100 text-amber-700" },
+  ];
+
   return (
     <div className="max-w-6xl mx-auto space-y-8">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-on-surface">
-          Welcome back, {firstName}
-        </h1>
-        <p className="text-on-surface-variant mt-1">
-          Here&apos;s an overview of your activity and earnings.
-        </p>
+      {/* Greeting + primary action */}
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-on-surface">
+            Hi, {firstName}
+          </h1>
+          <p className="text-on-surface-variant text-sm sm:text-base mt-1">
+            {incoming.length > 0
+              ? `You have ${incoming.length} incoming request${incoming.length === 1 ? "" : "s"} waiting for a proposal.`
+              : "Here&apos;s what needs your attention today."}
+          </p>
+        </div>
+        <Link href="/helper/requests">
+          <Button>
+            <Inbox size={16} />
+            Review Incoming Requests
+          </Button>
+        </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* At a glance */}
+      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4" aria-label="At a glance">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Card key={stat.label} className="p-5">
-              <div className="flex items-start justify-between">
-                <div className="min-w-0">
-                  <p className="text-sm text-on-surface-variant">{stat.label}</p>
-                  <p className={`${stat.small ? "text-lg" : "text-2xl"} font-bold text-on-surface mt-1 truncate`}>
-                    {stat.value}
-                  </p>
+            <Link key={stat.label} href={stat.href} className="group">
+              <Card className="p-5 transition-shadow group-hover:shadow-md" hover>
+                <div className="flex items-start justify-between">
+                  <div className="min-w-0">
+                    <p className="text-sm text-on-surface-variant">{stat.label}</p>
+                    <p className={`${stat.small ? "text-lg" : "text-2xl"} font-bold text-on-surface mt-1 truncate`}>
+                      {stat.value}
+                    </p>
+                  </div>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${stat.color}`}>
+                    <Icon size={20} />
+                  </div>
                 </div>
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${stat.color}`}>
-                  <Icon size={20} />
-                </div>
-              </div>
-            </Card>
+              </Card>
+            </Link>
           );
         })}
-      </div>
+      </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        {/* Active projects */}
+        <section className="lg:col-span-2 flex flex-col gap-4">
+          <div className="flex items-center justify-between gap-4">
             <h2 className="font-display text-lg font-semibold text-on-surface">Active Projects</h2>
-            <Link href="/helper/orders" className="text-sm text-primary font-medium hover:underline flex items-center gap-1">
+            <Link href="/helper/orders" className="text-sm text-primary font-medium min-h-11 -my-2 inline-flex items-center gap-1 hover:underline">
               View all <ArrowUpRight size={14} />
             </Link>
           </div>
@@ -168,41 +175,40 @@ export default async function HelperDashboard() {
               const meta = orderStatusMeta(order.status);
               return (
                 <Card key={order.id} className="p-5" hover>
-                  <Link href={`/helper/orders/${order.id}`}>
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h3 className="font-semibold text-on-surface truncate">{order.makeTitle}</h3>
-                          <Badge variant={meta.variant} dot>{meta.label}</Badge>
-                        </div>
-                        <p className="text-sm text-on-surface-variant">
-                          Student: {order.student?.name ?? "Student"}
-                        </p>
-                        <div className="flex items-center gap-4 mt-3">
-                          <span className="text-sm text-on-surface-variant">
-                            {order.deadline
-                              ? `Due ${new Date(order.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
-                              : "Deadline flexible"}
-                          </span>
-                          <span className="text-sm font-semibold text-on-surface">
-                            {formatCurrency(Number(order.price), normalizeCurrency(order.currency))}
-                          </span>
-                        </div>
+                  <Link href={`/helper/orders/${order.id}`} className="min-h-11 -my-2 flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <h3 className="font-semibold text-on-surface truncate">{order.makeTitle}</h3>
+                        <Badge variant={meta.variant} dot>{meta.label}</Badge>
                       </div>
-                      <Button size="sm" variant="outline" className="shrink-0">Open <ArrowUpRight size={14} /></Button>
+                      <p className="text-sm text-on-surface-variant">
+                        Student: {order.student?.name ?? "Student"}
+                      </p>
+                      <div className="flex items-center gap-4 mt-3">
+                        <span className="text-sm text-on-surface-variant">
+                          {order.deadline
+                            ? `Due ${new Date(order.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+                            : "Deadline flexible"}
+                        </span>
+                        <span className="text-sm font-semibold text-on-surface">
+                          {formatCurrency(Number(order.price), normalizeCurrency(order.currency))}
+                        </span>
+                      </div>
                     </div>
+                    <ArrowUpRight size={18} className="text-on-surface-variant shrink-0 mt-1.5" />
                   </Link>
                 </Card>
               );
             })}
           </div>
-        </div>
+        </section>
 
+        {/* Right rail: incoming + activity */}
         <div className="space-y-6">
-          <div>
-            <div className="flex items-center justify-between mb-4">
+          <section>
+            <div className="flex items-center justify-between gap-4 mb-3">
               <h2 className="font-display text-lg font-semibold text-on-surface">Incoming Requests</h2>
-              <Link href="/helper/requests" className="text-sm text-primary font-medium hover:underline flex items-center gap-1">
+              <Link href="/helper/requests" className="text-sm text-primary font-medium min-h-11 -my-2 inline-flex items-center gap-1 hover:underline">
                 View all <ArrowUpRight size={14} />
               </Link>
             </div>
@@ -217,29 +223,29 @@ export default async function HelperDashboard() {
                 />
               )}
               {incoming.length > 0 && (
-                <div className="flex flex-col divide-y divide-outline-variant/30 px-4 py-3">
+                <div className="flex flex-col divide-y divide-outline-variant/30 px-4">
                   {incoming.map((r) => (
-                    <Link key={r.id} href={`/helper/requests/${r.id}`} className="py-2 flex items-center gap-2 group">
-                    <FileText size={15} className="text-primary shrink-0" />
-                    <span className="text-sm font-medium text-on-surface truncate group-hover:underline">{r.title}</span>
-                  </Link>
-                ))}
+                    <Link key={r.id} href={`/helper/requests/${r.id}`} className="py-3 flex items-center gap-3 group min-h-11">
+                      <FileText size={15} className="text-primary shrink-0" />
+                      <span className="text-sm font-medium text-on-surface truncate group-hover:underline">{r.title}</span>
+                    </Link>
+                  ))}
                 </div>
               )}
             </Card>
-          </div>
+          </section>
 
-          <div>
-            <div className="flex items-center justify-between mb-4">
+          <section>
+            <div className="flex items-center justify-between gap-4 mb-3">
               <h2 className="font-display text-lg font-semibold text-on-surface">Recent Activity</h2>
-              <Link href="/helper/notifications" className="text-sm text-primary font-medium hover:underline flex items-center gap-1">
+              <Link href="/helper/notifications" className="text-sm text-primary font-medium min-h-11 -my-2 inline-flex items-center gap-1 hover:underline">
                 View all <ArrowUpRight size={14} />
               </Link>
             </div>
             <Card className="divide-y divide-outline-variant/30 overflow-hidden">
               {notifications.length === 0 && (
                 <PanelEmpty
-                  icon={<ArrowUpRight size={18} className="text-primary" />}
+                  icon={<Sparkles size={18} className="text-primary" />}
                   title="No activity yet"
                   message="Payment, order and chat updates for your requests will show up here."
                   actionHref="/helper/notifications"
@@ -258,40 +264,9 @@ export default async function HelperDashboard() {
                 </Link>
               ))}
             </Card>
-          </div>
-
-          <div>
-            <h2 className="font-display text-lg font-semibold text-on-surface mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-2 gap-3">
-              <Link href="/helper/requests" className="flex flex-col items-center gap-2 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/30 hover:border-primary-container/50 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-primary-container/10 flex items-center justify-center">
-                  <Inbox size={20} className="text-primary" />
-                </div>
-                <span className="text-sm font-medium text-on-surface">Incoming</span>
-              </Link>
-              <Link href="/helper/orders" className="flex flex-col items-center gap-2 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/30 hover:border-primary-container/50 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-primary-container/10 flex items-center justify-center">
-                  <Briefcase size={20} className="text-primary" />
-                </div>
-                <span className="text-sm font-medium text-on-surface">Orders</span>
-              </Link>
-              <Link href="/helper/earnings" className="flex flex-col items-center gap-2 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/30 hover:border-primary-container/50 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                  <DollarSign size={20} className="text-emerald-600" />
-                </div>
-                <span className="text-sm font-medium text-on-surface">Earnings</span>
-              </Link>
-              <Link href="/helper/profile" className="flex flex-col items-center gap-2 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/30 hover:border-primary-container/50 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-secondary-container/50 flex items-center justify-center">
-                  <Settings size={20} className="text-secondary" />
-                </div>
-                <span className="text-sm font-medium text-on-surface">Profile</span>
-              </Link>
-            </div>
-          </div>
+          </section>
         </div>
       </div>
-
     </div>
   );
 }

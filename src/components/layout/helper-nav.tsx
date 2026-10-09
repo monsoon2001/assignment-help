@@ -46,7 +46,7 @@ export default function HelperNav({
             key={link.href}
             href={link.href}
             aria-current={active ? "page" : undefined}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+            className={`flex items-center gap-3 px-3 py-2.5 min-h-11 rounded-xl text-sm font-medium transition-all ${
               active
                 ? "bg-primary-container text-on-primary shadow-sm"
                 : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"

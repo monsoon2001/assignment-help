@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { BadgeCheck, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import Avatar from "@/components/ui/avatar";
+import { MaterialIcon } from "@/lib/icons-map";
 
 export type Testimonial = {
   id: string;
@@ -97,12 +98,11 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
                     key={t.id}
                     className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-outline-variant/40 bg-white p-6 sm:p-8 shadow-md shadow-ink-900/5 transition-all duration-300 hover:shadow-2xl hover:shadow-primary-container/20 hover:-translate-y-1"
                   >
-                    <span
-                      className="material-symbols-outlined pointer-events-none absolute -top-1 -right-1 text-7xl leading-none text-primary/10"
-                      aria-hidden="true"
-                    >
-                      format_quote
-                    </span>
+                    <MaterialIcon
+                      name="format_quote"
+                      size={72}
+                      className="pointer-events-none absolute -top-1 -right-1 text-primary/10"
+                    />
 
                     <div className="relative flex items-center justify-between gap-3">
                       <div className="flex items-center gap-0.5" aria-label={`${t.rating.toFixed(1)} out of 5`}>

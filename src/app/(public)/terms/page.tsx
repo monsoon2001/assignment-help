@@ -19,9 +19,6 @@ export default function TermsPage() {
   return (
     <>
       <PageHeader
-        tone="blue"
-        icon="gavel"
-        eyebrow="Legal"
         title="Terms of Service"
         subtitle="Last updated: September 10, 2026"
         crumbs={[{ label: "Home", href: "/" }, { label: "Terms of Service" }]}

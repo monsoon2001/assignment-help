@@ -18,9 +18,6 @@ export default function PrivacyPage() {
   return (
     <>
       <PageHeader
-        tone="green"
-        icon="lock"
-        eyebrow="Legal"
         title="Privacy Policy"
         subtitle="Last updated: September 10, 2026"
         crumbs={[{ label: "Home", href: "/" }, { label: "Privacy Policy" }]}

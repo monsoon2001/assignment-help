@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
+import { avatarFor } from "@/lib/avatars";
 
 interface AvatarProps {
   src?: string;
@@ -16,12 +18,16 @@ export default function Avatar({ src, alt, name, size = "md", online, className 
   const dims = { sm: 32, md: 40, lg: 56 };
   const initials = name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "?";
   const [error, setError] = useState(false);
+  // Prefer the account's own safe remote avatar (e.g. Google), else fall back to
+  // a gender-default portrait inferred from the name. Untrusted URLs and names we
+  // cannot place still resolve to the initials tile.
+  const resolvedSrc = avatarFor(name, src);
 
   return (
     <div className={`relative shrink-0 ${className}`}>
-      {src && !error ? (
-        <img
-          src={src}
+      {resolvedSrc && !error ? (
+        <Image
+          src={resolvedSrc}
           alt={alt ?? name ?? ""}
           width={dims[size]}
           height={dims[size]}

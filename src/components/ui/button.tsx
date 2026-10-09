@@ -18,9 +18,9 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
       danger: "bg-error text-on-error hover:bg-danger",
     };
     const sizes: Record<string, string> = {
-      sm: "px-3 py-1.5 text-sm gap-1.5",
-      md: "px-4 py-2 text-sm gap-2",
-      lg: "px-6 py-3 text-base gap-2",
+      sm: "px-3 py-1.5 min-h-11 min-w-11 text-sm gap-1.5",
+      md: "px-4 py-2 min-h-11 text-sm gap-2",
+      lg: "px-6 py-3 min-h-11 text-base gap-2",
     };
     const classes = `${base} ${variants[variant]} ${sizes[size]} ${className}`;
     if (href) {

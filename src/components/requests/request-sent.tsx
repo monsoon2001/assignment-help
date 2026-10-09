@@ -12,6 +12,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import Button from "@/components/ui/button";
+import { MaterialIcon } from "@/lib/icons-map";
 
 function formatDate(value: string | null): string {
   if (!value) return "Flexible";
@@ -99,7 +100,7 @@ export default function RequestSent({
         {/* Reference Header Row */}
         <div className="flex items-center justify-between pb-3 mb-3 bg-surface-container-low/60 p-3 rounded-lg">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-on-surface-variant text-lg">receipt_long</span>
+            <MaterialIcon name="receipt_long" size={18} className="text-on-surface-variant" />
             <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
               Reference Code
             </span>
