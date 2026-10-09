@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Plus, FileText, CheckCircle2, Users, RefreshCcw } from "lucide-react";
+import { Plus, RefreshCcw } from "lucide-react";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
 import RequestsList, { type StudentRequestRow } from "./requests-list";
@@ -67,10 +67,8 @@ export default async function RequestsPage() {
       : { data: null };
 
   const requestIdByProposal = new Map(proposals.map((p) => [p.id, p.request_id]));
-  const orderByProposal: Record<string, string> = {};
   const orderStatusByRequest: Record<string, string> = {};
   for (const o of (orderRows ?? []) as { id: string; proposal_id: string; status: string }[]) {
-    orderByProposal[o.proposal_id] = o.id;
     const requestId = requestIdByProposal.get(o.proposal_id);
     if (requestId) orderStatusByRequest[requestId] = o.status;
   }
@@ -86,36 +84,17 @@ export default async function RequestsPage() {
     proposalsByRequest[p.request_id] = list;
   }
 
-  const activeCount = real.filter((r) =>
-    ["requested", "proposal_sent", "accepted"].includes(r.status)
-  ).length;
-  const awaitingCount = real.filter((r) => r.status === "requested").length;
-
-  const stats = [
-    { icon: FileText, label: "Active Requests", value: String(activeCount), tone: "bg-primary-container text-on-primary" },
-    { icon: CheckCircle2, label: "Awaiting Proposals", value: String(awaitingCount), tone: "bg-success text-white" },
-    { icon: Users, label: "Total Requests", value: String(real.length), tone: "bg-secondary-container text-on-secondary-container" },
-  ];
+  const counts = {
+    all: real.length,
+    in_progress: real.filter((r) => ["requested", "proposal_sent", "accepted"].includes(r.status)).length,
+    delivered: real.filter((r) => orderStatusByRequest[r.id] === "delivered").length,
+    completed: real.filter(
+      (r) => orderStatusByRequest[r.id] === "completed" || ["declined", "cancelled"].includes(r.status)
+    ).length,
+  };
 
   return (
     <div className="w-full max-w-7xl mx-auto flex flex-col gap-6">
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {stats.map((s) => {
-          const Icon = s.icon;
-          return (
-            <Card key={s.label} className="p-5 flex items-center gap-4">
-              <span className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${s.tone}`}>
-                <Icon size={20} />
-              </span>
-              <div>
-                <p className="text-2xl font-display font-bold text-on-surface">{s.value}</p>
-                <p className="text-xs text-on-surface-variant">{s.label}</p>
-              </div>
-            </Card>
-          );
-        })}
-      </section>
-
       <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="font-display font-bold text-2xl text-on-surface">My Requests</h1>
@@ -131,8 +110,8 @@ export default async function RequestsPage() {
       <RequestsList
         requests={real}
         proposalsByRequest={proposalsByRequest}
-        orderByProposal={orderByProposal}
         orderStatusByRequest={orderStatusByRequest}
+        counts={counts}
       />
 
       <Card className="p-5 flex items-start gap-3 bg-surface-container-low border border-outline-variant">

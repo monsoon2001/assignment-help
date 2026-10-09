@@ -2,12 +2,10 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   Search,
   SlidersHorizontal,
   FileText,
-  RefreshCcw,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -21,7 +19,7 @@ import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import Avatar from "@/components/ui/avatar";
 import { requestStatusVariant } from "@/lib/status-meta";
-import ProposalCard, { type RequestProposal } from "@/components/requests/proposal-card";
+import type { RequestProposal } from "@/components/requests/proposal-card";
 
 export type StudentRequestRow = {
   id: string;
@@ -73,22 +71,17 @@ function formatDate(value: string | null): string {
   });
 }
 
-function isPastResponseWindow(sentAt: string | null): boolean {
-  return !!sentAt && Date.now() - new Date(sentAt).getTime() > 2 * 60 * 60 * 1000;
-}
-
 export default function RequestsList({
   requests,
   proposalsByRequest,
-  orderByProposal,
   orderStatusByRequest,
+  counts,
 }: {
   requests: StudentRequestRow[];
   proposalsByRequest: Record<string, RequestProposal[]>;
-  orderByProposal: Record<string, string>;
   orderStatusByRequest: Record<string, string>;
+  counts: { all: number; in_progress: number; delivered: number; completed: number };
 }) {
-  const router = useRouter();
   const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("all");
   const [query, setQuery] = useState("");
   const [subject, setSubject] = useState("");
@@ -155,20 +148,30 @@ export default function RequestsList({
   return (
     <>
       <div className="flex flex-wrap gap-2">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => applyFilter(setTab)(t.key)}
-            aria-pressed={tab === t.key}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer inline-flex items-center min-h-11 ${
-              tab === t.key
-                ? "bg-primary-container text-on-primary"
-                : "bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:bg-surface-container-low"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+        {TABS.map((t) => {
+          const activeTab = tab === t.key;
+          return (
+            <button
+              key={t.key}
+              onClick={() => applyFilter(setTab)(t.key)}
+              aria-pressed={activeTab}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer inline-flex items-center gap-2 min-h-11 ${
+                activeTab
+                  ? "bg-primary-container text-on-primary"
+                  : "bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:bg-surface-container-low"
+              }`}
+            >
+              {t.label}
+              <span
+                className={`px-1.5 py-0.5 rounded-full text-[11px] font-bold ${
+                  activeTab ? "bg-white/25 text-on-primary" : "bg-surface-container-high text-on-surface"
+                }`}
+              >
+                {counts[t.key]}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
@@ -335,96 +338,48 @@ export default function RequestsList({
       )}
 
       {pageItems.length > 0 && (
-        <section className="flex flex-col gap-4">
+        <section className="flex flex-col gap-3">
           {pageItems.map((r) => {
             const meta = { label: STATUS_LABEL[r.status] ?? r.status, variant: requestStatusVariant(r.status) };
             const proposals = proposalsByRequest[r.id] ?? [];
-            const overdue = r.status === "requested" && isPastResponseWindow(r.sent_at);
             return (
-              <div key={r.id} className="flex flex-col gap-3">
-                {overdue && (
-                  <div className="p-4 rounded-xl border border-warning/50 bg-warning-container/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="flex items-start gap-3">
-                      <RefreshCcw size={17} className="text-warning shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-sm font-semibold text-on-surface">This helper hasn&apos;t responded</p>
-                        <p className="text-xs text-on-surface-variant mt-0.5">
-                          It&apos;s been over 2 hours — choose a different helper to keep this moving.
-                        </p>
-                      </div>
-                    </div>
-                    <Link href={`/requests/${r.id}?resend=1`}>
-                      <Button size="sm" variant="outline" className="shrink-0">
-                        Choose a different helper
-                      </Button>
-                    </Link>
-                  </div>
-                )}
+              <Link key={r.id} href={`/requests/${r.id}`} className="block">
                 <Card hover className="p-5">
-                  <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-                    <div className="flex items-start gap-4 min-w-0 flex-1">
-                      <Avatar name={r.subject || r.title} size="md" />
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-3 flex-wrap">
-                          <h3 className="font-display font-semibold text-on-surface truncate">{r.title}</h3>
-                          <Badge variant={meta.variant} dot>
-                            {meta.label}
+                  <div className="flex items-center gap-4">
+                    <Avatar name={r.subject || r.title} size="md" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <h3 className="font-display font-semibold text-on-surface truncate">{r.title}</h3>
+                        <Badge variant={meta.variant} dot>
+                          {meta.label}
+                        </Badge>
+                        {proposals.length > 0 && (
+                          <Badge variant="outline">
+                            {proposals.length} proposal{proposals.length > 1 ? "s" : ""}
                           </Badge>
-                        </div>
-                        <p className="text-xs text-on-surface-variant mt-1 truncate">
-                          {refCode(r.id)} · {r.subject || "General"} · Requested {formatDate(r.created_at)}
-                        </p>
-                        <div className="flex items-center gap-3 mt-2 text-xs text-on-surface-variant">
+                        )}
+                      </div>
+                      <p className="text-xs text-on-surface-variant mt-1 truncate">
+                        {refCode(r.id)} · {r.subject || "General"} · Requested {formatDate(r.created_at)}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-on-surface-variant">
+                        <span className="inline-flex items-center gap-1">
+                          <CalendarDays size={11} /> Due {formatDate(r.deadline)}
+                        </span>
+                        {(r.file_urls?.length ?? 0) > 0 && (
                           <span className="inline-flex items-center gap-1">
-                            <CalendarDays size={11} /> Due {formatDate(r.deadline)}
+                            <Paperclip size={11} /> {r.file_urls!.length} attachment{r.file_urls!.length > 1 ? "s" : ""}
                           </span>
-                          {(r.file_urls?.length ?? 0) > 0 && (
-                            <span className="inline-flex items-center gap-1">
-                              <Paperclip size={11} /> {r.file_urls!.length} attachment{r.file_urls!.length > 1 ? "s" : ""}
-                            </span>
-                          )}
-                          <span className="inline-flex items-center gap-1">
-                            <Users size={11} /> {r.helper?.name ?? "No helper yet"}
-                          </span>
-                        </div>
+                        )}
+                        <span className="inline-flex items-center gap-1">
+                          <Users size={11} /> {r.helper?.name ?? "No helper yet"}
+                        </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-5 lg:ml-auto shrink-0">
-                      {r.description && (
-                        <div className="hidden md:block max-w-70">
-                          <p className="text-xs text-on-surface-variant line-clamp-2">{r.description}</p>
-                        </div>
-                      )}
-                      <Link href={`/requests/${r.id}`}>
-                        <Button size="sm" onClick={() => router.push(`/requests/${r.id}`)}>
-                          <RefreshCcw size={13} /> Open Chat
-                        </Button>
-                      </Link>
-                      <Link href={`/requests/sent?id=${r.id}`}>
-                        <Button variant="outline" size="sm">
-                          View Request
-                        </Button>
-                      </Link>
-                    </div>
+                    <ChevronRight size={18} className="shrink-0 text-on-surface-variant" />
                   </div>
                 </Card>
-                {proposals.length > 0 && (
-                  <div className="flex flex-col gap-2 px-1">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
-                      Proposals ({proposals.length})
-                    </p>
-                    {proposals.map((p) => (
-                      <ProposalCard
-                        key={p.id}
-                        proposal={p}
-                        requestTitle={r.title}
-                        requestDeadline={r.deadline}
-                        orderId={orderByProposal[p.id] ?? null}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
+              </Link>
             );
           })}
         </section>
