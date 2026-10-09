@@ -42,12 +42,12 @@ export default async function StudentLayout({ children }: { children: React.Reac
     { key: "profile", href: "/profile", label: "Profile" },
   ];
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-dvh flex flex-col bg-background lg:h-dvh lg:overflow-hidden">
       <Header />
       <WarningsBanner />
 
-      <div className="flex flex-1 w-full max-w-360 mx-auto">
-        <aside className="hidden md:flex flex-col w-60 shrink-0 border-r border-outline-variant px-4 py-6 gap-1 sticky top-16 h-[calc(100vh-4rem)] bg-surface-container-lowest">
+      <div className="flex flex-1 w-full max-w-360 mx-auto lg:min-h-0">
+        <aside className="hidden md:flex flex-col w-60 shrink-0 border-r border-outline-variant px-4 py-6 gap-1 sticky top-16 md:h-[calc(100vh-4rem)] lg:h-full bg-surface-container-lowest">
           <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-widest text-on-surface-variant">
             Student
           </p>
@@ -68,7 +68,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0 px-4 md:px-8 py-6 pb-24 md:pb-10">
+        <main className="flex-1 min-w-0 px-4 md:px-8 py-6 pb-24 md:pb-10 lg:min-h-0 lg:overflow-y-auto">
           {children}
         </main>
       </div>

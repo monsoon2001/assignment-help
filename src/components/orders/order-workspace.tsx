@@ -418,8 +418,8 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
   ];
 
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col gap-5">
-      <nav className="flex items-center gap-1.5 text-sm text-on-surface-variant">
+    <div className="w-full max-w-7xl mx-auto flex flex-col gap-4 h-full min-h-0">
+      <nav className="shrink-0 flex items-center gap-1.5 text-sm text-on-surface-variant">
         <Link href={isHelper ? "/helper/orders" : "/requests"} className="hover:text-on-surface">
           {isHelper ? "Active Orders" : "My Requests"}
         </Link>
@@ -427,7 +427,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
         <span className="text-on-surface font-medium truncate">#{order.id.slice(0, 8).toUpperCase()} · {title}</span>
       </nav>
 
-      <section className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 rounded-2xl bg-surface-container-lowest border border-outline-variant">
+      <section className="shrink-0 flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant">
         <div className="flex items-center gap-4 min-w-0">
           <div>
             <div className="flex items-center gap-3 flex-wrap">
@@ -466,7 +466,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
         </div>
       </section>
 
-      <div className="flex items-center gap-1 border-b border-outline-variant">
+      <div className="shrink-0 flex items-center gap-1 border-b border-outline-variant">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const active = activeTab === tab.id;
@@ -492,9 +492,10 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
         })}
       </div>
 
+      <div className="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
       {activeTab === "overview" && (
-        <div className="flex flex-col gap-4">
-          <Card className="p-5">
+        <div className="flex flex-col gap-4 lg:h-full">
+          <Card className="shrink-0 p-5">
             <div className="flex items-center justify-between gap-3 mb-5">
               <div className="min-w-0">
                 <h2 className="font-display font-semibold text-on-surface">Order Progress</h2>
@@ -545,8 +546,8 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
             </ol>
           </Card>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-            <div className="lg:col-span-5 order-2 lg:order-1 flex flex-col gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start lg:flex-1 lg:min-h-0 lg:auto-rows-fr">
+            <div className="lg:col-span-5 order-2 lg:order-1 flex flex-col gap-4 lg:h-full lg:overflow-y-auto lg:pr-1">
             <Card className="p-5">
               <h2 className="font-display font-semibold text-on-surface mb-3">Agreed Scope</h2>
               {order.proposal?.description ? (
@@ -637,23 +638,21 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
             </Card>
           </div>
 
-            <div className="lg:col-span-7 order-1 lg:order-2 w-full lg:self-stretch">
-              <div className="lg:sticky lg:top-20">
-                <div className="h-[calc(100dvh-29rem)] min-h-[320px] lg:min-h-[400px]">
-                  <ChatPanel
-                    fill
-                    messages={messages}
-                    draft={draft}
-                    setDraft={setDraft}
-                    files={chatFiles}
-                    setFiles={setChatFiles}
-                    sending={sendingMsg}
-                    error={chatError}
-                    onSend={sendMessage}
-                    bottomRef={bottomRef}
-                    currentUserId={currentUserId}
-                  />
-                </div>
+            <div className="lg:col-span-7 order-1 lg:order-2 w-full lg:h-full">
+              <div className="h-[65dvh] min-h-[360px] lg:h-full">
+                <ChatPanel
+                  fill
+                  messages={messages}
+                  draft={draft}
+                  setDraft={setDraft}
+                  files={chatFiles}
+                  setFiles={setChatFiles}
+                  sending={sendingMsg}
+                  error={chatError}
+                  onSend={sendMessage}
+                  bottomRef={bottomRef}
+                  currentUserId={currentUserId}
+                />
               </div>
             </div>
           </div>
@@ -661,22 +660,20 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
       )}
 
       {activeTab === "chat" && (
-        <div className="w-full lg:sticky lg:top-20">
-          <div className="h-[calc(100dvh-17rem)] min-h-[360px]">
-            <ChatPanel
-              fill
-              messages={messages}
-              draft={draft}
-              setDraft={setDraft}
-              files={chatFiles}
-              setFiles={setChatFiles}
-              sending={sendingMsg}
-              error={chatError}
-              onSend={sendMessage}
-              bottomRef={bottomRef}
-              currentUserId={currentUserId}
-            />
-          </div>
+        <div className="h-[70dvh] min-h-[420px] lg:h-full">
+          <ChatPanel
+            fill
+            messages={messages}
+            draft={draft}
+            setDraft={setDraft}
+            files={chatFiles}
+            setFiles={setChatFiles}
+            sending={sendingMsg}
+            error={chatError}
+            onSend={sendMessage}
+            bottomRef={bottomRef}
+            currentUserId={currentUserId}
+          />
         </div>
       )}
 
@@ -927,6 +924,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
           )}
         </div>
       )}
+      </div>
     </div>
   );
 }
