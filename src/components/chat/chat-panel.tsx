@@ -44,9 +44,14 @@ const EMOJIS = [
 
 export default function ChatPanel({
   title = "Order Chat",
+  fill = false,
+  className = "",
   messages, draft, setDraft, files, setFiles, sending, error, onSend, bottomRef, currentUserId,
 }: {
   title?: string;
+  /** When true the panel fills its parent's height instead of using a viewport clamp. */
+  fill?: boolean;
+  className?: string;
   messages: ChatMessageRow[];
   draft: string;
   setDraft: (v: string) => void;
@@ -91,8 +96,14 @@ export default function ChatPanel({
   }
 
   return (
-    <Card className="flex flex-col h-[clamp(300px,calc(100vh-320px),480px)] sm:h-[clamp(360px,calc(100vh-300px),560px)] xl:h-[clamp(400px,calc(100vh-280px),600px)] overflow-hidden">
-      <div className="flex items-center gap-3 px-5 py-3.5 border-b border-outline-variant bg-surface-container-low/60">
+    <Card
+      className={`flex flex-col overflow-hidden ${
+        fill
+          ? "h-full min-h-0"
+          : "h-[clamp(300px,calc(100vh-320px),480px)] sm:h-[clamp(360px,calc(100vh-300px),560px)] xl:h-[clamp(400px,calc(100vh-280px),600px)]"
+      } ${className}`}
+    >
+      <div className="flex items-center gap-3 px-5 py-3 border-b border-outline-variant bg-surface-container-low/60">
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-on-surface">{title}</p>
           <p className="text-xs text-emerald-600 inline-flex items-center gap-1">

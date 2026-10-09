@@ -493,51 +493,60 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
       </div>
 
       {activeTab === "overview" && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          <div className="lg:col-span-5 flex flex-col gap-5">
-            <Card className="p-5">
-              <h2 className="font-display font-semibold text-on-surface mb-1">Order Progress</h2>
-              <p className="text-xs text-on-surface-variant mb-5">
-                Status driven by real order activity.
-              </p>
-
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide">Phase</span>
-                <span className="text-sm font-bold text-on-surface">Step {statusStep + 1} of {timeline.length}</span>
+        <div className="flex flex-col gap-4">
+          <Card className="p-5">
+            <div className="flex items-center justify-between gap-3 mb-5">
+              <div className="min-w-0">
+                <h2 className="font-display font-semibold text-on-surface">Order Progress</h2>
+                <p className="text-xs text-on-surface-variant">Status driven by real order activity.</p>
               </div>
+              <span className="shrink-0 text-sm font-bold text-on-surface">
+                Step {statusStep + 1} of {timeline.length}
+              </span>
+            </div>
 
-              <div className="flex flex-col gap-4">
-                {timeline.map((step, i) => {
-                  const done = i < statusStep;
-                  const current = i === statusStep;
-                  const Icon = step.icon;
-                  return (
-                    <div key={step.label} className="flex gap-3">
+            <ol className="flex items-start">
+              {timeline.map((step, i) => {
+                const done = i < statusStep;
+                const current = i === statusStep;
+                const reached = done || current;
+                const Icon = step.icon;
+                return (
+                  <li key={step.label} className="relative flex-1 min-w-0 flex flex-col items-center">
+                    {i > 0 && (
                       <span
-                        className={`w-7 h-7 mt-0.5 rounded-full flex items-center justify-center shrink-0 ${
-                          done
-                            ? "bg-success text-white"
-                            : current
-                              ? "bg-primary-container text-on-primary"
-                              : "bg-surface-container-high text-on-surface-variant"
+                        className={`absolute top-4 right-1/2 h-0.5 w-full ${
+                          reached ? "bg-success" : "bg-surface-container-high"
                         }`}
-                      >
-                        <Icon size={14} />
-                      </span>
-                      <div>
-                        <p className={`text-sm font-semibold ${done || current ? "text-on-surface" : "text-on-surface-variant/60"}`}>
-                          {step.label}
-                        </p>
-                        <p className="text-xs text-on-surface-variant">
-                          {current ? "Current stage of this order" : done ? "Completed" : "Pending"}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </Card>
+                        aria-hidden="true"
+                      />
+                    )}
+                    <span
+                      className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                        done
+                          ? "bg-success text-white"
+                          : current
+                            ? "bg-primary-container text-on-primary ring-4 ring-primary-container/20"
+                            : "bg-surface-container-high text-on-surface-variant"
+                      }`}
+                    >
+                      <Icon size={15} />
+                    </span>
+                    <span
+                      className={`relative mt-2 px-1 text-[11px] sm:text-xs font-medium text-center leading-tight ${
+                        reached ? "text-on-surface" : "text-on-surface-variant/50"
+                      }`}
+                    >
+                      {step.label}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </Card>
 
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+            <div className="lg:col-span-5 order-2 lg:order-1 flex flex-col gap-4">
             <Card className="p-5">
               <h2 className="font-display font-semibold text-on-surface mb-3">Agreed Scope</h2>
               {order.proposal?.description ? (
@@ -628,8 +637,34 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
             </Card>
           </div>
 
-          <div className="lg:col-span-7">
+            <div className="lg:col-span-7 order-1 lg:order-2 w-full lg:self-stretch">
+              <div className="lg:sticky lg:top-20">
+                <div className="h-[calc(100dvh-29rem)] min-h-[320px] lg:min-h-[400px]">
+                  <ChatPanel
+                    fill
+                    messages={messages}
+                    draft={draft}
+                    setDraft={setDraft}
+                    files={chatFiles}
+                    setFiles={setChatFiles}
+                    sending={sendingMsg}
+                    error={chatError}
+                    onSend={sendMessage}
+                    bottomRef={bottomRef}
+                    currentUserId={currentUserId}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === "chat" && (
+        <div className="w-full lg:sticky lg:top-20">
+          <div className="h-[calc(100dvh-17rem)] min-h-[360px]">
             <ChatPanel
+              fill
               messages={messages}
               draft={draft}
               setDraft={setDraft}
@@ -643,21 +678,6 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
             />
           </div>
         </div>
-      )}
-
-      {activeTab === "chat" && (
-        <ChatPanel
-          messages={messages}
-          draft={draft}
-          setDraft={setDraft}
-          files={chatFiles}
-          setFiles={setChatFiles}
-          sending={sendingMsg}
-          error={chatError}
-          onSend={sendMessage}
-          bottomRef={bottomRef}
-          currentUserId={currentUserId}
-        />
       )}
 
       {activeTab === "delivery" && (
