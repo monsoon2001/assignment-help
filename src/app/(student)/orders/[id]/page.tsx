@@ -1,13 +1,7 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import OrderWorkspace from "@/components/orders/order-workspace";
 
 export const dynamic = "force-dynamic";
-
-export const metadata: Metadata = {
-  title: "Order Workspace | Acadivo",
-};
 
 export default async function StudentOrderPage({
   params,
@@ -27,7 +21,7 @@ export default async function StudentOrderPage({
 
   const { data: order } = await supabase
     .from("orders")
-    .select("id, student_id, helper_id")
+    .select("id, student_id, proposal:proposals(request_id)")
     .eq("id", id)
     .maybeSingle();
 
@@ -35,5 +29,9 @@ export default async function StudentOrderPage({
     redirect("/requests");
   }
 
-  return <OrderWorkspace orderId={id} />;
+  const proposal = Array.isArray(order.proposal) ? (order.proposal[0] ?? null) : order.proposal;
+  const requestId = (proposal as { request_id: string | null } | null)?.request_id;
+
+  // Orders are now shown inside the single request workspace.
+  redirect(requestId ? `/requests/${requestId}` : "/requests");
 }

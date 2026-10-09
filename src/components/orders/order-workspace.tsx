@@ -100,8 +100,9 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
   const pathname = usePathname();
 
   useEffect(() => {
+    markThreadNotificationsRead(`/orders/${orderId}`);
     markThreadNotificationsRead(pathname);
-  }, [pathname]);
+  }, [pathname, orderId]);
 
   const loadOrder = useCallback(async () => {
     const { data, error } = await supabase.current
