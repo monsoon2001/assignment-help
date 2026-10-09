@@ -427,7 +427,9 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
         <span className="text-on-surface font-medium truncate">#{order.id.slice(0, 8).toUpperCase()} · {title}</span>
       </nav>
 
-      <section className="shrink-0 flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0 lg:overflow-hidden lg:auto-rows-fr">
+        <div className="lg:col-span-7 flex flex-col gap-4 min-h-0 lg:h-full">
+          <section className="shrink-0 flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant">
         <div className="flex items-center gap-4 min-w-0">
           <div>
             <div className="flex items-center gap-3 flex-wrap">
@@ -475,6 +477,8 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`inline-flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors cursor-pointer ${
+                tab.id === "chat" ? "lg:hidden " : ""
+              }${
                 active
                   ? "border-primary-container text-primary"
                   : "border-transparent text-on-surface-variant hover:text-on-surface"
@@ -490,12 +494,12 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
             </button>
           );
         })}
-      </div>
+          </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
+          <div className="min-h-0 lg:flex-1 lg:overflow-y-auto">
       {activeTab === "overview" && (
-        <div className="flex flex-col gap-4 lg:h-full">
-          <Card className="shrink-0 p-5">
+        <div className="flex flex-col gap-4">
+          <Card className="p-5">
             <div className="flex items-center justify-between gap-3 mb-5">
               <div className="min-w-0">
                 <h2 className="font-display font-semibold text-on-surface">Order Progress</h2>
@@ -546,9 +550,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
             </ol>
           </Card>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start lg:flex-1 lg:min-h-0 lg:auto-rows-fr">
-            <div className="lg:col-span-5 order-2 lg:order-1 flex flex-col gap-4 lg:h-full lg:overflow-y-auto lg:pr-1">
-            <Card className="p-5">
+          <Card className="p-5">
               <h2 className="font-display font-semibold text-on-surface mb-3">Agreed Scope</h2>
               {order.proposal?.description ? (
                 <p className="text-sm text-on-surface-variant leading-relaxed">{order.proposal.description}</p>
@@ -636,31 +638,11 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                 <span className="font-semibold text-on-surface">Expert</span>
               </div>
             </Card>
-          </div>
-
-            <div className="lg:col-span-7 order-1 lg:order-2 w-full lg:h-full">
-              <div className="h-[65dvh] min-h-[360px] lg:h-full">
-                <ChatPanel
-                  fill
-                  messages={messages}
-                  draft={draft}
-                  setDraft={setDraft}
-                  files={chatFiles}
-                  setFiles={setChatFiles}
-                  sending={sendingMsg}
-                  error={chatError}
-                  onSend={sendMessage}
-                  bottomRef={bottomRef}
-                  currentUserId={currentUserId}
-                />
-              </div>
-            </div>
-          </div>
         </div>
       )}
 
       {activeTab === "chat" && (
-        <div className="h-[70dvh] min-h-[420px] lg:h-full">
+        <div className="h-[70dvh] min-h-[420px] lg:hidden">
           <ChatPanel
             fill
             messages={messages}
@@ -924,6 +906,25 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
           )}
         </div>
       )}
+          </div>
+        </div>
+        <div className="hidden lg:block lg:col-span-5 min-h-0 lg:h-full">
+          <div className="h-full">
+            <ChatPanel
+              fill
+              messages={messages}
+              draft={draft}
+              setDraft={setDraft}
+              files={chatFiles}
+              setFiles={setChatFiles}
+              sending={sendingMsg}
+              error={chatError}
+              onSend={sendMessage}
+              bottomRef={bottomRef}
+              currentUserId={currentUserId}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
