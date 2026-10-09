@@ -419,7 +419,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
   ];
 
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col gap-4 h-full min-h-0">
+    <div className="w-full max-w-7xl mx-auto flex flex-col gap-3 h-full min-h-0">
       <nav className="shrink-0 flex items-center gap-1.5 text-sm text-on-surface-variant">
         <Link href={isHelper ? "/helper/orders" : "/requests"} className="hover:text-on-surface">
           {isHelper ? "Active Orders" : "My Requests"}
@@ -429,7 +429,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0 lg:overflow-hidden lg:auto-rows-fr">
-        <div className="lg:col-span-7 flex flex-col gap-4 min-h-0 lg:h-full">
+        <div className="lg:col-span-7 flex flex-col gap-3 min-h-0 lg:h-full">
           <section className="shrink-0 flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant">
         <div className="flex items-center gap-4 min-w-0">
           <div>
@@ -499,9 +499,9 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
 
           <div className="min-h-0 lg:flex-1 lg:overflow-y-auto">
       {activeTab === "overview" && (
-        <div className="flex flex-col gap-4">
-          <Card className="p-5">
-            <div className="flex items-center justify-between gap-3 mb-5">
+        <div className="flex flex-col gap-3">
+          <Card className="p-4">
+            <div className="flex items-center justify-between gap-3 mb-4">
               <div className="min-w-0">
                 <h2 className="font-display font-semibold text-on-surface">Order Progress</h2>
                 <p className="text-xs text-on-surface-variant">Status driven by real order activity.</p>
@@ -551,14 +551,14 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
             </ol>
           </Card>
 
-          <Card className="p-5">
-              <h2 className="font-display font-semibold text-on-surface mb-3">Agreed Scope</h2>
+          <Card className="p-4">
+              <h2 className="font-display font-semibold text-on-surface mb-2">Agreed Scope</h2>
               {order.proposal?.description ? (
                 <p className="text-sm text-on-surface-variant leading-relaxed">{order.proposal.description}</p>
               ) : (
                 <p className="text-sm text-on-surface-variant">No additional scope notes were provided.</p>
               )}
-              <div className="flex flex-wrap items-center gap-3 mt-4 text-sm">
+              <div className="flex flex-wrap items-center gap-3 mt-3 text-sm">
                 <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
                   <DollarSign size={14} /> {price} fixed
                 </span>
@@ -574,8 +574,9 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
               </div>
             </Card>
 
-            <Card className="p-5">
-              <div className="flex items-center justify-between mb-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Card className="p-4">
+              <div className="flex items-center justify-between mb-2">
                 <h2 className="font-display font-semibold text-on-surface inline-flex items-center gap-2">
                   <Receipt size={16} className="text-primary" /> Payment
                 </h2>
@@ -621,9 +622,9 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
               )}
             </Card>
 
-            <Card className="p-5">
-              <div className="flex items-center gap-3 mb-3">
-                <Avatar name={logoName} size="lg" online />
+            <Card className="p-4">
+              <div className="flex items-center gap-3 mb-2">
+                <Avatar name={logoName} size="md" online />
                 <div className="min-w-0 flex-1">
                   <p className="font-display font-semibold text-on-surface">{order.helper?.name ?? "Acadivo Helper"}</p>
                   <p className="text-xs text-on-surface-variant truncate">Assigned mentor</p>
@@ -639,6 +640,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                 <span className="font-semibold text-on-surface">Expert</span>
               </div>
             </Card>
+            </div>
         </div>
       )}
 
