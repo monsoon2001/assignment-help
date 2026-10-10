@@ -10,6 +10,8 @@ import { unwrapRow } from "@/lib/embedded";
 import { formatCurrency, normalizeCurrency } from "@/lib/currency";
 import { requestStatusVariant, proposalStatusVariant } from "@/lib/status-meta";
 import { EmptyState } from "@/components/ui/states";
+import { fileNameFromStoredUrl } from "@/lib/signed-files";
+import { createSignedFileUrl } from "@/lib/signed-files.server";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +38,15 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
 
   const student = unwrapRow<{ id: string; name: string | null; email: string | null }>(request.student);
   const proposals = (request.proposals as unknown as ProposalRow[]) ?? [];
+
+  const attachedFiles = (request.file_urls as string[] | undefined) ?? [];
+  const signedAttachments = await Promise.all(
+    attachedFiles.map(async (stored) => ({
+      stored,
+      label: fileNameFromStoredUrl(stored),
+      url: await createSignedFileUrl(stored, "request-files"),
+    }))
+  );
 
   type ProposalRow = {
     id: string;
@@ -70,15 +81,19 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
             {request.description || "No description provided."}
           </p>
 
-          {(request.file_urls as string[] | undefined)?.length ? (
+          {signedAttachments.length ? (
             <>
               <h3 className="font-medium text-on-surface mt-6 mb-2">Attachments</h3>
               <ul className="space-y-1.5">
-                {(request.file_urls as string[]).map((url) => (
-                  <li key={url}>
-                    <a href={url} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline break-all">
-                      {url}
-                    </a>
+                {signedAttachments.map((a) => (
+                  <li key={a.stored}>
+                    {a.url ? (
+                      <a href={a.url} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline break-all">
+                        {a.label}
+                      </a>
+                    ) : (
+                      <span className="text-sm text-on-surface-variant break-all">{a.label}</span>
+                    )}
                   </li>
                 ))}
               </ul>

@@ -10,6 +10,8 @@ import { unwrapRow } from "@/lib/embedded";
 import { formatCurrency, normalizeCurrency } from "@/lib/currency";
 import { orderStatusVariant, paymentStatusVariant } from "@/lib/status-meta";
 import { EmptyState } from "@/components/ui/states";
+import { fileNameFromStoredUrl } from "@/lib/signed-files";
+import { createSignedFileUrl } from "@/lib/signed-files.server";
 
 export const dynamic = "force-dynamic";
 
@@ -45,6 +47,20 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
   const request = unwrapRow<{ title: string; description: string | null }>(proposal?.request);
   const student = unwrapRow<{ id: string; name: string | null; email: string | null }>(order.student);
   const helper = unwrapRow<{ id: string; name: string | null; email: string | null }>(order.helper);
+
+  const deliveryFiles = new Map<string, { label: string; url: string | null }[]>();
+  await Promise.all(
+    (deliveries.data ?? []).map(async (delivery) => {
+      const files = (delivery.file_urls as string[] | null) ?? [];
+      const signed = await Promise.all(
+        files.map(async (stored) => ({
+          label: fileNameFromStoredUrl(stored),
+          url: await createSignedFileUrl(stored, "order-files"),
+        }))
+      );
+      deliveryFiles.set(delivery.id, signed);
+    })
+  );
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -139,10 +155,14 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
               <div key={delivery.id} className="p-5">
                 <p className="text-sm text-on-surface">{delivery.message || "No message."}</p>
                 <p className="text-xs text-on-surface-variant mt-1">{formatDate(delivery.created_at)}</p>
-                {(delivery.file_urls ?? []).map((url: string) => (
-                  <a key={url} href={url} target="_blank" rel="noreferrer" className="block text-xs text-primary hover:underline mt-1 break-all">
-                    {url}
-                  </a>
+                {(deliveryFiles.get(delivery.id) ?? []).map((file) => (
+                  file.url ? (
+                    <a key={file.label} href={file.url} target="_blank" rel="noreferrer" className="block text-xs text-primary hover:underline mt-1 break-all">
+                      {file.label}
+                    </a>
+                  ) : (
+                    <span key={file.label} className="block text-xs text-on-surface-variant mt-1 break-all">{file.label}</span>
+                  )
                 ))}
               </div>
             ))}

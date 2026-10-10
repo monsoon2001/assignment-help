@@ -18,8 +18,9 @@ export async function uploadOrderFile(
   if (error) {
     throw new Error(error.message);
   }
-  const { data } = supabase.storage.from("order-files").getPublicUrl(path);
-  return data.publicUrl;
+  // Store the bare object path: the bucket is private and downloads go through
+  // a participant-checked signed URL (/api/files/url).
+  return path;
 }
 
 export async function formatBytes(bytes: number): Promise<string> {

@@ -36,10 +36,9 @@ export async function sendRequestMessage(
     if (uploadError) {
       return { error: uploadError.message };
     }
-    const { data: publicUrl } = supabase.storage
-      .from("request-files")
-      .getPublicUrl(path);
-    attachmentUrl = publicUrl?.publicUrl ?? path;
+    // Store the bare object path: the bucket is private and downloads go
+    // through a participant-checked signed URL (/api/files/url).
+    attachmentUrl = path;
   }
 
   const { error } = await supabase.from("messages").insert({

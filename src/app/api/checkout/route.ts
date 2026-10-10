@@ -115,6 +115,34 @@ export async function POST(request: Request) {
     );
   }
 
+  // The amount the student accepted (order.price/currency) must be exactly what
+  // the checkout charges (proposal.price/currency). A mismatch means the
+  // proposal was edited after acceptance, which the DB now forbids — refuse
+  // loudly instead of charging an unexpected amount.
+  const acceptedPrice = Number(order.price);
+  const quotedPrice = Number(proposal.price);
+  const acceptedCurrency = normalizeCurrency(order.currency);
+  const quotedCurrency = normalizeCurrency(proposal.currency);
+  if (
+    !Number.isFinite(acceptedPrice) ||
+    !Number.isFinite(quotedPrice) ||
+    acceptedPrice !== quotedPrice ||
+    acceptedCurrency !== quotedCurrency
+  ) {
+    console.error("checkout: proposal drifted from accepted order", {
+      orderId: order.id,
+      proposalId: proposal.id,
+      orderPrice: order.price,
+      proposalPrice: proposal.price,
+      orderCurrency: order.currency,
+      proposalCurrency: proposal.currency,
+    });
+    return NextResponse.json(
+      { error: "This offer has changed since you accepted it. Please review and try again." },
+      { status: 409 }
+    );
+  }
+
   const origin = new URL(request.url).origin;
   const requestTitle = unwrapRow<{ title: string }>(proposal.request)?.title ?? null;
   const title = requestTitle || "Acadivo Order";

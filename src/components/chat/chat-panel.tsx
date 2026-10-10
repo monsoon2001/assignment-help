@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { FileText, Loader2, Paperclip, Send, SmilePlus, X } from "lucide-react";
 import Avatar from "@/components/ui/avatar";
 import Card from "@/components/ui/card";
+import SecureFileLink from "@/components/ui/secure-file-link";
+import { fileNameFromStoredUrl, type StorageBucket } from "@/lib/signed-files";
 
 export type ChatMessageRow = {
   id: string;
@@ -24,13 +26,7 @@ export function timeLabel(value: string): string {
 }
 
 export function fileNameFromUrl(url: string): string {
-  try {
-    const parsed = new URL(url);
-    const last = parsed.pathname.split("/").pop() || "file";
-    return decodeURIComponent(last.replace(/^[a-f0-9-]{36}-/, ""));
-  } catch {
-    return "file";
-  }
+  return fileNameFromStoredUrl(url);
 }
 
 const EMOJIS = [
@@ -47,6 +43,7 @@ export default function ChatPanel({
   fill = false,
   className = "",
   messages, draft, setDraft, files, setFiles, sending, error, onSend, bottomRef, currentUserId,
+  filesBucket,
 }: {
   title?: string;
   /** When true the panel fills its parent's height instead of using a viewport clamp. */
@@ -62,6 +59,8 @@ export default function ChatPanel({
   onSend: () => void;
   bottomRef: React.RefObject<HTMLDivElement | null>;
   currentUserId?: string;
+  /** Storage bucket that hosted this chat's attachments (request-files or order-files). */
+  filesBucket?: StorageBucket;
 }) {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -136,10 +135,9 @@ export default function ChatPanel({
                 >
                   {m.body && <p>{m.body}</p>}
                   {m.attachment_url && (
-                    <a
-                      href={m.attachment_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <SecureFileLink
+                      stored={m.attachment_url}
+                      bucket={filesBucket}
                       className={`inline-flex items-center gap-2 mt-1.5 px-3 py-2 rounded-lg text-xs font-medium ${
                         isMine
                           ? "bg-white/20 text-white hover:bg-white/30"
@@ -148,7 +146,7 @@ export default function ChatPanel({
                     >
                       <FileText size={14} />
                       {fileNameFromUrl(m.attachment_url)}
-                    </a>
+                    </SecureFileLink>
                   )}
                 </div>
                 <div className="flex items-center gap-1.5 mt-1 text-xs text-on-surface-variant justify-end">

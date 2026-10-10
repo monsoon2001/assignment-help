@@ -22,6 +22,7 @@ import { normalizeCurrency, formatCurrency } from "@/lib/currency";
 import { orderStatusMeta, paymentStatusVariant } from "@/lib/status-meta";
 import { markThreadNotificationsRead } from "@/lib/notifications";
 import ChatPanel, { type ChatMessageRow, timeLabel, fileNameFromUrl } from "@/components/chat/chat-panel";
+import SecureFileLink from "@/components/ui/secure-file-link";
 import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
 
 type OrderStatus =
@@ -101,6 +102,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
 
   useEffect(() => {
     markThreadNotificationsRead(`/orders/${orderId}`);
+    markThreadNotificationsRead(`/helper/orders/${orderId}`);
     markThreadNotificationsRead(pathname);
   }, [pathname, orderId]);
 
@@ -648,6 +650,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
         <div className="h-[70dvh] min-h-[420px] lg:hidden">
           <ChatPanel
             fill
+            filesBucket="order-files"
             messages={messages}
             draft={draft}
             setDraft={setDraft}
@@ -714,11 +717,10 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                     {d.file_urls.length > 0 && (
                       <div className="flex flex-col gap-2">
                         {d.file_urls.map((url, i) => (
-                          <a
+                          <SecureFileLink
                             key={i}
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            stored={url}
+                            bucket="order-files"
                             className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant hover:bg-surface-container-low transition-colors"
                           >
                             <span className="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
@@ -728,7 +730,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                               {fileNameFromUrl(url)}
                             </span>
                             <Download size={15} className="text-on-surface-variant shrink-0" />
-                          </a>
+                          </SecureFileLink>
                         ))}
                       </div>
                     )}

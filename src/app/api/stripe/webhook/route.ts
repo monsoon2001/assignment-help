@@ -27,6 +27,12 @@ export async function POST(request: Request) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
 
+    // Only a confirmed one-time card payment may unlock an order. Ignore other
+    // modes (setup/subscription) and async/unpaid completions silently.
+    if (session.mode !== "payment" || session.payment_status !== "paid") {
+      return NextResponse.json({ received: true });
+    }
+
     const intentId =
       typeof session.payment_intent === "string"
         ? session.payment_intent
@@ -66,20 +72,6 @@ export async function POST(request: Request) {
     }
 
     try {
-      // The webhook is the ONLY writer that transitions an order to
-      // in_progress. The status filter makes double delivery harmless and
-      // prevents regressing a later status (e.g. a refund/cancel).
-      const { error: orderError } = await adminClient
-        .from("orders")
-        .update({ status: "in_progress" })
-        .eq("id", orderId)
-        .eq("status", "payment_pending");
-
-      if (orderError) {
-        console.error("webhook: order update failed", orderError);
-        return NextResponse.json({ error: orderError.message }, { status: 500 });
-      }
-
       // Idempotent (guard: reversing an insert/upsert of an existing intent)
       // thanks to the partial unique index on stripe_payment_intent_id.
       const { data: exists } = await adminClient
@@ -88,6 +80,8 @@ export async function POST(request: Request) {
         .eq("stripe_payment_intent_id", intentId)
         .maybeSingle();
 
+      // Record the payment FIRST: the order transition trigger requires a
+      // `paid` payment row to exist before an order may leave payment_pending.
       if (!exists && intentId) {
         const { error: paymentError } = await adminClient.from("payments").upsert(
           {
@@ -115,6 +109,20 @@ export async function POST(request: Request) {
             { status: 500 }
           );
         }
+      }
+
+      // The webhook is the ONLY writer that transitions an order to
+      // in_progress. The status filter makes double delivery harmless and
+      // prevents regressing a later status (e.g. a refund/cancel).
+      const { error: orderError } = await adminClient
+        .from("orders")
+        .update({ status: "in_progress" })
+        .eq("id", orderId)
+        .eq("status", "payment_pending");
+
+      if (orderError) {
+        console.error("webhook: order update failed", orderError);
+        return NextResponse.json({ error: orderError.message }, { status: 500 });
       }
 
       // Keep the cached workspace/confirmed pages fresh once the payment lands.

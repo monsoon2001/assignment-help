@@ -19,6 +19,7 @@ import { SUPPORTED_CURRENCIES, CURRENCY_LABELS } from "@/lib/currency";
 import ChatPanel, {
   type ChatMessageRow, fileNameFromUrl,
 } from "@/components/chat/chat-panel";
+import SecureFileLink from "@/components/ui/secure-file-link";
 import ProposalCard, { type RequestProposal } from "@/components/requests/proposal-card";
 import HelperPicker from "@/components/requests/helper-picker";
 import { createClient } from "@/lib/supabase/client";
@@ -400,6 +401,7 @@ export default function RequestWorkspace({
         <div className="lg:col-span-7 flex flex-col gap-5">
           <ChatPanel
             title="Request Chat"
+            filesBucket="request-files"
             messages={messages}
             draft={draft}
             setDraft={setDraft}
@@ -455,11 +457,10 @@ export default function RequestWorkspace({
             {request.file_urls.length > 0 && (
               <div className="flex flex-col gap-2 mt-4">
                 {request.file_urls.map((url, i) => (
-                  <a
+                  <SecureFileLink
                     key={i}
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    stored={url}
+                    bucket="request-files"
                     className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant hover:bg-surface-container-low transition-colors"
                   >
                     <span className="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
@@ -468,7 +469,7 @@ export default function RequestWorkspace({
                     <span className="min-w-0 flex-1 text-sm font-medium text-on-surface truncate">
                       {fileNameFromUrl(url)}
                     </span>
-                  </a>
+                  </SecureFileLink>
                 ))}
               </div>
             )}
