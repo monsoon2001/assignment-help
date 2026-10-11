@@ -37,7 +37,7 @@ export default function HelperNav({
   const current = segments[0];
 
   return (
-    <aside className="w-64 shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 min-h-[calc(100vh-4rem)] p-4 hidden md:flex flex-col gap-1">
+    <aside className="w-64 shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 p-4 hidden md:flex flex-col gap-1 md:h-[calc(100vh-4rem)] lg:h-full">
       {links.map((link) => {
         const Icon = link.icon;
         const active = current === link.key;

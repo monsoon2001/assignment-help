@@ -5,7 +5,7 @@ import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
-import { Eye, MessageSquare, Clock, DollarSign, ChevronRight } from "lucide-react";
+import { Clock, DollarSign } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeCurrency, formatCurrency } from "@/lib/currency";
 import { orderStatusMeta } from "@/lib/status-meta";
@@ -90,56 +90,45 @@ export default async function HelperOrders() {
           const title = order.proposal?.request?.title ?? "Untitled Order";
           const subject = order.proposal?.request?.subject ?? "General";
           return (
-            <Card key={order.id} className="p-6" hover>
-              <div className="flex items-start gap-4">
-                <Avatar name={order.student?.name || "Student"} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <h2 className="font-semibold text-on-surface">
-                          {title}
-                        </h2>
-                        <Badge variant={meta.variant} dot>{meta.label}</Badge>
+            <Link key={order.id} href={`/helper/orders/${order.id}`} className="block">
+              <Card className="p-6" hover>
+                <div className="flex items-start gap-4">
+                  <Avatar name={order.student?.name || "Student"} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <h2 className="font-semibold text-on-surface">
+                            {title}
+                          </h2>
+                          <Badge variant={meta.variant} dot>{meta.label}</Badge>
+                        </div>
+                        <p className="text-sm text-on-surface-variant">
+                          #{order.id.slice(0, 8).toUpperCase()} &middot; Student: {order.student?.name || "Student"} &middot; {subject}
+                        </p>
                       </div>
-                      <p className="text-sm text-on-surface-variant">
-                        #{order.id.slice(0, 8).toUpperCase()} &middot; Student: {order.student?.name || "Student"} &middot; {subject}
-                      </p>
+                      <span className="text-sm font-semibold text-on-surface shrink-0 inline-flex items-center gap-1">
+                        <DollarSign size={14} />
+                        {formatCurrency(Number(order.price), normalizeCurrency(order.currency))}
+                      </span>
                     </div>
-                    <span className="text-sm font-semibold text-on-surface shrink-0 inline-flex items-center gap-1">
-                      <DollarSign size={14} />
-                      {formatCurrency(Number(order.price), normalizeCurrency(order.currency))}
-                    </span>
-                  </div>
 
-                  <div className="flex flex-wrap items-center gap-4 mt-3">
-                    <span className="inline-flex items-center gap-1.5 text-sm text-on-surface-variant">
-                      <Clock size={14} />
-                      Deadline:{" "}
-                      {order.deadline
-                        ? new Date(order.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                        : "Flexible"}
-                    </span>
-                    <span className="text-sm text-on-surface-variant">
-                      Updated {timeAgo(order.created_at)}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-3 mt-4">
-                    <Link href={`/helper/orders/${order.id}`}>
-                      <Button size="sm">
-                        <Eye size={14} /> Open Workspace <ChevronRight size={14} />
-                      </Button>
-                    </Link>
-                    <Link href={`/helper/orders/${order.id}`}>
-                      <Button size="sm" variant="outline">
-                        <MessageSquare size={14} /> Chat
-                      </Button>
-                    </Link>
+                    <div className="flex flex-wrap items-center gap-4 mt-3">
+                      <span className="inline-flex items-center gap-1.5 text-sm text-on-surface-variant">
+                        <Clock size={14} />
+                        Deadline:{" "}
+                        {order.deadline
+                          ? new Date(order.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                          : "Flexible"}
+                      </span>
+                      <span className="text-sm text-on-surface-variant">
+                        Updated {timeAgo(order.created_at)}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </Link>
           );
         })}
       </div>

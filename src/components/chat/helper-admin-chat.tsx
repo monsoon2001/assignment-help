@@ -178,7 +178,7 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
   };
 
   return (
-    <div className="flex flex-col h-[clamp(380px,calc(100vh-260px),700px)] overflow-hidden">
+    <div className="flex flex-col min-h-[70dvh] lg:min-h-0 lg:h-full overflow-hidden">
       <div className="flex items-center gap-3 px-5 py-3.5 border-b border-outline-variant bg-surface-container-low/60">
         <Avatar name={admin.name} src={admin.avatarUrl ?? undefined} size="md" online />
         <div className="min-w-0 flex-1">

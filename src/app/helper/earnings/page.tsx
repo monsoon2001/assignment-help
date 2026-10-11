@@ -10,7 +10,6 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { unwrapRow } from "@/lib/embedded";
 import { Receipt } from "lucide-react";
 import { formatCurrency, normalizeCurrency, convertCurrency, type CurrencyCode } from "@/lib/currency";
 import { ErrorState, PanelEmpty } from "@/components/ui/states";
@@ -24,10 +23,7 @@ type PaymentRow = {
   status: string;
   created_at: string;
   receipt_url: string | null;
-  order: {
-    status: string;
-    proposal: { request: { title: string | null } | null } | null;
-  } | null;
+  request_title: string | null;
 };
 
 function monthLabel(iso: string): string {
@@ -48,15 +44,12 @@ export default async function HelperEarnings() {
   const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
 
   const { data: payments, error } = await supabase
-    .from("payments")
-    .select("id, amount, currency, status, created_at, receipt_url, order:orders!inner(status, proposal:proposals(request:requests(title)))")
+    .from("helper_payments")
+    .select("id, amount, currency, status, created_at, receipt_url, request_title")
     .eq("status", "paid")
     .order("created_at", { ascending: false });
 
-  const rows = ((payments ?? []) as unknown as PaymentRow[]).map((p) => ({
-    ...p,
-    order: unwrapRow<PaymentRow["order"]>(p.order),
-  }));
+  const rows = ((payments ?? []) as unknown) as PaymentRow[];
 
   const { count: completedCount } = await supabase
     .from("orders")
@@ -222,9 +215,7 @@ export default async function HelperEarnings() {
                 </thead>
                 <tbody>
                   {rows.map((txn) => {
-                    const title =
-                      unwrapRow<{ request: { title: string | null } | null }>(txn.order?.proposal)?.request?.title ??
-                      "Acadivo order";
+                    const title = txn.request_title ?? "Acadivo order";
                     return (
                       <tr key={txn.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
                         <td className="px-6 py-4">

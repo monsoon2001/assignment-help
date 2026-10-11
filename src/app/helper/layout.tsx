@@ -28,12 +28,14 @@ export default async function HelperLayout({ children }: { children: React.React
 
   return (
     <VoiceCallProvider role="helper">
-      <div className="min-h-screen flex flex-col bg-background">
+      <div className="min-h-dvh flex flex-col bg-background lg:h-dvh lg:overflow-hidden">
         <Header />
         <WarningsBannerClient />
-        <div className="flex flex-1">
+        <div className="flex flex-1 w-full max-w-360 mx-auto lg:min-h-0">
           <HelperNav completedOrders={completedOrders} activeOrders={activeOrders} />
-          <main className="flex-1 p-6 lg:p-8 pb-24 lg:pb-8 overflow-auto">{children}</main>
+          <main className="flex-1 min-w-0 p-6 lg:p-8 pb-24 lg:pb-8 lg:min-h-0 lg:overflow-y-auto">
+            {children}
+          </main>
         </div>
 
         <RoleBottomNav

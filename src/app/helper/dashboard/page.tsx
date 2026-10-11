@@ -64,7 +64,7 @@ export default async function HelperDashboard() {
         .order("created_at", { ascending: false })
         .limit(5),
       supabase
-        .from("payments")
+        .from("helper_payments")
         .select("amount, currency, created_at")
         .eq("status", "paid"),
     ]);

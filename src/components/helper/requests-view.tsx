@@ -6,7 +6,7 @@ import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
-import { BookOpen, Calendar, CheckCircle2, MessageSquare } from "lucide-react";
+import { BookOpen, Calendar, MessageSquare } from "lucide-react";
 
 type HelperRequest = {
   id: string;
@@ -113,60 +113,47 @@ export default function HelperRequestsView({
         {rows.map((req) => {
           const alreadyProposed = proposedIds.has(req.id);
           return (
-            <Card key={req.id} className="p-6" hover>
-              <div className="flex items-start gap-4">
-                <Avatar name={req.student?.name || "Student"} size="lg" />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <h2 className="font-semibold text-on-surface">
-                          {req.title}
-                        </h2>
-                        <Badge variant={alreadyProposed ? "success" : "warning"} dot>
-                          {alreadyProposed ? "Proposal Sent" : "New Request"}
-                        </Badge>
+            <Link key={req.id} href={`/helper/requests/${req.id}`} className="block">
+              <Card className="p-6" hover>
+                <div className="flex items-start gap-4">
+                  <Avatar name={req.student?.name || "Student"} size="lg" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <h2 className="font-semibold text-on-surface">
+                            {req.title}
+                          </h2>
+                          <Badge variant={alreadyProposed ? "success" : "warning"} dot>
+                            {alreadyProposed ? "Proposal Sent" : "New Request"}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-on-surface-variant">
+                          Sent by {req.student?.name || "Student"} &middot; {timeAgo(req.created_at)}
+                        </p>
                       </div>
-                      <p className="text-sm text-on-surface-variant">
-                        Sent by {req.student?.name || "Student"} &middot; {timeAgo(req.created_at)}
+                    </div>
+                    {req.description && (
+                      <p className="text-sm text-on-surface-variant mt-2 line-clamp-2">
+                        {req.description}
                       </p>
+                    )}
+                    <div className="flex flex-wrap items-center gap-4 mt-3">
+                      {req.subject && (
+                        <span className="inline-flex items-center gap-1.5 text-sm text-on-surface-variant">
+                          <BookOpen size={14} />
+                          {req.subject}
+                        </span>
+                      )}
+                      <span className="inline-flex items-center gap-1.5 text-sm text-on-surface-variant">
+                        <Calendar size={14} />
+                        Deadline: {deadlineLabel(req.deadline)}
+                      </span>
                     </div>
                   </div>
-                  {req.description && (
-                    <p className="text-sm text-on-surface-variant mt-2 line-clamp-2">
-                      {req.description}
-                    </p>
-                  )}
-                  <div className="flex flex-wrap items-center gap-4 mt-3">
-                    {req.subject && (
-                      <span className="inline-flex items-center gap-1.5 text-sm text-on-surface-variant">
-                        <BookOpen size={14} />
-                        {req.subject}
-                      </span>
-                    )}
-                    <span className="inline-flex items-center gap-1.5 text-sm text-on-surface-variant">
-                      <Calendar size={14} />
-                      Deadline: {deadlineLabel(req.deadline)}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-3 mt-4">
-                    <Link href={`/helper/requests/${req.id}`}>
-                      <Button size="sm">
-                        <MessageSquare size={15} />
-                        {alreadyProposed ? "Open Chat" : "Open Chat & Respond"}
-                      </Button>
-                    </Link>
-                    {alreadyProposed && (
-                      <span className="text-xs text-on-surface-variant inline-flex items-center gap-1">
-                        <CheckCircle2 size={14} className="text-emerald-600" />
-                        Proposal sent — waiting on the student
-                      </span>
-                    )}
-                  </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </Link>
           );
         })}
       </div>

@@ -33,7 +33,7 @@ export default async function HelperChatAdminPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-5xl mx-auto lg:h-full flex flex-col">
       <HelperAdminChat
         admin={{ id: admin.id, name: admin.name ?? "Support", avatarUrl: admin.avatar_url }}
       />
