@@ -9,6 +9,38 @@ and static verification (`tsc`, `eslint`). Dynamic cross-tenant testing must run
 against a dev/staging Supabase project (script provided) — see *Verification*.
 **Date:** 2026-10-10.
 
+## Live database state — read this first
+
+Introspection of the database reachable from `.env.local` (`DIRECT_URL`) shows it
+is **not** what the migration folder assumes:
+
+- There is **no `supabase_migrations.schema_migrations` table** — the database was
+  not provisioned by the Supabase CLI, so `supabase db push` / `migration list`
+  cannot track state (the Remote column is empty for every migration).
+- The hardening migration `20260913000005` and everything after it are **not
+  applied**: `public.is_admin()` and `guard_order_status_transitions()` do not
+  exist; `proposals` still has `helpers_can_update_own_proposals`; `orders` still
+  has the original `order_participants_can_update`; `reviews` still has
+  `reviews_are_publicly_visible` + `students_can_review_own_orders`; `users`
+  still grants `anon`/`authenticated` full table privileges
+  (`SELECT/INSERT/UPDATE/DELETE/TRUNCATE/REFERENCES/TRIGGER`).
+- `requests` still has the original `students_can_manage_own_requests`
+  (which *does* grant SELECT) — so finding **F1 is latent, not currently active**
+  on this database.
+
+Consequences:
+- **Do not run `supabase db push`** against this database: with no history it
+  would try to replay all 29 migrations over an existing schema.
+- Applying `20261010000001_business_flow_hardening.sql` **alone** is unsafe: its
+  trigger calls `public.is_admin()`, which does not exist here, and would raise
+  at runtime on every order status update.
+- Confirm whether this database is production, a stale dev copy, or one of
+  several; if production, the deployed app is running the pre-harden schema and
+  the whole hardening migration series still needs to be deployed in order.
+
+The code changes in this audit are backward-compatible with the pre-harden
+schema and were pushed, but the database fixes are **pending deployment**.
+
 ## Summary
 
 The codebase is already unusually well hardened: `20260913000005_harden_rls_and_security.sql`
@@ -256,16 +288,23 @@ refunds, message flags/warnings, but not every admin view/action.
 
 ## Go-live checklist
 
-1. `supabase db push` the new migration `20261010000001_business_flow_hardening.sql`.
-2. `supabase migration list` — confirm the harden migration actually applied (F1).
-3. Run `node scripts/test-security-audit.mjs` against staging; fix any FAIL.
-4. Optional backfill: convert legacy stored full URLs to bare paths in
+> The database is **not CLI-managed** and is pre-harden (see top section). Resolve
+> the schema baseline before any push; the steps below assume that is done.
+
+1. Decide the schema baseline: either (a) `supabase link` + repair history, or
+   (b) apply the missing migrations in order directly against the database.
+2. Apply `20260913000005_harden_rls_and_security.sql` and everything after it
+   **in order**, then `20261010000001_business_flow_hardening.sql` (F1–F6).
+3. Confirm `public.is_admin()` and `guard_order_status_transitions` exist, and
+   that `storage.buckets` for `request-files`/`order-files` have `public = false`.
+4. Run `node scripts/test-security-audit.mjs` against staging; fix any FAIL.
+5. Optional backfill: convert legacy stored full URLs to bare paths in
    `requests.file_urls`, `messages.attachment_url`, `deliveries.file_urls`
    (the UI already tolerates both, but bare paths are canonical).
-5. Confirm "Confirm email" and allowed redirect URLs in Supabase Auth.
-6. Add `rate_limit_ok` calls to `/api/checkout` and auth routes (F7).
-7. Add a report-only CSP, then enforce (F15).
-8. Confirm Stripe webhook secret and endpoint in the dashboard.
+6. Confirm "Confirm email" and allowed redirect URLs in Supabase Auth.
+7. Add `rate_limit_ok` calls to `/api/checkout` and auth routes (F7).
+8. Add a report-only CSP, then enforce (F15).
+9. Confirm Stripe webhook secret and endpoint in the dashboard.
 
 ## Changes in this audit
 
