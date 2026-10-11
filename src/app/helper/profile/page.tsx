@@ -11,7 +11,7 @@ export default async function HelperProfilePage() {
   } = await supabase.auth.getUser();
 
   let name = user?.user_metadata?.full_name ?? user?.user_metadata?.name ?? "";
-  let email = user?.email ?? "";
+  const email = user?.email ?? "";
   let avatarUrl: string | null = null;
   let bio = "";
   let subjects: string[] = [];
@@ -22,12 +22,11 @@ export default async function HelperProfilePage() {
   if (user) {
     const { data: profile } = await supabase
       .from("users")
-      .select("name, email, avatar_url")
+      .select("name, avatar_url")
       .eq("id", user.id)
       .single();
     if (profile) {
       name = profile.name ?? name;
-      email = profile.email ?? email;
       avatarUrl = profile.avatar_url;
     }
 

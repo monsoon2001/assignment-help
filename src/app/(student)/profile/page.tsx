@@ -11,25 +11,22 @@ export default async function ProfilePage() {
   } = await supabase.auth.getUser();
 
   let name = user?.user_metadata?.full_name ?? user?.user_metadata?.name ?? "";
-  let email = user?.email ?? "";
+  const email = user?.email ?? "";
   let avatarUrl: string | null = null;
   let memberSince: number | null = null;
-  let institution = "";
-  let levelOfStudy = "";
+  const institution = "";
+  const levelOfStudy = "";
 
   if (user) {
     const { data: profile } = await supabase
       .from("users")
-      .select("name, email, avatar_url, created_at, institution, level_of_study")
+      .select("name, avatar_url, created_at")
       .eq("id", user.id)
       .single();
     if (profile) {
       name = profile.name ?? name;
-      email = profile.email ?? email;
       avatarUrl = profile.avatar_url;
       memberSince = new Date(profile.created_at).getFullYear();
-      institution = profile.institution ?? "";
-      levelOfStudy = profile.level_of_study ?? "";
     }
   }
 

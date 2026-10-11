@@ -68,10 +68,10 @@ export default function AdminLayout({
       setIdentity({ name: fallbackName, email: user.email ?? "" });
       const { data } = await supabase
         .from("users")
-        .select("name, email")
+        .select("name")
         .eq("id", user.id)
         .single();
-      if (data && active) setIdentity({ name: data.name ?? fallbackName, email: data.email ?? user.email ?? "" });
+      if (data && active) setIdentity({ name: data.name ?? fallbackName, email: user.email ?? "" });
     })();
     return () => {
       active = false;

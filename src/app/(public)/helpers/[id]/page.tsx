@@ -10,7 +10,6 @@ export const dynamic = "force-dynamic";
 type RawHelper = {
   id: string;
   name: string | null;
-  email: string;
   avatar_url: string | null;
   helper_profiles:
     | {
@@ -56,7 +55,7 @@ export default async function HelperProfilePage({
 
   const { data: helperData } = await supabase
     .from("users")
-    .select("id, name, email, avatar_url, helper_profiles(subjects, skills, bio, rating_avg)")
+    .select("id, name, avatar_url, helper_profiles(subjects, skills, bio, rating_avg)")
     .eq("id", id)
     .eq("role", "helper")
     .maybeSingle();
