@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ChevronRight, LayoutGrid, MessageSquare, Package, Check,
-  ShieldCheck, FileText, Download, RotateCcw, Star, Clock,
+  ShieldCheck, FileText, RotateCcw, Star, Clock,
   Loader2, CalendarDays, Timer, DollarSign, CheckCircle2, Paperclip,
   Receipt, ExternalLink,
 } from "lucide-react";
@@ -721,6 +721,8 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                             key={i}
                             stored={url}
                             bucket="order-files"
+                            showDownload
+                            label={fileNameFromUrl(url)}
                             className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant hover:bg-surface-container-low transition-colors"
                           >
                             <span className="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
@@ -729,7 +731,6 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                             <span className="min-w-0 flex-1 text-sm font-medium text-on-surface truncate">
                               {fileNameFromUrl(url)}
                             </span>
-                            <Download size={15} className="text-on-surface-variant shrink-0" />
                           </SecureFileLink>
                         ))}
                       </div>

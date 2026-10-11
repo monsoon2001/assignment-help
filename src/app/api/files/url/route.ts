@@ -21,6 +21,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const bucket = url.searchParams.get("bucket");
   const rawPath = url.searchParams.get("path") ?? "";
+  const download = url.searchParams.get("download");
 
   if (!bucket || !isStorageBucket(bucket)) {
     return NextResponse.json({ error: "Invalid bucket" }, { status: 400 });
@@ -51,7 +52,11 @@ export async function GET(request: Request) {
 
   const { data, error } = await adminClient.storage
     .from(bucket)
-    .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
+    .createSignedUrl(
+      path,
+      SIGNED_URL_TTL_SECONDS,
+      download ? { download: download === "1" ? true : download } : undefined
+    );
   if (error || !data?.signedUrl) {
     return NextResponse.json({ error: "File unavailable" }, { status: 404 });
   }

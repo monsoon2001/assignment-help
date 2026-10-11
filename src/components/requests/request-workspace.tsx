@@ -461,6 +461,8 @@ export default function RequestWorkspace({
                     key={i}
                     stored={url}
                     bucket="request-files"
+                    showDownload
+                    label={fileNameFromUrl(url)}
                     className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant hover:bg-surface-container-low transition-colors"
                   >
                     <span className="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
