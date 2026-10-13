@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import {
-  CalendarDays, ChevronRight, Clock, FileText, Loader2, RotateCcw, Send, ShieldCheck,
+  CalendarDays, ChevronRight, Clock, FileText, Loader2, MessageSquare, RotateCcw, Send, ShieldCheck,
   Timer, UserRound,
 } from "lucide-react";
 import Button from "@/components/ui/button";
@@ -85,6 +85,8 @@ export default function RequestWorkspace({
   const [bidExpires, setBidExpires] = useState("");
   const [sendingBid, setSendingBid] = useState(false);
   const [bidError, setBidError] = useState<string | null>(null);
+
+  const [view, setView] = useState<"chat" | "details">("chat");
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -293,9 +295,15 @@ export default function RequestWorkspace({
 
   const title = request.title || "Untitled Request";
 
+  const chatLabel = isHelper ? "Chat with student" : "Chat with helper";
+  const tabs = [
+    { id: "chat" as const, label: chatLabel, icon: MessageSquare },
+    { id: "details" as const, label: "Request details", icon: FileText },
+  ];
+
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col gap-5">
-      <nav className="flex items-center gap-1.5 text-sm text-on-surface-variant">
+    <div className="w-full max-w-7xl mx-auto flex flex-col gap-4 min-h-0 lg:h-full">
+      <nav className="flex items-center gap-1.5 text-sm text-on-surface-variant shrink-0">
         <Link href={isHelper ? "/helper/requests" : "/requests"} className="hover:text-on-surface">
           {isHelper ? "Incoming Requests" : "My Requests"}
         </Link>
@@ -303,7 +311,7 @@ export default function RequestWorkspace({
         <span className="text-on-surface font-medium truncate">#{request.id.slice(0, 8).toUpperCase()} · {title}</span>
       </nav>
 
-      <section className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 rounded-2xl bg-surface-container-lowest border border-outline-variant">
+      <section className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 rounded-2xl bg-surface-container-lowest border border-outline-variant shrink-0">
         <div className="flex items-center gap-4 min-w-0">
           <div>
             <div className="flex items-center gap-3 flex-wrap">
@@ -329,7 +337,7 @@ export default function RequestWorkspace({
       </section>
 
       {overdue && (
-        <Card className="p-5 border-warning">
+        <Card className="p-5 border-warning shrink-0">
           <div className="flex items-start gap-3">
             <span className="w-10 h-10 rounded-xl bg-warning-container/20 text-warning flex items-center justify-center shrink-0">
               <Clock size={18} />
@@ -345,28 +353,37 @@ export default function RequestWorkspace({
         </Card>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-        <div className="lg:col-span-7 flex flex-col gap-5">
-          <ChatPanel
-            title="Request Chat"
-            filesBucket="request-files"
-            messages={messages}
-            draft={draft}
-            setDraft={setDraft}
-            files={chatFiles}
-            setFiles={setChatFiles}
-            sending={sendingMsg}
-            error={chatError}
-            onSend={sendMessage}
-            bottomRef={bottomRef}
-            currentUserId={currentUserId}
-          />
-        </div>
+      <div className="shrink-0 flex items-center gap-1 border-b border-outline-variant">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const active = view === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setView(tab.id)}
+              className={`inline-flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors cursor-pointer ${
+                active
+                  ? "border-primary-container text-primary"
+                  : "border-transparent text-on-surface-variant hover:text-on-surface"
+              }`}
+            >
+              <Icon size={16} />
+              {tab.label}
+              {tab.id === "chat" && messages.length > 0 && (
+                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-gradient-to-br from-primary-container to-secondary-container text-white text-xs font-bold">
+                  {messages.length}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
 
-        <div className="lg:col-span-5 flex flex-col gap-5">
-          <Card className="p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <Avatar name={otherParty?.name || (isHelper ? "Student" : "Helper")} role={isHelper ? "student" : "helper"} size="lg" online />
+      {view === "chat" ? (
+        <div className="flex flex-col gap-4 flex-1 min-h-0">
+          <Card className="p-4 shrink-0">
+            <div className="flex items-center gap-3">
+              <Avatar name={otherParty?.name || (isHelper ? "Student" : "Helper")} role={isHelper ? "student" : "helper"} size="md" online />
               <div className="min-w-0 flex-1">
                 <p className="font-display font-semibold text-on-surface">
                   {otherParty?.name || (isHelper ? "Student" : "Acadivo Helper")}
@@ -375,15 +392,35 @@ export default function RequestWorkspace({
                   {isHelper ? "Student who requested help" : "Expert assigned to your request"}
                 </p>
               </div>
+              {request.sent_at && !isHelper && (
+                <span className="text-xs text-on-surface-variant shrink-0 inline-flex items-center gap-1">
+                  <Clock size={12} />
+                  Sent {new Date(request.sent_at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                </span>
+              )}
             </div>
-            {request.sent_at && !isHelper && (
-              <p className="text-xs text-on-surface-variant inline-flex items-center gap-1">
-                <Clock size={12} />
-                Sent {new Date(request.sent_at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
-              </p>
-            )}
           </Card>
 
+          <div className="flex-1 min-h-[420px] sm:min-h-[520px] lg:min-h-0">
+            <ChatPanel
+              title={chatLabel}
+              fill
+              filesBucket="request-files"
+              messages={messages}
+              draft={draft}
+              setDraft={setDraft}
+              files={chatFiles}
+              setFiles={setChatFiles}
+              sending={sendingMsg}
+              error={chatError}
+              onSend={sendMessage}
+              bottomRef={bottomRef}
+              currentUserId={currentUserId}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-5 max-w-3xl min-h-0 flex-1 lg:overflow-y-auto">
           <Card className="p-5">
             <h2 className="font-display font-semibold text-on-surface mb-2">Request details</h2>
             {request.description ? (
@@ -503,7 +540,7 @@ export default function RequestWorkspace({
             </Link>
           )}
         </div>
-      </div>
+      )}
     </div>
   );
 }

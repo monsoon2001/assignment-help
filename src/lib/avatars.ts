@@ -5,6 +5,15 @@ export const FEMALE_AVATAR_URL = UNSPLASH("photo-1438761681033-6461ffad8d80");
 
 export const DEFAULT_AVATAR_URL = FEMALE_AVATAR_URL;
 
+// The platform's designated helper is presented as a branded identity rather
+// than a personal account: the helper's own photo and stock portraits are
+// never shown, only a neutral initials avatar.
+export const ACADIVO_HELPER_NAME = "Acadivo Helper";
+
+function isAcadivoHelper(name: string): boolean {
+  return name.trim().toLowerCase() === ACADIVO_HELPER_NAME.toLowerCase();
+}
+
 // Distinct portraits for the seeded, non-Google helper accounts. Every helper on
 // the platform is female, so these stand in for helpers who signed up with an
 // email/password account and therefore have no Google profile photo.
@@ -61,6 +70,8 @@ export function avatarFor(
   if (src && isGoogleAvatar(src)) return src;
 
   const key = (name ?? "").trim();
+  // The Acadivo helper brand identity never shows a personal or stock photo.
+  if (key && isAcadivoHelper(key)) return "";
   if (key && HELPER_AVATARS[key]) return HELPER_AVATARS[key];
 
   if (role === "helper") {

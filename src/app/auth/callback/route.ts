@@ -4,6 +4,12 @@ import { getIpCountry } from "@/lib/geo.server";
 import { AUTH_AT_COOKIE, authAtCookieOptions } from "@/lib/session-timebox";
 import { NextResponse } from "next/server";
 
+// Mirrors DESIGNATED_HELPER_ID in lib/requests.ts; inlined to avoid pulling the
+// "use client" supabase browser client into this server route.
+const DESIGNATED_HELPER_ID =
+  process.env.NEXT_PUBLIC_DESIGNATED_HELPER_ID?.trim() ||
+  "bc7a1271-c9bf-4c76-9afe-401098ab6491";
+
 /**
  * Best-effort: record the country the account first signed up from so we can
  * later show an approximate display currency. Only fills a missing value, so a
@@ -92,7 +98,9 @@ export async function GET(request: Request) {
 
   // Sync a Google profile picture (and a missing name) from the OAuth identity
   // into the users table so every surface — helper listings, chats, admin —
-  // sees the real Google avatar instead of the initials fallback.
+  // sees the real Google avatar instead of the initials fallback. The
+  // designated Acadivo helper is the one exception: its identity stays branded
+  // ("Acadivo Helper", no personal photo), so never copy Google data over it.
   const metadata = (user.user_metadata ?? {}) as Record<string, unknown>;
   const googleAvatar =
     typeof metadata.avatar_url === "string"
@@ -101,7 +109,10 @@ export async function GET(request: Request) {
         ? metadata.picture
         : null;
   const metaName = typeof metadata.name === "string" ? metadata.name : null;
-  if (googleAvatar || (metaName && !profile?.name)) {
+  if (
+    user.id !== DESIGNATED_HELPER_ID &&
+    (googleAvatar || (metaName && !profile?.name))
+  ) {
     const updates: Record<string, unknown> = {};
     if (googleAvatar) updates.avatar_url = googleAvatar;
     if (metaName && !profile?.name) updates.name = metaName;
