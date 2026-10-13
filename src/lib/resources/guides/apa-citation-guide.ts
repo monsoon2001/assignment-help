@@ -214,9 +214,9 @@ const guide: Resource = {
   ],
   service: {
     title: "Need citations formatted correctly?",
-    body: "Find a helper to format APA references and in-text citations consistently across your work.",
-    cta: "Find a Citation Helper",
-    href: "/browse-helpers",
+    body: "Send your brief and our verified helper can format APA references and in-text citations consistently across your work.",
+    cta: "Request Citation Help",
+    href: "/requests/new",
   },
 };
 

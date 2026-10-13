@@ -73,7 +73,7 @@ export default async function OrderReviewPage({
 
       <Card className="p-5">
         <div className="flex items-center gap-3 mb-4">
-          <Avatar name={helper?.name || "Helper"} size="lg" online />
+          <Avatar name={helper?.name || "Helper"} role="helper" size="lg" online />
           <div className="min-w-0 flex-1">
             <p className="font-display font-semibold text-on-surface">{helper?.name || "Acadivo Helper"}</p>
             <p className="text-xs text-on-surface-variant truncate">{title}</p>

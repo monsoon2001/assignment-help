@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import {
-  CalendarDays, CheckCircle2, ChevronRight, Clock, FileText, Loader2, RotateCcw, Send, ShieldCheck,
+  CalendarDays, ChevronRight, Clock, FileText, Loader2, RotateCcw, Send, ShieldCheck,
   Timer, UserRound,
 } from "lucide-react";
 import Button from "@/components/ui/button";
@@ -13,19 +13,15 @@ import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import Avatar from "@/components/ui/avatar";
 import Input from "@/components/ui/input";
-import Select from "@/components/ui/select";
 import Textarea from "@/components/ui/textarea";
-import { SUPPORTED_CURRENCIES, CURRENCY_LABELS } from "@/lib/currency";
 import ChatPanel, {
   type ChatMessageRow, fileNameFromUrl,
 } from "@/components/chat/chat-panel";
 import SecureFileLink from "@/components/ui/secure-file-link";
 import ProposalCard, { type RequestProposal } from "@/components/requests/proposal-card";
-import HelperPicker from "@/components/requests/helper-picker";
 import { createClient } from "@/lib/supabase/client";
 import { realtimeTopic } from "@/lib/supabase/realtime";
 import { fetchRequestMessages, sendRequestMessage } from "@/lib/request-chat";
-import { reassignRequest, type HelperCandidate } from "@/lib/requests";
 import { submitProposal } from "@/lib/proposals";
 import { markThreadNotificationsRead } from "@/lib/notifications";
 import { requestStatusVariant } from "@/lib/status-meta";
@@ -63,11 +59,9 @@ const STATUS_LABEL: Record<string, string> = {
 export default function RequestWorkspace({
   requestId,
   mode,
-  initialResend = false,
 }: {
   requestId: string;
   mode: "student" | "helper";
-  initialResend?: boolean;
 }) {
   const supabase = useRef(createClient());
 
@@ -86,16 +80,11 @@ export default function RequestWorkspace({
   const [chatError, setChatError] = useState<string | null>(null);
 
   const [bidPrice, setBidPrice] = useState("");
-  const [bidCurrency, setBidCurrency] = useState("USD");
   const [bidDescription, setBidDescription] = useState("");
   const [bidRevisions, setBidRevisions] = useState("1");
   const [bidExpires, setBidExpires] = useState("");
   const [sendingBid, setSendingBid] = useState(false);
   const [bidError, setBidError] = useState<string | null>(null);
-
-  const [resendOpen, setResendOpen] = useState(initialResend);
-  const [resendMessage, setResendMessage] = useState<string | null>(null);
-  const [resendError, setResendError] = useState<string | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -285,7 +274,6 @@ export default function RequestWorkspace({
     const result = await submitProposal({
       request_id: requestId,
       price: parsedPrice,
-      currency: bidCurrency,
       description: bidDescription.trim() || undefined,
       revisions_included: Math.max(0, Number(bidRevisions) || 0),
       expires_at: bidExpires ? new Date(`${bidExpires}T23:59:59`).toISOString() : null,
@@ -296,24 +284,11 @@ export default function RequestWorkspace({
       return;
     }
     setBidPrice("");
-    setBidCurrency("USD");
     setBidDescription("");
     setBidRevisions("1");
     setBidExpires("");
     await loadProposal();
     await loadRequest();
-  }
-
-  async function handleReassign(helper: HelperCandidate) {
-    setResendError(null);
-    const result = await reassignRequest(requestId, helper.user_id);
-    if ("error" in result) {
-      setResendError(result.error);
-      return;
-    }
-    setResendOpen(false);
-    setResendMessage(`Request sent to ${helper.user?.name ?? "your new helper"}. They have 2 hours to respond.`);
-    await Promise.all([loadRequest(), loadProposal()]);
   }
 
   const title = request.title || "Untitled Request";
@@ -355,46 +330,19 @@ export default function RequestWorkspace({
 
       {overdue && (
         <Card className="p-5 border-warning">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <span className="w-10 h-10 rounded-xl bg-warning-container/20 text-warning flex items-center justify-center shrink-0">
-                <Clock size={18} />
-              </span>
-              <div>
-                <p className="font-semibold text-on-surface">This helper hasn&apos;t responded</p>
-                <p className="text-sm text-on-surface-variant mt-0.5">
-                  It&apos;s been more than 2 hours since your request was sent. Choose a different helper to keep things moving.
-                </p>
-              </div>
+          <div className="flex items-start gap-3">
+            <span className="w-10 h-10 rounded-xl bg-warning-container/20 text-warning flex items-center justify-center shrink-0">
+              <Clock size={18} />
+            </span>
+            <div>
+              <p className="font-semibold text-on-surface">This helper hasn&apos;t responded yet</p>
+              <p className="text-sm text-on-surface-variant mt-0.5">
+                It&apos;s been more than 2 hours since your request was sent. You can keep chatting in the
+                request thread or contact support if you need help.
+              </p>
             </div>
-            <Button size="sm" variant="outline" onClick={() => setResendOpen((v) => !v)}>
-              {resendOpen ? "Cancel" : "Choose a different helper"}
-            </Button>
           </div>
-          {resendOpen && (
-            <div className="mt-4 pt-4 border-t border-outline-variant">
-              <HelperPicker subject={request.subject} onSelect={handleReassign} pickLabel="Send to this helper instead" heading="Pick a different helper" />
-              {resendError && <p className="text-sm text-error mt-3">{resendError}</p>}
-            </div>
-          )}
         </Card>
-      )}
-
-      {!overdue && resendOpen && (
-        <Card className="p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display font-semibold text-on-surface">Choose a different helper</h2>
-            <Button size="sm" variant="ghost" onClick={() => setResendOpen(false)}>Close</Button>
-          </div>
-          <HelperPicker subject={request.subject} onSelect={handleReassign} pickLabel="Send to this helper instead" heading="" />
-          {resendError && <p className="text-sm text-error mt-3">{resendError}</p>}
-        </Card>
-      )}
-
-      {resendMessage && !resendOpen && (
-        <p className="text-sm text-success inline-flex items-center gap-1.5">
-          <CheckCircle2 size={15} /> {resendMessage}
-        </p>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -418,7 +366,7 @@ export default function RequestWorkspace({
         <div className="lg:col-span-5 flex flex-col gap-5">
           <Card className="p-5">
             <div className="flex items-center gap-3 mb-3">
-              <Avatar name={otherParty?.name || (isHelper ? "Student" : "Helper")} size="lg" online />
+              <Avatar name={otherParty?.name || (isHelper ? "Student" : "Helper")} role={isHelper ? "student" : "helper"} size="lg" online />
               <div className="min-w-0 flex-1">
                 <p className="font-display font-semibold text-on-surface">
                   {otherParty?.name || (isHelper ? "Student" : "Acadivo Helper")}
@@ -483,21 +431,15 @@ export default function RequestWorkspace({
               <p className="text-sm text-on-surface-variant mb-4">
                 Price this request in the chat — the student reviews and accepts from here.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <Input
-                  label="Price"
+                  label="Price (CAD)"
                   type="number"
                   min="0.01"
                   step="0.01"
                   placeholder="25.00"
                   value={bidPrice}
                   onChange={(e) => setBidPrice(e.target.value)}
-                />
-                <Select
-                  label="Currency"
-                  value={bidCurrency}
-                  onChange={(e) => setBidCurrency(e.target.value)}
-                  options={SUPPORTED_CURRENCIES.map((c) => ({ value: c, label: CURRENCY_LABELS[c] }))}
                 />
               </div>
               <div className="mt-4">

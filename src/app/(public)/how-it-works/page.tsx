@@ -5,8 +5,8 @@ import { MaterialIcon } from "@/lib/icons-map";
 
 const steps = [
   { num: "1", title: "Tell us what you need", desc: "Describe your assignment, select the subject, academic level, deadline, and any specific requirements. Upload files like rubrics, lecture notes, or drafts if you have them.", icon: "edit_note", details: ["Select subject and help type", "Describe your requirements", "Set your deadline", "Upload reference files"] },
-  { num: "2", title: "Choose your helper", desc: "Browse verified peer helpers who specialize in your subject. Review profiles, ratings, and reviews, then pick the helper you feel most comfortable with — you're in control, not a random match.", icon: "group_add", details: ["Browse helpers by subject", "Review profiles and ratings", "Choose your preferred helper", "Start a conversation right away"] },
-  { num: "3", title: "Review price & confirm", desc: "Receive a transparent, upfront quote with no hidden fees. Review the scope, timeline, and pricing before confirming. You only pay when you're satisfied with the match.", icon: "receipt_long", details: ["Transparent pricing", "No hidden fees", "Pay only after confirmation", "Secure payment processing"] },
+  { num: "2", title: "Get matched with a helper", desc: "Your brief goes straight to our verified academic helper, who reviews it and sends back a personalized proposal. Discuss the scope in the request chat — nothing starts without your approval.", icon: "group_add", details: ["Sent to our verified helper", "Discuss scope in the request chat", "Review the proposal", "Approve before any work starts"] },
+  { num: "3", title: "Review price & confirm", desc: "Receive a transparent, upfront quote in Canadian dollars with no hidden fees. Review the scope, timeline, and price, then accept it to start the order.", icon: "receipt_long", details: ["Transparent pricing", "No hidden fees", "Pay only after accepting the quote", "Secure payment processing"] },
   { num: "4", title: "Get completed work & learn", desc: "Receive your completed work on time. Review it, and if anything isn't right, request unlimited free revisions until you're fully satisfied — no extra cost, no time limit.", icon: "task_alt", details: ["On-time delivery", "Unlimited revisions until you're satisfied", "Learn from expert feedback"] },
 ];
 
@@ -63,9 +63,9 @@ export default function HowItWorksPage() {
           <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary-container to-primary" aria-hidden="true" />
           <h2 className="font-display text-3xl font-bold text-on-surface mb-3">Ready to get started?</h2>
           <p className="text-on-surface-variant mb-8 max-w-lg mx-auto leading-relaxed">Get matched with a verified helper in your subject and start improving your grades with Acadivo.</p>
-          <Link href="/browse-helpers" className="inline-flex items-center gap-2 px-8 py-3.5 text-white rounded-xl font-semibold text-sm transition-all shadow-lg shadow-primary-container/30 hover:shadow-xl hover:shadow-primary-container/40 hover:-translate-y-0.5"
+          <Link href="/requests/new" className="inline-flex items-center gap-2 px-8 py-3.5 text-white rounded-xl font-semibold text-sm transition-all shadow-lg shadow-primary-container/30 hover:shadow-xl hover:shadow-primary-container/40 hover:-translate-y-0.5"
             style={{ background: "linear-gradient(135deg, #2b4bf0, #466bf2)" }}>
-            Browse Helpers
+            Request Help
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

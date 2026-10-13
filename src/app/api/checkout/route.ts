@@ -3,17 +3,22 @@ import { stripe } from "@/lib/stripe";
 import { unwrapRow } from "@/lib/embedded";
 import { adminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { normalizeCurrency, isSupportedCurrency, convertCurrency, type CurrencyCode } from "@/lib/currency";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Starts a Stripe Checkout session for an order.
+ *
+ * The model is platform-collected and CAD-only: the amount is read from the
+ * accepted proposal stored in the database (never from the client) and every
+ * session is created with currency "cad". There is no Stripe Connect,
+ * destination charge, transfer or application fee.
+ */
 export async function POST(request: Request) {
   let orderId: unknown;
-  let currency: unknown;
   try {
     const body = await request.json();
     orderId = body?.orderId;
-    currency = body?.currency;
   } catch {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
@@ -21,7 +26,6 @@ export async function POST(request: Request) {
   if (typeof orderId !== "string" || orderId.length === 0) {
     return NextResponse.json({ error: "Missing order id" }, { status: 400 });
   }
-  const payCurrency: CurrencyCode = isSupportedCurrency(currency) ? currency : "USD";
 
   const supabase = await createClient();
   const {
@@ -37,7 +41,6 @@ export async function POST(request: Request) {
   let order: {
     id: string;
     price: number;
-    currency: string;
     status: string;
     proposal_id: string | null;
     student_id: string;
@@ -46,7 +49,7 @@ export async function POST(request: Request) {
   try {
     const { data, error } = await supabase
       .from("orders")
-      .select("id, price, currency, status, proposal_id, student_id, helper_id")
+      .select("id, price, status, proposal_id, student_id, helper_id")
       .eq("id", orderId)
       .single();
     if (error || !data) {
@@ -76,12 +79,26 @@ export async function POST(request: Request) {
     );
   }
 
-  // The accepted proposal is the single authority for amount and currency.
+  // Never let a proposal be paid twice: refuse if a paid payment already exists.
+  const { data: existingPayment } = await adminClient
+    .from("payments")
+    .select("id")
+    .eq("order_id", order.id)
+    .eq("status", "paid")
+    .maybeSingle();
+  if (existingPayment) {
+    return NextResponse.json(
+      { error: "This order has already been paid." },
+      { status: 409 }
+    );
+  }
+
+  // The accepted proposal is the single authority for the amount.
   let proposal: {
     id: string;
     price: number;
-    currency: string;
     status: string;
+    expires_at: string | null;
     request_id: string;
     helper_id: string;
     description: string | null;
@@ -90,7 +107,7 @@ export async function POST(request: Request) {
   try {
     const { data, error } = await adminClient
       .from("proposals")
-      .select("id, price, currency, status, request_id, helper_id, description, request:requests(title)")
+      .select("id, price, status, expires_at, request_id, helper_id, description, request:requests(title)")
       .eq("id", order.proposal_id)
       .single();
     if (error) {
@@ -115,27 +132,30 @@ export async function POST(request: Request) {
     );
   }
 
-  // The amount the student accepted (order.price/currency) must be exactly what
-  // the checkout charges (proposal.price/currency). A mismatch means the
-  // proposal was edited after acceptance, which the DB now forbids — refuse
-  // loudly instead of charging an unexpected amount.
+  // A declined/expired proposal must never be paid.
+  if (proposal.expires_at && new Date(proposal.expires_at).getTime() < Date.now()) {
+    return NextResponse.json(
+      { error: "This offer has expired. Please ask the helper for a new quote." },
+      { status: 409 }
+    );
+  }
+
+  // The amount the student accepted (order.price) must be exactly what the
+  // checkout charges (proposal.price). A mismatch means the proposal was edited
+  // after acceptance, which the DB now forbids — refuse loudly instead of
+  // charging an unexpected amount.
   const acceptedPrice = Number(order.price);
   const quotedPrice = Number(proposal.price);
-  const acceptedCurrency = normalizeCurrency(order.currency);
-  const quotedCurrency = normalizeCurrency(proposal.currency);
   if (
     !Number.isFinite(acceptedPrice) ||
     !Number.isFinite(quotedPrice) ||
-    acceptedPrice !== quotedPrice ||
-    acceptedCurrency !== quotedCurrency
+    acceptedPrice !== quotedPrice
   ) {
     console.error("checkout: proposal drifted from accepted order", {
       orderId: order.id,
       proposalId: proposal.id,
       orderPrice: order.price,
       proposalPrice: proposal.price,
-      orderCurrency: order.currency,
-      proposalCurrency: proposal.currency,
     });
     return NextResponse.json(
       { error: "This offer has changed since you accepted it. Please review and try again." },
@@ -147,14 +167,8 @@ export async function POST(request: Request) {
   const requestTitle = unwrapRow<{ title: string }>(proposal.request)?.title ?? null;
   const title = requestTitle || "Acadivo Order";
 
-  const orderCurrency = normalizeCurrency(proposal.currency);
-  const amountInPayCurrency = convertCurrency(
-    Number(proposal.price),
-    orderCurrency,
-    payCurrency
-  );
-  const priceCents = Math.round(amountInPayCurrency * 100);
-
+  // CAD only, amount taken straight from the accepted proposal.
+  const priceCents = Math.round(quotedPrice * 100);
   if (!Number.isFinite(priceCents) || priceCents <= 0) {
     console.error("checkout: non-positive amount computed", { proposalId: proposal.id, price: proposal.price });
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
@@ -169,7 +183,7 @@ export async function POST(request: Request) {
       line_items: [
         {
           price_data: {
-            currency: payCurrency.toLowerCase(),
+            currency: "cad",
             product_data: {
               name: title,
               description: proposal.description ?? "Acadivo academic order",
@@ -181,6 +195,11 @@ export async function POST(request: Request) {
       ],
       metadata: {
         order_id: order.id,
+      },
+      payment_intent_data: {
+        metadata: {
+          order_id: order.id,
+        },
       },
       success_url: `${origin}/orders/${order.id}/confirmed?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/orders/${order.id}/payment`,

@@ -139,7 +139,7 @@ export default async function OrderConfirmedPage({
           <div>
             <p className="text-xs text-on-surface-variant uppercase tracking-wide">Helper</p>
             <div className="flex items-center gap-2 mt-1">
-              <Avatar name={helper?.name || "Helper"} size="sm" />
+              <Avatar name={helper?.name || "Helper"} role="helper" size="sm" />
               <p className="text-sm font-semibold text-on-surface truncate">{helper?.name || "Acadivo Helper"}</p>
             </div>
           </div>
@@ -183,7 +183,8 @@ export default async function OrderConfirmedPage({
         <p className="text-xs leading-relaxed text-on-surface-variant">
           Protected by the <span className="font-semibold text-on-surface">Acadivo Academic Guarantee</span>:{" "}
           <span className="font-semibold text-on-surface inline-flex items-center gap-1"><Timer size={11} /> unlimited revisions</span>{" "}
-          until you&apos;re satisfied. Funds release to the mentor only after your review.
+          until you&apos;re satisfied. If the delivered work doesn&apos;t match the agreed scope,
+          you can request a refund under our Refund Policy.
         </p>
       </div>
     </div>

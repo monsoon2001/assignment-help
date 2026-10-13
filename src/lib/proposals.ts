@@ -27,7 +27,7 @@ export async function submitProposal(
       request_id: input.request_id,
       helper_id: user.id,
       price: input.price,
-      currency: input.currency ?? "USD",
+      currency: "CAD",
       description: input.description ?? null,
       revisions_included: input.revisions_included ?? 0,
       expires_at: input.expires_at ?? null,

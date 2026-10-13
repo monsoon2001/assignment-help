@@ -14,19 +14,23 @@ export default async function ProfilePage() {
   const email = user?.email ?? "";
   let avatarUrl: string | null = null;
   let memberSince: number | null = null;
-  const institution = "";
-  const levelOfStudy = "";
+  let institution = "";
+  let levelOfStudy = "";
+  let country = "";
 
   if (user) {
     const { data: profile } = await supabase
       .from("users")
-      .select("name, avatar_url, created_at")
+      .select("name, avatar_url, created_at, institution, level_of_study, country")
       .eq("id", user.id)
       .single();
     if (profile) {
       name = profile.name ?? name;
       avatarUrl = profile.avatar_url;
       memberSince = new Date(profile.created_at).getFullYear();
+      institution = profile.institution ?? "";
+      levelOfStudy = profile.level_of_study ?? "";
+      country = profile.country ?? "";
     }
   }
 
@@ -43,6 +47,7 @@ export default async function ProfilePage() {
       lastName={lastName}
       institution={institution}
       levelOfStudy={levelOfStudy}
+      country={country}
       memberSince={memberSince}
     />
   );

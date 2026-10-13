@@ -5,7 +5,7 @@ import Avatar from "@/components/ui/avatar";
 import { CreditCard } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
-import { formatCurrency, normalizeCurrency } from "@/lib/currency";
+import { formatCurrency } from "@/lib/currency";
 import { paymentStatusVariant, orderStatusVariant } from "@/lib/status-meta";
 import RefundButton from "@/app/admin/components/refund-button";
 import { EmptyState } from "@/components/ui/states";
@@ -26,7 +26,7 @@ export default async function AdminPaymentsPage() {
 
   const { data: payments, error } = await adminClient
     .from("payments")
-    .select("id, amount, currency, status, stripe_payment_intent_id, created_at, order:orders(id, status, student:users!orders_student_id_fkey(name), helper:users!orders_helper_id_fkey(name))")
+    .select("id, amount, currency, status, stripe_payment_intent_id, gross_cad, stripe_fee_cad, net_cad, helper_share_cad, helper_payout_status, refunded_amount_cad, disputed, created_at, order:orders(id, status, student:users!orders_student_id_fkey(name), helper:users!orders_helper_id_fkey(name))")
     .order("created_at", { ascending: false })
     .limit(200);
 
@@ -49,13 +49,17 @@ export default async function AdminPaymentsPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-outline-variant/30">
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Student</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Helper</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Amount</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Order</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Date</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Status</th>
-                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Action</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-4 py-3">Student</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-4 py-3">Helper</th>
+                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-4 py-3">Total</th>
+                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-4 py-3">Stripe fee</th>
+                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-4 py-3">Net</th>
+                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-4 py-3">Helper share</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-4 py-3">Payout</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-4 py-3">Order</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-4 py-3">Date</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-4 py-3">Status</th>
+                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-4 py-3">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -63,29 +67,55 @@ export default async function AdminPaymentsPage() {
                 const order = unwrapRow<{ id: string; status: string; student: unknown; helper: unknown }>(payment.order);
                 const orderStudent = unwrapRow<{ name: string | null }>(order?.student);
                 const orderHelper = unwrapRow<{ name: string | null }>(order?.helper);
+                const gross = Number(payment.gross_cad ?? payment.amount ?? 0);
+                const fee = payment.stripe_fee_cad === null || payment.stripe_fee_cad === undefined ? null : Number(payment.stripe_fee_cad);
+                const net = payment.net_cad === null || payment.net_cad === undefined ? null : Number(payment.net_cad);
+                const share = payment.helper_share_cad === null || payment.helper_share_cad === undefined ? null : Number(payment.helper_share_cad);
+                const payout = payment.helper_payout_status as string | null;
+                const refunded = Number(payment.refunded_amount_cad ?? 0);
+                const fmt = (v: number | null) => (v === null ? "—" : formatCurrency(v));
                 return (
                   <tr key={payment.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-4">
                       <div className="flex items-center gap-2">
                         <Avatar name={orderStudent?.name ?? "Student"} size="sm" />
                         <span className="text-sm text-on-surface">{orderStudent?.name ?? "—"}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-4">
                       <div className="flex items-center gap-2">
-                        <Avatar name={orderHelper?.name ?? "Helper"} size="sm" />
+                        <Avatar name={orderHelper?.name ?? "Helper"} role="helper" size="sm" />
                         <span className="text-sm text-on-surface">{orderHelper?.name ?? "—"}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm font-semibold text-on-surface">{formatCurrency(Number(payment.amount), normalizeCurrency(payment.currency))}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-4 text-right text-sm font-semibold text-on-surface">
+                      {formatCurrency(gross)}
+                      {refunded > 0 && (
+                        <span className="block text-xs font-normal text-error">-{formatCurrency(refunded)} refunded</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-4 text-right text-sm text-on-surface-variant">{fmt(fee)}</td>
+                    <td className="px-4 py-4 text-right text-sm text-on-surface-variant">{fmt(net)}</td>
+                    <td className="px-4 py-4 text-right text-sm font-semibold text-primary">{fmt(share)}</td>
+                    <td className="px-4 py-4">
+                      {payment.disputed ? (
+                        <Badge variant="danger">Disputed</Badge>
+                      ) : payout === "paid" ? (
+                        <Badge variant="success">Paid</Badge>
+                      ) : payout === "on_hold" ? (
+                        <Badge variant="warning">On hold</Badge>
+                      ) : (
+                        <Badge variant="outline">Unpaid</Badge>
+                      )}
+                    </td>
+                    <td className="px-4 py-4">
                       <Badge variant={orderStatusVariant(order?.status)}>{order?.status ?? "—"}</Badge>
                     </td>
-                    <td className="px-6 py-4 text-sm text-on-surface-variant">{formatDate(payment.created_at)}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-4 text-sm text-on-surface-variant">{formatDate(payment.created_at)}</td>
+                    <td className="px-4 py-4">
                       <Badge variant={paymentStatusVariant(payment.status)}>{payment.status}</Badge>
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-4 py-4 text-right">
                       {payment.status === "paid" ? (
                         <RefundButton paymentId={payment.id} />
                       ) : (

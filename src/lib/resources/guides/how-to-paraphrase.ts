@@ -178,9 +178,9 @@ const guide: Resource = {
   ],
   service: {
     title: "Want your paraphrasing checked?",
-    body: "A helper can review whether your restatements stay accurate to the original sources.",
-    cta: "Find a Paraphrasing Helper",
-    href: "/browse-helpers",
+    body: "Our verified helper can review whether your restatements stay accurate to the original sources.",
+    cta: "Request Paraphrasing Help",
+    href: "/requests/new",
   },
 };
 

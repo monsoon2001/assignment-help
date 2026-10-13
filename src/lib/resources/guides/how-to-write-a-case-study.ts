@@ -198,9 +198,9 @@ const guide: Resource = {
   ],
   service: {
     title: "Analysing a complex case?",
-    body: "Find a helper to work through your framework, evidence, and analysis with you.",
-    cta: "Find a Case Study Helper",
-    href: "/browse-helpers",
+    body: "Send your brief and our verified helper can work through your framework, evidence, and analysis with you.",
+    cta: "Request Case Study Help",
+    href: "/requests/new",
   },
 };
 

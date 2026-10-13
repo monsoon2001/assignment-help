@@ -82,7 +82,7 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
               All guides
             </Link>
             <Link
-              href="/browse-helpers"
+              href="/requests/new"
               className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-container text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-primary-container/20"
             >
               Looking for one-to-one help?

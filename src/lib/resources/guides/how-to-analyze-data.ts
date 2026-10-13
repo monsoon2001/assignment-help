@@ -211,9 +211,9 @@ const guide: Resource = {
   ],
   service: {
     title: "Working on an analysis?",
-    body: "Find a helper to check your method choice, run your analysis, and interpret the output.",
-    cta: "Find a Data Analysis Helper",
-    href: "/browse-helpers",
+    body: "Send your brief and our verified helper can check your method choice, run your analysis, and interpret the output.",
+    cta: "Request Data Analysis Help",
+    href: "/requests/new",
   },
 };
 

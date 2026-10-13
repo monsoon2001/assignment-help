@@ -55,7 +55,6 @@ const resourcesGroups: MenuGroup[] = [
 ];
 
 const publicMenuItems: MenuItem[] = [
-  { label: "Browse Helpers", href: "/browse-helpers" },
   { label: "Services", href: "/services", groups: servicesGroups },
   { label: "Subjects", href: "/subjects", groups: subjectGroups },
   { label: "Resources", href: "/resources", groups: resourcesGroups },

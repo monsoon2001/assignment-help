@@ -182,9 +182,9 @@ const guide: Resource = {
   ],
   service: {
     title: "Need help interpreting output?",
-    body: "Find a helper to work through your statistical output and what it actually supports.",
-    cta: "Find a Statistics Helper",
-    href: "/browse-helpers",
+    body: "Send your brief and our verified helper can work through your statistical output and what it actually supports.",
+    cta: "Request Statistics Help",
+    href: "/requests/new",
   },
 };
 

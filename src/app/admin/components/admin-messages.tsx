@@ -191,7 +191,7 @@ const selectedIdRef = useRef<string | null>(null);
                 selectedId === helper.id ? "bg-primary-container/20" : "hover:bg-surface-container-low"
               }`}
             >
-              <Avatar name={helper.name ?? "Helper"} src={helper.avatar_url ?? undefined} size="sm" />
+              <Avatar name={helper.name ?? "Helper"} src={helper.avatar_url ?? undefined} role="helper" size="sm" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-on-surface truncate">{helper.name ?? "Helper"}</p>
                 <p className="text-xs text-on-surface-variant truncate">{helper.email}</p>
@@ -206,7 +206,7 @@ const selectedIdRef = useRef<string | null>(null);
         {selected ? (
           <>
             <div className="p-4 border-b border-outline-variant/30 flex items-center gap-3">
-              <Avatar name={selected.name ?? "Helper"} src={selected.avatar_url ?? undefined} size="md" />
+              <Avatar name={selected.name ?? "Helper"} src={selected.avatar_url ?? undefined} role="helper" size="md" />
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-on-surface">{selected.name ?? "Helper"}</p>
                 <p className="text-xs text-on-surface-variant truncate">{selected.email}</p>

@@ -100,8 +100,8 @@ export default function HelperRequestsView({
           </span>
           <h2 className="font-display font-semibold text-on-surface">No requests here right now</h2>
           <p className="text-sm text-on-surface-variant max-w-md">
-            Students reach out directly, so a request appears here once a student picks you. A complete
-            profile helps students find you in Browse Helpers.
+            Students reach out directly, so a request appears here once a student sends their brief. Keep your
+            profile up to date so students know what you cover.
           </p>
           <Link href="/helper/profile" className="mt-1">
             <Button size="sm" variant="outline">Complete your profile</Button>

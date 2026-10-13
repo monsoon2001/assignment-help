@@ -28,7 +28,7 @@ export async function generateMetadata({
   const service = getServicePage(slug);
   if (!service) return {};
   const title = `${service.name} Assignment Help | Acadivo`;
-  const description = `${service.desc} Compare verified helpers, agree the scope and price in writing, and pay only once the proposal looks right.`;
+  const description = `${service.desc} Send your brief to our verified helper, agree the scope and price in writing, and pay only once the proposal looks right.`;
   return {
     title,
     description,
@@ -77,14 +77,14 @@ export default async function ServiceDetailPage({
               href="/#estimate"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-primary-container text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-primary-container/20"
             >
-              Get matched with helpers
+              Get matched with a helper
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
-              href="/browse-helpers"
+              href="/requests/new"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-outline-variant bg-white rounded-xl font-semibold text-sm text-on-surface hover:bg-surface-container-lowest transition-colors"
             >
-              Browse helpers
+              Request Help
             </Link>
           </div>
         </div>
@@ -226,10 +226,10 @@ export default async function ServiceDetailPage({
       <CtaBand
         eyebrow="handshake"
         title={`Need ${service.name.toLowerCase()} from a verified helper?`}
-        body="Pick the helper you want to work with, agree the scope and price in writing, and pay only after it looks right."
+        body="Send your brief to our verified helper, agree the scope and price in writing, and pay only after it looks right."
         primary={{
-          label: "Browse Helpers",
-          href: `/browse-helpers?subject=${encodeURIComponent(service.group.title)}`,
+          label: "Request Help",
+          href: "/requests/new",
         }}
         secondary={{ label: "How It Works", href: "/how-it-works" }}
       />    </>

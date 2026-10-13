@@ -70,7 +70,7 @@ export default async function AdminHelpersPage({
                   <tr key={user.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <Avatar name={user.name ?? "Helper"} src={user.avatar_url ?? undefined} size="sm" />
+                        <Avatar name={user.name ?? "Helper"} src={user.avatar_url ?? undefined} role="helper" size="sm" />
                         <div>
                           <p className="text-sm font-medium text-on-surface">{user.name ?? "Unnamed"}</p>
                           <p className="text-xs text-on-surface-variant">{user.email}</p>

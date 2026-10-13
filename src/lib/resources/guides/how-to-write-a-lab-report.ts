@@ -191,9 +191,9 @@ const guide: Resource = {
   ],
   service: {
     title: "Working on a lab report?",
-    body: "Find a helper to work through your method, results, and discussion before you submit.",
-    cta: "Find a Lab Report Helper",
-    href: "/browse-helpers",
+    body: "Send your brief and our verified helper can work through your method, results, and discussion before you submit.",
+    cta: "Request Lab Report Help",
+    href: "/requests/new",
   },
 };
 

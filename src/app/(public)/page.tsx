@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Star, CheckCircle, ArrowRight } from "lucide-react";
+import { CheckCircle, ArrowRight } from "lucide-react";
 import { MaterialIcon } from "@/lib/icons-map";
 import PriceEstimateForm from "@/components/marketing/price-estimate-form";
 import TestimonialCarousel, { type Testimonial } from "@/components/marketing/testimonial-carousel";
-import Avatar from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/server";
 import { SERVICE_TYPES, SUBJECTS } from "@/lib/constants";
 import { SUBJECT_CONTENT } from "@/lib/subject-content";
@@ -17,7 +16,6 @@ import {
   HOME_FAQS,
   HOME_SERVICE_COUNT,
   STEPS,
-  helperFocus,
 } from "@/lib/home-content";
 import FaqAccordion from "@/components/marketing/faq-accordion";
 import { CURATED_TESTIMONIALS, THIN_REVIEW_MIN_LENGTH } from "@/lib/home-testimonials";
@@ -26,12 +24,9 @@ export const dynamic = "force-dynamic";
 
 const SITE_URL = "https://acadivo.com";
 
-// Subject names helpers pick from -> the matching public subject page.
-const SUBJECT_PAGE_BY_NAME = new Map(SUBJECT_CONTENT.map((s) => [s.name, `/subjects/${s.slug}`]));
+const HERO_TITLE = "Assignment Help Online from a Verified Assignment Helper | Acadivo";
 
-const HERO_TITLE = "Assignment Help Online | Choose a Verified Assignment Helper | Acadivo";
-
-const HERO_DESCRIPTION = `Get assignment help online from verified peer helpers across ${SUBJECTS.length} subjects. Post your brief, compare helpers by subject, rating and price, agree a personalized proposal, and pay only after you approve — essay help, lab reports, citations, programming, data analysis and more.`;
+const HERO_DESCRIPTION = `Get assignment help online from a verified subject helper across ${SUBJECTS.length} subjects. Send your brief, agree a personalized proposal, and pay only after you approve — essay help, lab reports, citations, programming, data analysis and more.`;
 
 export const metadata: Metadata = {
   title: HERO_TITLE,
@@ -128,15 +123,6 @@ const HOMEPAGE_SUBJECTS = [
   "academic-writing",
 ] as const;
 
-type HomeHelper = {
-  id: string;
-  name: string;
-  avatar_url: string | null;
-  rating_avg: number;
-  subjects: string[];
-  bio: string | null;
-};
-
 type RawReview = {
   id: string;
   rating: number;
@@ -146,32 +132,14 @@ type RawReview = {
   created_at?: string | null;
 };
 
-type RawHelper = {
-  id: string;
-  name: string | null;
-  avatar_url: string | null;
-  helper_profiles:
-    | { rating_avg: number; bio: string | null; subjects: string[]; skills: string[] }
-    | { rating_avg: number; bio: string | null; subjects: string[]; skills: string[] }[]
-    | null;
-};
-
 export default async function HomePage() {
   const supabase = await createClient();
-  const [helpersResult, reviewsResult] = await Promise.all([
-    supabase
-      .from("users")
-      .select("id, name, avatar_url, helper_profiles(rating_avg, bio, subjects, skills)")
-      .eq("role", "helper")
-      .not("helper_profiles", "is", null)
-      .order("name", { ascending: true }),
-    supabase
-      .from("helper_reviews")
-      .select("id, rating, comment, created_at, student_name, student_avatar_url")
-      .not("comment", "is", null)
-      .order("created_at", { ascending: false })
-      .limit(8),
-  ]);
+  const reviewsResult = await supabase
+    .from("helper_reviews")
+    .select("id, rating, comment, created_at, student_name, student_avatar_url")
+    .not("comment", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(8);
 
   const seenReviews = new Set<string>();
   const realTestimonials: Testimonial[] = ((reviewsResult.data ?? []) as unknown as RawReview[])
@@ -204,34 +172,6 @@ export default async function HomePage() {
       ? testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length
       : 0;
 
-  // The same person can have more than one helper account, so collapse duplicate
-  // names to a single card — every helper shown has a distinct profile.
-  const seenNames = new Set<string>();
-  const helpers: HomeHelper[] = ((helpersResult.data ?? []) as unknown as RawHelper[])
-    .map((record): HomeHelper | null => {
-      const embedded = record.helper_profiles;
-      const profile = Array.isArray(embedded) ? embedded[0] : embedded;
-      const name = (record.name ?? "").trim();
-      if (!profile || !name) return null;
-      const key = name.toLowerCase();
-      if (seenNames.has(key)) return null;
-      seenNames.add(key);
-      return {
-        id: record.id,
-        name,
-        avatar_url: record.avatar_url,
-        rating_avg: profile.rating_avg ?? 0,
-        subjects: profile.subjects ?? [],
-        bio: profile.bio ?? null,
-      };
-    })
-    .filter((h): h is HomeHelper => h !== null)
-    .sort((a, b) => b.rating_avg - a.rating_avg || a.name.localeCompare(b.name));
-
-  // The homepage stays scannable: six highest-rated unique profiles, while the
-  // subject-coverage note below still reports every helper currently taking work.
-  const featuredHelpers = helpers.slice(0, 6);
-
   const homepageSubjects = HOMEPAGE_SUBJECTS.map((slug) => {
     const subject = SUBJECT_CONTENT.find((s) => s.slug === slug)!;
     return { ...subject, detail: HOMEPAGE_SUBJECT_DETAIL[slug] ?? "" };
@@ -262,11 +202,6 @@ export default async function HomePage() {
       })),
   ];
 
-  const coveredSubjects = SUBJECTS.filter((s) =>
-    helpers.some((h) => h.subjects.includes(s)),
-  );
-  const uncoveredSubjects = SUBJECTS.filter((s) => !coveredSubjects.includes(s));
-
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -285,7 +220,7 @@ export default async function HomePage() {
     description: HERO_DESCRIPTION,
     potentialAction: {
       "@type": "SearchAction",
-      target: `${SITE_URL}/browse-helpers?q={search_term_string}`,
+      target: `${SITE_URL}/requests/new?q={search_term_string}`,
       "query-input": "required name=search_term_string",
     },
   };
@@ -359,16 +294,16 @@ export default async function HomePage() {
                 Independent Peer Guidance
               </span>
               <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-on-surface leading-tight">
-                Find the Right{" "}
+                Get Help from a Verified{" "}
                 <span className="bg-gradient-to-r from-primary-container to-primary bg-clip-text text-transparent">
                   Assignment Helper
                 </span>
               </h1>
               <p className="text-lg text-on-surface-variant leading-relaxed max-w-xl">
-                Tell us what you&apos;re working on, browse relevant helpers, choose who you want to work with,
-                discuss your requirements, and receive a personalized proposal before you pay. Every helper is
-                verified in the subject they teach, every quote states the scope and price in writing, and you
-                keep the authorship of your own work.
+                Tell us what you&apos;re working on and we&apos;ll route it straight to our verified academic
+                helper. Discuss your requirements in the request chat, receive a personalized proposal before
+                you pay, and keep the authorship of your own work. Every quote states the scope and price in
+                writing.
               </p>
 
               {/* Trust Checkmarks */}
@@ -389,16 +324,9 @@ export default async function HomePage() {
 
               {/* Coverage Panel */}
               <div className="flex items-center gap-4 pt-1">
-                <div className="flex -space-x-2">
-                  {featuredHelpers.slice(0, 4).map((h) => (
-                    <Avatar
-                      key={h.id}
-                      name={h.name}
-                      src={h.avatar_url ?? undefined}
-                      className="border-2 border-white ring-2 ring-primary-container/40"
-                    />
-                  ))}
-                </div>
+                <span className="w-11 h-11 rounded-xl bg-primary-fixed flex items-center justify-center shrink-0">
+                  <MaterialIcon name="groups" size={22} className="text-primary" />
+                </span>
                 <div>
                   <p className="text-base font-semibold text-on-surface leading-relaxed">
                     Covering {SUBJECTS.length} subjects
@@ -581,163 +509,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Meet The Helpers */}
-      <section className="py-16 bg-section" aria-labelledby="helpers-heading">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
-            <div className="max-w-2xl">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">
-                <MaterialIcon name="groups" size={16} />
-                Our Helpers
-              </span>
-              <h2
-                id="helpers-heading"
-                className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-2"
-              >
-                Meet the helpers behind the work
-              </h2>
-              <p className="text-base text-on-surface-variant leading-relaxed">
-                Each helper lists the subjects and specialisms they cover, so you can pick someone who has
-                already handled work like yours. Ratings come from completed orders only.
-              </p>
-            </div>
-            <Link
-              href="/browse-helpers"
-              className="inline-flex items-center gap-2 shrink-0 px-5 py-2.5 text-sm font-semibold border border-outline-variant/50 bg-white rounded-xl text-primary hover:bg-primary-fixed transition-colors"
-            >
-              Browse all helpers
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          {helpers.length === 0 ? (
-            <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-6 sm:p-8 text-center">
-              <p className="text-base text-on-surface-variant leading-relaxed">
-                Helpers are being verified now. Send us your brief and we&apos;ll match you as soon as
-                your subject is covered.
-              </p>
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 text-sm font-medium bg-primary-container text-on-primary rounded-xl hover:bg-primary transition-colors"
-              >
-                Request a match
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          ) : (
-            <>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {featuredHelpers.map((helper) => {
-                  const focus = helperFocus(helper.subjects);
-                  const subjectTags = helper.subjects.filter((s) =>
-                    SUBJECT_PAGE_BY_NAME.has(s),
-                  );
-                  const skillTags = helper.subjects.filter((s) => !SUBJECT_PAGE_BY_NAME.has(s));
-                  return (
-                    <article
-                      key={helper.id}
-                      className={`group bg-white rounded-2xl p-5 border border-outline-variant/30 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col ${CARD}`}
-                    >
-                      <div className="flex items-start gap-3 mb-4">
-                        <Avatar name={helper.name} src={helper.avatar_url ?? undefined} size="lg" />
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <h3 className="font-display text-base font-bold text-on-surface truncate">
-                              {helper.name}
-                            </h3>
-                            <span title="Verified helper">
-                              <MaterialIcon name="verified" size={18} className={ICON} />
-                            </span>
-                          </div>
-                          <p className={`text-xs uppercase tracking-wide font-semibold ${LINK}`}>
-                            {focus.label}
-                          </p>
-                          <div className="flex items-center gap-1 mt-1">
-                            <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                            <span className="text-sm font-semibold text-on-surface">
-                              {helper.rating_avg > 0 ? helper.rating_avg.toFixed(1) : "New helper"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <p className="text-base text-on-surface-variant leading-relaxed line-clamp-4 mb-3">
-                        {helper.bio && helper.bio.trim().length > 0
-                          ? helper.bio
-                          : `${focus.label} support across ${helper.subjects
-                              .slice(0, 3)
-                              .join(", ")} — focused on ${focus.focus}.`}
-                      </p>
-
-                      <div className="flex flex-wrap gap-1.5 mb-1.5">
-                        {subjectTags.map((s) => (
-                          <Link
-                            key={s}
-                            href={SUBJECT_PAGE_BY_NAME.get(s) ?? "/subjects"}
-                            className="px-2.5 py-1 rounded-full bg-primary-fixed text-primary text-xs font-medium hover:opacity-80"
-                          >
-                            {s}
-                          </Link>
-                        ))}
-                        {skillTags.slice(0, 3).map((s) => (
-                          <span
-                            key={s}
-                            className="px-2.5 py-1 rounded-full bg-section text-on-surface-variant text-xs font-medium"
-                          >
-                            {s}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="mt-auto pt-4 flex gap-2.5">
-                        <Link
-                          href={`/helpers/${helper.id}`}
-                          className="flex-1 text-center px-3 py-2.5 text-sm font-medium border border-outline-variant rounded-xl text-on-surface hover:bg-surface-container-low transition-colors"
-                        >
-                          View Profile
-                        </Link>
-                        <Link
-                          href={`/contact?helper=${helper.id}`}
-                          className="flex-1 text-center px-3 py-2.5 text-sm font-semibold text-white rounded-xl bg-primary hover:bg-primary-container transition-colors"
-                        >
-                          Request Help
-                        </Link>
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-
-              <div className="mt-6 bg-primary-fixed/50 rounded-2xl border border-outline-variant/50 p-5">
-                <div className="flex flex-col lg:flex-row lg:items-center gap-3">
-                  <p className="text-base text-on-surface-variant">
-                    <span className="font-semibold text-on-surface">Subjects with helpers live today:</span>{" "}
-                    {coveredSubjects.join(", ") || "publishing shortly"}.
-                    {uncoveredSubjects.length > 0 && (
-                      <>
-                        {" "}
-                        Working in {uncoveredSubjects.join(" or ")}?{" "}
-                        <Link href="/contact" className="font-semibold text-primary hover:underline">
-                          Send your brief
-                        </Link>{" "}
-                        and we&apos;ll match you.
-                      </>
-                    )}
-                  </p>
-                  <Link
-                    href="/subjects"
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline shrink-0"
-                  >
-                    See every subject we cover
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </section>
-
       {/* Why Students Choose Us */}
       <section className="py-16 bg-white" aria-labelledby="why-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -844,8 +615,7 @@ export default async function HomePage() {
               </h2>
               <p className="text-base text-on-surface-variant leading-relaxed">
                 From literature and history through mathematics, physics, computer science, engineering and
-                nursing. Open a subject to see the topics covered, the help types available and the helpers
-                who take that work.
+                nursing. Open a subject to see the topics covered and the help types available.
               </p>
             </div>
             <Link
@@ -1034,16 +804,16 @@ export default async function HomePage() {
               Ready to get help with your next assignment?
             </h2>
             <p className="on-band-muted mb-7 max-w-2xl mx-auto leading-relaxed text-base">
-              Work one-on-one with verified peer helpers across {SUBJECTS.length} subjects and{" "}
-              {HOME_SERVICE_COUNT} types of assignment help. You choose the helper, agree the scope and price
+              Work one-on-one with a verified subject helper across {SUBJECTS.length} subjects and{" "}
+              {HOME_SERVICE_COUNT} types of assignment help. Send your brief, agree the scope and price
               in writing, and only pay once it looks right.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
-                href="/browse-helpers"
+                href="/requests/new"
                 className="px-7 py-3 bg-white text-ink-900 rounded-xl font-semibold text-sm hover:bg-primary-fixed transition-colors shadow-lg shadow-ink-900/40 inline-flex items-center gap-2"
               >
-                Browse Helpers
+                Request Help
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link

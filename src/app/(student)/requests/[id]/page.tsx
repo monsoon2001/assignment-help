@@ -12,13 +12,10 @@ export const metadata: Metadata = {
 
 export default async function StudentRequestDetailPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ resend?: string }>;
 }) {
   const { id } = await params;
-  const sp = await searchParams;
 
   const supabase = await createClient();
   const {
@@ -58,5 +55,5 @@ export default async function StudentRequestDetailPage({
     return <OrderWorkspace orderId={orderId} />;
   }
 
-  return <RequestWorkspace requestId={id} mode="student" initialResend={sp.resend === "1"} />;
+  return <RequestWorkspace requestId={id} mode="student" />;
 }

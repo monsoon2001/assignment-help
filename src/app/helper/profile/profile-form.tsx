@@ -60,14 +60,14 @@ export default function HelperProfile({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold text-on-surface">Profile Settings</h1>
-          <p className="text-on-surface-variant mt-1">Manage what students see on your public helper profile.</p>
+          <p className="text-on-surface-variant mt-1">Manage your helper profile and the subjects you cover.</p>
         </div>
       </div>
 
       <form action={formAction} className="space-y-6">
         <Card className="p-6 space-y-6">
           <div className="flex items-center gap-4 pb-5 border-b border-outline-variant">
-            <Avatar name={name || firstName || "Acadivo Helper"} size="lg" src={avatarUrl ?? undefined} />
+            <Avatar name={name || firstName || "Acadivo Helper"} role="helper" size="lg" src={avatarUrl ?? undefined} />
             <div>
               <h2 className="font-display text-lg font-semibold text-on-surface">{name || `${firstName} ${lastName}` || "Acadivo Helper"}</h2>
               <StarRating rating={rating} reviewCount={reviewCount} />

@@ -104,7 +104,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
         <Card className="p-6">
           <h2 className="font-display text-lg font-semibold text-on-surface mb-4">Helper</h2>
           <div className="flex items-center gap-3">
-            <Avatar name={helper?.name ?? "Helper"} size="md" />
+            <Avatar name={helper?.name ?? "Helper"} role="helper" size="md" />
             <div className="min-w-0">
               <p className="text-sm font-medium text-on-surface truncate">{helper?.name ?? "Unnamed"}</p>
               <p className="text-xs text-on-surface-variant truncate flex items-center gap-1">

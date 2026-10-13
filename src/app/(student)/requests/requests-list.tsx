@@ -301,7 +301,7 @@ export default function RequestsList({
           <div>
             <h3 className="font-semibold text-on-surface">No requests yet</h3>
             <p className="text-sm text-on-surface-variant mt-1">
-              Submit your first help request and choose the helper right for you.
+              Submit your first help request and our verified helper will take it from there.
             </p>
           </div>
           <Link href="/requests/new">

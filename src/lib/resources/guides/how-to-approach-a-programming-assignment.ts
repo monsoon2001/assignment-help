@@ -191,8 +191,8 @@ const guide: Resource = {
   ],
   service: {
     title: "Stuck on an assignment?",
-    body: "Find a helper to work through the problem, your approach, and your testing strategy.",
-    cta: "Find a Programming Helper",
+    body: "Send your brief and our verified helper can work through the problem, your approach, and your testing strategy.",
+    cta: "Request Programming Help",
     href: "/services/programming-help",
   },
 };

@@ -157,9 +157,9 @@ const guide: Resource = {
   ],
   service: {
     title: "Drafting an application?",
-    body: "Find a helper to review your statement for specificity, structure, and whether it answers the prompt.",
-    cta: "Find a Personal Statement Helper",
-    href: "/browse-helpers",
+    body: "Send your brief and our verified helper can review your statement for specificity, structure, and whether it answers the prompt.",
+    cta: "Request Personal Statement Help",
+    href: "/requests/new",
   },
 };
 

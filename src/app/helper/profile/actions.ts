@@ -57,7 +57,5 @@ export async function saveHelperProfile(
   }
 
   revalidatePath("/helper/profile");
-  revalidatePath(`/helpers/${user.id}`);
-  revalidatePath("/browse-helpers");
   return { ok: true, message: "Profile saved." };
 }

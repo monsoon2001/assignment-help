@@ -50,7 +50,7 @@ export default async function OrderPaymentPage({
   const order = {
     id: orderRow.id,
     price: Number(orderRow.price),
-    currency: typeof orderRow.currency === "string" ? orderRow.currency : "USD",
+    currency: "CAD",
     status: orderRow.status,
     deadline: orderRow.deadline as string | null,
     title: request?.title ?? "Acadivo Order",
@@ -103,7 +103,7 @@ export default async function OrderPaymentPage({
         </div>
 
         <div className="flex items-center gap-3">
-          <Avatar name={order.helperName} size="md" online />
+          <Avatar name={order.helperName} role="helper" size="md" online />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
               <p className="font-semibold text-on-surface truncate">{order.helperName}</p>
@@ -136,13 +136,16 @@ export default async function OrderPaymentPage({
           baseCurrency={order.currency}
           country={order.country}
           title={order.title}
+          helperName={order.helperName}
         />
 
         <div className="flex items-start gap-2 p-3.5 rounded-xl bg-surface-container-low">
           <School size={16} className="text-primary shrink-0 mt-0.5" />
           <p className="text-xs leading-relaxed text-on-surface-variant">
-            Your payment confirms an order with <span className="font-semibold text-on-surface">{order.helperName}</span>.
-            Funds are released only after you review and approve the finalized draft.
+            Your payment is taken now, when you accept the quote, and confirms an order with{" "}
+            <span className="font-semibold text-on-surface">{order.helperName}</span>. If the
+            delivered work doesn&apos;t match the agreed scope, you can request revisions, or a
+            refund under our Refund Policy.
           </p>
         </div>
       </Card>

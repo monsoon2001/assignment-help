@@ -363,7 +363,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                 <span className="hidden 2xl:block text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
                   {firstName}
                 </span>
-                <Avatar name={userName ?? "User"} src={avatarUrl ?? undefined} size="md" online className="cursor-pointer" />
+                <Avatar name={userName ?? "User"} src={avatarUrl ?? undefined} role={role} size="md" online className="cursor-pointer" />
               </Link>
               <Button
                 variant="ghost"

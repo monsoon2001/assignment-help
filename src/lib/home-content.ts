@@ -15,7 +15,7 @@ export const STEPS: Step[] = [
     num: "1",
     icon: "edit_note",
     title: "Describe your assignment",
-    desc: "Share exactly what you need so helpers can judge the right fit.",
+    desc: "Share exactly what you need so your helper can judge the right fit.",
     points: [
       "Pick subject, help type and academic level",
       "Add deadline and expected length",
@@ -25,12 +25,12 @@ export const STEPS: Step[] = [
   {
     num: "2",
     icon: "group_add",
-    title: "Choose a helper",
-    desc: "Compare verified helpers who cover your subject.",
+    title: "Get matched with a helper",
+    desc: "Your brief goes straight to our verified subject helper.",
     points: [
-      "Check ratings, subjects and specialisms",
-      "Review their written proposals",
-      "Pick the one that fits your budget and timeline",
+      "One verified helper for your subject",
+      "Review their written proposal",
+      "Approve the scope and timeline",
     ],
   },
   {
@@ -68,14 +68,14 @@ export const BENEFITS: Benefit[] = [
   {
     icon: "request_quote",
     title: "You see the price before you pay",
-    desc: "Helpers quote the scope, timeline and cost up front, so you can compare like for like instead of discovering a surprise invoice later.",
+    desc: "Your helper quotes the scope, timeline and cost up front, so you see the full cost before you commit instead of discovering a surprise invoice later.",
     points: ["Fixed quote per request", "No bidding wars", "Re-quote if the brief changes"],
   },
   {
     icon: "verified_user",
     title: "Vetted subject helpers",
-    desc: "Every helper is reviewed before they can receive requests, and profiles show the subjects and help types they actually cover.",
-    points: ["Credential and identity checks", "Subject specialisms listed", "Ratings from completed orders only"],
+    desc: "Every helper is reviewed before they can receive requests, and they specialise in the subjects and help types they actually cover.",
+    points: ["Credential and identity checks", "Subject specialisms", "Ratings from completed orders only"],
   },
   {
     icon: "menu_book",
@@ -148,7 +148,7 @@ export type Faq = { q: string; a: string };
 export const HOME_FAQS: Faq[] = [
   {
     q: "What is Acadivo and how is it different from a writing service?",
-    a: `Acadivo is an assignment help marketplace where students choose a verified helper for guidance, feedback and tutoring. Helpers are not ghostwriters: they explain, review and coach, and you stay the author of the work. You choose the helper, agree the scope in a proposal and pay only after you approve it.`,
+    a: `Acadivo is an assignment help service where your request goes to a verified helper for guidance, feedback and tutoring. Helpers are not ghostwriters: they explain, review and coach, and you stay the author of the work. You agree the scope in a proposal and pay only after you approve it.`,
   },
   {
     q: `How many subjects and types of assignment help do you cover?`,
@@ -167,8 +167,8 @@ export const HOME_FAQS: Faq[] = [
     a: "Yes. Revisions are unlimited within the agreed scope, at no extra cost and with no deadline. Work that falls outside the original scope is quoted separately before it starts.",
   },
   {
-    q: "How do I choose a helper?",
-    a: `Browse matched helpers and compare their subjects, specialisms, ratings and bios. Message them with your brief before you commit. Every helper profile lists what they cover, so you can pick someone for your subject and help type.`,
+    q: "Who works on my request?",
+    a: "Your request goes straight to our verified academic helper, who reviews your brief and responds with a personalized proposal. You discuss the scope in the request chat before you commit, so nothing starts without your approval.",
   },
   {
     q: "Is it allowed to use Acadivo for my assignment?",
@@ -179,31 +179,6 @@ export const HOME_FAQS: Faq[] = [
     a: "Ask for revisions first — helpers are expected to keep working until the agreed scope is met. If that does not resolve it, our academic integrity team mediates between you and the helper.",
   },
 ];
-
-const SUBJECT_HINTS: { match: RegExp; label: string; focus: string }[] = [
-  { match: /nursing|anatomy|physiology|biomedical|clinical/i, label: "Clinical & biomedical", focus: "care plans, clinical write-ups, referencing and APA or Harvard style" },
-  { match: /computer|python|java|sql|algorithm|data structure|program/i, label: "Programming", focus: "debugging, algorithms, database queries and project walkthroughs" },
-  { match: /math|calculus|algebra|statistic|probability|quantitative/i, label: "Quantitative", focus: "derivations, problem sets, hypothesis testing and result interpretation" },
-  { match: /physics|mechanics|thermo|electro|quantum|chemistry|organic|inorganic|engineering/i, label: "Physical sciences", focus: "methodology, lab write-ups, modelling assumptions and technical explanations" },
-  { match: /psycholog|cognitive|clinical|developmental/i, label: "Psychology", focus: "study design, ethics applications, results interpretation and referencing" },
-  { match: /literature|poetry|prose|essay|academic writing|citation|proofread|editing/i, label: "Writing & analysis", focus: "close reading, argument structure, citations and revision strategy" },
-  { match: /history|philosophy|politic|sociolog|ethic/i, label: "Humanities & social science", focus: "source analysis, competing arguments and evidence-based essays" },
-  { match: /business|econom|management|market|finance/i, label: "Business & economics", focus: "applied analysis, frameworks, data and structured recommendations" },
-];
-
-export type HelperFocus = { label: string; focus: string };
-
-// Derives a distinct specialty line per helper from the subjects they actually
-// list, so every card reads differently without inventing new credentials.
-export function helperFocus(subjects: string[]): HelperFocus {
-  const haystack = subjects.join(" ");
-  const hit = SUBJECT_HINTS.find((h) => h.match.test(haystack));
-  const fallback: HelperFocus = {
-    label: "Assignment support",
-    focus: "structured guidance, clear feedback and on-time delivery",
-  };
-  return hit ?? fallback;
-}
 
 // A second line of homepage-only detail for the subject cards, keyed by the
 // subject page slug. The shorter `cardDesc` from subject-content.ts still leads.

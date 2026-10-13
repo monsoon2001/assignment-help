@@ -1,7 +1,33 @@
 import { createClient } from "@/lib/supabase/server";
 import { roleToHome } from "@/lib/auth";
+import { getIpCountry } from "@/lib/geo.server";
 import { AUTH_AT_COOKIE, authAtCookieOptions } from "@/lib/session-timebox";
 import { NextResponse } from "next/server";
+
+/**
+ * Best-effort: record the country the account first signed up from so we can
+ * later show an approximate display currency. Only fills a missing value, so a
+ * user-edited country is never overwritten. Display-only; the charge is CAD.
+ */
+async function captureSignupCountry(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+) {
+  try {
+    const country = await getIpCountry();
+    if (!country) return;
+    const { data } = await supabase
+      .from("users")
+      .select("country")
+      .eq("id", userId)
+      .maybeSingle();
+    if (!data?.country) {
+      await supabase.from("users").update({ country }).eq("id", userId);
+    }
+  } catch {
+    // Never block sign-in on geolocation.
+  }
+}
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -40,6 +66,8 @@ export async function GET(request: Request) {
   if (!user) {
     return NextResponse.redirect(new URL("/sign-in?error=no_user", url.origin));
   }
+
+  await captureSignupCountry(supabase, user.id);
 
   const emailVerified = (user as any).email_confirmed_at;
   const wasJustConfirmed =

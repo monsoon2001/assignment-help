@@ -8,11 +8,10 @@ const TONE = PAGE_TONES.blue;
 
 const STEPS = [
   { num: "1", title: "Tell us what you're working on", desc: "Share your assignment topic, details, and requirements." },
-  { num: "2", title: "Browse relevant helpers", desc: "See helpers relevant to your subject and topic." },
-  { num: "3", title: "Choose who you want to work with", desc: "Pick a specific helper based on their expertise and track record." },
-  { num: "4", title: "Discuss your requirements", desc: "Chat to clarify scope, deadline, and expectations before paying." },
-  { num: "5", title: "Get a personalized proposal", desc: "Receive a clear quote with scope and delivery details." },
-  { num: "6", title: "Pay and manage your order", desc: "Pay only after accepting, then track everything in one workspace." },
+  { num: "2", title: "Get matched with a helper", desc: "Your brief goes straight to our verified academic helper." },
+  { num: "3", title: "Discuss your requirements", desc: "Chat to clarify scope, deadline, and expectations before paying." },
+  { num: "4", title: "Get a personalized proposal", desc: "Receive a clear quote with scope and delivery details." },
+  { num: "5", title: "Pay and manage your order", desc: "Pay only after accepting, then track everything in one workspace." },
 ];
 
 export default function SubjectDetail({ subject }: { subject: SubjectContent }) {
@@ -31,7 +30,7 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
       <div className="bg-white border-b border-outline-variant/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-7">
           <div className="flex flex-col sm:flex-row gap-3 text-sm text-on-surface-variant mb-6">
-            {["Choose a specific helper", "Discuss before you pay", "Personalized proposal"].map((item) => (
+            {["Verified subject helper", "Discuss before you pay", "Personalized proposal"].map((item) => (
               <span key={item} className="inline-flex items-center gap-2 bg-white rounded-full px-3.5 py-1.5 ring-1 ring-primary-container/40">
                 <CheckCircle className="w-4 h-4 text-primary shrink-0" />
                 {item}
@@ -41,10 +40,10 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
 
           <div className="flex flex-wrap gap-4">
             <Link
-              href={`/browse-helpers?subject=${encodeURIComponent(subject.name)}`}
+              href="/requests/new"
               className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-container text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-primary-container/30"
             >
-              Find {subject.name} Helpers
+              Request {subject.name} Help
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
@@ -72,7 +71,7 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
               return (
               <Link
                 key={t.title}
-                href={`/browse-helpers?subject=${encodeURIComponent(subject.name)}`}
+                href="/requests/new"
                 className={`relative overflow-hidden bg-white rounded-2xl p-5 pt-6 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}
               >
                 <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${tone.hairline}`} aria-hidden="true" />
@@ -90,8 +89,8 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
           <div className="text-center mb-10">
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-on-surface mb-4">How Acadivo Works</h2>
             <p className="text-on-surface-variant max-w-3xl mx-auto">
-              Choose a specific helper, communicate before paying, receive a personalized proposal, and manage
-              your order in one workspace.
+              Send your brief to our verified helper, communicate before paying, receive a personalized
+              proposal, and manage your order in one workspace.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -134,11 +133,11 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
 
       <CtaBand
         eyebrow="school"
-        title={`Ready to find your ${subject.name} helper?`}
-        body="Browse relevant helpers, ask questions, and receive a personalized proposal before you pay."
+        title={`Ready to get ${subject.name} help?`}
+        body="Send your brief, ask questions, and receive a personalized proposal before you pay."
         primary={{
-          label: `Find ${subject.name} Helpers`,
-          href: `/browse-helpers?subject=${encodeURIComponent(subject.name)}`,
+          label: `Request ${subject.name} Help`,
+          href: "/requests/new",
         }}
         secondary={{ label: "Read free guides", href: "/resources" }}
       />

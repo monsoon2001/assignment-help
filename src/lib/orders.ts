@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
 import { unwrapRow } from "@/lib/embedded";
-import { defaultCurrencyForCountry } from "@/lib/currency";
 
 export interface ProposalForAccept {
   proposal_id: string;
@@ -53,10 +52,9 @@ export async function acceptProposal(
     return { error: "This request has already been resolved." };
   }
 
-  // The order is quoted in the currency the helper priced their proposal in, so
-  // the amount the student sees always matches what the checkout route charges.
-  // The student's country is only a fallback for proposals with no currency.
-  const orderCurrency = proposal.currency ?? defaultCurrencyForCountry(request.country);
+  // The platform charges in a single currency. Orders are always created in CAD
+  // so the amount the student sees always matches what checkout charges.
+  const orderCurrency = "CAD";
 
   const { data: order, error: insertError } = await supabase
     .from("orders")

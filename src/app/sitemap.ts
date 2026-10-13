@@ -8,7 +8,6 @@ const BASE_URL = "https://acadivo.com";
 const STATIC_ROUTES = [
   "",
   "/about",
-  "/browse-helpers",
   "/contact",
   "/faq",
   "/how-it-works",
@@ -46,7 +45,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return allRoutes.map((route) => ({
     url: `${BASE_URL}${route}`,
     lastModified,
-    changeFrequency: route === "" || route === "/browse-helpers" ? ("daily" as const) : ("weekly" as const),
+    changeFrequency: route === "" ? ("daily" as const) : ("weekly" as const),
     priority: route === ""
       ? 1
       : route === "/resources"

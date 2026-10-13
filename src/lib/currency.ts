@@ -1,80 +1,55 @@
-export const SUPPORTED_CURRENCIES = ["USD", "AUD", "CAD", "GBP", "NZD"] as const;
+// Acadivo charges in a single currency: Canadian dollars (CAD). All proposal
+// prices, estimates and order amounts are quoted and charged in CAD. There is
+// no multicurrency presentment, conversion or Adaptive Pricing.
 
-// Acadivo's platform fee, deducted from the helper's share of an order.
-// The student always pays the agreed price; the helper receives (1 - fee) of it.
-export const PLATFORM_FEE_RATE = 0.2;
+export const SUPPORTED_CURRENCIES = ["CAD"] as const;
 
 export type CurrencyCode = (typeof SUPPORTED_CURRENCIES)[number];
 
 export const CURRENCY_LABELS: Record<CurrencyCode, string> = {
-  USD: "USD — US Dollar ($)",
-  AUD: "AUD — Australian Dollar (A$)",
   CAD: "CAD — Canadian Dollar (C$)",
-  GBP: "GBP — British Pound (£)",
-  NZD: "NZD — New Zealand Dollar (NZ$)",
 };
 
 export const CURRENCY_FLAGS: Record<CurrencyCode, string> = {
-  USD: "🇺🇸",
-  AUD: "🇦🇺",
   CAD: "🇨🇦",
-  GBP: "🇬🇧",
-  NZD: "🇳🇿",
 };
 
 const CURRENCY_SYMBOLS: Record<CurrencyCode, string> = {
-  USD: "$",
-  AUD: "A$",
   CAD: "C$",
-  GBP: "£",
-  NZD: "NZ$",
-};
-
-// Approximate units per 1 USD (static snapshot). Used to convert a helper's
-// quoted price into the currency the student chooses to pay with.
-const UNITS_PER_USD: Record<CurrencyCode, number> = {
-  USD: 1,
-  AUD: 1.52,
-  CAD: 1.36,
-  GBP: 0.79,
-  NZD: 1.64,
 };
 
 export function isSupportedCurrency(value: unknown): value is CurrencyCode {
   return typeof value === "string" && (SUPPORTED_CURRENCIES as readonly string[]).includes(value);
 }
 
-export function convertCurrency(
-  amount: number,
-  from: CurrencyCode,
-  to: CurrencyCode
-): number {
-  if (from === to) return amount;
-  const usd = amount / UNITS_PER_USD[from];
-  return usd * UNITS_PER_USD[to];
+/** Amounts are always CAD, so this is an identity function kept for call sites. */
+export function convertCurrency(amount: number, _from?: string, _to?: string): number {
+  void _from;
+  void _to;
+  return amount;
 }
 
-export function formatCurrency(
-  amount: number,
-  currency: CurrencyCode = "USD"
-): string {
-  return amount.toLocaleString("en-US", {
+export function formatCurrency(amount: number, _currency?: string): string {
+  void _currency;
+  return new Intl.NumberFormat("en-CA", {
     style: "currency",
-    currency,
+    currency: "CAD",
     minimumFractionDigits: 2,
-  });
+  }).format(amount);
 }
 
-export function currencySymbol(currency: CurrencyCode): string {
-  return CURRENCY_SYMBOLS[currency];
+export function currencySymbol(_currency?: string): string {
+  void _currency;
+  return CURRENCY_SYMBOLS.CAD;
 }
 
-export function normalizeCurrency(value: string | null | undefined): CurrencyCode {
-  return isSupportedCurrency(value ?? "") ? (value as CurrencyCode) : "USD";
+export function normalizeCurrency(_value?: string | null): CurrencyCode {
+  void _value;
+  return "CAD";
 }
 
-// Countries offered in the request form. Anything not listed here (the
-// "Other" option, or a country we have not onboarded) falls back to USD.
+// Countries offered in the request form. Kept for the request form UI; they no
+// longer affect the payment currency.
 export const OTHER_COUNTRY = "Other";
 
 export const COUNTRIES = [
@@ -88,25 +63,215 @@ export const COUNTRIES = [
 
 export type CountryName = (typeof COUNTRIES)[number];
 
-/** Used whenever a country is needed but the student never picked one. */
 export const DEFAULT_COUNTRY = "United States";
-
-/** Default payment currency for a student's chosen country. */
-export const COUNTRY_CURRENCY: Record<string, CurrencyCode> = {
-  Australia: "AUD",
-  Canada: "CAD",
-  "New Zealand": "NZD",
-  "United Kingdom": "GBP",
-  "United States": "USD",
-};
 
 export function isKnownCountry(value: string | null | undefined): value is CountryName {
   return (COUNTRIES as readonly string[]).includes(value ?? "");
 }
 
-export function defaultCurrencyForCountry(
-  country: string | null | undefined
-): CurrencyCode {
-  if (!country) return "USD";
-  return COUNTRY_CURRENCY[country] ?? "USD";
+export function defaultCurrencyForCountry(_country?: string | null): CurrencyCode {
+  void _country;
+  return "CAD";
+}
+
+// ============================================================================
+// Approximate display currencies.
+//
+// The platform always *charges* CAD. A student may additionally see an
+// approximate equivalent in their own currency under each quote. These are the
+// only currencies we can render, and they are display-only — they never affect
+// the amount charged, the Pay button label or the Stripe receipt.
+// ============================================================================
+
+export const DISPLAY_CURRENCIES = ["CAD", "GBP", "AUD", "USD", "NZD", "EUR"] as const;
+
+export type DisplayCurrency = (typeof DISPLAY_CURRENCIES)[number];
+
+export const DEFAULT_DISPLAY_CURRENCY: DisplayCurrency = "CAD";
+
+/** The non-CAD currencies a quote can be approximated in. */
+export type ForeignDisplayCurrency = Exclude<DisplayCurrency, "CAD">;
+
+/** CAD-based rates (value of 1 CAD in each foreign currency). */
+export type DisplayRates = Partial<Record<ForeignDisplayCurrency, number>>;
+
+export const DISPLAY_CURRENCY_LABELS: Record<DisplayCurrency, string> = {
+  CAD: "CAD — Canadian Dollar",
+  GBP: "GBP — British Pound",
+  AUD: "AUD — Australian Dollar",
+  USD: "USD — US Dollar",
+  NZD: "NZD — New Zealand Dollar",
+  EUR: "EUR — Euro",
+};
+
+export const DISPLAY_CURRENCY_SYMBOLS: Record<DisplayCurrency, string> = {
+  CAD: "C$",
+  GBP: "£",
+  AUD: "A$",
+  USD: "US$",
+  NZD: "NZ$",
+  EUR: "€",
+};
+
+export function isDisplayCurrency(value: unknown): value is DisplayCurrency {
+  return (
+    typeof value === "string" &&
+    (DISPLAY_CURRENCIES as readonly string[]).includes(value)
+  );
+}
+
+export function normalizeDisplayCurrency(value: unknown): DisplayCurrency {
+  return isDisplayCurrency(value) ? value : DEFAULT_DISPLAY_CURRENCY;
+}
+
+// ISO 3166-1 alpha-2 country -> display currency. Only countries whose national
+// currency is one of the six display currencies are mapped; everything else
+// falls back to CAD. Extend this map (and COUNTRY_NAMES) to widen coverage.
+const COUNTRY_CURRENCY: Record<string, DisplayCurrency> = {
+  // Canadian dollar
+  CA: "CAD",
+  // US dollar (incl. countries that use it as legal tender)
+  US: "USD",
+  EC: "USD",
+  SV: "USD",
+  PA: "USD",
+  PR: "USD",
+  TL: "USD",
+  ZW: "USD",
+  // Pound sterling
+  GB: "GBP",
+  // Australian dollar
+  AU: "AUD",
+  // New Zealand dollar
+  NZ: "NZD",
+  // Euro
+  AD: "EUR",
+  AT: "EUR",
+  BE: "EUR",
+  CY: "EUR",
+  DE: "EUR",
+  EE: "EUR",
+  ES: "EUR",
+  FI: "EUR",
+  FR: "EUR",
+  GR: "EUR",
+  HR: "EUR",
+  IE: "EUR",
+  IT: "EUR",
+  LT: "EUR",
+  LU: "EUR",
+  LV: "EUR",
+  MC: "EUR",
+  ME: "EUR",
+  MT: "EUR",
+  NL: "EUR",
+  PT: "EUR",
+  SI: "EUR",
+  SK: "EUR",
+  SM: "EUR",
+  VA: "EUR",
+  XK: "EUR",
+};
+
+const COUNTRY_NAMES: Record<string, string> = {
+  CA: "Canada",
+  US: "United States",
+  EC: "Ecuador",
+  SV: "El Salvador",
+  PA: "Panama",
+  PR: "Puerto Rico",
+  TL: "Timor-Leste",
+  ZW: "Zimbabwe",
+  GB: "United Kingdom",
+  AU: "Australia",
+  NZ: "New Zealand",
+  AD: "Andorra",
+  AT: "Austria",
+  BE: "Belgium",
+  CY: "Cyprus",
+  DE: "Germany",
+  EE: "Estonia",
+  ES: "Spain",
+  FI: "Finland",
+  FR: "France",
+  GR: "Greece",
+  HR: "Croatia",
+  IE: "Ireland",
+  IT: "Italy",
+  LT: "Lithuania",
+  LU: "Luxembourg",
+  LV: "Latvia",
+  MC: "Monaco",
+  ME: "Montenegro",
+  MT: "Malta",
+  NL: "Netherlands",
+  PT: "Portugal",
+  SI: "Slovenia",
+  SK: "Slovakia",
+  SM: "San Marino",
+  VA: "Vatican City",
+  XK: "Kosovo",
+};
+
+const COUNTRY_NAME_ALIASES: Record<string, string> = {
+  "united states of america": "US",
+  usa: "US",
+  "u.s.a.": "US",
+  "united kingdom": "GB",
+  uk: "GB",
+  "great britain": "GB",
+  england: "GB",
+};
+
+/**
+ * Resolve a country (ISO alpha-2 code or English name) to a known ISO code that
+ * maps to a display currency. Returns null for unknown/unmapped countries.
+ */
+export function isoForCountry(country?: string | null): string | null {
+  if (!country) return null;
+  const raw = country.trim();
+  if (!raw) return null;
+  if (/^[a-zA-Z]{2}$/.test(raw)) {
+    const code = raw.toUpperCase();
+    return COUNTRY_CURRENCY[code] ? code : null;
+  }
+  const lower = raw.toLowerCase();
+  const alias = COUNTRY_NAME_ALIASES[lower];
+  if (alias) return alias;
+  const found = Object.entries(COUNTRY_NAMES).find(([, name]) => name.toLowerCase() === lower);
+  return found ? found[0] : null;
+}
+
+/**
+ * Map a country to one of the display currencies. Returns null when the country
+ * is unknown or has no supported display currency (callers default to CAD).
+ */
+export function currencyForCountry(country?: string | null): DisplayCurrency | null {
+  const iso = isoForCountry(country);
+  return iso ? COUNTRY_CURRENCY[iso] ?? null : null;
+}
+
+/** Selectable countries for the profile, derived from the currency map. */
+export const COUNTRY_OPTIONS: { code: string; name: string; currency: DisplayCurrency }[] =
+  Object.entries(COUNTRY_CURRENCY)
+    .map(([code, currency]) => ({ code, name: COUNTRY_NAMES[code] ?? code, currency }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+export function countryNameFor(code?: string | null): string | null {
+  if (!code) return null;
+  return COUNTRY_NAMES[code.trim().toUpperCase()] ?? null;
+}
+
+/** Format an approximate foreign amount (never used for the charged CAD value). */
+export function formatApproxCurrency(amount: number, currency: DisplayCurrency): string {
+  const safe = Number.isFinite(amount) ? amount : 0;
+  try {
+    return new Intl.NumberFormat("en-CA", {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 2,
+    }).format(safe);
+  } catch {
+    return `${DISPLAY_CURRENCY_SYMBOLS[currency]}${safe.toFixed(2)}`;
+  }
 }

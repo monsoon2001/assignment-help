@@ -19,6 +19,7 @@ import { createClient } from "@/lib/supabase/client";
 import { realtimeTopic } from "@/lib/supabase/realtime";
 import { uploadOrderFile } from "@/lib/order-files";
 import { normalizeCurrency, formatCurrency } from "@/lib/currency";
+import { ApproxPrice } from "@/components/currency/currency-display";
 import { orderStatusMeta, paymentStatusVariant } from "@/lib/status-meta";
 import { markThreadNotificationsRead } from "@/lib/notifications";
 import ChatPanel, { type ChatMessageRow, timeLabel, fileNameFromUrl } from "@/components/chat/chat-panel";
@@ -574,6 +575,9 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                     : "Flexible"}
                 </span>
               </div>
+              {isStudent && (
+                <ApproxPrice amountCad={Number(order.price)} withSelector className="mt-3" />
+              )}
             </Card>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -606,6 +610,12 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                   </span>
                 )}
               </div>
+              {isStudent && (
+                <ApproxPrice
+                  amountCad={Number(payment?.amount ?? order.price)}
+                  className="mt-2"
+                />
+              )}
               {payment?.status === "paid" && payment.receipt_url ? (
                 <a
                   href={payment.receipt_url}
@@ -618,7 +628,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
               ) : (
                 <p className="text-xs text-on-surface-variant mt-3 leading-relaxed">
                   {isHelper
-                    ? "Payment is secured by Acadivo and releases to you after the student reviews the delivery. The student's paid receipt is shown here once confirmed."
+                    ? "The student's payment is collected by Acadivo and shown here once confirmed. Payouts are settled manually by the Acadivo team."
                     : "Complete payment to start your order."}
                 </p>
               )}
@@ -626,7 +636,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
 
             <Card className="p-4">
               <div className="flex items-center gap-3 mb-2">
-                <Avatar name={logoName} size="md" online />
+                <Avatar name={logoName} role="helper" size="md" online />
                 <div className="min-w-0 flex-1">
                   <p className="font-display font-semibold text-on-surface">{order.helper?.name ?? "Acadivo Helper"}</p>
                   <p className="text-xs text-on-surface-variant truncate">Assigned mentor</p>

@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Receipt } from "lucide-react";
-import { formatCurrency, normalizeCurrency, convertCurrency, type CurrencyCode } from "@/lib/currency";
+import { formatCurrency } from "@/lib/currency";
 import { ErrorState, PanelEmpty } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +24,7 @@ type PaymentRow = {
   created_at: string;
   receipt_url: string | null;
   request_title: string | null;
+  helper_payout_status: string | null;
 };
 
 function monthLabel(iso: string): string {
@@ -45,7 +46,7 @@ export default async function HelperEarnings() {
 
   const { data: payments, error } = await supabase
     .from("helper_payments")
-    .select("id, amount, currency, status, created_at, receipt_url, request_title")
+    .select("id, amount, currency, status, created_at, receipt_url, request_title, helper_payout_status")
     .eq("status", "paid")
     .order("created_at", { ascending: false });
 
@@ -57,48 +58,32 @@ export default async function HelperEarnings() {
     .eq("helper_id", user.id)
     .eq("status", "completed");
 
-  const totalByCurrency = new Map<CurrencyCode, number>();
-  const monthByCurrency = new Map<CurrencyCode, number>();
-  let monthTotalUsd = 0;
+  // Everything is CAD, so totals are a straight sum of the helper's share.
+  let totalEarned = 0;
+  let monthTotal = 0;
   for (const p of rows) {
-    const c = normalizeCurrency(p.currency);
     const amount = Number(p.amount);
-    totalByCurrency.set(c, (totalByCurrency.get(c) ?? 0) + amount);
+    totalEarned += amount;
     if (new Date(p.created_at).getTime() >= monthStart.getTime()) {
-      monthByCurrency.set(c, (monthByCurrency.get(c) ?? 0) + amount);
-      monthTotalUsd += convertCurrency(amount, c, "USD");
+      monthTotal += amount;
     }
   }
-  const fmtTotal =
-    totalByCurrency.size === 0
-      ? formatCurrency(0)
-      : Array.from(totalByCurrency.entries())
-          .map(([c, amt]) => formatCurrency(amt, c))
-          .join(" · ");
-  const fmtMonth =
-    monthByCurrency.size === 0
-      ? formatCurrency(0)
-      : Array.from(monthByCurrency.entries())
-          .map(([c, amt]) => formatCurrency(amt, c))
-          .join(" · ");
+  const fmtTotal = formatCurrency(totalEarned);
+  const fmtMonth = formatCurrency(monthTotal);
 
-  // The chart needs a single comparable scale, so every payment is converted to
-  // USD before being grouped by month. Summing raw amounts across different
-  // currency codes would be meaningless.
-  const monthlyUsd = new Map<string, number>();
+  const monthly = new Map<string, number>();
   for (const p of rows) {
     const key = monthLabel(p.created_at);
-    const usd = convertCurrency(Number(p.amount), normalizeCurrency(p.currency), "USD");
-    monthlyUsd.set(key, (monthlyUsd.get(key) ?? 0) + usd);
+    monthly.set(key, (monthly.get(key) ?? 0) + Number(p.amount));
   }
-  const chart = Array.from(monthlyUsd.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  const chart = Array.from(monthly.entries()).sort((a, b) => a[0].localeCompare(b[0]));
   const maxMonth = chart.reduce((m, [, v]) => Math.max(m, v), 0);
 
   const summaryStats = [
-    { label: "Total Earnings", value: fmtTotal, icon: DollarSign, color: "bg-emerald-100 text-emerald-700" },
+    { label: "Total Earned", value: fmtTotal, icon: DollarSign, color: "bg-emerald-100 text-emerald-700" },
     { label: "This Month", value: fmtMonth, icon: TrendingUp, color: "bg-primary-container text-on-primary" },
     { label: "Completed Orders", value: String(completedCount ?? 0), icon: CheckCircle, color: "bg-secondary-container text-on-secondary-container" },
-    { label: "This Month (USD equiv.)", value: formatCurrency(monthTotalUsd, "USD"), icon: Clock, color: "bg-amber-100 text-amber-700" },
+    { label: "Payouts", value: "Manual", icon: Clock, color: "bg-amber-100 text-amber-700" },
   ];
 
   return (
@@ -148,12 +133,12 @@ export default async function HelperEarnings() {
                   Monthly Earnings
                 </h2>
                 <span className="text-xs text-on-surface-variant">
-                  Shown in USD equivalent
+                  In CAD
                 </span>
               </div>
               <p className="text-sm text-on-surface-variant mb-6">
-                Net payouts grouped by month. Payments in other currencies are converted so the
-                bars share one scale.
+                Your share of each order, grouped by month. Payouts are sent manually by the
+                Acadivo team.
               </p>
 
               <div className="flex items-end gap-3 sm:gap-5 h-48">
@@ -166,9 +151,9 @@ export default async function HelperEarnings() {
                     >
                       <span
                         className="text-xs font-semibold text-on-surface tabular-nums truncate max-w-full"
-                        title={formatCurrency(total, "USD")}
+                        title={formatCurrency(total)}
                       >
-                        {formatCurrency(total, "USD")}
+                        {formatCurrency(total)}
                       </span>
                       <div
                         className="w-full rounded-lg bg-surface-container flex items-end overflow-hidden"
@@ -238,11 +223,17 @@ export default async function HelperEarnings() {
                           {new Date(txn.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                         </td>
                         <td className="px-6 py-4">
-                          <Badge variant="success">Paid</Badge>
+                          {txn.helper_payout_status === "paid" ? (
+                            <Badge variant="success">Paid out</Badge>
+                          ) : txn.helper_payout_status === "on_hold" ? (
+                            <Badge variant="warning">On hold</Badge>
+                          ) : (
+                            <Badge variant="outline">Unpaid</Badge>
+                          )}
                         </td>
                         <td className="px-6 py-4 text-right">
                           <span className="text-sm font-semibold text-emerald-600">
-                            +{formatCurrency(Number(txn.amount), normalizeCurrency(txn.currency))}
+                            +{formatCurrency(Number(txn.amount))}
                           </span>
                         </td>
                       </tr>

@@ -3,7 +3,10 @@ import HelperNav from "@/components/layout/helper-nav";
 import RoleBottomNav from "@/components/layout/role-bottom-nav";
 import WarningsBannerClient from "@/components/layout/warnings-banner-client";
 import { VoiceCallProvider } from "@/components/call/voice-call";
+import { CurrencyDisplayProvider } from "@/components/currency/currency-display";
 import { createClient } from "@/lib/supabase/server";
+import { resolveDisplayCurrency } from "@/lib/display-currency.server";
+import { getDisplayRates } from "@/lib/exchange-rates.server";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +29,22 @@ export default async function HelperLayout({ children }: { children: React.React
     }
   }
 
+  let userCountry: string | null = null;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("users")
+      .select("country")
+      .eq("id", user.id)
+      .maybeSingle();
+    userCountry = (profile as { country?: string | null } | null)?.country ?? null;
+  }
+  const [defaultCurrency, rates] = await Promise.all([
+    resolveDisplayCurrency(userCountry),
+    getDisplayRates(),
+  ]);
+
   return (
+    <CurrencyDisplayProvider defaultCurrency={defaultCurrency} rates={rates}>
     <VoiceCallProvider role="helper">
       <div className="min-h-dvh flex flex-col bg-background lg:h-dvh lg:overflow-hidden">
         <Header />
@@ -54,5 +72,6 @@ export default async function HelperLayout({ children }: { children: React.React
         />
       </div>
     </VoiceCallProvider>
+    </CurrencyDisplayProvider>
   );
 }

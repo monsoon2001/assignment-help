@@ -3,7 +3,7 @@ import { MaterialIcon } from "@/lib/icons-map";
 
 const footerLinks = {
   Platform: [
-    { label: "Browse Helpers", href: "/browse-helpers" },
+    { label: "Request Help", href: "/requests/new" },
     { label: "Services", href: "/services" },
     { label: "How It Works", href: "/how-it-works" },
     { label: "Subjects", href: "/subjects" },

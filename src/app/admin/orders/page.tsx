@@ -67,7 +67,7 @@ export default async function AdminOrdersPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <Avatar name={helper?.name ?? "Helper"} size="sm" />
+                        <Avatar name={helper?.name ?? "Helper"} role="helper" size="sm" />
                         <span className="text-sm text-on-surface">{helper?.name ?? "—"}</span>
                       </div>
                     </td>

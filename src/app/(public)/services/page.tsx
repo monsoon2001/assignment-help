@@ -72,8 +72,8 @@ export default function ServicesPage() {
             We support many more subject areas and task types. Tell us about your assignment and we&apos;ll help you get started.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button href="/browse-helpers" size="lg" className="shadow-md shadow-primary-container/25">
-              Find a Helper
+            <Button href="/requests/new" size="lg" className="shadow-md shadow-primary-container/25">
+              Request Help
               <ArrowRight className="w-4 h-4" />
             </Button>
             <Button href="/contact" variant="outline" size="lg">
@@ -89,8 +89,8 @@ export default function ServicesPage() {
       <CtaBand
         eyebrow="forum"
         title="Not sure which service fits?"
-        body="Tell us the assignment and deadline. We'll point you at the right help type and the helpers who cover it."
-        primary={{ label: "Browse Helpers", href: "/browse-helpers" }}
+        body="Tell us the assignment and deadline. We'll point you at the right help type and get your request to our verified helper."
+        primary={{ label: "Request Help", href: "/requests/new" }}
         secondary={{ label: "Contact Us", href: "/contact" }}
       />
     </>

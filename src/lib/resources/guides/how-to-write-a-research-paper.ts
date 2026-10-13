@@ -198,9 +198,9 @@ const guide: Resource = {
   ],
   service: {
     title: "Developing a research paper?",
-    body: "Find a helper to work through your question, method, and discussion structure with you.",
-    cta: "Find a Research Helper",
-    href: "/browse-helpers",
+    body: "Send your brief and our verified helper can work through your question, method, and discussion structure with you.",
+    cta: "Request Research Help",
+    href: "/requests/new",
   },
 };
 

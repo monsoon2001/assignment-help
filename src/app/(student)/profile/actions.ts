@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { isoForCountry } from "@/lib/currency";
 
 export interface StudentProfileResult {
   ok: boolean;
@@ -23,6 +24,7 @@ export async function saveStudentProfile(
   const lastName = String(formData.get("lastName") ?? "").trim();
   const institution = String(formData.get("institution") ?? "").trim();
   const level = String(formData.get("levelOfStudy") ?? "").trim();
+  const countryRaw = String(formData.get("country") ?? "").trim();
 
   const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
 
@@ -30,6 +32,7 @@ export async function saveStudentProfile(
   if (fullName) updates.name = fullName;
   updates.institution = institution || null;
   updates.level_of_study = level || null;
+  updates.country = isoForCountry(countryRaw) ?? null;
 
   const { error } = await supabase.from("users").update(updates).eq("id", user.id);
   if (error) return { ok: false, message: error.message };

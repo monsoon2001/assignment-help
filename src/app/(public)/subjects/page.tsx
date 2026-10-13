@@ -7,12 +7,12 @@ import { SUBJECT_GROUPS, SUBJECT_CONTENT } from "@/lib/subject-content";
 export const metadata = {
   title: "Assignment Help by Subject | Browse All Subjects | Acadivo",
   description:
-    "Explore assignment help by subject. Choose a specific helper for computer science, statistics, mathematics, business, academic writing, science, engineering, and more.",
+    "Explore assignment help by subject. Get a verified helper for computer science, statistics, mathematics, business, academic writing, science, engineering, and more.",
   alternates: { canonical: "https://acadivo.com/subjects" },
   openGraph: {
     title: "Assignment Help by Subject | Acadivo",
     description:
-      "Browse assignment help by subject, see topics covered, and choose a specific helper before you pay.",
+      "Browse assignment help by subject, see topics covered, and send your brief to our verified helper before you pay.",
     type: "website",
     url: "https://acadivo.com/subjects",
   },
@@ -23,7 +23,7 @@ export default function SubjectsPage() {
     <>
       <PageHeader
         title="Assignment Help by Subject"
-        subtitle="Pick a subject to see the topics we cover, find relevant helpers, and choose who you want to work with before you pay."
+        subtitle="Pick a subject to see the topics we cover, the help we provide, and send your brief to our verified helper before you pay."
         crumbs={[{ label: "Home", href: "/" }, { label: "Subjects" }]}
       />
 
@@ -68,7 +68,7 @@ export default function SubjectsPage() {
         title="Don't see your subject?"
         body="We're always expanding. Contact us and we'll do our best to find a helper for your specific subject."
         primary={{ label: "Contact Us", href: "/contact" }}
-        secondary={{ label: `Browse All ${SUBJECT_CONTENT.length} Subjects`, href: "/browse-helpers" }}
+        secondary={{ label: `Browse All ${SUBJECT_CONTENT.length} Subjects`, href: "/requests/new" }}
       />
     </>
   );

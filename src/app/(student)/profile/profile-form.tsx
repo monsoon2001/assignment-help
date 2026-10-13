@@ -8,6 +8,7 @@ import Select from "@/components/ui/select";
 import Avatar from "@/components/ui/avatar";
 import StarRating from "@/components/ui/star-rating";
 import { Save, Mail, GraduationCap, MapPin } from "lucide-react";
+import { COUNTRY_OPTIONS } from "@/lib/currency";
 import { saveStudentProfile, type StudentProfileResult } from "./actions";
 
 const LEVELS = [
@@ -28,6 +29,7 @@ export default function StudentProfileForm({
   lastName = "",
   institution = "",
   levelOfStudy = "",
+  country = "",
   memberSince = null,
 }: {
   name?: string;
@@ -37,6 +39,7 @@ export default function StudentProfileForm({
   lastName?: string;
   institution?: string;
   levelOfStudy?: string;
+  country?: string;
   memberSince?: number | null;
 }) {
   const [state, formAction, pending] = useActionState<StudentProfileResult, FormData>(
@@ -92,6 +95,23 @@ export default function StudentProfileForm({
                   <Mail size={16} className="shrink-0 text-on-surface-variant" />
                   <span className="truncate">{email || "—"}</span>
                 </div>
+              </div>
+              <div className="sm:col-span-2">
+                <Select
+                  name="country"
+                  label="Country / Region"
+                  defaultValue={country}
+                  options={[
+                    { value: "", label: "Not listed / Prefer not to say" },
+                    ...COUNTRY_OPTIONS.map((c) => ({
+                      value: c.code,
+                      label: `${c.name} (${c.currency})`,
+                    })),
+                  ]}
+                />
+                <p className="text-xs text-on-surface-variant mt-1.5">
+                  Used to show an approximate price in your currency. You are always charged in CAD.
+                </p>
               </div>
             </div>
           </Card>

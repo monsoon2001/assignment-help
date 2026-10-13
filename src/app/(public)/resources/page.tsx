@@ -117,8 +117,8 @@ export default function ResourcesPage() {
       <CtaBand
         eyebrow="school"
         title="Looking for one-to-one help?"
-        body="Guides are free. If you would rather work through your assignment with someone, browse verified helpers and choose who you want to work with before you pay."
-        primary={{ label: "Find a Helper", href: "/browse-helpers" }}
+        body="Guides are free. If you would rather work through your assignment with someone, send your brief and our verified helper will quote your scope before you pay."
+        primary={{ label: "Request Help", href: "/requests/new" }}
         secondary={{ label: "How It Works", href: "/how-it-works" }}
       />
     </>

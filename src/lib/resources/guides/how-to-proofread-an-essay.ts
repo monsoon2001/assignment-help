@@ -163,9 +163,9 @@ const guide: Resource = {
   ],
   service: {
     title: "Want a proofreading review?",
-    body: "Find a helper who can check grammar, flow, and structure before you hand your work in.",
-    cta: "Find a Proofreading Helper",
-    href: "/browse-helpers",
+    body: "Send your brief and our verified helper can check grammar, flow, and structure before you hand your work in.",
+    cta: "Request Proofreading Help",
+    href: "/requests/new",
   },
 };
 

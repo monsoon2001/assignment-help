@@ -151,9 +151,9 @@ const guide: Resource = {
   ],
   service: {
     title: "Want your conclusion checked?",
-    body: "A helper can review whether your closing paragraph genuinely closes the argument or just repeats it.",
-    cta: "Find an Essay Helper",
-    href: "/browse-helpers",
+    body: "Our verified helper can review whether your closing paragraph genuinely closes the argument or just repeats it.",
+    cta: "Request Essay Help",
+    href: "/requests/new",
   },
 };
 

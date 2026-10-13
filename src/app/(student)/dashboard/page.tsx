@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowRight, FileText, CheckCircle2, Sparkles, Users, Clock, RefreshCcw } from "lucide-react";
+import { ArrowRight, FileText, CheckCircle2, Sparkles, Clock, RefreshCcw } from "lucide-react";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
@@ -131,12 +131,6 @@ export default async function DashboardPage() {
           </p>
         </div>
         <div className="flex gap-3">
-          <Link href="/browse-helpers" className="shrink-0">
-            <Button variant="outline">
-              <Users size={16} />
-              Browse Helpers
-            </Button>
-          </Link>
           <Link href="/requests/new" className="shrink-0">
             <Button>
               <Sparkles size={16} />
@@ -215,14 +209,11 @@ export default async function DashboardPage() {
                   <ArrowRight size={18} className="text-on-surface-variant shrink-0" />
                 </Link>
                 {overdue && (
-                  <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg bg-warning/10 border border-warning/40 px-3 py-2.5">
+                  <div className="mt-4 flex items-center gap-2 rounded-lg bg-warning/10 border border-warning/40 px-3 py-2.5">
                     <p className="text-xs text-on-surface inline-flex items-center gap-1.5">
                       <RefreshCcw size={13} className="text-warning" />
                       This helper hasn&apos;t responded in 2 hours.
                     </p>
-                    <Link href={`/requests/${r.id}?resend=1`} className="text-xs font-semibold text-primary min-h-11 -my-2 inline-flex items-center hover:underline">
-                      Choose a different helper
-                    </Link>
                   </div>
                 )}
               </Card>

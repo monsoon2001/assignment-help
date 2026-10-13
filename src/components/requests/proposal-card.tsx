@@ -9,6 +9,7 @@ import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
 import { acceptProposal, declineProposal } from "@/lib/orders";
 import { normalizeCurrency, formatCurrency } from "@/lib/currency";
+import { ApproxPrice } from "@/components/currency/currency-display";
 import { proposalStatusMeta } from "@/lib/status-meta";
 
 export type RequestProposal = {
@@ -115,6 +116,7 @@ export default function ProposalCard({
             <p className="text-xs text-on-surface-variant mt-0.5">
               No hidden charges &middot; Pay securely on the platform
             </p>
+            <ApproxPrice amountCad={Number(proposal.price)} withSelector className="mt-2" />
           </div>
           <div className="flex flex-col justify-center sm:pl-3">
             <span className="text-xs text-secondary uppercase font-semibold tracking-wider">
@@ -162,7 +164,7 @@ export default function ProposalCard({
       </div>
 
       <div className="flex items-center gap-3 px-4 sm:px-5 pb-4">
-        <Avatar name={proposal.helper?.name || "Helper"} size="sm" />
+        <Avatar name={proposal.helper?.name || "Helper"} role="helper" size="sm" />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold text-on-surface truncate">
             {proposal.helper?.name || "Acadivo Helper"}
@@ -209,7 +211,8 @@ export default function ProposalCard({
             </div>
             <p className="text-xs text-on-surface-variant inline-flex items-center gap-1">
               <ShieldCheck size={12} className="text-primary shrink-0" />
-              Funds are released only after you review and approve the finalized draft.
+              Your payment is taken when you accept this quote. If the delivered work doesn&apos;t
+              match the agreed scope, you can request revisions, or a refund under our Refund Policy.
             </p>
           </div>
         ) : (

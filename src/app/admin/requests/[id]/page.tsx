@@ -127,7 +127,7 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
               const helper = unwrapRow<{ name: string | null }>(helperRaw);
               return (
               <div key={proposal.id} className="p-6 flex flex-col sm:flex-row sm:items-start gap-4">
-                <Avatar name={helper?.name ?? "Helper"} size="md" />
+                <Avatar name={helper?.name ?? "Helper"} role="helper" size="md" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold text-on-surface">{helper?.name ?? "Helper"}</p>

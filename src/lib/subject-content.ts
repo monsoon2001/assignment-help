@@ -19,7 +19,7 @@ export type SubjectContent = {
 };
 
 const HOW_IT_WORDS =
-  "Tell us what you're working on, browse relevant helpers, choose who you want to work with, discuss your requirements, and receive a personalized proposal before you pay.";
+  "Tell us what you're working on and we'll route it to our verified academic helper, discuss your requirements in the request chat, and receive a personalized proposal before you pay.";
 
 export const SUBJECT_CONTENT: SubjectContent[] = [
   {
@@ -31,7 +31,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     h1: "Computer Science Assignment Help",
     title: "Computer Science Assignment Help | Python, Java, SQL & More | Acadivo",
     description:
-      "Get computer science assignment help for Python, Java, SQL, databases, machine learning, data structures, and programming projects. Choose a helper and get a proposal before you pay.",
+      "Get computer science assignment help for Python, Java, SQL, databases, machine learning, data structures, and programming projects. Send your brief to our verified helper and get a proposal before you pay.",
     ogDescription:
       "CS assignment help for Python, Java, SQL, databases, algorithms, ML, and projects. Discuss with a helper, get a personalized proposal, pay only after accepting.",
     intro: `Get expert computer science assignment help across programming, databases, algorithms, and machine learning. ${HOW_IT_WORDS}`,
@@ -63,7 +63,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     description:
       "Get statistics assignment help, statistics homework help, SPSS assignment help, R programming assignment help, data analysis help, hypothesis testing help, and regression analysis help.",
     ogDescription:
-      "Statistics assignment help with SPSS, R, data analysis, hypothesis testing, and regression. Choose a helper, discuss requirements, get a proposal before paying.",
+      "Statistics assignment help with SPSS, R, data analysis, hypothesis testing, and regression. Send your brief to our verified helper, discuss requirements, get a proposal before paying.",
     intro: `Get expert statistics support for assignments, homework, and analysis projects. ${HOW_IT_WORDS}`,
     subtopics: [
       { title: "Statistics Assignment Help", blurb: "Full support for coursework, reports, and statistical analysis projects." },
@@ -91,7 +91,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     description:
       "Get mathematics assignment help for algebra, calculus, geometry, linear algebra, discrete math, and applied mathematics from verified tutors who explain every step.",
     ogDescription:
-      "Mathematics assignment help with step-by-step explanations for algebra, calculus, geometry, and more. Choose a tutor, discuss your problem, and get a proposal before paying.",
+      "Mathematics assignment help with step-by-step explanations for algebra, calculus, geometry, and more. Send your brief to our verified helper, discuss your problem, and get a proposal before paying.",
     intro: `Get clear, step-by-step mathematics guidance from verified tutors. ${HOW_IT_WORDS}`,
     subtopics: [
       { title: "Algebra Assignment Help", blurb: "Equations, functions, inequalities, and sequences explained clearly." },
@@ -120,7 +120,7 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
     description:
       "Get business assignment help, marketing assignment help, finance assignment help, accounting assignment help, case study help, and MBA assignment help from verified tutors.",
     ogDescription:
-      "Business assignment help for marketing, finance, accounting, case studies, and MBA work. Choose a tutor, discuss your requirements, and get a proposal before paying.",
+      "Business assignment help for marketing, finance, accounting, case studies, and MBA work. Send your brief to our verified helper, discuss your requirements, and get a proposal before paying.",
     intro: `Get expert business guidance for assignments, reports, and case studies. ${HOW_IT_WORDS}`,
     subtopics: [
       { title: "Business Assignment Help", blurb: "Structured support for essays, reports, and presentations." },

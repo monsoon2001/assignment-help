@@ -8,7 +8,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import { SUBJECTS, SERVICE_TYPES, ACADEMIC_LEVELS } from "@/lib/constants";
-import { SUPPORTED_CURRENCIES, currencySymbol } from "@/lib/currency";
 
 const FLOW = [
   {
@@ -132,11 +131,10 @@ export default function AuthShowcase() {
             <div>
               <p className="flex items-center gap-1.5 text-xs font-semibold text-inverse-on-surface/80">
                 <HandCoins size={13} className="text-inverse-primary" />
-                Pay in your currency
+                Simple CAD pricing
               </p>
               <p className="mt-1 text-xs text-inverse-on-surface/60">
-                {SUPPORTED_CURRENCIES.map((code) => currencySymbol(code)).join(" · ")} — default
-                picked from your country
+                One upfront price in Canadian dollars — no hidden fees
               </p>
             </div>
           </div>

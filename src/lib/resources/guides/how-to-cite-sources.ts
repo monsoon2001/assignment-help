@@ -198,9 +198,9 @@ const guide: Resource = {
   ],
   service: {
     title: "Getting your references right?",
-    body: "Find a helper to check in-text citations, reference entries, and consistency across your document.",
-    cta: "Find a Citation Helper",
-    href: "/browse-helpers",
+    body: "Send your brief and our verified helper can check in-text citations, reference entries, and consistency across your document.",
+    cta: "Request Citation Help",
+    href: "/requests/new",
   },
 };
 

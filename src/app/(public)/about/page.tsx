@@ -1,7 +1,6 @@
 import { CtaBand, PAGE_TONES, PageHeader } from "@/components/marketing/page-shell";
 import { MaterialIcon } from "@/lib/icons-map";
 import { SUBJECTS, SERVICE_TYPES, ACADEMIC_LEVELS } from "@/lib/constants";
-import { SUPPORTED_CURRENCIES } from "@/lib/currency";
 
 const values = [
   { icon: "school", title: "Academic Integrity First", desc: "We believe in genuine learning. Our helpers guide and teach — they don't do the work for you. Every interaction is designed to build your understanding." },
@@ -15,7 +14,7 @@ const stats = [
   { value: String(SUBJECTS.length), label: "Subjects Covered" },
   { value: String(SERVICE_TYPES.length), label: "Types Of Help" },
   { value: String(ACADEMIC_LEVELS.length), label: "Academic Levels" },
-  { value: String(SUPPORTED_CURRENCIES.length), label: "Currencies Supported" },
+  { value: "CAD", label: "Simple Pricing" },
 ];
 
 export default function AboutPage() {
@@ -86,7 +85,7 @@ export default function AboutPage() {
         eyebrow="volunteer_activism"
         title="Join the Acadivo community"
         body="Whether you're a student seeking guidance or an expert wanting to help others, we'd love to have you."
-        primary={{ label: "Browse Helpers", href: "/browse-helpers" }}
+        primary={{ label: "Request Help", href: "/requests/new" }}
         secondary={{ label: "Contact Us", href: "/contact" }}
       />
     </>

@@ -1,11 +1,10 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, FileText, MessageSquare, Bell, User } from "lucide-react";
+import { LayoutDashboard, FileText, MessageSquare, Bell, User } from "lucide-react";
 
 const links = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/browse-helpers", label: "Browse Helpers", icon: Users },
   { href: "/requests", label: "My Requests", icon: FileText },
   { href: "/messages", label: "Messages", icon: MessageSquare },
   { href: "/notifications", label: "Notifications", icon: Bell },

@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { FileText, Info, CheckCircle2, ShieldCheck, Loader2, ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { FileText, Info, CheckCircle2, ShieldCheck } from "lucide-react";
 import Card from "@/components/ui/card";
-import HelperPicker from "@/components/requests/helper-picker";
 import TaskRequestForm, {
   HELP_TYPE_OPTIONS,
   LAST_DUE_TIME,
@@ -16,14 +15,13 @@ import TaskRequestForm, {
 } from "@/components/requests/task-request-form";
 import {
   submitRequest, loadPendingDraft, clearPendingDraft, loadDraftFiles, clearDraftFiles,
-  type HelperCandidate,
 } from "@/lib/requests";
 
 import { OTHER_OPTION, withCustom } from "@/lib/constants";
-import { DEFAULT_COUNTRY, convertCurrency, formatCurrency, defaultCurrencyForCountry } from "@/lib/currency";
+import { DEFAULT_COUNTRY, formatCurrency, defaultCurrencyForCountry } from "@/lib/currency";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Indicative bands, quoted in USD and converted to the student's currency.
+// Indicative bands, quoted in CAD (the platform's single currency).
 const PRICING_BANDS = [
   { label: "Essays (per page)", from: 7, to: 15 },
   { label: "Problem sets (per set)", from: 35, to: 90 },
@@ -74,11 +72,6 @@ export default function NewRequestPage() {
     details: "",
     files: [],
   });
-  const [step, setStep] = useState<"details" | "helper">("details");
-  // /requests/new?helper=<id> (from "Request Help" on a helper card) keeps the
-  // chosen helper selected once the student reaches the helper step.
-  const searchParams = useSearchParams();
-  const preselectedHelper = searchParams.get("helper");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -91,8 +84,6 @@ export default function NewRequestPage() {
   }, []);
 
   // Restores the draft the homepage estimate form saved across sign-in/sign-up.
-  // The details step stays on screen (filled in) so the student can review it
-  // before choosing a helper.
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -134,10 +125,11 @@ export default function NewRequestPage() {
       ? values.customSubject.trim()
       : values.subject;
 
-  const quoteCurrency = defaultCurrencyForCountry(DEFAULT_COUNTRY);
-
-  const handleContinue = () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (submitting) return;
     setError("");
+
     if (values.helpType === OTHER_OPTION && !values.customHelpType.trim()) {
       setError("Please select the type of help you need.");
       return;
@@ -166,12 +158,8 @@ export default function NewRequestPage() {
       setError("Add pages/words or a short description so a helper can assess the scope.");
       return;
     }
-    setStep("helper");
-  };
 
-  const handlePick = async (helper: HelperCandidate) => {
     setSubmitting(true);
-    setError("");
 
     const title = `${resolvedHelpType} — ${resolvedSubject}`;
     const descriptionWithMeta = [
@@ -194,7 +182,6 @@ export default function NewRequestPage() {
         ? new Date(`${values.deadline}T${values.dueTime || LAST_DUE_TIME}:00`).toISOString()
         : null,
       files: values.files,
-      helper_id: helper.user_id,
     });
 
     setSubmitting(false);
@@ -216,34 +203,13 @@ export default function NewRequestPage() {
         <div>
           <h1 className="font-display font-bold text-2xl text-on-surface">Request Academic Help</h1>
           <p className="text-sm text-on-surface-variant">
-            Describe your assignment, then pick the exact helper you want to work with.
+            Describe your assignment and send it straight to our academic helper.
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <Card className="lg:col-span-2 p-6 sm:p-8">
-          <div className="flex items-center gap-2 mb-6">
-            {["details", "helper"].map((s, i) => {
-              const active = step === s;
-              return (
-                <div key={s} className="flex items-center gap-2">
-                  <span
-                    className={`w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center ${
-                      active ? "bg-primary-container text-on-primary" : "bg-surface-container-high text-on-surface-variant"
-                    }`}
-                  >
-                    {i + 1}
-                  </span>
-                  <span className={`text-sm font-medium ${active ? "text-on-surface" : "text-on-surface-variant"}`}>
-                    {s === "details" ? "Assignment Details" : "Choose a Helper"}
-                  </span>
-                  {i === 0 && <span className="w-8 h-px bg-outline-variant mx-1" />}
-                </div>
-              );
-            })}
-          </div>
-
           {!ready ? (
             <div className="flex flex-col gap-3" aria-busy="true" aria-live="polite">
               <span className="sr-only">Preparing your request…</span>
@@ -270,81 +236,16 @@ export default function NewRequestPage() {
               <Skeleton className="h-16 w-full rounded-lg" />
               <Skeleton className="h-11 w-full rounded-xl" />
             </div>
-          ) : step === "details" ? (
+          ) : (
             <TaskRequestForm
               values={values}
               set={set}
               error={error}
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleContinue();
-              }}
-              submitLabel="Continue to Choose Helper"
-              note="Next you’ll choose a helper. No charge until a bid is accepted."
+              onSubmit={handleSubmit}
+              submitting={submitting}
+              submitLabel="Send Task Request"
+              note="Your request goes straight to our verified academic helper. No charge until you accept a proposal."
             />
-          ) : (
-            <div className="flex flex-col gap-5">
-              <div className="rounded-xl border border-outline-variant bg-surface-container-low p-4">
-                <div className="flex items-center justify-between gap-3 mb-2">
-                  <p className="text-sm font-semibold text-on-surface">Your request</p>
-                  <button
-                    onClick={() => setStep("details")}
-                    className="text-xs text-primary font-medium hover:underline inline-flex items-center gap-1 cursor-pointer"
-                  >
-                    <ArrowLeft size={12} /> Edit details
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-on-surface-variant">
-                  <span><strong className="text-on-surface">{resolvedHelpType}</strong></span>
-                  <span>{resolvedSubject}</span>
-                  {values.level && <span>{values.level}</span>}
-                  {values.pages && (
-                    <span>
-                      {values.pages} page{Number(values.pages) === 1 ? "" : "s"} · approx{" "}
-                      {((Number(values.pages) || 0) * WORDS_PER_PAGE).toLocaleString()} words
-                    </span>
-                  )}
-                  {values.deadline && (
-                    <span>
-                      Due{" "}
-                      {new Date(`${values.deadline}T${values.dueTime || LAST_DUE_TIME}:00`).toLocaleString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                  )}
-                  {values.files.length > 0 && <span>{values.files.length} attachment{values.files.length > 1 ? "s" : ""}</span>}
-                </div>
-              </div>
-
-              {preselectedHelper && (
-                <p className="text-xs text-on-surface-variant">
-                  You picked a helper from the directory — press{" "}
-                  <span className="font-semibold text-on-surface">Send Request</span> on their card to post
-                  your request to them.
-                </p>
-              )}
-
-              <HelperPicker
-                subject={resolvedSubject}
-                onSelect={handlePick}
-                heading={`Helpers for ${resolvedSubject}`}
-                preselectedId={preselectedHelper}
-              />
-
-              {error && (
-                <p className="text-sm text-error bg-error-container/40 border border-error/30 rounded-lg px-3 py-2">
-                  {error}
-                </p>
-              )}
-              {submitting && (
-                <p className="text-sm text-on-surface-variant inline-flex items-center gap-2">
-                  <Loader2 size={16} className="animate-spin text-primary" /> Sending your request to the helper…
-                </p>
-              )}
-            </div>
           )}
         </Card>
 
@@ -359,16 +260,16 @@ export default function NewRequestPage() {
                 <div key={band.label} className="flex items-center justify-between">
                   <span className="text-on-surface-variant">{band.label}</span>
                   <span className="font-semibold text-on-surface">
-                    {formatCurrency(convertCurrency(band.from, "USD", quoteCurrency), quoteCurrency)} –{" "}
-                    {formatCurrency(convertCurrency(band.to, "USD", quoteCurrency), quoteCurrency)}
+                    {formatCurrency(band.from)} –{" "}
+                    {formatCurrency(band.to)}
                   </span>
                 </div>
               ))}
             </div>
             <p className="text-xs text-on-surface-variant mt-3 leading-relaxed">
-              Shown in <span className="font-semibold">{quoteCurrency}</span>. Your
-              helper responds in the request chat within <span className="font-semibold">2 hours</span> or you can
-              choose someone else. Rush orders under 12 hours carry a <span className="font-semibold">+25%</span> premium.
+              Shown in <span className="font-semibold">CAD</span>. Your
+              helper responds in the request chat within <span className="font-semibold">2 hours</span>.
+              Rush orders under 12 hours carry a <span className="font-semibold">+25%</span> premium.
             </p>
           </Card>
 
@@ -385,7 +286,7 @@ export default function NewRequestPage() {
                 <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> Revisions until you are satisfied with the draft.
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> Payments released only after you approve.
+                <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> You approve each draft and can request revisions until it meets the agreed scope.
               </li>
             </ul>
           </Card>
