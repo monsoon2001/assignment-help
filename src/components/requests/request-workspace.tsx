@@ -82,7 +82,6 @@ export default function RequestWorkspace({
   const [bidPrice, setBidPrice] = useState("");
   const [bidDescription, setBidDescription] = useState("");
   const [bidRevisions, setBidRevisions] = useState("1");
-  const [bidExpires, setBidExpires] = useState("");
   const [sendingBid, setSendingBid] = useState(false);
   const [bidError, setBidError] = useState<string | null>(null);
 
@@ -278,7 +277,6 @@ export default function RequestWorkspace({
       price: parsedPrice,
       description: bidDescription.trim() || undefined,
       revisions_included: Math.max(0, Number(bidRevisions) || 0),
-      expires_at: bidExpires ? new Date(`${bidExpires}T23:59:59`).toISOString() : null,
     });
     setSendingBid(false);
     if ("error" in result) {
@@ -288,7 +286,6 @@ export default function RequestWorkspace({
     setBidPrice("");
     setBidDescription("");
     setBidRevisions("1");
-    setBidExpires("");
     await loadProposal();
     await loadRequest();
   }
@@ -301,8 +298,50 @@ export default function RequestWorkspace({
     { id: "details" as const, label: "Request details", icon: FileText },
   ];
 
+  const contactCard = (
+    <Card className="p-3 shrink-0">
+      <div className="flex items-center gap-3">
+        <Avatar name={otherParty?.name || (isHelper ? "Student" : "Helper")} role={isHelper ? "student" : "helper"} size="md" online />
+        <div className="min-w-0 flex-1">
+          <p className="font-display font-semibold text-sm text-on-surface">
+            {otherParty?.name || (isHelper ? "Student" : "Acadivo Helper")}
+          </p>
+          <p className="text-xs text-on-surface-variant truncate">
+            {isHelper ? "Student who requested help" : "Expert assigned to your request"}
+          </p>
+        </div>
+        {request.sent_at && !isHelper && (
+          <span className="text-xs text-on-surface-variant shrink-0 inline-flex items-center gap-1">
+            <Clock size={12} />
+            {new Date(request.sent_at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+          </span>
+        )}
+      </div>
+    </Card>
+  );
+
+  const chatPanel = (
+    <ChatPanel
+      title={chatLabel}
+      fill
+      compact
+      className="border border-outline-variant"
+      filesBucket="request-files"
+      messages={messages}
+      draft={draft}
+      setDraft={setDraft}
+      files={chatFiles}
+      setFiles={setChatFiles}
+      sending={sendingMsg}
+      error={chatError}
+      onSend={sendMessage}
+      bottomRef={bottomRef}
+      currentUserId={currentUserId}
+    />
+  );
+
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col gap-4 min-h-0 lg:h-full">
+    <div className="w-full max-w-7xl mx-auto flex flex-col gap-3 h-full min-h-0">
       <nav className="flex items-center gap-1.5 text-sm text-on-surface-variant shrink-0">
         <Link href={isHelper ? "/helper/requests" : "/requests"} className="hover:text-on-surface">
           {isHelper ? "Incoming Requests" : "My Requests"}
@@ -311,236 +350,202 @@ export default function RequestWorkspace({
         <span className="text-on-surface font-medium truncate">#{request.id.slice(0, 8).toUpperCase()} · {title}</span>
       </nav>
 
-      <section className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 rounded-2xl bg-surface-container-lowest border border-outline-variant shrink-0">
-        <div className="flex items-center gap-4 min-w-0">
-          <div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="font-display font-bold text-xl text-on-surface">{title}</h1>
-              <Badge variant={meta.variant} dot className="shrink-0">{meta.label}</Badge>
-            </div>
-            <p className="text-xs text-on-surface-variant mt-1">
-              #{request.id.slice(0, 8).toUpperCase()} · {request.subject || "General"}
-            </p>
-            <p className="text-xs text-on-surface-variant mt-1 inline-flex items-center gap-1">
-              <Timer size={12} />{" "}
-              {request.deadline
-                ? `Due ${new Date(request.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
-                : "Deadline flexible"}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          {isHelper && request.status === "proposal_sent" && (
-            <Badge variant="success"><ShieldCheck size={12} /> Proposal Sent</Badge>
-          )}
-        </div>
-      </section>
-
-      {overdue && (
-        <Card className="p-5 border-warning shrink-0">
-          <div className="flex items-start gap-3">
-            <span className="w-10 h-10 rounded-xl bg-warning-container/20 text-warning flex items-center justify-center shrink-0">
-              <Clock size={18} />
-            </span>
-            <div>
-              <p className="font-semibold text-on-surface">This helper hasn&apos;t responded yet</p>
-              <p className="text-sm text-on-surface-variant mt-0.5">
-                It&apos;s been more than 2 hours since your request was sent. You can keep chatting in the
-                request thread or contact support if you need help.
-              </p>
-            </div>
-          </div>
-        </Card>
-      )}
-
-      <div className="shrink-0 flex items-center gap-1 border-b border-outline-variant">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const active = view === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setView(tab.id)}
-              className={`inline-flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors cursor-pointer ${
-                active
-                  ? "border-primary-container text-primary"
-                  : "border-transparent text-on-surface-variant hover:text-on-surface"
-              }`}
-            >
-              <Icon size={16} />
-              {tab.label}
-              {tab.id === "chat" && messages.length > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-gradient-to-br from-primary-container to-secondary-container text-white text-xs font-bold">
-                  {messages.length}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {view === "chat" ? (
-        <div className="flex flex-col gap-4 flex-1 min-h-0">
-          <Card className="p-4 shrink-0">
-            <div className="flex items-center gap-3">
-              <Avatar name={otherParty?.name || (isHelper ? "Student" : "Helper")} role={isHelper ? "student" : "helper"} size="md" online />
-              <div className="min-w-0 flex-1">
-                <p className="font-display font-semibold text-on-surface">
-                  {otherParty?.name || (isHelper ? "Student" : "Acadivo Helper")}
-                </p>
-                <p className="text-xs text-on-surface-variant truncate">
-                  {isHelper ? "Student who requested help" : "Expert assigned to your request"}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0 lg:overflow-hidden lg:auto-rows-fr">
+        <div className="lg:col-span-7 flex flex-col gap-1.5 min-h-0 lg:h-full">
+          <section className="flex flex-col lg:flex-row lg:items-center justify-between gap-1.5 lg:gap-4 p-2.5 rounded-2xl bg-surface-container-lowest border border-outline-variant shrink-0">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <h1 className="font-display font-bold text-lg text-on-surface truncate">{title}</h1>
+                  <Badge variant={meta.variant} dot className="shrink-0">{meta.label}</Badge>
+                </div>
+                <p className="text-xs text-on-surface-variant mt-0.5 flex items-center gap-1.5 flex-wrap">
+                  <span className="whitespace-nowrap">#{request.id.slice(0, 8).toUpperCase()} · {request.subject || "General"}</span>
+                  <span className="text-outline-variant" aria-hidden>·</span>
+                  <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                    <Timer size={12} />{" "}
+                    {request.deadline
+                      ? `Due ${new Date(request.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+                      : "Deadline flexible"}
+                  </span>
                 </p>
               </div>
-              {request.sent_at && !isHelper && (
-                <span className="text-xs text-on-surface-variant shrink-0 inline-flex items-center gap-1">
-                  <Clock size={12} />
-                  Sent {new Date(request.sent_at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
-                </span>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {isHelper && request.status === "proposal_sent" && (
+                <Badge variant="success"><ShieldCheck size={12} /> Proposal Sent</Badge>
               )}
             </div>
-          </Card>
+          </section>
 
-          <div className="flex-1 min-h-[420px] sm:min-h-[520px] lg:min-h-0">
-            <ChatPanel
-              title={chatLabel}
-              fill
-              filesBucket="request-files"
-              messages={messages}
-              draft={draft}
-              setDraft={setDraft}
-              files={chatFiles}
-              setFiles={setChatFiles}
-              sending={sendingMsg}
-              error={chatError}
-              onSend={sendMessage}
-              bottomRef={bottomRef}
-              currentUserId={currentUserId}
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-5 max-w-3xl min-h-0 flex-1 lg:overflow-y-auto">
-          <Card className="p-5">
-            <h2 className="font-display font-semibold text-on-surface mb-2">Request details</h2>
-            {request.description ? (
-              <p className="text-sm text-on-surface-variant leading-relaxed">{request.description}</p>
-            ) : (
-              <p className="text-sm text-on-surface-variant">No additional details were provided.</p>
-            )}
-            <div className="flex flex-wrap items-center gap-3 mt-4 text-sm">
-              <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
-                <CalendarDays size={14} />{" "}
-                {request.deadline
-                  ? new Date(request.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                  : "Flexible"}
-              </span>
-              <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
-                <UserRound size={14} /> {request.subject || "General"}
-              </span>
-            </div>
-            {request.file_urls.length > 0 && (
-              <div className="flex flex-col gap-2 mt-4">
-                {request.file_urls.map((url, i) => (
-                  <SecureFileLink
-                    key={i}
-                    stored={url}
-                    bucket="request-files"
-                    showDownload
-                    label={fileNameFromUrl(url)}
-                    className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant hover:bg-surface-container-low transition-colors"
-                  >
-                    <span className="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
-                      <FileText size={16} />
-                    </span>
-                    <span className="min-w-0 flex-1 text-sm font-medium text-on-surface truncate">
-                      {fileNameFromUrl(url)}
-                    </span>
-                  </SecureFileLink>
-                ))}
-              </div>
-            )}
-          </Card>
-
-          {isHelper && !proposal && (
-            <Card className="p-5">
-              <h2 className="font-display font-semibold text-on-surface mb-1">Send a proposal</h2>
-              <p className="text-sm text-on-surface-variant mb-4">
-                Price this request in the chat — the student reviews and accepts from here.
-              </p>
-              <div className="grid grid-cols-1 gap-4">
-                <Input
-                  label="Price (CAD)"
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  placeholder="25.00"
-                  value={bidPrice}
-                  onChange={(e) => setBidPrice(e.target.value)}
-                />
-              </div>
-              <div className="mt-4">
-                <div className="flex items-start gap-2 p-3 rounded-lg bg-surface-container-low border border-outline-variant">
-                  <RotateCcw size={15} className="text-primary shrink-0 mt-0.5" />
-                  <p className="text-xs leading-relaxed text-on-surface-variant">
-                    Unlimited revisions until the student is satisfied with the delivered work — no extra cost.
+          {overdue && (
+            <Card className="p-4 border-warning shrink-0">
+              <div className="flex items-start gap-3">
+                <span className="w-9 h-9 rounded-xl bg-warning-container/20 text-warning flex items-center justify-center shrink-0">
+                  <Clock size={16} />
+                </span>
+                <div>
+                  <p className="font-semibold text-on-surface text-sm">This helper hasn&apos;t responded yet</p>
+                  <p className="text-xs text-on-surface-variant mt-0.5">
+                    It&apos;s been more than 2 hours since your request was sent. You can keep chatting in the
+                    request thread or contact support if you need help.
                   </p>
                 </div>
               </div>
-              <div className="mt-4">
-                <Input
-                  label="Offer expires"
-                  type="date"
-                  value={bidExpires}
-                  onChange={(e) => setBidExpires(e.target.value)}
-                />
-              </div>
-              <div className="mt-4">
-                <Textarea
-                  label="Proposal message"
-                  rows={3}
-                  placeholder="Describe how you'll help and what's included..."
-                  value={bidDescription}
-                  onChange={(e) => setBidDescription(e.target.value)}
-                />
-              </div>
-              {bidError && <p className="text-sm text-error mt-2">{bidError}</p>}
-              <Button
-                disabled={sendingBid}
-                onClick={handleSendBid}
-                className="w-full justify-center mt-4"
-              >
-                {sendingBid ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                {sendingBid ? "Sending..." : "Send Proposal"}
-              </Button>
             </Card>
           )}
 
-          {!isHelper && proposal && (
-            <ProposalCard
-              proposal={proposal}
-              requestTitle={title}
-              requestDeadline={request.deadline}
-              orderId={orderId}
-            />
-          )}
+          <div className="shrink-0 flex items-center gap-1 border-b border-outline-variant lg:hidden">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const active = view === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setView(tab.id)}
+                  className={`inline-flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors cursor-pointer ${
+                    active
+                      ? "border-primary-container text-primary"
+                      : "border-transparent text-on-surface-variant hover:text-on-surface"
+                  }`}
+                >
+                  <Icon size={16} />
+                  {tab.label}
+                  {tab.id === "chat" && messages.length > 0 && (
+                    <span className="ml-1 px-1.5 py-0.5 rounded-full bg-gradient-to-br from-primary-container to-secondary-container text-white text-xs font-bold">
+                      {messages.length}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-          {isHelper && proposal && (
-            <p className="text-xs text-on-surface-variant inline-flex items-center gap-1">
-              <ShieldCheck size={12} className="text-primary" />
-              Your proposal is with the student. You&apos;ll be notified when they respond.
-            </p>
-          )}
+          <div className="min-h-0 lg:flex-1 lg:overflow-y-auto">
+            <div className={`${view === "details" ? "flex" : "hidden lg:flex"} flex-col gap-1.5 lg:h-full`}>
+              <Card className="p-2.5">
+                <h2 className="font-display font-semibold text-on-surface text-xs uppercase tracking-wide mb-1">Request details</h2>
+                {request.description ? (
+                  <p className="text-xs text-on-surface-variant leading-snug whitespace-pre-line">{request.description}</p>
+                ) : (
+                  <p className="text-xs text-on-surface-variant">No additional details were provided.</p>
+                )}
+                <div className="flex flex-wrap items-center gap-2.5 mt-1.5 text-xs">
+                  <span className="inline-flex items-center gap-1 text-on-surface-variant">
+                    <CalendarDays size={12} />{" "}
+                    {request.deadline
+                      ? new Date(request.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                      : "Flexible"}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-on-surface-variant">
+                    <UserRound size={12} /> {request.subject || "General"}
+                  </span>
+                </div>
+                {request.file_urls.length > 0 && (
+                  <div className="flex flex-col gap-1 mt-1.5">
+                    {request.file_urls.map((url, i) => (
+                      <SecureFileLink
+                        key={i}
+                        stored={url}
+                        bucket="request-files"
+                        showDownload
+                        label={fileNameFromUrl(url)}
+                        className="flex items-center gap-2 p-1.5 rounded-lg border border-outline-variant hover:bg-surface-container-low transition-colors"
+                      >
+                        <span className="w-7 h-7 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
+                          <FileText size={13} />
+                        </span>
+                        <span className="min-w-0 flex-1 text-xs font-medium text-on-surface truncate">
+                          {fileNameFromUrl(url)}
+                        </span>
+                      </SecureFileLink>
+                    ))}
+                  </div>
+                )}
+              </Card>
 
-          {!isHelper && request.status === "accepted" && (
-            <Link href="/requests">
-              <Button className="w-full justify-center" size="sm">
-                <RotateCcw size={15} /> View My Requests
-              </Button>
-            </Link>
-          )}
+              {isHelper && !proposal && (
+                <Card className="p-3.5">
+                  <h2 className="font-display font-semibold text-on-surface text-sm mb-1">Send a proposal</h2>
+                  <p className="text-xs text-on-surface-variant mb-3">
+                    Price this request in the chat — the student reviews and accepts from here.
+                  </p>
+                  <Input
+                    label="Price (CAD)"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="25.00"
+                    value={bidPrice}
+                    onChange={(e) => setBidPrice(e.target.value)}
+                  />
+                  <div className="mt-3 flex items-start gap-2 p-2.5 rounded-lg bg-surface-container-low border border-outline-variant">
+                    <RotateCcw size={14} className="text-primary shrink-0 mt-0.5" />
+                    <p className="text-xs leading-relaxed text-on-surface-variant">
+                      Unlimited revisions until the student is satisfied with the delivered work — no extra cost.
+                    </p>
+                  </div>
+                  <div className="mt-3">
+                    <Textarea
+                      label="Proposal message"
+                      rows={3}
+                      placeholder="Describe how you'll help and what's included..."
+                      value={bidDescription}
+                      onChange={(e) => setBidDescription(e.target.value)}
+                    />
+                  </div>
+                  {bidError && <p className="text-sm text-error mt-2">{bidError}</p>}
+                  <Button
+                    disabled={sendingBid}
+                    onClick={handleSendBid}
+                    className="w-full justify-center mt-3"
+                  >
+                    {sendingBid ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                    {sendingBid ? "Sending..." : "Send Proposal"}
+                  </Button>
+                </Card>
+              )}
+
+              {!isHelper && proposal && (
+                <ProposalCard
+                  proposal={proposal}
+                  requestTitle={title}
+                  requestDeadline={request.deadline}
+                  orderId={orderId}
+                  className="lg:flex-1"
+                />
+              )}
+
+              {isHelper && proposal && (
+                <p className="text-xs text-on-surface-variant inline-flex items-center gap-1">
+                  <ShieldCheck size={12} className="text-primary" />
+                  Your proposal is with the student. You&apos;ll be notified when they respond.
+                </p>
+              )}
+
+              {!isHelper && request.status === "accepted" && (
+                <Link href="/requests">
+                  <Button className="w-full justify-center" size="sm">
+                    <RotateCcw size={15} /> View My Requests
+                  </Button>
+                </Link>
+              )}
+            </div>
+
+            {view === "chat" && (
+              <div className="lg:hidden flex flex-col gap-3">
+                {contactCard}
+                <div className="h-[70dvh] min-h-[420px]">{chatPanel}</div>
+              </div>
+            )}
+          </div>
         </div>
-      )}
+
+        <div className="hidden lg:flex flex-col gap-3 lg:col-span-5 min-h-0 lg:h-full">
+          {contactCard}
+          <div className="flex-1 min-h-0">{chatPanel}</div>
+        </div>
+      </div>
     </div>
   );
 }

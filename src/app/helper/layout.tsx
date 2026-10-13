@@ -51,7 +51,7 @@ export default async function HelperLayout({ children }: { children: React.React
         <WarningsBannerClient />
         <div className="flex flex-1 w-full max-w-360 mx-auto lg:min-h-0">
           <HelperNav completedOrders={completedOrders} activeOrders={activeOrders} />
-          <main className="flex-1 min-w-0 p-6 lg:p-8 pb-24 lg:pb-8 lg:min-h-0 lg:overflow-y-auto">
+          <main className="flex-1 min-w-0 p-6 lg:p-8 pb-24 lg:pb-0 lg:min-h-0 lg:overflow-y-auto">
             {children}
           </main>
         </div>

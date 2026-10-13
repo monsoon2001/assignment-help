@@ -30,7 +30,7 @@ export async function submitProposal(
       currency: "CAD",
       description: input.description ?? null,
       revisions_included: input.revisions_included ?? 0,
-      expires_at: input.expires_at ?? null,
+      expires_at: input.expires_at ?? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       status: "pending",
     })
     .select("id")

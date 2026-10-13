@@ -41,6 +41,7 @@ const EMOJIS = [
 export default function ChatPanel({
   title = "Order Chat",
   fill = false,
+  compact = false,
   className = "",
   messages, draft, setDraft, files, setFiles, sending, error, onSend, bottomRef, currentUserId,
   filesBucket,
@@ -48,6 +49,8 @@ export default function ChatPanel({
   title?: string;
   /** When true the panel fills its parent's height instead of using a viewport clamp. */
   fill?: boolean;
+  /** Tighter typography/spacing so more conversation fits on screen. */
+  compact?: boolean;
   className?: string;
   messages: ChatMessageRow[];
   draft: string;
@@ -102,9 +105,9 @@ export default function ChatPanel({
           : "h-[clamp(300px,calc(100vh-320px),480px)] sm:h-[clamp(360px,calc(100vh-300px),560px)] xl:h-[clamp(400px,calc(100vh-280px),600px)]"
       } ${className}`}
     >
-      <div className="flex items-center gap-3 px-5 py-3 border-b border-outline-variant bg-surface-container-low/60">
+      <div className={`flex items-center gap-3 ${compact ? "px-3 py-2" : "px-5 py-3"} border-b border-outline-variant bg-surface-container-low/60`}>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-on-surface">{title}</p>
+          <p className={`${compact ? "text-[13px]" : "text-sm"} font-semibold text-on-surface`}>{title}</p>
           <p className="text-xs text-emerald-600 inline-flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
             Live · messages sync instantly
@@ -112,22 +115,22 @@ export default function ChatPanel({
         </div>
       </div>
 
-      <div ref={messageListRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-4 bg-surface-container-low/40 overscroll-contain pb-6">
+      <div ref={messageListRef} className={`flex-1 overflow-y-auto ${compact ? "px-3 py-3 space-y-3 pb-4" : "px-5 py-4 space-y-4 pb-6"} bg-surface-container-low/40 overscroll-contain`}>
         {messages.length === 0 && (
-          <div className="text-center pt-16">
+          <div className={`text-center ${compact ? "pt-10" : "pt-16"}`}>
             <p className="text-sm text-on-surface-variant">No messages yet — say hello!</p>
           </div>
         )}
         {messages.map((m) => {
           const isMine = m.sender_id === currentUserId;
           return (
-            <div key={m.id} className={`flex ${isMine ? "justify-end" : "justify-start"} gap-2.5`}>
+            <div key={m.id} className={`flex ${isMine ? "justify-end" : "justify-start"} gap-2`}>
               {!isMine && (
                 <Avatar name={(m.sender && !Array.isArray(m.sender) ? m.sender.name : null) || "U"} size="sm" className="mt-1" />
               )}
               <div className={`max-w-[78%] ${isMine ? "items-end text-right" : "items-start"}`}>
                 <div
-                  className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                  className={`${compact ? "px-3 py-2 rounded-xl text-[13px]" : "px-4 py-2.5 rounded-2xl text-sm"} leading-relaxed ${
                     isMine
                       ? "bg-primary-container text-on-primary rounded-br-sm"
                       : "bg-surface-container border border-outline-variant text-on-surface rounded-bl-sm"
@@ -164,7 +167,7 @@ export default function ChatPanel({
         <div ref={bottomRef} />
       </div>
 
-      <div className="border-t border-outline-variant px-4 py-3 bg-surface-container-lowest">
+      <div className={`border-t border-outline-variant ${compact ? "px-3 py-2.5" : "px-4 py-3"} bg-surface-container-lowest`}>
         {files.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-2">
             {files.map((f, i) => (
@@ -229,7 +232,7 @@ export default function ChatPanel({
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Write a message…"
-              className="w-full resize-none outline-none bg-transparent text-sm text-on-surface placeholder:text-outline min-h-6 max-h-32"
+              className="w-full resize-none outline-none bg-transparent text-[13px] text-on-surface placeholder:text-outline min-h-6 max-h-32"
               style={{ height: "auto" }}
             />
           </div>

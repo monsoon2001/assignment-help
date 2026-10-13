@@ -86,7 +86,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0 px-4 md:px-8 py-6 pb-24 md:pb-10 lg:min-h-0 lg:overflow-y-auto">
+        <main className="flex-1 min-w-0 px-4 md:px-8 py-6 pb-24 md:pb-10 lg:pb-0 lg:min-h-0 lg:overflow-y-auto">
           {children}
         </main>
       </div>
