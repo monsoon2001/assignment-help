@@ -101,6 +101,14 @@ html {
   }
 }
 
+/* Phones: tighten Tailwind's spacing scale (padding, margin, gap, space-*)
+   alongside the smaller type so sections don't feel airy. Restored at sm. */
+@media (max-width: 639px) {
+  :root {
+    --spacing: 0.21rem;
+  }
+}
+
 body {
   background: var(--color-background);
   color: var(--color-on-surface);
