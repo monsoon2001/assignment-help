@@ -1,10 +1,24 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowRight, FileText, CheckCircle2, Sparkles, Clock, RefreshCcw, Bell, MessageSquare, Wallet, Inbox, ShoppingBag, RotateCcw, type LucideIcon } from "lucide-react";
+import {
+  ArrowRight,
+  FileText,
+  CheckCircle2,
+  Sparkles,
+  Clock,
+  RefreshCcw,
+  MessageSquare,
+  ShoppingBag,
+  RotateCcw,
+  Package,
+  AlertTriangle,
+  ChevronRight,
+  Inbox,
+  type LucideIcon,
+} from "lucide-react";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
-import { PanelEmpty } from "@/components/ui/states";
 import { createClient } from "@/lib/supabase/server";
 import { unwrapRow } from "@/lib/embedded";
 import { requestStatusVariant } from "@/lib/status-meta";
@@ -34,21 +48,17 @@ function timeAgo(value: string): string {
   return `${days}d ago`;
 }
 
-type NotifRow = { id: string; type: string; message: string; link: string | null; read: boolean; created_at: string };
-
-const ACTIVITY_META: Record<string, { icon: LucideIcon; tone: string }> = {
-  proposal: { icon: FileText, tone: "bg-secondary-container text-on-secondary-container" },
-  request: { icon: Inbox, tone: "bg-primary-container text-on-primary" },
-  payment: { icon: Wallet, tone: "bg-emerald-100 text-emerald-700" },
-  message: { icon: MessageSquare, tone: "bg-primary-container text-on-primary" },
-  delivery: { icon: ShoppingBag, tone: "bg-tertiary-container text-on-tertiary" },
-  revision: { icon: RotateCcw, tone: "bg-amber-100 text-amber-700" },
-  completed: { icon: CheckCircle2, tone: "bg-emerald-100 text-emerald-700" },
+type ActionCardItem = {
+  id: string;
+  key: string;
+  href: string;
+  title: string;
+  body: string;
+  createdAt: string;
+  tone: string;
+  icon: LucideIcon;
+  dot?: boolean;
 };
-
-function activityMeta(type: string): { icon: LucideIcon; tone: string } {
-  return ACTIVITY_META[type] ?? { icon: Bell, tone: "bg-surface-container-high text-on-surface-variant" };
-}
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -60,26 +70,21 @@ export default async function DashboardPage() {
     redirect("/sign-in");
   }
 
-  const [{ data: reqRows }, { data: completedOrders }, { data: notifRows }] =
-    await Promise.all([
-      supabase
-        .from("requests")
-        .select("id, title, subject, description, deadline, file_urls, status, created_at, sent_at, helper:users!requests_helper_id_fkey(id, name)")
-        .eq("student_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(20),
-      supabase
-        .from("orders")
-        .select("id")
-        .eq("student_id", user.id)
-        .eq("status", "completed"),
-      supabase
-        .from("notifications")
-        .select("id, type, message, link, read, created_at")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(8),
-    ]);
+  const [{ data: reqRows }, { data: completedOrders }] = await Promise.all([
+    supabase
+      .from("requests")
+      .select(
+        "id, title, subject, description, deadline, file_urls, status, created_at, sent_at, helper:users!requests_helper_id_fkey(id, name), helper_id"
+      )
+      .eq("student_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(50),
+    supabase
+      .from("orders")
+      .select("id")
+      .eq("student_id", user.id)
+      .eq("status", "completed"),
+  ]);
 
   const requests = (reqRows ?? []).map((r) => ({
     ...r,
@@ -90,39 +95,230 @@ export default async function DashboardPage() {
     .filter((r) => ["proposal_sent", "accepted"].includes(r.status))
     .map((r) => r.id);
 
-  const { data: proposalRows } =
+  const proposalRowsRes =
     activeIds.length > 0
       ? await supabase
           .from("proposals")
-          .select("id, request_id, status")
+          .select("id, request_id, status, created_at, helper_id, price, currency, description")
           .in("request_id", activeIds)
+          .order("created_at", { ascending: false })
       : { data: null };
 
+  const proposals = (proposalRowsRes.data ?? []) as Array<{
+    id: string;
+    request_id: string;
+    status: string;
+    created_at: string;
+    helper_id: string | null;
+  }>;
+
   const acceptedByRequest = new Map<string, string>();
-  for (const p of (proposalRows ?? []) as { id: string; request_id: string; status: string }[]) {
-    if (p.status === "accepted") acceptedByRequest.set(p.request_id, p.id);
+  for (const p of proposals) {
+    if (p.status === "accepted") {
+      if (!acceptedByRequest.has(p.request_id)) {
+        acceptedByRequest.set(p.request_id, p.id);
+      }
+    }
   }
 
   const orderByProposal = new Map<string, string>();
   if (acceptedByRequest.size > 0) {
     const { data: orderRows } = await supabase
       .from("orders")
-      .select("id, proposal_id")
+      .select("id, proposal_id, status, updated_at, created_at")
       .in("proposal_id", Array.from(acceptedByRequest.values()));
-    for (const o of (orderRows ?? []) as { id: string; proposal_id: string }[]) {
+    for (const o of (orderRows ?? []) as Array<{ id: string; proposal_id: string; status: string }>) {
       orderByProposal.set(o.proposal_id, o.id);
     }
   }
+
+  const actionCards: ActionCardItem[] = [];
+  const seenKeys = new Set<string>();
+
+  // Proposals for requests that are still open (proposal_sent or just have pending proposal)
+  for (const req of requests) {
+    if (req.status === "cancelled" || req.status === "declined") continue;
+    const reqProposals = proposals.filter((p) => p.request_id === req.id && p.status !== "declined");
+    for (const p of reqProposals) {
+      const key = `proposal:${p.id}:${req.id}`;
+      if (seenKeys.has(key)) continue;
+      seenKeys.add(key);
+      actionCards.push({
+        id: p.id,
+        key,
+        href: `/requests/${req.id}`,
+        title: "New proposal",
+        body: `Helper sent a proposal for "${req.title}". Review and respond.`,
+        createdAt: p.created_at,
+        tone: "bg-secondary-container text-on-secondary-container",
+        icon: FileText,
+        dot: true,
+      });
+    }
+  }
+
+  // Orders that need action from student
+  const orderListRes = await supabase
+    .from("orders")
+    .select("id, status, updated_at, created_at, proposal:proposals(id, request_id, request:requests(id,title))")
+    .eq("student_id", user.id)
+    .order("updated_at", { ascending: false })
+    .limit(30);
+
+  const orders = (orderListRes.data ?? []).map((o) => {
+    const prop = unwrapRow<{ id: string | null; request_id: string | null; request: unknown }>(o.proposal);
+    const req = unwrapRow<{ id: string | null; title: string | null }>(prop?.request);
+    return {
+      id: o.id,
+      status: o.status,
+      updated_at: o.updated_at,
+      created_at: o.created_at,
+      requestId: req?.id ?? null,
+      requestTitle: req?.title ?? "your request",
+      proposalId: prop?.id ?? null,
+    };
+  });
+
+  for (const o of orders) {
+    if (!o.requestId) continue;
+    if (o.status === "payment_pending") {
+      const key = `order:pay:${o.id}`;
+      if (!seenKeys.has(key)) {
+        seenKeys.add(key);
+        actionCards.push({
+          id: o.id,
+          key,
+          href: `/orders/${o.id}/payment`,
+          title: "Complete payment",
+          body: `Payment pending for "${o.requestTitle}". Pay to start the work.`,
+          createdAt: o.created_at,
+          tone: "bg-amber-100 text-amber-700",
+          icon: AlertTriangle,
+          dot: true,
+        });
+      }
+    }
+    if (o.status === "delivered") {
+      const key = `order:delivered:${o.id}`;
+      if (!seenKeys.has(key)) {
+        seenKeys.add(key);
+        actionCards.push({
+          id: o.id,
+          key,
+          href: `/requests/${o.requestId}`,
+          title: "Work delivered",
+          body: `Work delivered for "${o.requestTitle}". Review and approve or request revision.`,
+          createdAt: o.updated_at,
+          tone: "bg-emerald-100 text-emerald-700",
+          icon: Package,
+          dot: true,
+        });
+      }
+    }
+    if (o.status === "revision_requested") {
+      const key = `order:revision:${o.id}`;
+      if (!seenKeys.has(key)) {
+        seenKeys.add(key);
+        actionCards.push({
+          id: o.id,
+          key,
+          href: `/requests/${o.requestId}`,
+          title: "Revision in progress",
+          body: `Revision requested for "${o.requestTitle}". Helper is working on it.`,
+          createdAt: o.updated_at,
+          tone: "bg-amber-100 text-amber-700",
+          icon: RotateCcw,
+          dot: true,
+        });
+      }
+    }
+  }
+
+  // Recent messages from helpers (request messages + order messages) that need attention
+  const { data: reqMsgRows } = await supabase
+    .from("messages")
+    .select("id, request_id, sender_id, created_at, content")
+    .in(
+      "request_id",
+      requests.map((r) => r.id)
+    )
+    .order("created_at", { ascending: false })
+    .limit(15);
+  for (const m of (reqMsgRows ?? []) as Array<{ id: string; request_id: string | null; sender_id: string; created_at: string }>) {
+    if (!m.request_id) continue;
+    const req = requests.find((r) => r.id === m.request_id);
+    if (!req) continue;
+    if (m.sender_id === user.id) continue;
+    if (req.helper_id && m.sender_id === req.helper_id) {
+      const key = `msg:req:${m.id}`;
+      if (!seenKeys.has(key)) {
+        seenKeys.add(key);
+        actionCards.push({
+          id: m.id,
+          key,
+          href: `/requests/${req.id}`,
+          title: "New message",
+          body: `Helper replied on "${req.title}".`,
+          createdAt: m.created_at,
+          tone: "bg-primary-container text-on-primary",
+          icon: MessageSquare,
+          dot: true,
+        });
+      }
+    }
+  }
+
+  const orderIdsForMsgs = orders.map((o) => o.id);
+  if (orderIdsForMsgs.length > 0) {
+    const { data: ordMsgRows } = await supabase
+      .from("messages")
+      .select("id, order_id, sender_id, created_at")
+      .in("order_id", orderIdsForMsgs)
+      .order("created_at", { ascending: false })
+      .limit(15);
+    for (const m of (ordMsgRows ?? []) as Array<{ id: string; order_id: string | null; sender_id: string; created_at: string }>) {
+      if (!m.order_id) continue;
+      const o = orders.find((x) => x.id === m.order_id);
+      if (!o || !o.requestId) continue;
+      if (m.sender_id === user.id) continue;
+      const key = `msg:ord:${m.id}`;
+      if (!seenKeys.has(key)) {
+        seenKeys.add(key);
+        actionCards.push({
+          id: m.id,
+          key,
+          href: `/requests/${o.requestId}`,
+          title: "New message",
+          body: `Helper replied on "${o.requestTitle}".`,
+          createdAt: m.created_at,
+          tone: "bg-primary-container text-on-primary",
+          icon: MessageSquare,
+          dot: true,
+        });
+      }
+    }
+  }
+
+  // Remove delivered/completed/declined/cancelled context from action cards by cross-checking - keep only actionable
+  const actionable = actionCards
+    .filter((card) => {
+      // Remove if it's about a completed order
+      if (card.key.startsWith("order:")) {
+        const oId = card.id;
+        const o = orders.find((x) => x.id === oId);
+        if (o && ["completed", "cancelled", "declined", "disputed"].includes(o.status)) return false;
+        if (o && o.status === "delivered" && card.key.startsWith("order:revision")) return false;
+      }
+      return true;
+    })
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 12);
 
   const firstName = (user.user_metadata?.name ?? user.email ?? "there").toString().trim().split(/\s+/)[0];
   const activeCount = requests.filter((r) => ["requested", "proposal_sent", "accepted"].includes(r.status)).length;
   const awaitingCount = requests.filter((r) => r.status === "requested").length;
   const completedCount = completedOrders?.length ?? 0;
-
-  const notifications = (notifRows ?? []) as NotifRow[];
-  const nextAction = requests.find((r) =>
-    ["requested", "proposal_sent", "accepted"].includes(r.status)
-  );
+  const nextAction = requests.find((r) => ["requested", "proposal_sent", "accepted"].includes(r.status));
 
   const stats = [
     { icon: FileText, label: "Open requests", value: String(activeCount), href: "/requests", tone: "bg-primary-container text-on-primary" },
@@ -132,12 +328,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="w-full max-w-7xl mx-auto flex flex-col gap-8">
-      {/* Greeting + primary action */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <h1 className="font-display font-bold text-2xl sm:text-3xl text-on-surface">
-            Hi, {firstName}
-          </h1>
+          <h1 className="font-display font-bold text-2xl sm:text-3xl text-on-surface">Hi, {firstName}</h1>
           <p className="text-on-surface-variant text-sm sm:text-base mt-1">
             {nextAction
               ? `"${nextAction.title}" is ${STATUS_LABEL[nextAction.status]?.toLowerCase() ?? "in progress"}.`
@@ -154,7 +347,6 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* At a glance */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-4" aria-label="At a glance">
         {stats.map((s) => {
           const Icon = s.icon;
@@ -174,8 +366,44 @@ export default async function DashboardPage() {
         })}
       </section>
 
+      {actionable.length > 0 && (
+        <section className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="font-display font-bold text-lg text-on-surface">Action Required</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {actionable.map((card) => {
+              const Icon = card.icon;
+              return (
+                <Link key={card.key} href={card.href}>
+                  <Card className="p-5 hover:shadow-md transition-shadow border border-primary-container/40" hover>
+                    <div className="flex items-start gap-3">
+                      <span className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${card.tone}`}>
+                        <Icon size={18} />
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-on-surface truncate">{card.title}</p>
+                          {card.dot && <span className="w-2 h-2 rounded-full bg-primary" />}
+                        </div>
+                        <p className="text-sm text-on-surface-variant line-clamp-2 mt-1">{card.body}</p>
+                        <div className="flex items-center justify-between mt-3">
+                          <p className="text-xs text-on-surface-variant">{timeAgo(card.createdAt)}</p>
+                          <span className="text-sm font-medium text-primary inline-flex items-center gap-1">
+                            Act now <ChevronRight size={14} />
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
-        {/* Your requests */}
         <section className="xl:col-span-2 flex flex-col gap-4">
           <div className="flex items-center justify-between gap-4">
             <h2 className="font-display font-bold text-lg text-on-surface">Your Requests</h2>
@@ -201,7 +429,7 @@ export default async function DashboardPage() {
             const proposalId = acceptedByRequest.get(r.id);
             const orderId = proposalId ? orderByProposal.get(proposalId) : undefined;
             const overdue = r.status === "requested" && isPastResponseWindow(r.sent_at);
-            const target = orderId ? `/orders/${orderId}` : `/requests/${r.id}`;
+            const target = orderId ? `/requests/${r.id}` : `/requests/${r.id}`;
             return (
               <Card key={r.id} hover className="p-5">
                 <Link href={target} className="flex items-center justify-between gap-4 min-h-11 -my-2">
@@ -212,7 +440,9 @@ export default async function DashboardPage() {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="font-display font-semibold text-on-surface truncate">{r.title}</h3>
-                        <Badge variant={meta.variant} dot>{meta.label}</Badge>
+                        <Badge variant={meta.variant} dot>
+                          {meta.label}
+                        </Badge>
                       </div>
                       <p className="text-xs text-on-surface-variant mt-0.5">
                         {r.subject || "General"}
@@ -235,42 +465,35 @@ export default async function DashboardPage() {
           })}
         </section>
 
-        {/* Recent activity */}
         <section>
           <div className="flex items-center justify-between gap-4 mb-3">
-            <h2 className="font-display font-bold text-lg text-on-surface">Recent Activity</h2>
+            <h2 className="font-display font-bold text-lg text-on-surface">Quick Links</h2>
             <Link href="/notifications" className="text-sm font-semibold text-primary min-h-11 -my-2 inline-flex items-center hover:underline">
-              View all
+              View all notifications
             </Link>
           </div>
-          <Card className="divide-y divide-outline-variant/50 overflow-hidden">
-            {notifications.length === 0 && (
-              <PanelEmpty
-                icon={<Sparkles size={18} className="text-primary" />}
-                title="No activity yet"
-                message="When a helper sends you a proposal, a message or a delivery, it will show up here."
-                actionHref="/requests/new"
-                actionLabel="Start a request"
-              />
-            )}
-            {notifications.map((n) => {
-              const meta = activityMeta(n.type);
-              const Icon = meta.icon;
-              return (
-                <Link href={n.link ?? "/notifications"} key={n.id} className="flex items-start gap-3 p-4 hover:bg-surface-container-low transition-colors">
-                  <span className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${meta.tone}`}>
-                    <Icon size={16} />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className={`text-sm line-clamp-2 ${n.read ? "text-on-surface-variant" : "font-semibold text-on-surface"}`}>
-                      {n.message}
-                    </p>
-                    <p className="text-xs text-on-surface-variant mt-1">{timeAgo(n.created_at)}</p>
-                  </div>
-                  {!n.read && <span className="w-2 h-2 rounded-full bg-primary-container shrink-0 mt-1.5" />}
-                </Link>
-              );
-            })}
+          <Card className="p-4 flex flex-col gap-2">
+            <Link href="/messages" className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-surface-container-low transition-colors">
+              <div className="flex items-center gap-2">
+                <MessageSquare size={16} className="text-primary" />
+                <span className="text-sm text-on-surface">Messages</span>
+              </div>
+              <ArrowRight size={14} className="text-on-surface-variant" />
+            </Link>
+            <Link href="/orders" className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-surface-container-low transition-colors">
+              <div className="flex items-center gap-2">
+                <Package size={16} className="text-primary" />
+                <span className="text-sm text-on-surface">Orders</span>
+              </div>
+              <ArrowRight size={14} className="text-on-surface-variant" />
+            </Link>
+            <Link href="/requests" className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-surface-container-low transition-colors">
+              <div className="flex items-center gap-2">
+                <Inbox size={16} className="text-primary" />
+                <span className="text-sm text-on-surface">My Requests</span>
+              </div>
+              <ArrowRight size={14} className="text-on-surface-variant" />
+            </Link>
           </Card>
         </section>
       </div>
