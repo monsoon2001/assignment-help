@@ -236,7 +236,7 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
         </div>
 
         <div className="grid lg:grid-cols-[1fr_240px] gap-8 lg:gap-12">
-          <article className="min-w-0 bg-white rounded-2xl border border-outline-variant/30 p-6 sm:p-8 shadow-sm">
+          <article className="min-w-0 break-words bg-white rounded-2xl border border-outline-variant/30 p-6 sm:p-8 shadow-sm">
             <div className="mb-8">
               {resource.intro.map((para) => (
                 <p key={para} className="text-lg text-on-surface leading-relaxed mb-4">

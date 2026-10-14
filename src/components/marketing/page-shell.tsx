@@ -135,16 +135,16 @@ export function PageHeader({
   return (
     <div className="border-b border-outline-variant/40 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6">
-        <nav className="flex items-center gap-1.5 text-sm mb-3" aria-label="Breadcrumb">
+        <nav className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm mb-3" aria-label="Breadcrumb">
           {crumbs.map((crumb, i) => (
-            <span key={`${crumb.label}-${i}`} className="flex items-center gap-1.5">
-              {i > 0 && <ChevronRight className="w-3 h-3 text-outline-variant" />}
+            <span key={`${crumb.label}-${i}`} className="flex min-w-0 items-center gap-1.5">
+              {i > 0 && <ChevronRight className="w-3 h-3 shrink-0 text-outline-variant" />}
               {crumb.href ? (
                 <Link href={crumb.href} className={`text-on-surface-variant transition-colors inline-flex items-center min-h-11 min-w-11`}>
                   {crumb.label}
                 </Link>
               ) : (
-                <span className="text-on-surface font-medium truncate max-w-[14rem] inline-block">{crumb.label}</span>
+                <span className="text-on-surface font-medium truncate max-w-[60vw] sm:max-w-[16rem] inline-block">{crumb.label}</span>
               )}
             </span>
           ))}
