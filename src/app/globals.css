@@ -88,7 +88,7 @@ html {
   /* Tailwind's rem-based type scale is built on this, so the root size sets the
      whole page's scale. Phones start smaller (more content per screen, no
      cramped/overflowing bars); from the sm breakpoint up we use the design size. */
-  font-size: 16px;
+   font-size: 15px;
   /* Safari boosts font sizes on wide viewports ("text autosizing") on top of
      the rem scale above, which overflows dense bars like the navbar. */
   -webkit-text-size-adjust: 100%;
