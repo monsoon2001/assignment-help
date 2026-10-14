@@ -130,7 +130,7 @@ export default function ChatPanel({
               )}
               <div className={`max-w-[78%] ${isMine ? "items-end text-right" : "items-start"}`}>
                 <div
-                  className={`${compact ? "px-3 py-2 rounded-xl text-[13px]" : "px-4 py-2.5 rounded-2xl text-sm"} leading-relaxed ${
+                  className={`${compact ? "px-3 py-1.5 rounded-xl text-[14px]" : "px-3.5 py-2 rounded-2xl text-[15px]"} leading-snug ${
                     isMine
                       ? "bg-primary-container text-on-primary rounded-br-sm"
                       : "bg-surface-container border border-outline-variant text-on-surface rounded-bl-sm"
@@ -196,7 +196,7 @@ export default function ChatPanel({
                   <button
                     key={e}
                     onClick={() => insertEmoji(e)}
-                    className="w-8 h-8 flex items-center justify-center text-lg rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer"
+                    className="w-8 h-8 flex items-center justify-center text-xl rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer"
                   >
                     {e}
                   </button>
@@ -232,7 +232,7 @@ export default function ChatPanel({
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Write a message…"
-              className="w-full resize-none outline-none bg-transparent text-[13px] text-on-surface placeholder:text-outline min-h-6 max-h-32"
+              className="w-full resize-none outline-none bg-transparent text-[14px] text-on-surface placeholder:text-outline min-h-6 max-h-32"
               style={{ height: "auto" }}
             />
           </div>

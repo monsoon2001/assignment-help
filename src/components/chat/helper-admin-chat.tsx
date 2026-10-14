@@ -228,7 +228,7 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
             return (
               <div key={`msg-${m.id}`} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                 <div
-                  className={`max-w-[78%] rounded-2xl px-4 py-2.5 text-sm ${
+                  className={`max-w-[78%] rounded-2xl px-3.5 py-2 text-[15px] leading-snug ${
                     mine
                       ? "bg-primary-container text-on-primary rounded-br-md"
                       : "bg-surface-container-high text-on-surface rounded-bl-md"
@@ -280,7 +280,7 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
                       setDraft((d) => d + e);
                       setEmojiOpen(false);
                     }}
-                    className="w-8 h-8 flex items-center justify-center text-lg rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer"
+                    className="w-8 h-8 flex items-center justify-center text-xl rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer"
                   >
                     {e}
                   </button>
@@ -306,7 +306,7 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Write a message…"
-                className="w-full resize-none outline-none bg-transparent text-sm text-on-surface placeholder:text-outline min-h-6 max-h-32"
+                className="w-full resize-none outline-none bg-transparent text-[15px] text-on-surface placeholder:text-outline min-h-6 max-h-32"
                 style={{ height: "auto" }}
               />
             </div>
