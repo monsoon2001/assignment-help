@@ -179,7 +179,7 @@ export function CtaBand({
   eyebrow?: string;
 }) {
   return (
-    <section className="relative overflow-hidden py-16 band-ink" aria-labelledby="cta-heading">
+    <section className="relative overflow-hidden py-12 sm:py-16 band-ink" aria-labelledby="cta-heading">
       <div className="absolute inset-0 band-ink-grid" aria-hidden="true" />
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {eyebrow && (

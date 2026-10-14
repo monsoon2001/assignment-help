@@ -8,27 +8,34 @@ import {
   Clock,
   CheckCircle,
   ArrowUpRight,
+  Receipt,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { Receipt } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
 import { ErrorState, PanelEmpty } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
 
-type PaymentRow = {
+type PayoutRow = {
   id: string;
-  amount: number;
-  currency: string;
-  status: string;
-  created_at: string;
-  receipt_url: string | null;
-  request_title: string | null;
-  helper_payout_status: string | null;
+  amount_sent_cad: number;
+  amount_received: number | null;
+  received_currency: string | null;
+  method: string;
+  reference: string | null;
+  order_ids: string[] | null;
+  paid_at: string;
+  notes: string | null;
 };
 
 function monthLabel(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
+
+function methodLabel(method: string): string {
+  if (method === "wise") return "Wise";
+  if (method === "bank_transfer") return "Bank transfer";
+  return "Other";
 }
 
 export default async function HelperEarnings() {
@@ -44,13 +51,13 @@ export default async function HelperEarnings() {
   const today = new Date();
   const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
 
-  const { data: payments, error } = await supabase
-    .from("helper_payments")
-    .select("id, amount, currency, status, created_at, receipt_url, request_title, helper_payout_status")
-    .eq("status", "paid")
-    .order("created_at", { ascending: false });
+  // The view is already scoped to the signed-in helper.
+  const { data: payouts, error } = await supabase
+    .from("helper_payouts")
+    .select("id, amount_sent_cad, amount_received, received_currency, method, reference, order_ids, paid_at, notes")
+    .order("paid_at", { ascending: false });
 
-  const rows = ((payments ?? []) as unknown) as PaymentRow[];
+  const rows = ((payouts ?? []) as unknown) as PayoutRow[];
 
   const { count: completedCount } = await supabase
     .from("orders")
@@ -58,13 +65,13 @@ export default async function HelperEarnings() {
     .eq("helper_id", user.id)
     .eq("status", "completed");
 
-  // Everything is CAD, so totals are a straight sum of the helper's share.
+  // Earnings are the payouts actually recorded by the Acadivo team (in CAD).
   let totalEarned = 0;
   let monthTotal = 0;
   for (const p of rows) {
-    const amount = Number(p.amount);
+    const amount = Number(p.amount_sent_cad);
     totalEarned += amount;
-    if (new Date(p.created_at).getTime() >= monthStart.getTime()) {
+    if (new Date(p.paid_at).getTime() >= monthStart.getTime()) {
       monthTotal += amount;
     }
   }
@@ -73,8 +80,8 @@ export default async function HelperEarnings() {
 
   const monthly = new Map<string, number>();
   for (const p of rows) {
-    const key = monthLabel(p.created_at);
-    monthly.set(key, (monthly.get(key) ?? 0) + Number(p.amount));
+    const key = monthLabel(p.paid_at);
+    monthly.set(key, (monthly.get(key) ?? 0) + Number(p.amount_sent_cad));
   }
   const chart = Array.from(monthly.entries()).sort((a, b) => a[0].localeCompare(b[0]));
   const maxMonth = chart.reduce((m, [, v]) => Math.max(m, v), 0);
@@ -83,7 +90,7 @@ export default async function HelperEarnings() {
     { label: "Total Earned", value: fmtTotal, icon: DollarSign, color: "bg-emerald-100 text-emerald-700" },
     { label: "This Month", value: fmtMonth, icon: TrendingUp, color: "bg-primary-container text-on-primary" },
     { label: "Completed Orders", value: String(completedCount ?? 0), icon: CheckCircle, color: "bg-secondary-container text-on-secondary-container" },
-    { label: "Payouts", value: "Manual", icon: Clock, color: "bg-amber-100 text-amber-700" },
+    { label: "Payouts", value: String(rows.length), icon: Clock, color: "bg-amber-100 text-amber-700" },
   ];
 
   return (
@@ -92,7 +99,7 @@ export default async function HelperEarnings() {
         <div>
           <h1 className="font-display text-2xl font-bold text-on-surface">Earnings</h1>
           <p className="text-on-surface-variant mt-1">
-            Track your earnings and transaction history.
+            {formatCurrency(totalEarned)} sent to you across {rows.length} payout{rows.length === 1 ? "" : "s"}.
           </p>
         </div>
         <Link href="/helper/orders" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline min-h-11 -my-2">
@@ -103,7 +110,7 @@ export default async function HelperEarnings() {
       {error ? (
         <ErrorState
           title="Couldn't load your earnings"
-          message="We hit a snag fetching your payment history. Please try again in a moment."
+          message="We hit a snag fetching your payout history. Please try again in a moment."
         />
       ) : (
         <>
@@ -130,15 +137,12 @@ export default async function HelperEarnings() {
             <Card className="p-6">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 mb-1">
                 <h2 className="font-display text-lg font-semibold text-on-surface">
-                  Monthly Earnings
+                  Monthly Payouts
                 </h2>
-                <span className="text-xs text-on-surface-variant">
-                  In CAD
-                </span>
+                <span className="text-xs text-on-surface-variant">In CAD</span>
               </div>
               <p className="text-sm text-on-surface-variant mb-6">
-                Your share of each order, grouped by month. Payouts are sent manually by the
-                Acadivo team.
+                Amounts the Acadivo team sent you, grouped by month.
               </p>
 
               <div className="flex items-end gap-3 sm:gap-5 h-48">
@@ -177,70 +181,66 @@ export default async function HelperEarnings() {
           <Card>
             <div className="p-6 border-b border-outline-variant/30">
               <h2 className="font-display text-lg font-semibold text-on-surface">
-                Transaction History {rows.length > 0 && `(${rows.length})`}
+                Payout History {rows.length > 0 && `(${rows.length})`}
               </h2>
             </div>
             {rows.length === 0 ? (
               <PanelEmpty
                 icon={<Receipt size={18} className="text-primary" />}
-                title="No payments yet"
-                message="Paid orders will appear here as earnings once a student completes checkout."
+                title="No payouts yet"
+                message="Payouts recorded by the Acadivo team will appear here."
                 actionHref="/helper/orders"
                 actionLabel="View your orders"
               />
             ) : (
-              <table className="w-full">
+              <div className="overflow-x-auto">
+              <table className="w-full min-w-[520px]">
                 <thead>
                   <tr className="border-b border-outline-variant/30">
-                    <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Transaction</th>
-                    <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Date</th>
-                    <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Status</th>
-                    <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Amount</th>
+                    <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Payout</th>
+                    <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Date</th>
+                    <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Method</th>
+                    <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Amount</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((txn) => {
-                    const title = txn.request_title ?? "Acadivo order";
+                  {rows.map((p) => {
+                    const orderCount = Array.isArray(p.order_ids) ? p.order_ids.length : 0;
                     return (
-                      <tr key={txn.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
-                        <td className="px-6 py-4">
+                      <tr key={p.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
+                        <td className="px-3 sm:px-6 py-4">
                           <div>
-                            <p className="text-sm font-medium text-on-surface truncate max-w-80">{title}</p>
-                            <p className="text-xs text-on-surface-variant font-mono">{txn.id.slice(0, 8).toUpperCase()}</p>
-                            {txn.receipt_url && (
-                              <a
-                                href={txn.receipt_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline mt-1"
-                              >
-                                <Receipt size={12} /> View receipt
-                              </a>
+                            <p className="text-sm font-medium text-on-surface">
+                              {orderCount} order{orderCount === 1 ? "" : "s"} paid out
+                            </p>
+                            <p className="text-xs text-on-surface-variant font-mono">{p.id.slice(0, 8).toUpperCase()}</p>
+                            {p.reference && (
+                              <p className="text-xs text-on-surface-variant mt-1">Ref: {p.reference}</p>
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-sm text-on-surface-variant">
-                          {new Date(txn.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">
+                          {new Date(p.paid_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                         </td>
-                        <td className="px-6 py-4">
-                          {txn.helper_payout_status === "paid" ? (
-                            <Badge variant="success">Paid out</Badge>
-                          ) : txn.helper_payout_status === "on_hold" ? (
-                            <Badge variant="warning">On hold</Badge>
-                          ) : (
-                            <Badge variant="outline">Unpaid</Badge>
-                          )}
+                        <td className="px-3 sm:px-6 py-4">
+                          <Badge variant="outline">{methodLabel(p.method)}</Badge>
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-3 sm:px-6 py-4 text-right">
                           <span className="text-sm font-semibold text-emerald-600">
-                            +{formatCurrency(Number(txn.amount))}
+                            +{formatCurrency(Number(p.amount_sent_cad))}
                           </span>
+                          {p.amount_received !== null && p.received_currency && (
+                            <span className="block text-xs text-on-surface-variant">
+                              received {p.amount_received} {p.received_currency}
+                            </span>
+                          )}
                         </td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
+              </div>
             )}
           </Card>
         </>

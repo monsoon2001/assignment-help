@@ -18,7 +18,7 @@ export default function ContactPage() {
       />
 
       <div className="band-soft">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="grid lg:grid-cols-5 gap-10 lg:gap-12">
           {/* Form */}
           <div className="lg:col-span-3">

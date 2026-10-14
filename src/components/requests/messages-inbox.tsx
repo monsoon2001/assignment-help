@@ -94,7 +94,7 @@ export default function MessagesInbox({
       </div>
 
       {threads.length === 0 ? (
-        <Card className="p-12 text-center flex flex-col items-center gap-3">
+        <Card className="p-8 sm:p-12 text-center flex flex-col items-center gap-3">
           <span className="w-14 h-14 rounded-2xl bg-primary-container/20 flex items-center justify-center">
             <MessageSquare size={26} className="text-primary" />
           </span>
@@ -141,7 +141,7 @@ export default function MessagesInbox({
             ))}
           </Card>
 
-          <div className="lg:col-span-2 flex flex-col gap-4">
+          <div className="hidden lg:flex lg:col-span-2 flex-col gap-4">
             <Card className="p-6 sm:p-8 text-center flex flex-col items-center gap-3">
               <div className="w-14 h-14 rounded-2xl bg-primary-container/30 flex items-center justify-center">
                 <MessageSquare size={26} className="text-primary" />

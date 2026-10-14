@@ -6,8 +6,8 @@ import { headers } from "next/headers";
  * the hosting platform's geolocation headers (Vercel / Cloudflare). Returns null
  * when the country cannot be determined (e.g. local development).
  *
- * This is only used to pick an *approximate* display currency; it never
- * influences the amount charged.
+ * Used to seed a user's saved country on first sign-in, which in turn decides the
+ * currency they are charged in. It never lets a client pick the amount.
  */
 export async function getIpCountry(): Promise<string | null> {
   try {

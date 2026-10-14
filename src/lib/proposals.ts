@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { normalizeCurrency } from "@/lib/currency";
 
 export interface NewProposalInput {
   request_id: string;
@@ -27,7 +28,7 @@ export async function submitProposal(
       request_id: input.request_id,
       helper_id: user.id,
       price: input.price,
-      currency: "CAD",
+      currency: normalizeCurrency(input.currency),
       description: input.description ?? null,
       revisions_included: input.revisions_included ?? 0,
       expires_at: input.expires_at ?? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),

@@ -25,22 +25,22 @@ const footerLinks = {
 export default function Footer() {
   return (
     <footer className="bg-surface-container-high border-t border-outline-variant/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-10 items-start">
-          <div className="sm:col-span-2 lg:col-span-1">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 sm:gap-x-10 gap-y-8 items-start">
+          <div className="col-span-2 sm:col-span-2 lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 bg-primary-container rounded-lg flex items-center justify-center">
                 <MaterialIcon name="school" size={18} className="text-on-primary" />
               </div>
               <span className="font-display font-bold text-xl text-on-surface">Acadivo</span>
             </Link>
-            <p className="text-sm text-on-surface-variant leading-relaxed">
+            <p className="text-sm text-on-surface-variant leading-relaxed max-w-md">
               Connect with verified peer helpers for academic guidance and support across all subjects.
             </p>
           </div>
 
           {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category} className={category === "Legal" ? "sm:col-span-2 lg:col-span-1" : ""}>
+            <div key={category} className={category === "Legal" ? "col-span-2 sm:col-span-2 lg:col-span-1" : ""}>
               <h3 className="font-semibold text-on-surface text-sm mb-3">{category}</h3>
               <ul className="space-y-2">
                 {links.map((link) => (

@@ -1,7 +1,7 @@
-// Acceptance tests for the platform-collected, CAD-only payment model.
+// Acceptance tests for the multi-currency local-charge + manual-payout model.
 //
 // Prerequisites:
-//   * supabase/migrations/20261011000001_payment_model_cad_ledger.sql applied
+//   * supabase/migrations/20261013000001_multicurrency_local_charge.sql applied
 //   * a dev server running at http://localhost:3000
 //   * .env.local with Supabase + Stripe (test mode) keys
 //
@@ -32,7 +32,6 @@ const secretKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 const BASE = "http://localhost:3000";
 const PRICE = 100.0;
-const SHARE_PERCENT = 80;
 
 const admin = createClient(url, secretKey, {
   auth: { autoRefreshToken: false, persistSession: false },
@@ -54,7 +53,7 @@ function check(name, condition, detail = "") {
   }
 }
 
-async function createUser(role, tag) {
+async function createUser(role, tag, country) {
   const email = `pay.${role}.${tag}@acadivo.test`;
   const { data, error } = await admin.auth.admin.createUser({
     email,
@@ -63,7 +62,10 @@ async function createUser(role, tag) {
     user_metadata: { name: `Pay ${role}`, role },
   });
   if (error) throw error;
-  await admin.from("users").update({ role }).eq("id", data.user.id);
+  await admin
+    .from("users")
+    .update({ role, ...(country ? { country } : {}) })
+    .eq("id", data.user.id);
   return { id: data.user.id, email };
 }
 
@@ -126,6 +128,7 @@ async function postWebhook(evt) {
 }
 
 let requestId, proposalId, orderId, student, helper, studentSession, piId;
+let requestId2, proposalId2, orderId2, student2, student2Session;
 const createdEventIds = [];
 
 (async () => {
@@ -134,33 +137,35 @@ const createdEventIds = [];
   // Fail fast if the migration was not applied.
   const { error: schemaErr } = await admin
     .from("platform_settings")
-    .select("id")
+    .select("fx_surcharge_percent")
     .limit(1);
   if (schemaErr) {
     throw new Error(
-      `Migration 20261011000001 does not appear to be applied (${schemaErr.message}). ` +
+      `Migration 20261013000001 does not appear to be applied (${schemaErr.message}). ` +
         "Apply it before running this test."
     );
   }
 
   const tag = Date.now();
-  student = await createUser("student", tag);
+  // A Canadian student has no FX buffer, so the charge is deterministic (no
+  // network rate is required) — keeps the test hermetic.
+  student = await createUser("student", tag, "CA");
   helper = await createUser("helper", tag);
   studentSession = await buildSession(student);
 
-  // --- seed a request -> proposal (accepted) -> order (payment_pending) -------
+  // --- seed a request -> pending proposal -------------------------------------
   const deadline = new Date(Date.now() + 7 * 864e5).toISOString();
   const { data: req, error: reqErr } = await admin
     .from("requests")
     .insert({
       student_id: student.id,
-      title: "Payment model acceptance test",
-      description: "CAD ledger acceptance test request.",
+      title: "Multi-currency acceptance test",
+      description: "Local charge acceptance test request.",
       subject: "Economics",
       deadline,
       file_urls: [],
       helper_id: helper.id,
-      status: "accepted",
+      status: "proposal_sent",
     })
     .select("id")
     .single();
@@ -177,30 +182,39 @@ const createdEventIds = [];
       description: "Acceptance test proposal.",
       revisions_included: 1,
       expires_at: new Date(Date.now() + 3 * 864e5).toISOString(),
-      status: "accepted",
+      status: "pending",
     })
     .select("id")
     .single();
   if (propErr) throw propErr;
   proposalId = prop.id;
 
-  const { data: order, error: orderErr } = await admin
-    .from("orders")
-    .insert({
-      proposal_id: proposalId,
-      student_id: student.id,
-      helper_id: helper.id,
-      status: "payment_pending",
-      price: PRICE,
-      currency: "CAD",
-      deadline,
-    })
-    .select("id")
-    .single();
-  if (orderErr) throw orderErr;
-  orderId = order.id;
+  // --- 1. Accepting via the server route locks the local charge ----------------
+  const acceptRes = await fetch(`${BASE}/api/orders/accept`, {
+    method: "POST",
+    headers: { "content-type": "application/json", cookie: studentSession.cookieHeader },
+    body: JSON.stringify({ proposal_id: proposalId, request_id: requestId }),
+  });
+  const acceptBody = await acceptRes.json().catch(() => ({}));
+  check("accept route creates an order", acceptRes.status === 200 && !!acceptBody.orderId, JSON.stringify(acceptBody));
+  orderId = acceptBody.orderId;
 
-  // --- 1. Checkout: CAD only, amount from the stored proposal, client ignored -
+  if (!orderId) {
+    throw new Error("Order was not created; cannot continue.");
+  }
+
+  const { data: orderRow } = await admin
+    .from("orders")
+    .select("status, price, currency, base_amount, base_currency, charge_amount, charge_currency, charge_locked_at")
+    .eq("id", orderId)
+    .single();
+  check("order base amount locked to proposal", Number(orderRow?.base_amount) === PRICE, `got ${orderRow?.base_amount}`);
+  check("order base currency is CAD", orderRow?.base_currency === "CAD", `got ${orderRow?.base_currency}`);
+  check("order charge locked to CAD for a Canadian student", orderRow?.charge_currency === "CAD", `got ${orderRow?.charge_currency}`);
+  check("order charge amount = base for Canada (no buffer)", Number(orderRow?.charge_amount) === PRICE, `got ${orderRow?.charge_amount}`);
+  check("order charge locked timestamp set", !!orderRow?.charge_locked_at);
+
+  // --- 2. Checkout: charges the locked currency/amount, ignores the client -----
   const coRes = await fetch(`${BASE}/api/checkout`, {
     method: "POST",
     headers: { "content-type": "application/json", cookie: studentSession.cookieHeader },
@@ -211,29 +225,29 @@ const createdEventIds = [];
 
   if (coBody.sessionId) {
     const session = await stripe.checkout.sessions.retrieve(coBody.sessionId);
-    check("checkout currency is cad", session.currency === "cad", `got ${session.currency}`);
+    check("checkout currency matches locked charge (cad)", session.currency === "cad", `got ${session.currency}`);
     check(
-      "checkout amount equals agreed proposal price (client ignored)",
+      "checkout amount equals locked charge (client ignored)",
       session.amount_total === Math.round(PRICE * 100),
       `got ${session.amount_total}`
     );
   } else {
-    check("checkout currency is cad", false, "no session");
-    check("checkout amount equals agreed proposal price (client ignored)", false, "no session");
+    check("checkout currency matches locked charge (cad)", false, "no session");
+    check("checkout amount equals locked charge (client ignored)", false, "no session");
   }
 
-  // --- 2. Student-facing checkout page shows no fee/share breakdown -----------
+  // --- 3. Student-facing checkout page shows no fee/share breakdown -----------
   const pageRes = await fetch(`${BASE}/orders/${orderId}/payment`, {
     headers: { cookie: studentSession.cookieHeader },
     redirect: "manual",
   });
   const pageHtml = pageRes.status === 200 ? await pageRes.text() : "";
-  const leaks = ["Payment breakdown", "Helper receives", "service fee", "Platform fee", "Our fee"].filter(
+  const leaks = ["Payment breakdown", "Helper receives", "service fee", "Platform fee", "Our fee", "commission"].filter(
     (needle) => pageHtml.toLowerCase().includes(needle.toLowerCase())
   );
   check("student checkout page shows no fee/share breakdown", leaks.length === 0, `found: ${leaks.join(", ")}`);
 
-  // --- 3. Forged webhook is rejected ------------------------------------------
+  // --- 4. Forged webhook is rejected ------------------------------------------
   const forged = await fetch(`${BASE}/api/stripe/webhook`, {
     method: "POST",
     headers: { "stripe-signature": "t=1,v1=deadbeef", "content-type": "application/json" },
@@ -241,7 +255,7 @@ const createdEventIds = [];
   });
   check("forged webhook rejected (400)", forged.status === 400, `got ${forged.status}`);
 
-  // --- 4. Real signed event is processed, and replay cannot double-count ------
+  // --- 5. Real signed event is processed, and replay cannot double-count ------
   piId = `pi_test_${Math.random().toString(36).slice(2, 12)}`;
   const completed = signedEvent("checkout.session.completed", {
     id: `cs_test_${Math.random().toString(36).slice(2, 10)}`,
@@ -264,24 +278,23 @@ const createdEventIds = [];
 
   const { data: payRows } = await admin
     .from("payments")
-    .select("id, gross_cad, net_cad, helper_share_cad, helper_payout_status, disputed, status, stripe_payment_intent_id")
+    .select("id, gross_cad, net_cad, charge_currency, charge_amount, charge_to_cad_rate, platform_fee_cad, helper_payout_status, disputed, status, stripe_payment_intent_id")
     .eq("order_id", orderId);
   check("exactly one payment recorded for replay", (payRows ?? []).length === 1, `count ${(payRows ?? []).length}`);
 
   const { data: orderAfter } = await admin.from("orders").select("status").eq("id", orderId).single();
   check("order moved to in_progress by webhook", orderAfter?.status === "in_progress", `got ${orderAfter?.status}`);
 
-  // --- 5. Ledger values are correct -------------------------------------------
+  // --- 6. Ledger values are correct -------------------------------------------
   const pay = (payRows ?? [])[0];
   check("ledger gross_cad correct", Number(pay?.gross_cad) === PRICE, `got ${pay?.gross_cad}`);
-  check(
-    "ledger helper_share_cad = 80% of gross",
-    Number(pay?.helper_share_cad) === (PRICE * SHARE_PERCENT) / 100,
-    `got ${pay?.helper_share_cad}`
-  );
+  check("ledger charge currency recorded", pay?.charge_currency === "CAD", `got ${pay?.charge_currency}`);
+  check("ledger charge amount recorded", Number(pay?.charge_amount) === PRICE, `got ${pay?.charge_amount}`);
+  check("ledger charge_to_cad_rate is 1 for CAD", Number(pay?.charge_to_cad_rate) === 1, `got ${pay?.charge_to_cad_rate}`);
+  check("ledger platform buffer is 0 for Canada", Number(pay?.platform_fee_cad) === 0, `got ${pay?.platform_fee_cad}`);
   check("ledger payout status starts unpaid", pay?.helper_payout_status === "unpaid", `got ${pay?.helper_payout_status}`);
 
-  // --- 6. Partial refund reduces what is owed ----------------------------------
+  // --- 7. Partial refund is recorded (no share to reduce) ----------------------
   const refunded = signedEvent("charge.refunded", {
     id: `ch_test_${Math.random().toString(36).slice(2, 10)}`,
     object: "charge",
@@ -295,17 +308,12 @@ const createdEventIds = [];
 
   const { data: afterRefund } = await admin
     .from("payments")
-    .select("refunded_amount_cad, helper_share_cad, status")
+    .select("refunded_amount_cad, status")
     .eq("order_id", orderId)
     .single();
   check("refund recorded", Number(afterRefund?.refunded_amount_cad) === 25, `got ${afterRefund?.refunded_amount_cad}`);
-  check(
-    "refund reduces amount owed",
-    Number(afterRefund?.helper_share_cad) === 60,
-    `got ${afterRefund?.helper_share_cad}`
-  );
 
-  // --- 7. Recording a payout marks exactly the selected order paid -------------
+  // --- 8. Recording a manual payout marks exactly the selected order paid ------
   const { data: payoutId, error: payoutErr } = await admin.rpc("record_helper_payout", {
     p_helper_id: helper.id,
     p_order_ids: [orderId],
@@ -339,7 +347,7 @@ const createdEventIds = [];
   });
   check("double payout blocked", !!doubleErr, "second payout unexpectedly succeeded");
 
-  // --- 8. Dispute puts the payout on hold --------------------------------------
+  // --- 9. Dispute puts the payout on hold --------------------------------------
   const dispute = signedEvent("charge.dispute.created", {
     id: `dp_test_${Math.random().toString(36).slice(2, 10)}`,
     object: "dispute",
@@ -358,13 +366,13 @@ const createdEventIds = [];
   check("dispute flags payment", afterDispute?.disputed === true, `got ${afterDispute?.disputed}`);
   check("dispute puts payout on hold", afterDispute?.helper_payout_status === "on_hold", `got ${afterDispute?.helper_payout_status}`);
 
-  // --- 9. Non-admin cannot read the private ledger -----------------------------
+  // --- 10. Non-admin cannot read the private ledger ----------------------------
   const { error: colErr, data: colData } = await studentSession.sb
     .from("payments")
-    .select("helper_share_cad")
+    .select("charge_amount, platform_fee_cad")
     .eq("order_id", orderId);
   check(
-    "student cannot read ledger column (helper_share_cad)",
+    "student cannot read ledger columns (charge/platform fee)",
     !!(colErr || (colData ?? []).length === 0),
     colErr ? "" : `leaked ${JSON.stringify(colData)}`
   );
@@ -375,8 +383,8 @@ const createdEventIds = [];
   const { error: payoutsErr } = await studentSession.sb.from("manual_payouts").select("id").limit(1);
   check("student cannot read manual_payouts", !!payoutsErr, "no error returned");
 
-  const { error: compErr } = await studentSession.sb.from("helper_compensation").select("helper_id").limit(1);
-  check("student cannot read helper_compensation", !!compErr, "no error returned");
+  const { error: itemsErr } = await studentSession.sb.from("manual_payout_items").select("id").limit(1);
+  check("student cannot read manual_payout_items", !!itemsErr, "no error returned");
 
   // Student should still be able to read their own non-sensitive payment fields.
   const { error: safeErr } = await studentSession.sb
@@ -384,6 +392,87 @@ const createdEventIds = [];
     .select("id, amount, currency, status, created_at")
     .eq("order_id", orderId);
   check("student can still read non-sensitive payment fields", !safeErr, safeErr?.message ?? "");
+
+  // --- 11. A non-Canadian student is charged in their local currency + buffer -----
+  student2 = await createUser("student", `${tag}b`, "US");
+  student2Session = await buildSession(student2);
+
+  const { data: req2, error: req2Err } = await admin
+    .from("requests")
+    .insert({
+      student_id: student2.id,
+      title: "Multi-currency local charge (US)",
+      description: "US local charge acceptance test request.",
+      subject: "Economics",
+      deadline,
+      file_urls: [],
+      helper_id: helper.id,
+      status: "proposal_sent",
+    })
+    .select("id")
+    .single();
+  if (req2Err) throw req2Err;
+  requestId2 = req2.id;
+
+  const { data: prop2, error: prop2Err } = await admin
+    .from("proposals")
+    .insert({
+      request_id: requestId2,
+      helper_id: helper.id,
+      price: PRICE,
+      currency: "CAD",
+      description: "US acceptance test proposal.",
+      revisions_included: 1,
+      expires_at: new Date(Date.now() + 3 * 864e5).toISOString(),
+      status: "pending",
+    })
+    .select("id")
+    .single();
+  if (prop2Err) throw prop2Err;
+  proposalId2 = prop2.id;
+
+  const accept2Res = await fetch(`${BASE}/api/orders/accept`, {
+    method: "POST",
+    headers: { "content-type": "application/json", cookie: student2Session.cookieHeader },
+    body: JSON.stringify({ proposal_id: proposalId2, request_id: requestId2 }),
+  });
+  const accept2Body = await accept2Res.json().catch(() => ({}));
+  check("US accept route creates an order", accept2Res.status === 200 && !!accept2Body.orderId, JSON.stringify(accept2Body));
+  orderId2 = accept2Body.orderId;
+
+  if (orderId2) {
+    const { data: order2 } = await admin
+      .from("orders")
+      .select("charge_amount, charge_currency")
+      .eq("id", orderId2)
+      .single();
+    check("US order charged in USD", order2?.charge_currency === "USD", `got ${order2?.charge_currency}`);
+
+    // Recompute the expected charge from the same live rate the server uses.
+    const rateRes = await fetch("https://api.frankfurter.dev/v1/latest?base=CAD&symbols=USD");
+    const rateJson = await rateRes.json().catch(() => null);
+    const usdPerCad = rateJson?.rates?.USD;
+    const { data: settings } = await admin
+      .from("platform_settings")
+      .select("fx_surcharge_percent")
+      .limit(1)
+      .single();
+    const surcharge = Number(settings?.fx_surcharge_percent ?? 0);
+
+    if (Number.isFinite(usdPerCad) && usdPerCad > 0) {
+      const unconverted = PRICE * usdPerCad;
+      const expected = Math.round(unconverted * (1 + surcharge / 100) * 100) / 100;
+      check("US charge includes the hidden buffer (never shown)", Number(order2?.charge_amount) > unconverted, `got ${order2?.charge_amount}`);
+      check("US charge matches converted base + buffer", Math.abs(Number(order2?.charge_amount) - expected) < 0.02, `got ${order2?.charge_amount}, expected ~${expected}`);
+    } else {
+      check("US charge includes the hidden buffer (never shown)", false, "no live USD rate");
+      check("US charge matches converted base + buffer", false, "no live USD rate");
+    }
+  } else {
+    check("US order charged in USD", false, "no order");
+    check("US charge includes the hidden buffer (never shown)", false, "no order");
+    check("US charge matches converted base + buffer", false, "no order");
+  }
 
   // --- report ------------------------------------------------------------------
   console.log("\n" + results.join("\n"));
@@ -404,6 +493,11 @@ async function cleanup() {
       await admin.from("payments").delete().eq("order_id", orderId);
       await admin.from("orders").delete().eq("id", orderId);
     }
+    if (orderId2) {
+      await admin.from("manual_payout_items").delete().eq("order_id", orderId2);
+      await admin.from("payments").delete().eq("order_id", orderId2);
+      await admin.from("orders").delete().eq("id", orderId2);
+    }
     if (createdEventIds.length) {
       await admin.from("processed_stripe_events").delete().in("event_id", createdEventIds);
     }
@@ -415,9 +509,12 @@ async function cleanup() {
         await admin.from("manual_payouts").delete().eq("id", p.id);
       }
     }
+    if (proposalId2) await admin.from("proposals").delete().eq("id", proposalId2);
+    if (requestId2) await admin.from("requests").delete().eq("id", requestId2);
     if (proposalId) await admin.from("proposals").delete().eq("id", proposalId);
     if (requestId) await admin.from("requests").delete().eq("id", requestId);
     if (helper) await admin.from("helper_profiles").delete().eq("user_id", helper.id);
+    if (student2) await admin.auth.admin.deleteUser(student2.id);
     if (student) await admin.auth.admin.deleteUser(student.id);
     if (helper) await admin.auth.admin.deleteUser(helper.id);
   } catch (err) {

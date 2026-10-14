@@ -285,21 +285,21 @@ export default async function HomePage() {
           className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-section"
           aria-hidden="true"
         />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-20">
           <div className="grid lg:grid-cols-[1fr_minmax(0,640px)] gap-8 lg:gap-10 items-start">
             {/* Left Column */}
             <div className="space-y-5">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed border border-outline-variant/50 text-primary text-sm font-semibold">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed border border-outline-variant/50 text-primary text-xs sm:text-sm font-semibold">
                 <MaterialIcon name="emoji_objects" size={16} />
                 Independent Peer Guidance
               </span>
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-on-surface leading-tight">
+              <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold text-on-surface leading-tight">
                 Get Help from a Verified{" "}
                 <span className="bg-gradient-to-r from-primary-container to-primary bg-clip-text text-transparent">
                   Assignment Helper
                 </span>
               </h1>
-              <p className="text-lg text-on-surface-variant leading-relaxed max-w-xl">
+              <p className="text-base sm:text-lg text-on-surface-variant leading-relaxed max-w-xl">
                 Tell us what you&apos;re working on and we&apos;ll route it straight to our verified academic
                 helper. Discuss your requirements in the request chat, receive a personalized proposal before
                 you pay, and keep the authorship of your own work. Every quote states the scope and price in
@@ -361,15 +361,15 @@ export default async function HomePage() {
       </section>
 
       {/* Core Academic Services */}
-      <section className="py-16 bg-section">
+      <section className="py-12 sm:py-16 bg-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center mb-12">
+          <div className="max-w-3xl mx-auto text-center mb-8 sm:mb-12">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-4">
               <MaterialIcon name="auto_stories" size={16} />
               Our Services
             </span>
             <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-4">Core Academic Services</h2>
-            <p className="text-on-surface-variant max-w-2xl mx-auto text-lg">Comprehensive academic guidance across every stage of your coursework</p>
+            <p className="text-on-surface-variant max-w-2xl mx-auto text-base sm:text-lg">Comprehensive academic guidance across every stage of your coursework</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service) => {
@@ -386,7 +386,7 @@ export default async function HomePage() {
                   <h3 className="font-display font-bold text-lg text-on-surface leading-tight">{service.title}</h3>
                 </div>
                 <p className="text-base text-on-surface-variant leading-relaxed mb-4">{service.desc}</p>
-                <ul className="space-y-2 mb-5">
+                <ul className="hidden sm:block space-y-2 mb-5">
                   {service.items.map((item) => (
                     <li key={item} className="flex items-start gap-2 text-base text-on-surface-variant leading-relaxed">
                       <CheckCircle className={`w-4 h-4 shrink-0 mt-0.5 ${ICON}`} />
@@ -419,7 +419,7 @@ export default async function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-white" aria-labelledby="how-heading">
+      <section className="py-12 sm:py-16 bg-white" aria-labelledby="how-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-8">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">
@@ -462,7 +462,7 @@ export default async function HomePage() {
                     </h3>
                   </div>
                   <p className="mt-3 text-base leading-relaxed text-on-surface-variant">{step.desc}</p>
-                  <ul className="mt-4 space-y-2 border-t border-outline-variant/30 pt-4">
+                  <ul className="hidden sm:block mt-4 space-y-2 border-t border-outline-variant/30 pt-4">
                     {step.points.map((point) => (
                       <li
                         key={point}
@@ -510,7 +510,7 @@ export default async function HomePage() {
       </section>
 
       {/* Why Students Choose Us */}
-      <section className="py-16 bg-white" aria-labelledby="why-heading">
+      <section className="py-12 sm:py-16 bg-white" aria-labelledby="why-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-8">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">
@@ -543,7 +543,7 @@ export default async function HomePage() {
                   </h3>
                 </div>
                 <p className="text-base text-on-surface-variant leading-relaxed mb-4">{benefit.desc}</p>
-                <ul className="space-y-2">
+                <ul className="hidden sm:block space-y-2">
                   {benefit.points.map((point) => (
                     <li
                       key={point}
@@ -561,7 +561,7 @@ export default async function HomePage() {
 
           {/* Comparison */}
           <div className="mt-8 overflow-x-auto">
-            <table className="w-full min-w-160 text-sm border-collapse bg-white rounded-2xl overflow-hidden border border-outline-variant/30 shadow-sm">
+            <table className="w-full min-w-0 sm:min-w-160 text-sm border-collapse bg-white rounded-2xl overflow-hidden border border-outline-variant/30 shadow-sm">
               <caption className="sr-only">
                 Acadivo compared with hiring a freelance writer and using an AI writing tool
               </caption>
@@ -573,10 +573,10 @@ export default async function HomePage() {
                   <th scope="col" className="px-4 py-3 font-display font-bold text-primary text-sm">
                     Acadivo
                   </th>
-                  <th scope="col" className="px-4 py-3 font-display font-bold text-on-surface text-sm">
+                  <th scope="col" className="hidden sm:table-cell px-4 py-3 font-display font-bold text-on-surface text-sm">
                     Freelance writer
                   </th>
-                  <th scope="col" className="px-4 py-3 font-display font-bold text-on-surface text-sm">
+                  <th scope="col" className="hidden sm:table-cell px-4 py-3 font-display font-bold text-on-surface text-sm">
                     AI writing tool
                   </th>
                 </tr>
@@ -588,8 +588,8 @@ export default async function HomePage() {
                       {row.criterion}
                     </th>
                     <td className="px-4 py-3 text-sm text-on-surface bg-primary-fixed/30 font-medium">{row.acadivo}</td>
-                    <td className="px-4 py-3 text-sm text-on-surface-variant">{row.freelancer}</td>
-                    <td className="px-4 py-3 text-sm text-on-surface-variant">{row.aiTool}</td>
+                    <td className="hidden sm:table-cell px-4 py-3 text-sm text-on-surface-variant">{row.freelancer}</td>
+                    <td className="hidden sm:table-cell px-4 py-3 text-sm text-on-surface-variant">{row.aiTool}</td>
                   </tr>
                 ))}
               </tbody>
@@ -599,7 +599,7 @@ export default async function HomePage() {
       </section>
 
       {/* Subjects We Cover */}
-      <section className="py-16 bg-section" aria-labelledby="subjects-heading">
+      <section className="py-12 sm:py-16 bg-section" aria-labelledby="subjects-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
             <div className="max-w-2xl">
@@ -645,7 +645,7 @@ export default async function HomePage() {
                 </div>
                 <p className="text-base text-on-surface-variant leading-relaxed">{s.cardDesc}</p>
                 {s.detail && (
-                  <p className="mt-2 text-base text-on-surface-variant/90 leading-relaxed">{s.detail}</p>
+                  <p className="hidden sm:block mt-2 text-base text-on-surface-variant/90 leading-relaxed">{s.detail}</p>
                 )}
                 <p className={`mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold ${LINK}`}>
                   {s.name} help topics
@@ -659,7 +659,7 @@ export default async function HomePage() {
       </section>
 
       {/* Free Study Guides */}
-      <section className="py-16 bg-white" aria-labelledby="guides-heading">
+      <section className="py-12 sm:py-16 bg-white" aria-labelledby="guides-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
             <div className="max-w-2xl">
@@ -708,7 +708,7 @@ export default async function HomePage() {
                 </h3>
                 <p className="mt-2 text-base leading-relaxed text-on-surface-variant">{guide.description}</p>
                 {guide.detail && (
-                  <p className="mt-2 text-base leading-relaxed text-on-surface-variant/90">{guide.detail}</p>
+                  <p className="hidden sm:block mt-2 text-base leading-relaxed text-on-surface-variant/90">{guide.detail}</p>
                 )}
                 <span className={`mt-4 inline-flex items-center gap-1.5 text-sm font-semibold ${LINK}`}>
                   Read the guide
@@ -723,7 +723,7 @@ export default async function HomePage() {
 
       {/* Testimonials */}
       <section
-        className="py-16 bg-section"
+        className="py-12 sm:py-16 bg-section"
         aria-labelledby="testimonials-heading"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -765,7 +765,7 @@ export default async function HomePage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-white" aria-labelledby="faq-heading">
+      <section className="py-12 sm:py-16 bg-white" aria-labelledby="faq-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-8">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">
@@ -790,7 +790,7 @@ export default async function HomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="relative overflow-hidden py-20 band-ink" aria-labelledby="cta-heading">
+      <section className="relative overflow-hidden py-14 sm:py-20 band-ink" aria-labelledby="cta-heading">
         <div className="absolute inset-0 band-ink-grid" aria-hidden="true" />
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">

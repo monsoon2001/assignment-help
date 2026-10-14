@@ -8,8 +8,7 @@ import {
 import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
 import { acceptProposal, declineProposal } from "@/lib/orders";
-import { normalizeCurrency, formatCurrency } from "@/lib/currency";
-import { ApproxPrice } from "@/components/currency/currency-display";
+import { computeLocalCharge, normalizeCurrency, formatCurrency, DEFAULT_CURRENCY } from "@/lib/currency";
 import { proposalStatusMeta } from "@/lib/status-meta";
 
 export type RequestProposal = {
@@ -43,12 +42,18 @@ export default function ProposalCard({
   proposal,
   requestDeadline,
   orderId,
+  localCurrency = DEFAULT_CURRENCY,
+  rates = null,
+  surchargePercent = 0,
   className = "",
 }: {
   proposal: RequestProposal;
   requestTitle?: string | null;
   requestDeadline?: string | null;
   orderId?: string | null;
+  localCurrency?: string;
+  rates?: Record<string, number> | null;
+  surchargePercent?: number;
   className?: string;
 }) {
   const router = useRouter();
@@ -56,7 +61,26 @@ export default function ProposalCard({
   const [error, setError] = useState<string | null>(null);
 
   const currency = normalizeCurrency(proposal.currency);
-  const price = formatCurrency(Number(proposal.price), currency);
+  const basePrice = Number(proposal.price);
+
+  // Show the student what they will actually be charged, in their local
+  // currency. Falls back to the helper's quoted amount when no local rate is
+  // available. No CAD equivalent is shown.
+  const localAmount = computeLocalCharge(
+    basePrice,
+    currency,
+    localCurrency,
+    rates,
+    surchargePercent
+  );
+  const localResolved =
+    localCurrency !== currency && localAmount !== null && localAmount > 0
+      ? { currency: localCurrency, amount: localAmount }
+      : null;
+
+  const displayAmount = localResolved ? localResolved.amount : basePrice;
+  const displayCurrency = localResolved ? localResolved.currency : currency;
+  const price = formatCurrency(displayAmount, displayCurrency);
 
   const statusMeta = proposalStatusMeta(proposal.status);
 
@@ -107,15 +131,19 @@ export default function ProposalCard({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-lg bg-surface-container-low p-2">
           <div className="flex flex-col justify-center">
             <span className="text-xs text-secondary uppercase font-semibold tracking-wider">
-              Total Fixed Price
+              {localResolved ? "You Pay" : "Total Fixed Price"}
             </span>
             <div className="flex items-baseline gap-1.5 mt-0.5">
               <span className="font-display text-xl font-bold text-primary tracking-tight">
                 {price}
               </span>
-              <span className="text-xs text-on-surface-variant font-medium">{currency}</span>
+              <span className="text-xs text-on-surface-variant font-medium">{displayCurrency}</span>
             </div>
-            <ApproxPrice amountCad={Number(proposal.price)} withSelector className="mt-1" />
+            {localResolved && (
+              <p className="text-xs text-on-surface-variant mt-1">
+                Helper&apos;s quote: {formatCurrency(basePrice, currency)}
+              </p>
+            )}
           </div>
           <div className="flex flex-col justify-center sm:pl-3">
             <span className="text-xs text-secondary uppercase font-semibold tracking-wider">

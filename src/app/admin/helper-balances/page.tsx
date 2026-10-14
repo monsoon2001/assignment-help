@@ -1,6 +1,8 @@
 import { requireAdmin } from "@/lib/admin";
 import { adminClient } from "@/lib/supabase/admin";
 import { unwrapRow } from "@/lib/embedded";
+import { getCadRates } from "@/lib/fx.server";
+import { convertViaCad, normalizeCurrency } from "@/lib/currency";
 import HelperBalancesClient, {
   type HelperBalance,
   type RecentPayout,
@@ -10,22 +12,24 @@ export const dynamic = "force-dynamic";
 
 interface UnpaidPayment {
   order_id: string;
-  helper_share_cad: number | null;
   order: unknown;
 }
 
 export default async function HelperBalancesPage() {
   await requireAdmin();
 
-  const { data: unpaidRows } = await adminClient
-    .from("payments")
-    .select(
-      "order_id, helper_share_cad, order:orders(id, status, price, helper:users!orders_helper_id_fkey(id, name), proposal:proposals(request:requests(title)))"
-    )
-    .eq("status", "paid")
-    .eq("helper_payout_status", "unpaid")
-    .eq("disputed", false)
-    .order("created_at", { ascending: true });
+  const [{ data: unpaidRows }, rates] = await Promise.all([
+    adminClient
+      .from("payments")
+      .select(
+        "order_id, order:orders(id, status, price, currency, base_amount, base_currency, helper:users!orders_helper_id_fkey(id, name), proposal:proposals(request:requests(title)))"
+      )
+      .eq("status", "paid")
+      .eq("helper_payout_status", "unpaid")
+      .eq("disputed", false)
+      .order("created_at", { ascending: true }),
+    getCadRates(),
+  ]);
 
   const byHelper = new Map<string, HelperBalance>();
   for (const row of (unpaidRows ?? []) as unknown as UnpaidPayment[]) {
@@ -33,6 +37,9 @@ export default async function HelperBalancesPage() {
       id: string;
       status: string;
       price: number;
+      currency: string | null;
+      base_amount: number | null;
+      base_currency: string | null;
       helper: unknown;
       proposal: unknown;
     }>(row.order);
@@ -47,19 +54,28 @@ export default async function HelperBalancesPage() {
           )
         : "Untitled order";
 
-    const share = Number(row.helper_share_cad ?? 0);
+    // Reference value: the helper's quoted amount converted to CAD. The admin
+    // still decides the exact amount sent — this is only a starting figure.
+    const baseAmount = Number(order.base_amount ?? order.price);
+    const baseCurrency = normalizeCurrency(order.base_currency ?? order.currency);
+    const cadValue =
+      baseCurrency === "CAD"
+        ? Math.round(baseAmount * 100) / 100
+        : convertViaCad(baseAmount, baseCurrency, "CAD", rates);
+
     const existing = byHelper.get(helper.id) ?? {
       helperId: helper.id,
       helperName: helper.name ?? "Helper",
       owedCad: 0,
       orders: [],
     };
-    existing.owedCad = Math.round((existing.owedCad + share) * 100) / 100;
+    const referenceCad = cadValue === null ? 0 : Math.round(cadValue * 100) / 100;
+    existing.owedCad = Math.round((existing.owedCad + referenceCad) * 100) / 100;
     existing.orders.push({
       orderId: order.id,
       title,
       status: order.status,
-      amountCad: share,
+      amountCad: referenceCad,
     });
     byHelper.set(helper.id, existing);
   }

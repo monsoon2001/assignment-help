@@ -294,7 +294,7 @@ export default function RequestsList({
       )}
 
       {requests.length === 0 && (
-        <div className="flex flex-col items-center gap-3 p-10 rounded-xl bg-surface-container-low border border-outline-variant text-center">
+        <div className="flex flex-col items-center gap-3 p-6 sm:p-10 rounded-xl bg-surface-container-low border border-outline-variant text-center">
           <span className="w-14 h-14 rounded-2xl bg-primary-container/10 flex items-center justify-center">
             <FileText size={26} className="text-primary" />
           </span>
@@ -313,7 +313,7 @@ export default function RequestsList({
       )}
 
       {requests.length > 0 && filtered.length === 0 && (
-        <div className="flex flex-col items-center gap-3 p-10 rounded-xl bg-surface-container-low border border-outline-variant text-center">
+        <div className="flex flex-col items-center gap-3 p-6 sm:p-10 rounded-xl bg-surface-container-low border border-outline-variant text-center">
           <span className="w-14 h-14 rounded-2xl bg-primary-container/10 flex items-center justify-center">
             <Search size={26} className="text-primary" />
           </span>

@@ -58,10 +58,17 @@ export default function RoleBottomNav({
   primary,
   more,
   roleLabel,
+  hideFrom = "md",
 }: {
   primary: RoleNavItem[];
   more: RoleNavItem[];
   roleLabel: string;
+  /**
+   * Viewport width (Tailwind breakpoint) at which the persistent sidebar takes
+   * over and this bottom bar disappears. Admin's sidebar appears at `lg`, so it
+   * passes `lg`; student/helper sidebars appear at `md`.
+   */
+  hideFrom?: "md" | "lg";
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -69,10 +76,12 @@ export default function RoleBottomNav({
   const isActive = (href: string) =>
     pathname === href || (href !== "/dashboard" && pathname.startsWith(`${href}/`));
 
+  const navVisibility = hideFrom === "lg" ? "lg:hidden" : "md:hidden";
+
   return (
     <>
       <nav
-        className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-outline-variant bg-surface-container-lowest/95 backdrop-blur px-1 pb-[env(safe-area-inset-bottom)]"
+        className={`${navVisibility} fixed bottom-0 inset-x-0 z-50 border-t border-outline-variant bg-surface-container-lowest/95 backdrop-blur px-1 pb-[env(safe-area-inset-bottom)]`}
         aria-label={`${roleLabel} navigation`}
       >
         <div className="flex items-stretch justify-around">
@@ -115,7 +124,7 @@ export default function RoleBottomNav({
       </nav>
 
       {open && (
-        <div className="fixed inset-0 z-[80] flex flex-col md:hidden" role="dialog" aria-modal="true" aria-label="Navigation">
+        <div className={`fixed inset-0 z-[80] flex flex-col ${navVisibility}`} role="dialog" aria-modal="true" aria-label="Navigation">
           <div
             className="absolute inset-0 bg-black/40 animate-[fade-in_0.15s_ease-out]"
             onClick={() => setOpen(false)}

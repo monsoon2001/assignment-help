@@ -3,7 +3,8 @@ import { revalidatePath } from "next/cache";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { adminClient } from "@/lib/supabase/admin";
-import { computeHelperShare, getHelperShareConfig } from "@/lib/payment-ledger.server";
+import { normalizeCurrency } from "@/lib/currency";
+import { rateBetween } from "@/lib/fx.server";
 
 export const dynamic = "force-dynamic";
 
@@ -103,6 +104,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     return;
   }
 
+  // The order carries the authoritative base + locked charge.
+  const { data: orderRow } = await adminClient
+    .from("orders")
+    .select("base_amount, base_currency, charge_currency, charge_amount")
+    .eq("id", orderId)
+    .maybeSingle();
+
   // Pull the real Stripe fee + net from the charge's balance transaction, and
   // the receipt URL from the charge.
   let receiptUrl: string | null = null;
@@ -119,8 +127,15 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         receiptUrl = charge.receipt_url ?? null;
         const bt = charge.balance_transaction;
         if (bt && typeof bt !== "string") {
-          stripeFeeCad = round2(bt.fee / 100);
           balanceTransactionId = bt.id;
+          const fee = round2(bt.fee / 100);
+          const feeCurrency = normalizeCurrency(bt.currency);
+          if (feeCurrency === "CAD") {
+            stripeFeeCad = fee;
+          } else {
+            const rate = await rateBetween(feeCurrency, "CAD");
+            stripeFeeCad = rate === null ? null : round2(fee * rate);
+          }
         }
       }
     } catch (err) {
@@ -129,23 +144,40 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
   }
 
-  const grossCad = round2(Number(session.amount_total ?? 0) / 100);
+  const chargeCurrency = normalizeCurrency(
+    orderRow?.charge_currency ?? session.currency ?? "cad"
+  );
+  const chargeAmount = round2(
+    Number(orderRow?.charge_amount ?? (Number(session.amount_total ?? 0) / 100))
+  );
 
-  // Determine the helper for share computation.
-  const { data: orderRow } = await adminClient
-    .from("orders")
-    .select("helper_id")
-    .eq("id", orderId)
-    .maybeSingle();
-
-  let helperShareCad: number | null = null;
-  let netCad: number | null = round2(grossCad - (stripeFeeCad ?? 0));
-  if (orderRow?.helper_id) {
-    const config = await getHelperShareConfig(orderRow.helper_id);
-    const computed = computeHelperShare(grossCad, stripeFeeCad, config);
-    helperShareCad = computed.helperShareCad;
-    netCad = computed.netCad;
+  // Convert the real charge to the internal CAD ledger.
+  let chargeToCadRate: number | null = chargeCurrency === "CAD" ? 1 : null;
+  if (chargeCurrency !== "CAD") {
+    chargeToCadRate = await rateBetween(chargeCurrency, "CAD");
   }
+  const grossCad = round2(
+    chargeCurrency === "CAD"
+      ? chargeAmount
+      : chargeToCadRate === null
+        ? 0
+        : chargeAmount * chargeToCadRate
+  );
+
+  // What the platform pays the helper's base quote would be in CAD; the
+  // difference is the platform's absorbed FX/processing buffer. Admin-only.
+  const baseAmount = Number(orderRow?.base_amount ?? chargeAmount);
+  const baseCurrency = normalizeCurrency(orderRow?.base_currency ?? chargeCurrency);
+  let baseCad = grossCad;
+  if (baseCurrency !== "CAD") {
+    const baseRate = await rateBetween(baseCurrency, "CAD");
+    baseCad = baseRate === null ? grossCad : round2(baseAmount * baseRate);
+  } else {
+    baseCad = round2(baseAmount);
+  }
+  const platformFeeCad = round2(grossCad - baseCad);
+
+  const netCad = round2(grossCad - (stripeFeeCad ?? 0));
 
   // Record the payment FIRST: the order transition trigger requires a `paid`
   // payment row to exist before an order may leave payment_pending.
@@ -157,7 +189,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       gross_cad: grossCad,
       stripe_fee_cad: stripeFeeCad,
       net_cad: netCad,
-      helper_share_cad: helperShareCad,
+      charge_currency: chargeCurrency,
+      charge_amount: chargeAmount,
+      charge_to_cad_rate: chargeToCadRate,
+      platform_fee_cad: platformFeeCad,
       helper_payout_status: "unpaid",
       stripe_payment_intent_id: intentId,
       stripe_balance_transaction_id: balanceTransactionId,
@@ -200,37 +235,25 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
 
   const { data: payment } = await adminClient
     .from("payments")
-    .select(
-      "id, order_id, gross_cad, net_cad, helper_share_cad, refunded_amount_cad, helper_payout_status"
-    )
+    .select("id, order_id, gross_cad, refunded_amount_cad, charge_to_cad_rate")
     .eq("stripe_payment_intent_id", intentId)
     .maybeSingle();
   if (!payment) return;
 
   const gross = Number(payment.gross_cad ?? 0);
-  const refundedTotal = round2(Number(charge.amount_refunded ?? 0) / 100);
+  const rate = Number(payment.charge_to_cad_rate ?? 1) || 1;
+  const refundedPresentment = round2(Number(charge.amount_refunded ?? 0) / 100);
+  const refundedTotal = round2(refundedPresentment * rate);
   const previousRefunded = round2(Number(payment.refunded_amount_cad ?? 0));
-  const delta = round2(refundedTotal - previousRefunded);
 
-  if (delta <= 0) return; // nothing new to reduce
+  if (refundedTotal <= previousRefunded) return; // nothing new to reduce
 
   const fullyRefunded = gross > 0 && refundedTotal >= gross;
-
-  // Reduce the helper's owed amount proportionally to the newly refunded slice.
-  let newShare = Number(payment.helper_share_cad ?? 0);
-  if (gross > 0) {
-    const remainingBefore = Math.max(gross - previousRefunded, 0);
-    const reduction =
-      remainingBefore > 0 ? newShare * (delta / remainingBefore) : newShare;
-    newShare = Math.max(0, round2(newShare - reduction));
-  }
-  if (fullyRefunded) newShare = 0;
 
   const { error } = await adminClient
     .from("payments")
     .update({
       refunded_amount_cad: refundedTotal,
-      helper_share_cad: newShare,
       ...(fullyRefunded ? { status: "refunded" } : {}),
     })
     .eq("id", payment.id);
@@ -255,7 +278,7 @@ async function handleDisputeCreated(dispute: Stripe.Dispute) {
     .maybeSingle();
   if (!payment) return;
 
-  // Hold the helper's payout and flag the order for the admin.
+  // Hold the payout and flag the order for the admin.
   const { error } = await adminClient
     .from("payments")
     .update({ helper_payout_status: "on_hold", disputed: true })

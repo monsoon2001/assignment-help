@@ -11,9 +11,9 @@ const DESIGNATED_HELPER_ID =
   "bc7a1271-c9bf-4c76-9afe-401098ab6491";
 
 /**
- * Best-effort: record the country the account first signed up from so we can
- * later show an approximate display currency. Only fills a missing value, so a
- * user-edited country is never overwritten. Display-only; the charge is CAD.
+ * Best-effort: record the country the account first signed up from. The saved
+ * country decides the currency the student is charged in, so it is only filled
+ * when missing (a user-edited country is never overwritten).
  */
 async function captureSignupCountry(
   supabase: Awaited<ReturnType<typeof createClient>>,

@@ -20,7 +20,7 @@ export default function HowItWorksPage() {
       />
 
       <div className="band-soft">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
         <div className="space-y-12">
           {steps.map((step, i) => {
             const tone = PAGE_TONES.blue;

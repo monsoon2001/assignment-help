@@ -57,7 +57,7 @@ export default function HelperBalancesClient({
       </div>
 
       {balances.length === 0 ? (
-        <Card className="p-8 text-center">
+        <Card className="p-6 sm:p-8 text-center">
           <div className="w-12 h-12 rounded-2xl bg-surface-container-low text-on-surface-variant flex items-center justify-center mx-auto mb-3">
             <Wallet size={20} />
           </div>
@@ -81,39 +81,41 @@ export default function HelperBalancesClient({
         {recentPayouts.length === 0 ? (
           <p className="p-6 text-sm text-on-surface-variant">No payouts recorded yet.</p>
         ) : (
-          <table className="w-full">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[560px]">
             <thead>
               <tr className="border-b border-outline-variant/30">
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-5 py-3">Helper</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-5 py-3">Sent (CAD)</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-5 py-3">Received</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-5 py-3">Orders</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-5 py-3">Date</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-5 py-3">Helper</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-5 py-3">Sent (CAD)</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-5 py-3">Received</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-5 py-3">Orders</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-5 py-3">Date</th>
               </tr>
             </thead>
             <tbody>
               {recentPayouts.map((p) => (
                 <tr key={p.id} className="border-b border-outline-variant/20 last:border-0">
-                  <td className="px-5 py-3 text-sm text-on-surface">
+                  <td className="px-3 sm:px-5 py-3 text-sm text-on-surface">
                     {p.helperName}
                     {p.reference && (
                       <span className="block text-xs text-on-surface-variant font-mono">{p.reference}</span>
                     )}
                   </td>
-                  <td className="px-5 py-3 text-sm font-semibold text-on-surface">{formatCurrency(p.amountSentCad)}</td>
-                  <td className="px-5 py-3 text-sm text-on-surface-variant">
+                  <td className="px-3 sm:px-5 py-3 text-sm font-semibold text-on-surface">{formatCurrency(p.amountSentCad)}</td>
+                  <td className="px-3 sm:px-5 py-3 text-sm text-on-surface-variant">
                     {p.amountReceived === null
                       ? `— · ${p.method}`
                       : `${p.amountReceived} ${p.receivedCurrency ?? ""} · ${p.method}`}
                   </td>
-                  <td className="px-5 py-3 text-sm text-on-surface-variant">{p.orderCount}</td>
-                  <td className="px-5 py-3 text-sm text-on-surface-variant">
+                  <td className="px-3 sm:px-5 py-3 text-sm text-on-surface-variant">{p.orderCount}</td>
+                  <td className="px-3 sm:px-5 py-3 text-sm text-on-surface-variant">
                     {new Date(p.paidAt).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </Card>
     </div>

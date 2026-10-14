@@ -28,11 +28,11 @@ export default function SubjectsPage() {
       />
 
       <div className="band-soft">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         {SUBJECT_GROUPS.map((group) => {
           const groupTone = PAGE_TONES.blue;
           return (
-          <div key={group.category} className="mb-16 last:mb-0">
+          <div key={group.category} className="mb-10 sm:mb-16 last:mb-0">
             <div className="flex items-center gap-3 mb-6">
               <span className={`h-1 w-10 rounded-full bg-gradient-to-r ${groupTone.hairline}`} aria-hidden="true" />
               <h2 className="font-display text-2xl font-bold text-on-surface">{group.category}</h2>

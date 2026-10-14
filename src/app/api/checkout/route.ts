@@ -3,16 +3,17 @@ import { stripe } from "@/lib/stripe";
 import { unwrapRow } from "@/lib/embedded";
 import { adminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { normalizeCurrency, toMinorUnits } from "@/lib/currency";
+import { minimumChargeMajor } from "@/lib/fx.server";
 
 export const dynamic = "force-dynamic";
 
 /**
  * Starts a Stripe Checkout session for an order.
  *
- * The model is platform-collected and CAD-only: the amount is read from the
- * accepted proposal stored in the database (never from the client) and every
- * session is created with currency "cad". There is no Stripe Connect,
- * destination charge, transfer or application fee.
+ * The amount and currency are read from the order's LOCKED local charge
+ * (set authoritatively at acceptance), never from the client. There is no
+ * Stripe Connect, destination charge, transfer or application fee.
  */
 export async function POST(request: Request) {
   let orderId: unknown;
@@ -41,6 +42,11 @@ export async function POST(request: Request) {
   let order: {
     id: string;
     price: number;
+    currency: string | null;
+    base_amount: number | null;
+    base_currency: string | null;
+    charge_amount: number | null;
+    charge_currency: string | null;
     status: string;
     proposal_id: string | null;
     student_id: string;
@@ -49,7 +55,9 @@ export async function POST(request: Request) {
   try {
     const { data, error } = await supabase
       .from("orders")
-      .select("id, price, status, proposal_id, student_id, helper_id")
+      .select(
+        "id, price, currency, base_amount, base_currency, charge_amount, charge_currency, status, proposal_id, student_id, helper_id"
+      )
       .eq("id", orderId)
       .single();
     if (error || !data) {
@@ -140,10 +148,8 @@ export async function POST(request: Request) {
     );
   }
 
-  // The amount the student accepted (order.price) must be exactly what the
-  // checkout charges (proposal.price). A mismatch means the proposal was edited
-  // after acceptance, which the DB now forbids — refuse loudly instead of
-  // charging an unexpected amount.
+  // The helper's quoted amount is frozen on the order; a mismatch with the
+  // accepted proposal means the proposal was edited after acceptance.
   const acceptedPrice = Number(order.price);
   const quotedPrice = Number(proposal.price);
   if (
@@ -167,10 +173,35 @@ export async function POST(request: Request) {
   const requestTitle = unwrapRow<{ title: string }>(proposal.request)?.title ?? null;
   const title = requestTitle || "Acadivo Order";
 
-  // CAD only, amount taken straight from the accepted proposal.
-  const priceCents = Math.round(quotedPrice * 100);
-  if (!Number.isFinite(priceCents) || priceCents <= 0) {
-    console.error("checkout: non-positive amount computed", { proposalId: proposal.id, price: proposal.price });
+  // Charge the LOCKED local amount, falling back to the base quote for legacy
+  // orders that predate the charge columns.
+  const chargeCurrency = normalizeCurrency(order.charge_currency ?? order.currency);
+  const chargeAmount =
+    order.charge_amount !== null && Number.isFinite(Number(order.charge_amount))
+      ? Number(order.charge_amount)
+      : quotedPrice;
+
+  const minimum = minimumChargeMajor(chargeCurrency);
+  if (!Number.isFinite(chargeAmount) || chargeAmount < minimum) {
+    console.error("checkout: amount below Stripe minimum", {
+      orderId: order.id,
+      chargeCurrency,
+      chargeAmount,
+      minimum,
+    });
+    return NextResponse.json(
+      { error: `The amount is below the minimum we can charge in ${chargeCurrency}.` },
+      { status: 409 }
+    );
+  }
+
+  const unitAmount = toMinorUnits(chargeAmount, chargeCurrency);
+  if (!Number.isFinite(unitAmount) || unitAmount <= 0) {
+    console.error("checkout: non-positive amount computed", {
+      orderId: order.id,
+      chargeCurrency,
+      chargeAmount,
+    });
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 
@@ -183,12 +214,12 @@ export async function POST(request: Request) {
       line_items: [
         {
           price_data: {
-            currency: "cad",
+            currency: chargeCurrency.toLowerCase(),
             product_data: {
               name: title,
               description: proposal.description ?? "Acadivo academic order",
             },
-            unit_amount: priceCents,
+            unit_amount: unitAmount,
           },
           quantity: 1,
         },

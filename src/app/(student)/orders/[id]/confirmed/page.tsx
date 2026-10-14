@@ -43,7 +43,7 @@ export default async function OrderConfirmedPage({
 
   const { data: orderRow } = await supabase
     .from("orders")
-    .select("id, price, currency, status, proposal_id, proposal:proposals(request:requests(title), helper:users(id, name))")
+    .select("id, price, currency, charge_amount, charge_currency, status, proposal_id, proposal:proposals(request:requests(title), helper:users(id, name))")
     .eq("id", id)
     .eq("student_id", user.id)
     .maybeSingle();
@@ -98,8 +98,12 @@ export default async function OrderConfirmedPage({
       ? paymentRow.receipt_url
       : null;
 
-  const currency = normalizeCurrency(orderRow.currency);
-  const price = formatCurrency(Number(orderRow.price), currency);
+  const currency = normalizeCurrency(orderRow.charge_currency ?? orderRow.currency);
+  const chargeAmount =
+    orderRow.charge_amount !== null && Number.isFinite(Number(orderRow.charge_amount))
+      ? Number(orderRow.charge_amount)
+      : Number(orderRow.price);
+  const price = formatCurrency(chargeAmount, currency);
 
   return (
     <div className="w-full max-w-xl mx-auto flex flex-col gap-5 py-4">

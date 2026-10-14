@@ -56,7 +56,7 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
         </div>
       </div>
 
-      <section className="py-16 bg-white band-hero">
+      <section className="py-12 sm:py-16 bg-white band-hero">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center gap-3 mb-8">
             <span className="h-1 w-10 rounded-full bg-gradient-to-r from-primary-container to-primary-fixed" aria-hidden="true" />
@@ -84,7 +84,7 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
         </div>
       </section>
 
-      <section className="py-16">
+      <section className="py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-on-surface mb-4">How Acadivo Works</h2>
@@ -112,7 +112,7 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
         </div>
       </section>
 
-      <section className="py-16 band-soft">
+      <section className="py-12 sm:py-16 band-soft">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="font-display text-2xl font-bold text-on-surface mb-8 text-center">
             {subject.name} Assignment Help FAQs

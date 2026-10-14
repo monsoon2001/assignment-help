@@ -8,10 +8,11 @@ import { formatCurrency } from "@/lib/currency";
 export default function PayButton({
   orderId,
   amount,
+  currency,
 }: {
   orderId: string;
   amount: number;
-  currency?: string;
+  currency: string;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +47,7 @@ export default function PayButton({
           <Loader2 size={18} className="animate-spin" />
         ) : (
           <>
-            Pay {formatCurrency(amount)}
+            Pay {formatCurrency(amount, currency)}
             <ArrowRight size={16} />
           </>
         )}

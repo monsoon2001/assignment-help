@@ -27,9 +27,9 @@ export default function AboutPage() {
       />
 
       {/* Mission */}
-      <section className="py-20 band-hero">
+      <section className="py-14 sm:py-20 band-hero">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
+          <div className="text-center mb-10 sm:mb-14">
             <span className="w-20 h-20 mx-auto rounded-3xl bg-primary-fixed flex items-center justify-center mb-6 shadow-lg shadow-primary-fixed/40">
               <MaterialIcon name="emoji_objects" size={38} className="text-primary" />
             </span>
@@ -54,7 +54,7 @@ export default function AboutPage() {
 
 
       {/* Values */}
-      <section className="py-16 band-soft">
+      <section className="py-12 sm:py-16 band-soft">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">

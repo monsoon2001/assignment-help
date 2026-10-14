@@ -272,7 +272,7 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
               ref={emojiRef}
               className="absolute bottom-12 left-0 z-20 p-2.5 rounded-2xl bg-surface-container-lowest border border-outline-variant shadow-lg"
             >
-              <div className="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto pr-0.5">
+              <div className="grid grid-cols-6 sm:grid-cols-8 gap-1 max-h-48 overflow-y-auto pr-0.5">
                 {EMOJIS.map((e) => (
                   <button
                     key={e}

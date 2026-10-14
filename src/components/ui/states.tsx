@@ -14,7 +14,7 @@ export function ErrorState({
   retry?: () => void;
 }) {
   return (
-    <Card className="flex flex-col items-center gap-3 p-10 text-center">
+    <Card className="flex flex-col items-center gap-3 p-6 sm:p-10 text-center">
       <span className="w-12 h-12 rounded-2xl bg-error-container/40 flex items-center justify-center">
         <AlertTriangle size={22} className="text-error" />
       </span>

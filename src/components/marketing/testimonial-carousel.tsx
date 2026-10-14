@@ -87,7 +87,7 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
           {pages.map((group, groupIndex) => (
             <div
               key={groupIndex}
-              className="grid w-full shrink-0 grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+              className="grid w-full shrink-0 grid-cols-1 gap-5 lg:grid-cols-3"
               aria-hidden={groupIndex !== activePage}
             >
               {group.map((t) => {

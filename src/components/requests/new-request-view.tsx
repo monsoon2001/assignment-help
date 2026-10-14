@@ -21,7 +21,7 @@ import { OTHER_OPTION, withCustom } from "@/lib/constants";
 import { countryNameFor, formatCurrency, defaultCurrencyForCountry } from "@/lib/currency";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Indicative bands, quoted in CAD (the platform's single currency).
+// Indicative budget guidance, quoted in CAD (the settlement currency).
 const PRICING_BANDS = [
   { label: "Essays (per page)", from: 7, to: 15 },
   { label: "Problem sets (per set)", from: 35, to: 90 },
@@ -299,9 +299,10 @@ export default function NewRequestView({
               ))}
             </div>
             <p className="text-xs text-on-surface-variant mt-3 leading-relaxed">
-              Shown in <span className="font-semibold">CAD</span>. Your
-              helper responds in the request chat within <span className="font-semibold">2 hours</span>.
-              Rush orders under 12 hours carry a <span className="font-semibold">+25%</span> premium.
+              Indicative guidance in <span className="font-semibold">CAD</span>; you&apos;ll be charged in your
+              local currency at checkout. Your helper responds in the request chat within{" "}
+              <span className="font-semibold">2 hours</span>. Rush orders under 12 hours carry a{" "}
+              <span className="font-semibold">+25%</span> premium.
             </p>
           </Card>
 

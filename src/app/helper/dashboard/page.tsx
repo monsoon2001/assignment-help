@@ -15,7 +15,7 @@ import Button from "@/components/ui/button";
 import { EmptyState, PanelEmpty } from "@/components/ui/states";
 import { createClient } from "@/lib/supabase/server";
 import { unwrapRow } from "@/lib/embedded";
-import { formatCurrency } from "@/lib/currency";
+import { formatCurrency, normalizeCurrency } from "@/lib/currency";
 import { orderStatusMeta } from "@/lib/status-meta";
 
 export const dynamic = "force-dynamic";
@@ -64,9 +64,8 @@ export default async function HelperDashboard() {
         .order("created_at", { ascending: false })
         .limit(5),
       supabase
-        .from("helper_payments")
-        .select("amount, currency, created_at")
-        .eq("status", "paid"),
+        .from("helper_payouts")
+        .select("amount_sent_cad, paid_at"),
     ]);
 
   const orders = (orderRows ?? []).map((o) => ({
@@ -82,10 +81,10 @@ export default async function HelperDashboard() {
   const incoming = reqRows ?? [];
 
   const monthPaid = (payRows ?? []).filter(
-    (p) => new Date(p.created_at).getTime() >= new Date(monthStart).getTime()
+    (p) => new Date(p.paid_at).getTime() >= new Date(monthStart).getTime()
   );
   const earningsThisMonth = formatCurrency(
-    monthPaid.reduce((sum, p) => sum + Number(p.amount), 0)
+    monthPaid.reduce((sum, p) => sum + Number(p.amount_sent_cad), 0)
   );
 
   const firstName = (user.user_metadata?.name ?? user.email ?? "helper").toString().trim().split(/\s+/)[0];
@@ -183,7 +182,7 @@ export default async function HelperDashboard() {
                             : "Deadline flexible"}
                         </span>
                         <span className="text-sm font-semibold text-on-surface">
-                          {formatCurrency(Number(order.price))}
+                          {formatCurrency(Number(order.price), normalizeCurrency(order.currency))}
                         </span>
                       </div>
                     </div>

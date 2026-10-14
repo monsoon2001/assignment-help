@@ -53,15 +53,15 @@ export default async function AdminRequestsPage() {
         <Card className="p-6 text-sm text-error">{error.message}</Card>
       ) : requests && requests.length > 0 ? (
         <Card className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[640px]">
             <thead>
               <tr className="border-b border-outline-variant/30">
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Request</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Student</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Proposals</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Status</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Deadline</th>
-                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Action</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Request</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Student</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Proposals</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Status</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Deadline</th>
+                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -70,26 +70,26 @@ export default async function AdminRequestsPage() {
                 const proposalRows = (request.proposals as unknown as unknown[] | null) ?? [];
                 return (
                   <tr key={request.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
-                    <td className="px-6 py-4 max-w-xs">
+                    <td className="px-3 sm:px-6 py-4 max-w-xs">
                       <p className="text-sm font-medium text-on-surface truncate">{request.title}</p>
                       {request.subject && <p className="text-xs text-on-surface-variant mt-0.5">{request.subject}</p>}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center gap-2">
                         <Avatar name={student?.name ?? "Student"} size="sm" />
                         <span className="text-sm text-on-surface">{student?.name ?? "—"}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-on-surface-variant">
+                    <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">
                       {proposalRows.length}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-4">
                       <Badge variant={requestStatusVariant(request.status)}>
                         {request.status.replaceAll("_", " ")}
                       </Badge>
                     </td>
-                    <td className="px-6 py-4 text-sm text-on-surface-variant">{formatDate(request.deadline)}</td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">{formatDate(request.deadline)}</td>
+                    <td className="px-3 sm:px-6 py-4 text-right">
                       <Link href={`/admin/requests/${request.id}`} className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
                         <Eye size={14} /> View
                       </Link>

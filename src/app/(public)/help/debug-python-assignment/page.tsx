@@ -26,7 +26,7 @@ export default function DebugPythonPage() {
         ]}
       />
       <div className="band-soft">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 prose">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 prose">
         <h2>Step-by-step debugging</h2>
         <ol>
           <li>Read the error message carefully</li>

@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
-  ArrowLeft, Lock, ShieldCheck, CreditCard, Wallet, School, CalendarDays, BookOpen,
+  ArrowLeft, ShieldCheck, CreditCard, CalendarDays, BookOpen,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { unwrapRow } from "@/lib/embedded";
+import { normalizeCurrency } from "@/lib/currency";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import Avatar from "@/components/ui/avatar";
@@ -35,7 +36,7 @@ export default async function OrderPaymentPage({
 
   const { data: orderRow } = await supabase
     .from("orders")
-    .select("id, price, currency, status, deadline, proposal:proposals(request:requests(title, country), helper:users(id, name))")
+    .select("id, price, currency, base_amount, base_currency, charge_amount, charge_currency, status, deadline, proposal:proposals(request:requests(title, country), helper:users(id, name))")
     .eq("id", id)
     .maybeSingle();
 
@@ -47,10 +48,16 @@ export default async function OrderPaymentPage({
   const request = unwrapRow<{ title: string; country: string | null }>(proposal?.request);
   const helper = unwrapRow<{ id: string; name: string }>(proposal?.helper);
 
+  const chargeAmount =
+    orderRow.charge_amount !== null && Number.isFinite(Number(orderRow.charge_amount))
+      ? Number(orderRow.charge_amount)
+      : Number(orderRow.price);
+  const chargeCurrency = normalizeCurrency(orderRow.charge_currency ?? orderRow.currency);
+
   const order = {
     id: orderRow.id,
-    price: Number(orderRow.price),
-    currency: "CAD",
+    price: chargeAmount,
+    currency: chargeCurrency,
     status: orderRow.status,
     deadline: orderRow.deadline as string | null,
     title: request?.title ?? "Acadivo Order",
@@ -63,7 +70,7 @@ export default async function OrderPaymentPage({
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto flex flex-col gap-5">
+    <div className="w-full max-w-5xl mx-auto flex flex-col gap-4">
       <Link
         href="/requests"
         className="inline-flex items-center gap-1.5 text-sm text-on-surface-variant hover:text-on-surface"
@@ -72,83 +79,57 @@ export default async function OrderPaymentPage({
         Back to My Requests
       </Link>
 
-      <div className="flex items-center gap-2">
-        <Badge variant="secondary" dot className="shrink-0">Session Locked &amp; Secure</Badge>
-        <span className="text-sm text-on-surface-variant">Review and Pay</span>
-      </div>
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
+        <Card className="p-5 sm:p-6 flex flex-col gap-4 relative overflow-hidden">
+          <div className="absolute -top-20 -right-20 h-52 w-52 rounded-full bg-primary-fixed/30 blur-3xl pointer-events-none" />
 
-      <Card className="p-6 flex flex-col gap-5 relative overflow-hidden">
-        <div className="absolute -top-20 -right-20 h-52 w-52 rounded-full bg-primary-fixed/30 blur-3xl pointer-events-none" />
+          <div>
+            <Badge variant="secondary" dot className="shrink-0">Session Locked &amp; Secure</Badge>
+            <h1 className="font-display text-lg font-bold text-on-surface mt-3">Review and Pay</h1>
+          </div>
 
-        <div>
-          <h1 className="font-display text-xl font-bold text-on-surface">Confirm your project details to begin work.</h1>
-          <div className="inline-flex items-center gap-2 mt-3">
-            <Lock size={15} className="text-primary" />
-            <span className="text-xs text-on-surface-variant">Verified and secure checkout</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-surface-container-low">
-          <div className="w-11 h-11 rounded-xl bg-primary-container/20 text-primary flex items-center justify-center shrink-0">
-            <BookOpen size={20} />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs text-on-surface-variant">Academic Service</p>
-            <p className="font-semibold text-on-surface truncate">{order.title}</p>
-          </div>
-          <div className="flex items-center gap-2 text-on-surface-variant text-xs">
-            <CalendarDays size={13} />
-            Due {order.deadline ? new Date(order.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Flexible"}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Avatar name={order.helperName} role="helper" size="md" online />
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <p className="font-semibold text-on-surface truncate">{order.helperName}</p>
-              <ShieldCheck size={15} className="text-primary shrink-0" />
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-surface-container-low">
+            <div className="w-11 h-11 rounded-xl bg-primary-container/20 text-primary flex items-center justify-center shrink-0">
+              <BookOpen size={20} />
             </div>
-            <p className="text-xs text-on-surface-variant">Acadivo verified mentor</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-on-surface-variant">Academic Service</p>
+              <p className="font-semibold text-on-surface truncate">{order.title}</p>
+            </div>
+            <div className="flex items-center gap-2 text-on-surface-variant text-xs">
+              <CalendarDays size={13} />
+              Due {order.deadline ? new Date(order.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Flexible"}
+            </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="flex items-center gap-3 p-3.5 rounded-xl border border-outline-variant bg-surface-container-lowest cursor-pointer hover:border-primary-container hover:shadow-sm transition-all">
+          <div className="flex items-center gap-3">
+            <Avatar name={order.helperName} role="helper" size="md" online />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <p className="font-semibold text-on-surface truncate">{order.helperName}</p>
+                <ShieldCheck size={15} className="text-primary shrink-0" />
+              </div>
+              <p className="text-xs text-on-surface-variant">Acadivo verified mentor</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-3.5 rounded-xl border border-outline-variant bg-surface-container-lowest">
             <CreditCard size={18} className="text-primary" />
             <div>
               <p className="text-sm font-medium text-on-surface">Card</p>
               <p className="text-xs text-on-surface-variant">Visa · Mastercard</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-3.5 rounded-xl border border-outline-variant opacity-50">
-            <Wallet size={18} className="text-on-surface-variant" />
-            <div>
-              <p className="text-sm font-medium text-on-surface-variant">Digital Wallets</p>
-              <p className="text-xs text-on-surface-variant">Apple Pay · Google Pay</p>
-            </div>
-          </div>
-        </div>
 
-        <CheckoutPanel
-          orderId={order.id}
-          basePrice={order.price}
-          baseCurrency={order.currency}
-          country={order.country}
-          title={order.title}
-          helperName={order.helperName}
-        />
-
-        <div className="flex items-start gap-2 p-3.5 rounded-xl bg-surface-container-low">
-          <School size={16} className="text-primary shrink-0 mt-0.5" />
           <p className="text-xs leading-relaxed text-on-surface-variant">
-            Your payment is taken now, when you accept the quote, and confirms an order with{" "}
-            <span className="font-semibold text-on-surface">{order.helperName}</span>. If the
-            delivered work doesn&apos;t match the agreed scope, you can request revisions, or a
-            refund under our Refund Policy.
+            Payment confirms your order with{" "}
+            <span className="font-semibold text-on-surface">{order.helperName}</span>. Revisions or a
+            refund under our Refund Policy if the delivered work doesn&apos;t match the agreed scope.
           </p>
-        </div>
-      </Card>
+        </Card>
+
+        <CheckoutPanel orderId={order.id} amount={order.price} currency={order.currency} />
+      </div>
     </div>
   );
 }

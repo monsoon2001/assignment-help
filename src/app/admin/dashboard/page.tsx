@@ -149,15 +149,15 @@ export default async function AdminDashboardPage() {
 
         {recentOrders && recentOrders.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[640px]">
               <thead>
                 <tr className="border-b border-outline-variant/30">
-                  <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Student</th>
-                  <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Helper</th>
-                  <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Amount</th>
-                  <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Status</th>
-                  <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Deadline</th>
-                  <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Action</th>
+                  <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Student</th>
+                  <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Helper</th>
+                  <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Amount</th>
+                  <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Status</th>
+                  <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Deadline</th>
+                  <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -166,26 +166,26 @@ export default async function AdminDashboardPage() {
                   const helper = unwrapRow<{ name: string | null }>(order.helper);
                   return (
                     <tr key={order.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
-                      <td className="px-6 py-4">
+                      <td className="px-3 sm:px-6 py-4">
                         <div className="flex items-center gap-2">
                           <Avatar name={student?.name ?? "Student"} size="sm" />
                           <span className="text-sm text-on-surface">{student?.name ?? "—"}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 sm:px-6 py-4">
                         <div className="flex items-center gap-2">
                           <Avatar name={helper?.name ?? "Helper"} role="helper" size="sm" />
                           <span className="text-sm text-on-surface">{helper?.name ?? "—"}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm font-semibold text-on-surface">{formatCurrency(Number(order.price), normalizeCurrency(order.currency))}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 sm:px-6 py-4 text-sm font-semibold text-on-surface">{formatCurrency(Number(order.price), normalizeCurrency(order.currency))}</td>
+                      <td className="px-3 sm:px-6 py-4">
                         <Badge variant={orderStatusVariant(order.status)}>
                           {order.status.replaceAll("_", " ")}
                         </Badge>
                       </td>
-                      <td className="px-6 py-4 text-sm text-on-surface-variant">{formatDate(order.deadline)}</td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">{formatDate(order.deadline)}</td>
+                      <td className="px-3 sm:px-6 py-4 text-right">
                         <Link href={`/admin/orders/${order.id}`} className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
                           <Eye size={14} /> View
                         </Link>

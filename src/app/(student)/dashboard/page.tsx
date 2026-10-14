@@ -174,7 +174,7 @@ export default async function DashboardPage() {
           </div>
 
           {requests.length === 0 && (
-            <Card className="p-10 text-center">
+            <Card className="p-6 sm:p-10 text-center">
               <p className="text-on-surface-variant">You haven&apos;t requested help yet.</p>
               <Link href="/requests/new" className="inline-block mt-4">
                 <Button>Create Your First Request <Sparkles size={15} /></Button>

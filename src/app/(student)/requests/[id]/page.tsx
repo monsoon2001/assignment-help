@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import RequestWorkspace from "@/components/requests/request-workspace";
 import OrderWorkspace from "@/components/orders/order-workspace";
 import { createClient } from "@/lib/supabase/server";
+import { getChargeContext } from "@/lib/charge.server";
 
 export const dynamic = "force-dynamic";
 
@@ -55,5 +56,21 @@ export default async function StudentRequestDetailPage({
     return <OrderWorkspace orderId={orderId} />;
   }
 
-  return <RequestWorkspace requestId={id} mode="student" />;
+  const { data: profile } = await supabase
+    .from("users")
+    .select("country")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const chargeContext = await getChargeContext(profile?.country ?? null);
+
+  return (
+    <RequestWorkspace
+      requestId={id}
+      mode="student"
+      localCurrency={chargeContext.localCurrency}
+      rates={chargeContext.rates}
+      surchargePercent={chargeContext.surchargePercent}
+    />
+  );
 }

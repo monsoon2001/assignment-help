@@ -19,7 +19,6 @@ import { createClient } from "@/lib/supabase/client";
 import { realtimeTopic } from "@/lib/supabase/realtime";
 import { uploadOrderFile } from "@/lib/order-files";
 import { normalizeCurrency, formatCurrency } from "@/lib/currency";
-import { ApproxPrice } from "@/components/currency/currency-display";
 import { orderStatusMeta, paymentStatusVariant } from "@/lib/status-meta";
 import { markThreadNotificationsRead } from "@/lib/notifications";
 import ChatPanel, { type ChatMessageRow, timeLabel, fileNameFromUrl } from "@/components/chat/chat-panel";
@@ -39,6 +38,10 @@ type OrderData = {
   status: OrderStatus;
   price: number;
   currency: string;
+  base_amount: number | null;
+  base_currency: string | null;
+  charge_amount: number | null;
+  charge_currency: string | null;
   deadline: string | null;
   created_at: string;
   student_id: string;
@@ -110,7 +113,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
   const loadOrder = useCallback(async () => {
     const { data, error } = await supabase.current
       .from("orders")
-      .select("id, status, price, currency, deadline, created_at, student_id, proposal_id, helper:users!orders_helper_id_fkey(id, name), proposal:proposals(id, request_id, description, revisions_included, request:requests(title, subject))")
+      .select("id, status, price, currency, base_amount, base_currency, charge_amount, charge_currency, deadline, created_at, student_id, proposal_id, helper:users!orders_helper_id_fkey(id, name), proposal:proposals(id, request_id, description, revisions_included, request:requests(title, subject))")
       .eq("id", orderId)
       .maybeSingle();
 
@@ -275,11 +278,20 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
   const isStudent = role === "student";
   const title = order.proposal?.request?.title ?? "Order";
   const subject = order.proposal?.request?.subject ?? "General";
-  const price = formatCurrency(Number(order.price), normalizeCurrency(order.currency));
+  const basePrice = formatCurrency(
+    Number(order.base_amount ?? order.price),
+    normalizeCurrency(order.base_currency ?? order.currency)
+  );
+  const chargePrice = formatCurrency(
+    Number(order.charge_amount ?? order.price),
+    normalizeCurrency(order.charge_currency ?? order.currency)
+  );
+  // Students see the local amount they were charged; helpers see the base quote.
+  const price = isStudent ? chargePrice : basePrice;
 
   const paidLabel =
     payment?.status === "paid"
-      ? `Paid ${formatCurrency(Number(payment.amount ?? order.price), normalizeCurrency(payment.currency ?? order.currency))}` +
+      ? `Paid ${isStudent ? chargePrice : basePrice}` +
         (payment.created_at
           ? ` · ${new Date(payment.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
           : "")
@@ -575,9 +587,6 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                     : "Flexible"}
                 </span>
               </div>
-              {isStudent && (
-                <ApproxPrice amountCad={Number(order.price)} withSelector className="mt-3" />
-              )}
             </Card>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -592,11 +601,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
               </div>
               <div className="flex flex-wrap items-center gap-3 text-sm">
                 <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
-                  <DollarSign size={14} />{" "}
-                  {formatCurrency(
-                    Number(payment?.amount ?? order.price),
-                    normalizeCurrency(payment?.currency ?? order.currency)
-                  )}
+                  <DollarSign size={14} /> {price}
                 </span>
                 {payment?.status === "paid" && payment.created_at && (
                   <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
@@ -610,12 +615,6 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                   </span>
                 )}
               </div>
-              {isStudent && (
-                <ApproxPrice
-                  amountCad={Number(payment?.amount ?? order.price)}
-                  className="mt-2"
-                />
-              )}
               {payment?.status === "paid" && payment.receipt_url ? (
                 <a
                   href={payment.receipt_url}

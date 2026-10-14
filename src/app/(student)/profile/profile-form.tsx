@@ -110,7 +110,7 @@ export default function StudentProfileForm({
                   ]}
                 />
                 <p className="text-xs text-on-surface-variant mt-1.5">
-                  Used to show an approximate price in your currency. You are always charged in CAD.
+                  Used to charge you in your local currency. You always pay in the currency shown at checkout.
                 </p>
               </div>
             </div>

@@ -46,9 +46,9 @@ export default function ResourcesPage() {
       </div>
 
 
-      <section className="py-16 band-soft">
+      <section className="py-12 sm:py-16 band-soft">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <section className="mb-16">
+        <section className="mb-10 sm:mb-16">
           <div className="flex items-center gap-3 mb-2">
             <span className="h-1 w-10 rounded-full bg-gradient-to-r from-primary-container to-primary-fixed" aria-hidden="true" />
             <h2 className="font-display text-2xl font-bold text-on-surface">Featured Guides</h2>
@@ -80,7 +80,7 @@ export default function ResourcesPage() {
           </div>
         </section>
 
-        <section className="mb-16">
+        <section className="mb-10 sm:mb-16">
           <h2 className="font-display text-2xl font-bold text-on-surface mb-6">Browse All Guides</h2>
           <ResourceBrowser />
         </section>

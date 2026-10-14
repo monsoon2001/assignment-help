@@ -94,7 +94,7 @@ export default function HelperRequestsView({
       </div>
 
       {rows.length === 0 && (
-        <Card className="p-10 text-center flex flex-col items-center gap-3">
+        <Card className="p-6 sm:p-10 text-center flex flex-col items-center gap-3">
           <span className="w-14 h-14 rounded-2xl bg-primary-container/20 flex items-center justify-center">
             <MessageSquare size={24} className="text-primary" />
           </span>

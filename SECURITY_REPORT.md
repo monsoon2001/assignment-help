@@ -72,6 +72,7 @@ It also documents the residual items that need a dashboard/config decision.
 | F13 | **Low** | Voice-call realtime uses a fixed broadcast channel, unauthenticated beyond login | **Open** |
 | F14 | **Low** | `next/image` `remotePatterns` use wildcards (`**.googleusercontent.com`, `**.ggpht.com`) | **Open** |
 | F15 | **Low** | No `Content-Security-Policy`; admin audit log covers only some actions | **Partially fixed** |
+| F16 | **Medium** | Multi-currency local charge: client must not influence the charge, the hidden FX buffer or the locked rate | **Fixed** (server-authoritative accept route + frozen columns/grants) |
 
 ---
 
@@ -237,6 +238,29 @@ Stripe + Google OAuth need a tested allow-list) — add one with a report-only
 rollout. Admin audit logging (`src/lib/audit.ts`) covers user status/role edits,
 refunds, message flags/warnings, but not every admin view/action.
 
+### F16 — Multi-currency local charge must stay server-authoritative · **Medium** · Fixed
+**Where:** the platform now charges each student in their **local** currency (from
+`users.country`) with a hidden FX/processing buffer, while helpers quote in any
+currency and the platform settles to CAD. Any path where the browser could pick the
+currency, amount, buffer or rate would let a student pay less than the agreed value.
+
+**Fix:**
+- Order creation moved behind `POST /api/orders/accept` (`src/app/api/orders/accept/route.ts`):
+  the proposal price/currency are **re-read from the DB**, the student's location is read
+  server-side, and `resolveLocalCharge` (`src/lib/charge.server.ts`) computes and **locks**
+  `base_amount/base_currency/charge_amount/charge_currency/charge_locked_at`. A missing rate
+  falls back to CAD rather than accepting a client-supplied value.
+- `checkout/route.ts` charges the **locked** `charge_amount`/`charge_currency` on the order
+  (with a minimum-charge guard); the client body is ignored.
+- The RLS freeze policy `order_participants_can_update` now also freezes
+  `base_currency/base_amount/charge_currency/charge_amount/charge_locked_at`, so neither
+  participant can edit the charge after locking.
+- The FX buffer (`platform_settings.fx_surcharge_percent`) and CAD ledger columns
+  (`charge_amount`, `charge_to_cad_rate`, `platform_fee_cad`) are **admin-only** via column
+  grants; students/helpers cannot read the breakdown.
+- The webhook derives `gross_cad`/`platform_fee_cad` from the locked charge and rate, and
+  converts refunds back to CAD with the locked `charge_to_cad_rate` (never a live rate).
+
 ---
 
 ## Verified as strong (no action)
@@ -249,7 +273,7 @@ refunds, message flags/warnings, but not every admin view/action.
 - **Stripe:** raw-body signature verification (`webhook/route.ts:17`),
   `client_reference_id`↔order cross-check, `payment_pending`→`in_progress` only,
   partial unique index on `stripe_payment_intent_id` (`:286`), amount computed
-  server-side from the accepted proposal (`checkout/route.ts`).
+  server-side from the **locked local charge** on the accepted order (F16).
 - **XSS:** no `dangerouslySetInnerHTML` on user data (only static JSON-LD);
   React escaping throughout; no `eval`/`innerHTML`.
 - **Open redirect:** `next` guards require `/` and reject `//` (sign-in page and
@@ -318,4 +342,12 @@ refunds, message flags/warnings, but not every admin view/action.
   `src/components/orders/order-workspace.tsx`, `src/app/admin/requests/[id]/page.tsx`,
   `src/app/admin/orders/[id]/page.tsx`: signed file links (F3).
 - `next.config.ts`: security headers, `poweredByHeader:false` (F15).
+- `supabase/migrations/20261013000001_multicurrency_local_charge.sql` (new): base/charge columns +
+  freeze policy, CAD ledger + `platform_fee_cad`, drops `helper_payments`/`helper_compensation`,
+  adds `helper_payouts` view, reworks `record_helper_payout` (F16).
+- `src/app/api/orders/accept/route.ts`, `src/lib/charge.server.ts`, `src/lib/currency.ts` (new/changed):
+  server-authoritative local charge (F16).
+- `src/app/api/checkout/route.ts`, `src/app/api/stripe/webhook/route.ts`: charge the locked currency/amount,
+  CAD ledger + buffer, locked-rate refunds (F16).
 - `scripts/test-security-audit.mjs` (new): regression checks.
+- `scripts/test-payment-model.mjs`: rewritten for the local-charge + manual-payout model.

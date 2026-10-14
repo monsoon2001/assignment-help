@@ -52,15 +52,15 @@ export default async function AdminHelpersPage({
         <Card className="p-6 text-sm text-error">{error.message}</Card>
       ) : users && users.length > 0 ? (
         <Card className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[640px]">
             <thead>
               <tr className="border-b border-outline-variant/30">
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Helper</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Subjects</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Rating</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Joined</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Status</th>
-                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-6 py-3">Actions</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Helper</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Subjects</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Rating</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Joined</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Status</th>
+                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -68,7 +68,7 @@ export default async function AdminHelpersPage({
                 const profile = user.profile as unknown as { subjects?: string[]; rating_avg?: number; bio?: string } | null;
                 return (
                   <tr key={user.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center gap-3">
                         <Avatar name={user.name ?? "Helper"} src={user.avatar_url ?? undefined} role="helper" size="sm" />
                         <div>
@@ -77,7 +77,7 @@ export default async function AdminHelpersPage({
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-4">
                       <div className="flex flex-wrap gap-1 max-w-xs">
                         {(profile?.subjects ?? []).slice(0, 3).map((s) => (
                           <span key={s} className="px-2 py-0.5 rounded-full bg-surface-container-low text-xs text-on-surface-variant">
@@ -87,17 +87,17 @@ export default async function AdminHelpersPage({
                         {(profile?.subjects?.length ?? 0) === 0 && <span className="text-xs text-on-surface-variant">No subjects set</span>}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-4">
                       <span className="inline-flex items-center gap-1 text-sm font-semibold text-on-surface">
                         <Star size={13} className="text-amber-500 fill-amber-500" />
                         {Number(profile?.rating_avg ?? 0).toFixed(1)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-on-surface-variant">{formatDate(user.created_at)}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">{formatDate(user.created_at)}</td>
+                    <td className="px-3 sm:px-6 py-4">
                       <Badge variant={userStatusVariant(user.status)}>{user.status ?? "active"}</Badge>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
                         {user.status === "pending" && (
                           <form action={setUserStatus}>

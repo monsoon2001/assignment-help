@@ -23,6 +23,7 @@ import { createClient } from "@/lib/supabase/client";
 import { realtimeTopic } from "@/lib/supabase/realtime";
 import { fetchRequestMessages, sendRequestMessage } from "@/lib/request-chat";
 import { submitProposal } from "@/lib/proposals";
+import { CHARGE_CURRENCIES, currencyFlag, currencyName, DEFAULT_CURRENCY } from "@/lib/currency";
 import { markThreadNotificationsRead } from "@/lib/notifications";
 import { requestStatusVariant } from "@/lib/status-meta";
 import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
@@ -59,9 +60,15 @@ const STATUS_LABEL: Record<string, string> = {
 export default function RequestWorkspace({
   requestId,
   mode,
+  localCurrency = DEFAULT_CURRENCY,
+  rates = null,
+  surchargePercent = 0,
 }: {
   requestId: string;
   mode: "student" | "helper";
+  localCurrency?: string;
+  rates?: Record<string, number> | null;
+  surchargePercent?: number;
 }) {
   const supabase = useRef(createClient());
 
@@ -80,6 +87,7 @@ export default function RequestWorkspace({
   const [chatError, setChatError] = useState<string | null>(null);
 
   const [bidPrice, setBidPrice] = useState("");
+  const [bidCurrency, setBidCurrency] = useState(DEFAULT_CURRENCY);
   const [bidDescription, setBidDescription] = useState("");
   const [bidRevisions, setBidRevisions] = useState("1");
   const [sendingBid, setSendingBid] = useState(false);
@@ -275,6 +283,7 @@ export default function RequestWorkspace({
     const result = await submitProposal({
       request_id: requestId,
       price: parsedPrice,
+      currency: bidCurrency,
       description: bidDescription.trim() || undefined,
       revisions_included: Math.max(0, Number(bidRevisions) || 0),
     });
@@ -470,15 +479,34 @@ export default function RequestWorkspace({
                   <p className="text-xs text-on-surface-variant mb-3">
                     Price this request in the chat — the student reviews and accepts from here.
                   </p>
-                  <Input
-                    label="Price (CAD)"
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    placeholder="25.00"
-                    value={bidPrice}
-                    onChange={(e) => setBidPrice(e.target.value)}
-                  />
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <div className="flex-1">
+                      <Input
+                        label="Your price"
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="25.00"
+                        value={bidPrice}
+                        onChange={(e) => setBidPrice(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5 sm:w-44">
+                      <label className="text-sm font-medium text-on-surface">Currency</label>
+                      <select
+                        aria-label="Currency"
+                        value={bidCurrency}
+                        onChange={(e) => setBidCurrency(e.target.value)}
+                        className="h-11 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20"
+                      >
+                        {CHARGE_CURRENCIES.map((code) => (
+                          <option key={code} value={code}>
+                            {currencyFlag(code)} {code} · {currencyName(code)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                   <div className="mt-3 flex items-start gap-2 p-2.5 rounded-lg bg-surface-container-low border border-outline-variant">
                     <RotateCcw size={14} className="text-primary shrink-0 mt-0.5" />
                     <p className="text-xs leading-relaxed text-on-surface-variant">
@@ -512,6 +540,9 @@ export default function RequestWorkspace({
                   requestTitle={title}
                   requestDeadline={request.deadline}
                   orderId={orderId}
+                  localCurrency={localCurrency}
+                  rates={rates}
+                  surchargePercent={surchargePercent}
                   className="lg:flex-1"
                 />
               )}

@@ -31,53 +31,50 @@ so the `{{ .Token }}` placeholder must be added in the dashboard:
 Without step 3 the user receives a confirmation link instead of a code, and the "Enter the 6-digit
 code" screen will never match the message that was sent.
 
-## Payments (CAD only, platform-collected)
+## Payments (multi-currency local charge, platform-collected)
 
-All charges are collected by Acadivo's **own Stripe account** in **Canadian dollars (CAD)**.
-There is **no Stripe Connect**, no connected accounts, destination charges, application fees,
-transfers or Stripe payouts. Helpers are paid manually by the team (Wise / bank transfer) outside
-the app.
+All charges are collected by Acadivo's **own Stripe account**. There is **no Stripe Connect**, no
+connected accounts, destination charges, application fees, transfers or Stripe payouts. Helpers are
+paid manually by the team (Wise / bank transfer) outside the app.
 
-- Students see a **single total** — no commission, fee or helper-share is ever shown or returned to
-  a student or helper client.
-- The amount charged is taken from the **accepted proposal stored in the database**, never from the
-  client, so tampering with the page cannot change the Stripe amount.
-- The helper's share and the share basis are **admin-only settings** (`platform_settings`,
-  `helper_compensation`): default `80%`, basis `gross`. They are read server-side only.
-- A **private ledger** on `payments` records `gross_cad`, `stripe_fee_cad`, `net_cad`,
-  `helper_share_cad`, `helper_payout_status`, `disputed` and `refunded_amount_cad`. These columns are
-  readable only by admins; student/helper clients are limited to non-sensitive columns by column
-  grants.
+**How a quote becomes a charge.** A helper quotes in **any supported currency**. When the student
+accepts the proposal, the server (`POST /api/orders/accept`) locks the charge in the **student's
+local currency**, derived from their saved sign-up location (`users.country`):
+
+- The **base** amount/currency (what the helper quoted) is stored on the order as
+  `base_amount` / `base_currency`, alongside `charge_amount` / `charge_currency` / `charge_locked_at`.
+- A Canadian student is charged the base amount converted to CAD with **no buffer**. Everyone else is
+  charged the local-currency equivalent of the base **plus a hidden FX/processing buffer**
+  (`platform_settings.fx_surcharge_percent`, default `3.5%`). The buffer is **never itemized** — the
+  student only ever sees a single total.
+- Rates come from the Frankfurter API (`base=CAD`), cached 24h server-side. If no rate is available the
+  charge **falls back to CAD** so acceptance never fails.
+- The rate and amount are **locked at acceptance**; the platform absorbs later drift.
+
+- The amount charged is taken from the **locked charge stored in the database**, never from the client,
+  so tampering with the page cannot change the Stripe amount.
+- Students see a **single total** — no commission, fee or helper-share is ever shown or returned to a
+  student or helper client. Helpers and admins see CAD equivalents and the full breakdown.
+- A **private ledger** on `payments` records the charge (`charge_currency`, `charge_amount`,
+  `charge_to_cad_rate`), the CAD settlement (`gross_cad`, `stripe_fee_cad`, `net_cad`), the hidden
+  buffer (`platform_fee_cad = gross_cad − base CAD value`) and `helper_payout_status`, `disputed`,
+  `refunded_amount_cad`. These columns are readable only by admins; student/helper clients are limited
+  to non-sensitive columns by column grants.
 - **Manual payouts** are recorded on `manual_payouts` / `manual_payout_items` via the
-  `record_helper_payout` RPC. An order can never be paid out twice (`unique(order_id)`).
+  `record_helper_payout` RPC, with no helper percentage — the admin enters the amount sent. Per-order
+  amounts are split proportionally to each order's CAD value (bookkeeping only). An order can never be
+  paid out twice (`unique(order_id)`); the helper's Earnings page shows these payout receipts.
+- The "This Month" figure on the helper dashboard reads from the `helper_payouts` view.
 - The webhook is the **only** writer that flips an order to `in_progress`, verifies the Stripe
-  signature on the raw body, and is **idempotent** (`processed_stripe_events`). Refunds reduce the
-  amount owed; disputes set the payout to `on_hold`.
+  signature on the raw body, and is **idempotent** (`processed_stripe_events`). Refunds convert the
+  refunded presentment amount back to CAD via the locked `charge_to_cad_rate`; disputes set the payout
+  to `on_hold`.
 
-Apply the ledger migration:
-
-```bash
-psql "$DIRECT_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261011000001_payment_model_cad_ledger.sql
-```
-
-## Approximate display currency
-
-Under each CAD quote a student may preview an **approximate** equivalent in their own currency.
-This is display-only: the amount charged, the Pay-button label and the Stripe receipt are always CAD.
-
-- Supported display currencies: **CAD, GBP, AUD, USD, NZD, EUR**. Unknown countries default to CAD.
-- The default currency comes from the student's **sign-up country** (`users.country`, captured best-effort
-  from the request IP on first sign-in), falling back to the current IP country, then CAD.
-- A small **"View approximate price in"** selector (persisted in `localStorage`) lets them switch; it only
-  changes the approximate line and never the amount charged.
-- Rates are fetched **server-side and cached for 24h** from the Frankfurter API (`base=CAD`); if unavailable,
-  the approximate line is simply hidden.
-- The line always carries the note *"approximate, your bank sets the final amount"*.
-
-Apply the country migration:
+Apply the multi-currency migration (also drops the old `helper_payments` view / `helper_compensation`
+table and creates the `helper_payouts` view):
 
 ```bash
-psql "$DIRECT_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261012000001_add_user_country.sql
+psql "$DIRECT_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261013000001_multicurrency_local_charge.sql
 ```
 
 ## Verification
@@ -89,7 +86,7 @@ npm run build
 node scripts/test-proposal-flow.mjs
 node scripts/test-order-flow.mjs
 node scripts/test-phase7to10.mjs   # notifications + admin panel (Phase 7-10)
-node scripts/test-payment-model.mjs  # CAD-only platform-collected payment model
+node scripts/test-payment-model.mjs  # multi-currency local-charge + manual-payout model
 ```
 
 ## Deploy on Vercel

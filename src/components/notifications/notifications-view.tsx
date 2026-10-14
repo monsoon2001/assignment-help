@@ -140,7 +140,7 @@ export default function NotificationsView({
     return (
       <div className="w-full max-w-5xl mx-auto flex flex-col gap-6">
         {header}
-        <Card className="flex flex-col items-center gap-3 p-12 text-center">
+        <Card className="flex flex-col items-center gap-3 p-8 sm:p-12 text-center">
           <span className="w-14 h-14 rounded-2xl bg-primary-container/10 flex items-center justify-center">
             <Bell size={26} className="text-primary" />
           </span>

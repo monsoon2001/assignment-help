@@ -5,10 +5,7 @@ import StudentNav from "@/components/layout/student-nav";
 import RoleBottomNav from "@/components/layout/role-bottom-nav";
 import WarningsBanner from "@/components/layout/warnings-banner";
 import Button from "@/components/ui/button";
-import { CurrencyDisplayProvider } from "@/components/currency/currency-display";
 import { createClient } from "@/lib/supabase/server";
-import { resolveDisplayCurrency } from "@/lib/display-currency.server";
-import { getDisplayRates } from "@/lib/exchange-rates.server";
 
 export const dynamic = "force-dynamic";
 
@@ -37,20 +34,6 @@ export default async function StudentLayout({ children }: { children: React.Reac
     notifCount = notif ?? 0;
   }
 
-  let userCountry: string | null = null;
-  if (user) {
-    const { data: profile } = await supabase
-      .from("users")
-      .select("country")
-      .eq("id", user.id)
-      .maybeSingle();
-    userCountry = (profile as { country?: string | null } | null)?.country ?? null;
-  }
-  const [defaultCurrency, rates] = await Promise.all([
-    resolveDisplayCurrency(userCountry),
-    getDisplayRates(),
-  ]);
-
   const navItems: { key: "dashboard" | "requests" | "messages" | "notifications" | "profile"; href: string; label: string; badge?: string }[] = [
     { key: "dashboard", href: "/dashboard", label: "Dashboard" },
     { key: "requests", href: "/requests", label: "My Requests", badge: requestCount > 0 ? String(requestCount) : undefined },
@@ -59,7 +42,6 @@ export default async function StudentLayout({ children }: { children: React.Reac
     { key: "profile", href: "/profile", label: "Profile" },
   ];
   return (
-    <CurrencyDisplayProvider defaultCurrency={defaultCurrency} rates={rates}>
     <div className="min-h-dvh flex flex-col bg-background lg:h-dvh lg:overflow-hidden">
       <Header />
       <WarningsBanner />
@@ -111,6 +93,5 @@ export default async function StudentLayout({ children }: { children: React.Reac
         integrity office for questions.
       </footer>
     </div>
-    </CurrencyDisplayProvider>
   );
 }

@@ -161,6 +161,7 @@ export default function AdminLayout({
 
       <RoleBottomNav
         roleLabel="Admin"
+        hideFrom="lg"
         primary={[
           { href: "/admin/dashboard", label: "Dashboard", icon: "dashboard" },
           { href: "/admin/requests", label: "Requests", icon: "requests" },

@@ -4,23 +4,22 @@ import { useActionState, useState } from "react";
 import Card from "@/components/ui/card";
 import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
-import Select from "@/components/ui/select";
-import { Save, Lock } from "lucide-react";
+import { Save, Lock, Globe } from "lucide-react";
 import {
-  updateCompensationSettings,
-  type CompensationResult,
-  type CompensationSettings,
+  updateFxSettings,
+  type FxResult,
+  type FxSettings,
 } from "./actions";
 
-const initialState: CompensationResult = { ok: false, message: "" };
+const initialState: FxResult = { ok: false, message: "" };
 
-export default function SettingsForm({ compensation }: { compensation: CompensationSettings }) {
+export default function SettingsForm({ fx }: { fx: FxSettings }) {
   const [platformName, setPlatformName] = useState("Acadivo");
   const [supportEmail, setSupportEmail] = useState("support@acadivo.com");
   const [autoMatch, setAutoMatch] = useState(true);
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [state, formAction, pending] = useActionState(
-    updateCompensationSettings,
+    updateFxSettings,
     initialState
   );
 
@@ -41,39 +40,30 @@ export default function SettingsForm({ compensation }: { compensation: Compensat
         </div>
       </Card>
 
-      {/* Private compensation config — admin-only, never shown to students/helpers. */}
+      {/* Private FX buffer — admin-only, never shown to students. */}
       <Card className="p-6 space-y-6">
         <div className="flex items-center gap-2">
           <Lock size={16} className="text-primary" />
-          <h2 className="font-display text-lg font-semibold text-on-surface">Helper Compensation</h2>
+          <h2 className="font-display text-lg font-semibold text-on-surface">FX &amp; Processing</h2>
         </div>
         <p className="text-sm text-on-surface-variant">
-          Private to admins. This controls what helpers are owed; students only ever see one total
-          price and never a fee or commission.
+          Private to admins. This buffer is baked into the local price a student sees outside
+          Canada; it is never itemised. Helpers are paid manually — there is no commission.
         </p>
         <form action={formAction} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="max-w-xs">
             <Input
-              label="Default Helper Share (%)"
-              name="sharePercent"
+              label="Processing / FX buffer (%)"
+              name="surchargePercent"
               type="number"
               min="0"
               max="100"
               step="0.01"
-              defaultValue={String(compensation.sharePercent)}
-            />
-            <Select
-              label="Share Basis"
-              name="basis"
-              defaultValue={compensation.basis}
-              options={[
-                { value: "net_of_stripe_fees", label: "Net of Stripe fees" },
-                { value: "gross", label: "Gross amount" },
-              ]}
+              defaultValue={String(fx.surchargePercent)}
             />
           </div>
           <div className="flex items-center gap-3">
-            <Button disabled={pending}><Save size={16} />{pending ? "Saving…" : "Save Compensation"}</Button>
+            <Button disabled={pending}><Save size={16} />{pending ? "Saving…" : "Save FX Settings"}</Button>
             {state.message && (
               <span className={`text-sm ${state.ok ? "text-success" : "text-error"}`}>
                 {state.message}
@@ -81,6 +71,11 @@ export default function SettingsForm({ compensation }: { compensation: Compensat
             )}
           </div>
         </form>
+        <p className="flex items-start gap-2 text-xs text-on-surface-variant">
+          <Globe size={13} className="shrink-0 mt-0.5 text-primary" />
+          Students in Canada are charged the converted total with no buffer. Everyone else pays the
+          converted total plus this buffer, shown only as one local amount.
+        </p>
       </Card>
 
       <Card className="p-6 space-y-6">
