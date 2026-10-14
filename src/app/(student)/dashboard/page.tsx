@@ -376,7 +376,7 @@ export default async function DashboardPage() {
               const Icon = card.icon;
               return (
                 <Link key={card.key} href={card.href}>
-                  <Card className="p-5 hover:shadow-md transition-shadow border border-primary-container/40" hover>
+                  <Card className="action-card p-5 transition-shadow hover:shadow-lg" hover>
                     <div className="flex items-start gap-3">
                       <span className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${card.tone}`}>
                         <Icon size={18} />

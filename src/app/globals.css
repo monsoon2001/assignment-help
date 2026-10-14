@@ -211,6 +211,50 @@ h6 {
   }
 }
 
+/* Action cards on the student dashboard: a red "pay attention" ring whose
+   gradient slides around the card so urgent items catch the eye. The ring is
+   painted with a masked pseudo-element so it sits on top of the card's own
+   background without disturbing its radius or content. */
+@keyframes action-card-border {
+  to {
+    background-position: 300% 0;
+  }
+}
+
+.action-card {
+  position: relative;
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.12), 0 6px 18px -10px rgba(220, 38, 38, 0.45);
+}
+
+.action-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(
+    90deg,
+    #fecaca 0%,
+    #ef4444 25%,
+    #b91c1c 50%,
+    #ef4444 75%,
+    #fecaca 100%
+  );
+  background-size: 300% 100%;
+  animation: action-card-border 4s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action-card::after {
+    animation: none;
+  }
+}
+
 /* Public section bands -------------------------------------------------------
    Colour lives in small accents (icon tiles, chips, the dark bands); section
    backgrounds stay neutral so a long marketing page reads as one calm sheet. */
