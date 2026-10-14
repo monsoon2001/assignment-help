@@ -217,7 +217,6 @@ export async function POST(request: Request) {
             currency: chargeCurrency.toLowerCase(),
             product_data: {
               name: title,
-              description: proposal.description ?? "Acadivo academic order",
             },
             unit_amount: unitAmount,
           },

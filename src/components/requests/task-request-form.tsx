@@ -153,8 +153,6 @@ export default function TaskRequestForm({
 }: TaskRequestFormProps) {
   const today = new Date().toISOString().slice(0, 10);
   const [filesOpen, setFilesOpen] = useState(false);
-  const [pagesEditing, setPagesEditing] = useState(false);
-  const pagesInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Picking files again adds to the list instead of replacing it.
@@ -188,15 +186,8 @@ export default function TaskRequestForm({
 
   const pages = Number(values.pages || "0");
   const wordEstimate = pages > 0 ? pages * WORDS_PER_PAGE : 0;
-  // The field reads "2 pages - approx 500 words" until it is clicked, then it
-  // turns into a plain number input for editing.
-  const pagesLabel =
-    pages > 0
-      ? `${pages} page${pages === 1 ? "" : "s"} \u00b7 approx ${wordEstimate.toLocaleString()} words`
-      : "";
 
-  // One page is roughly WORDS_PER_PAGE words, so each step is +/-1 page and
-  // +/-WORDS_PER_PAGE words.
+  // One page is roughly WORDS_PER_PAGE words, so each step is +/-1 page.
   const stepPages = (delta: number) => {
     const current = Number(values.pages || "0");
     const base = Number.isFinite(current) ? current : 0;
@@ -258,22 +249,16 @@ export default function TaskRequestForm({
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-semibold text-on-surface">Pages / words</label>
+          <label htmlFor="field-pages" className="text-xs font-semibold text-on-surface">Pages</label>
           <div className="relative flex items-center">
             <input
-              ref={pagesInputRef}
-              type={pagesEditing ? "number" : "text"}
-              inputMode={pagesEditing ? "numeric" : undefined}
+              id="field-pages"
+              type="number"
+              inputMode="numeric"
               min={0}
               step={1}
-              readOnly={!pagesEditing}
-              placeholder="1 page / 250 words approx"
-              value={pagesEditing ? values.pages : pagesLabel}
-              onFocus={() => {
-                setPagesEditing(true);
-                requestAnimationFrame(() => pagesInputRef.current?.select());
-              }}
-              onBlur={() => setPagesEditing(false)}
+              placeholder="e.g. 3"
+              value={values.pages}
               onChange={(e) => set("pages", e.target.value)}
               className={`${FIELD_CLASS} pr-9 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
             />
@@ -281,7 +266,7 @@ export default function TaskRequestForm({
               <button
                 type="button"
                 onClick={() => stepPages(1)}
-                aria-label="Add one page (250 words)"
+                aria-label="Add one page"
                 className="w-6 h-4 flex items-center justify-center rounded text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors cursor-pointer"
               >
                 <ChevronUp size={14} />
@@ -290,13 +275,16 @@ export default function TaskRequestForm({
                 type="button"
                 onClick={() => stepPages(-1)}
                 disabled={pages <= 0}
-                aria-label="Remove one page (250 words)"
+                aria-label="Remove one page"
                 className="w-6 h-4 flex items-center justify-center rounded text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors cursor-pointer disabled:opacity-40 disabled:pointer-events-none"
               >
                 <ChevronDown size={14} />
               </button>
             </span>
           </div>
+          <p className="text-xs text-on-surface-variant">
+            {wordEstimate > 0 ? `Approx. ${wordEstimate.toLocaleString()} words` : "1 page \u2248 250 words"}
+          </p>
         </div>
       </div>
 

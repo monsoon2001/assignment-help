@@ -100,7 +100,7 @@ export default function PriceEstimateForm() {
       return;
     }
     if (!values.pages.trim() && !values.details.trim()) {
-      setError("Add pages/words or a short description so a helper can assess the scope.");
+      setError("Add the page count or a short description so a helper can assess the scope.");
       return;
     }
 

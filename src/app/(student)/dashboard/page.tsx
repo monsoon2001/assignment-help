@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowRight, FileText, CheckCircle2, Sparkles, Clock, RefreshCcw } from "lucide-react";
+import { ArrowRight, FileText, CheckCircle2, Sparkles, Clock, RefreshCcw, Bell, MessageSquare, Wallet, Inbox, ShoppingBag, RotateCcw, type LucideIcon } from "lucide-react";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
@@ -36,6 +36,20 @@ function timeAgo(value: string): string {
 
 type NotifRow = { id: string; type: string; message: string; link: string | null; read: boolean; created_at: string };
 
+const ACTIVITY_META: Record<string, { icon: LucideIcon; tone: string }> = {
+  proposal: { icon: FileText, tone: "bg-secondary-container text-on-secondary-container" },
+  request: { icon: Inbox, tone: "bg-primary-container text-on-primary" },
+  payment: { icon: Wallet, tone: "bg-emerald-100 text-emerald-700" },
+  message: { icon: MessageSquare, tone: "bg-primary-container text-on-primary" },
+  delivery: { icon: ShoppingBag, tone: "bg-tertiary-container text-on-tertiary" },
+  revision: { icon: RotateCcw, tone: "bg-amber-100 text-amber-700" },
+  completed: { icon: CheckCircle2, tone: "bg-emerald-100 text-emerald-700" },
+};
+
+function activityMeta(type: string): { icon: LucideIcon; tone: string } {
+  return ACTIVITY_META[type] ?? { icon: Bell, tone: "bg-surface-container-high text-on-surface-variant" };
+}
+
 export default async function DashboardPage() {
   const supabase = await createClient();
   const {
@@ -64,7 +78,7 @@ export default async function DashboardPage() {
         .select("id, type, message, link, read, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
-        .limit(5),
+        .limit(8),
     ]);
 
   const requests = (reqRows ?? []).map((r) => ({
@@ -233,23 +247,30 @@ export default async function DashboardPage() {
             {notifications.length === 0 && (
               <PanelEmpty
                 icon={<Sparkles size={18} className="text-primary" />}
-                title="No notifications yet"
-                message="Request updates, proposal alerts and payment confirmations will show up here."
+                title="No activity yet"
+                message="When a helper sends you a proposal, a message or a delivery, it will show up here."
                 actionHref="/requests/new"
                 actionLabel="Start a request"
               />
             )}
-            {notifications.map((n) => (
-              <Link href={n.link ?? "/notifications"} key={n.id} className="flex items-start gap-3 p-4 hover:bg-surface-container-low transition-colors">
-                <div className="min-w-0 flex-1">
-                  <p className={`text-sm line-clamp-2 ${n.read ? "text-on-surface-variant" : "font-semibold text-on-surface"}`}>
-                    {n.message}
-                  </p>
-                  <p className="text-xs text-on-surface-variant mt-1">{timeAgo(n.created_at)}</p>
-                </div>
-                {!n.read && <span className="w-2 h-2 rounded-full bg-primary-container shrink-0 mt-1.5" />}
-              </Link>
-            ))}
+            {notifications.map((n) => {
+              const meta = activityMeta(n.type);
+              const Icon = meta.icon;
+              return (
+                <Link href={n.link ?? "/notifications"} key={n.id} className="flex items-start gap-3 p-4 hover:bg-surface-container-low transition-colors">
+                  <span className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${meta.tone}`}>
+                    <Icon size={16} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className={`text-sm line-clamp-2 ${n.read ? "text-on-surface-variant" : "font-semibold text-on-surface"}`}>
+                      {n.message}
+                    </p>
+                    <p className="text-xs text-on-surface-variant mt-1">{timeAgo(n.created_at)}</p>
+                  </div>
+                  {!n.read && <span className="w-2 h-2 rounded-full bg-primary-container shrink-0 mt-1.5" />}
+                </Link>
+              );
+            })}
           </Card>
         </section>
       </div>

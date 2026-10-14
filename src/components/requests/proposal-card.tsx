@@ -159,14 +159,9 @@ export default function ProposalCard({
         </div>
 
         {proposal.description && (
-          <div className="flex flex-col gap-1">
-            <p className="text-xs font-semibold text-on-surface">
-              Included in this Proposal
-            </p>
-            <p className="text-xs text-on-surface-variant leading-snug bg-surface-container-low p-2 rounded">
-              {proposal.description}
-            </p>
-          </div>
+          <p className="text-xs text-on-surface-variant leading-snug bg-surface-container-low p-2 rounded">
+            {proposal.description}
+          </p>
         )}
       </div>
 
