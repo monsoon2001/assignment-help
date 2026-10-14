@@ -9,6 +9,17 @@ import type { Testimonial } from "@/components/marketing/testimonial-carousel";
  */
 export const CURATED_TESTIMONIALS: Testimonial[] = [
   {
+    id: "curated-economics-essay",
+    rating: 5.0,
+    comment:
+      "My economics essay was a wall of definitions with no actual argument. Aisha made me map every paragraph back to the question, showed me how to use the data I already had, and explained exactly why my conclusion did not follow from it. She sent comments instead of a rewrite, so I could do the next one on my own.",
+    studentName: "Aisha Rahman",
+    subject: "Economics",
+    service: "Essay Writing",
+    length: "4 pages",
+    createdAt: "2026-10-06",
+  },
+  {
     id: "curated-nursing-care-plan",
     rating: 5.0,
     comment:
