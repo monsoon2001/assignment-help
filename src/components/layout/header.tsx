@@ -260,9 +260,9 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
           <span className="w-9 h-9 rounded-xl bg-primary-container text-on-primary flex items-center justify-center">
             <GraduationCap size={20} />
           </span>
-          <div className="leading-tight hidden sm:block">
-            <p className="font-display font-bold text-on-surface text-lg">Acadivo</p>
-            <p className="text-xs uppercase tracking-widest xl:tracking-widest text-on-surface-variant">Academic Network</p>
+          <div className="leading-tight">
+            <p className="font-display font-bold text-on-surface text-base sm:text-lg leading-none">Acadivo</p>
+            <p className="hidden sm:block text-xs uppercase tracking-widest xl:tracking-widest text-on-surface-variant">Academic Network</p>
           </div>
         </Link>
 
@@ -332,13 +332,13 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                   </Button>
                 </Link>
               )}
-              <Link href={dashboardHref}>
+              <Link href={dashboardHref} className="hidden md:inline-flex">
                 <Button variant="ghost" size="sm" aria-label="Dashboard">
                   <LayoutDashboard size={16} />
                   <span className="hidden 2xl:inline">Dashboard</span>
                 </Button>
               </Link>
-              <Link href={notificationsHref}>
+              <Link href={notificationsHref} className="hidden md:inline-flex">
                 <Button variant="ghost" size="sm" className="relative">
                   <Bell size={18} />
                   {unreadCount > 0 ? (
@@ -350,7 +350,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                   )}
                 </Button>
               </Link>
-              <Link href={messagesHref}>
+              <Link href={messagesHref} className="hidden md:inline-flex">
                 <Button variant="ghost" size="sm" className="relative">
                   <MessageSquare size={18} />
                   <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary-container ring-2 ring-surface-container-lowest" />
@@ -360,8 +360,8 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                 href={profileHref}
                 className="flex items-center gap-2 pl-1 pr-1 min-h-11 group"
               >
-                <span className="hidden 2xl:block text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
-                  {firstName}
+                <span className="block max-w-28 sm:max-w-none truncate text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
+                  Hi, {firstName}
                 </span>
                 <Avatar name={userName ?? "User"} src={avatarUrl ?? undefined} role={role} size="md" online className="cursor-pointer" />
               </Link>

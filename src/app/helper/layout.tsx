@@ -41,6 +41,7 @@ export default async function HelperLayout({ children }: { children: React.React
         <RoleBottomNav
           roleLabel="Helper"
           primary={[
+            { href: "/", label: "Home", icon: "home" },
             { href: "/helper/dashboard", label: "Dashboard", icon: "dashboard" },
             { href: "/helper/requests", label: "Requests", icon: "inbox" },
             { href: "/helper/messages", label: "Messages", icon: "messages" },
@@ -48,6 +49,7 @@ export default async function HelperLayout({ children }: { children: React.React
           more={[
             { href: "/helper/orders", label: "Orders", icon: "orders" },
             { href: "/helper/earnings", label: "Earnings", icon: "earnings" },
+            { href: "/helper/notifications", label: "Notifications", icon: "notifications" },
             { href: "/helper/chat-admin", label: "Chat With Admin", icon: "chat_admin" },
             { href: "/helper/profile", label: "Edit Profile", icon: "profile" },
           ]}

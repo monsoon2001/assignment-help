@@ -76,6 +76,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
       <RoleBottomNav
         roleLabel="Student"
         primary={[
+          { href: "/", label: "Home", icon: "home" },
           { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
           { href: "/requests", label: "Requests", icon: "requests", badge: requestCount > 0 ? requestCount : undefined },
           { href: "/messages", label: "Messages", icon: "messages" },
@@ -84,7 +85,6 @@ export default async function StudentLayout({ children }: { children: React.Reac
           { href: "/notifications", label: "Notifications", icon: "notifications", badge: notifCount > 0 ? notifCount : undefined },
           { href: "/profile", label: "Profile", icon: "profile" },
           { href: "/requests/new", label: "Request Help", icon: "new_request" },
-          { href: "/", label: "Home", icon: "home" },
         ]}
       />
 

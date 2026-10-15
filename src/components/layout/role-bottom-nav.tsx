@@ -74,7 +74,8 @@ export default function RoleBottomNav({
   const [open, setOpen] = useState(false);
 
   const isActive = (href: string) =>
-    pathname === href || (href !== "/dashboard" && pathname.startsWith(`${href}/`));
+    pathname === href ||
+    (href !== "/dashboard" && href !== "/" && pathname.startsWith(`${href}/`));
 
   const navVisibility = hideFrom === "lg" ? "lg:hidden" : "md:hidden";
 
