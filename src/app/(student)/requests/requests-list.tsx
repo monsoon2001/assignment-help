@@ -17,8 +17,9 @@ import {
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
+import StatusBadge from "@/components/ui/status-badge";
 import Avatar from "@/components/ui/avatar";
-import { requestStatusVariant } from "@/lib/status-meta";
+import { requestStatusTone } from "@/lib/status-meta";
 import type { RequestProposal } from "@/components/requests/proposal-card";
 
 export type StudentRequestRow = {
@@ -340,7 +341,7 @@ export default function RequestsList({
       {pageItems.length > 0 && (
         <section className="flex flex-col gap-3">
           {pageItems.map((r) => {
-            const meta = { label: STATUS_LABEL[r.status] ?? r.status, variant: requestStatusVariant(r.status) };
+            const meta = { label: STATUS_LABEL[r.status] ?? r.status, tone: requestStatusTone(r.status) };
             const proposals = proposalsByRequest[r.id] ?? [];
             return (
               <Link key={r.id} href={`/requests/${r.id}`} className="block">
@@ -350,9 +351,9 @@ export default function RequestsList({
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-3 flex-wrap">
                         <h3 className="font-display font-semibold text-on-surface truncate">{r.title}</h3>
-                        <Badge variant={meta.variant} dot>
+                        <StatusBadge tone={meta.tone} dot>
                           {meta.label}
-                        </Badge>
+                        </StatusBadge>
                         {proposals.length > 0 && (
                           <Badge variant="outline">
                             {proposals.length} proposal{proposals.length > 1 ? "s" : ""}

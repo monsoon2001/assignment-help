@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
-import Badge from "@/components/ui/badge";
+import StatusBadge from "@/components/ui/status-badge";
 import Avatar from "@/components/ui/avatar";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
@@ -25,7 +25,7 @@ import { fetchRequestMessages, sendRequestMessage } from "@/lib/request-chat";
 import { submitProposal } from "@/lib/proposals";
 import { CHARGE_CURRENCIES, currencyFlag, currencyName, DEFAULT_CURRENCY } from "@/lib/currency";
 import { markThreadNotificationsRead } from "@/lib/notifications";
-import { requestStatusVariant } from "@/lib/status-meta";
+import { requestStatusTone } from "@/lib/status-meta";
 import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
 
 const RESPONSE_WINDOW_MS = 2 * 60 * 60 * 1000;
@@ -96,11 +96,23 @@ export default function RequestWorkspace({
   const [view, setView] = useState<"chat" | "details">("chat");
 
   const bottomRef = useRef<HTMLDivElement>(null);
+  const proposalAutoShown = useRef(false);
   const pathname = usePathname();
 
   useEffect(() => {
     markThreadNotificationsRead(pathname);
   }, [pathname]);
+
+  // A student arriving from the dashboard's "Act now" card for a new proposal
+  // lands on the request page expecting to review the offer, not the chat. On
+  // mobile the details tab is hidden by default, so surface it once a pending
+  // proposal exists (they can still switch back to chat).
+  useEffect(() => {
+    if (!proposalAutoShown.current && proposal && proposal.status === "pending") {
+      proposalAutoShown.current = true;
+      setView("details");
+    }
+  }, [proposal]);
 
   const loadRequest = useCallback(async () => {
     const { data } = await supabase.current
@@ -251,7 +263,7 @@ export default function RequestWorkspace({
   }
 
   const isHelper = mode === "helper";
-  const meta = { label: STATUS_LABEL[request.status] ?? request.status, variant: requestStatusVariant(request.status) };
+  const meta = { label: STATUS_LABEL[request.status] ?? request.status, tone: requestStatusTone(request.status) };
   const otherParty = isHelper ? request.student : request.helper;
   const overdue =
     !isHelper && request.status === "requested" && isPastResponseWindow(request.sent_at);
@@ -366,7 +378,7 @@ export default function RequestWorkspace({
               <div className="min-w-0">
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <h1 className="font-display font-bold text-lg text-on-surface truncate">{title}</h1>
-                  <Badge variant={meta.variant} dot className="shrink-0">{meta.label}</Badge>
+                  <StatusBadge tone={meta.tone} dot className="shrink-0">{meta.label}</StatusBadge>
                 </div>
                 <p className="text-xs text-on-surface-variant mt-0.5 flex items-center gap-1.5 flex-wrap">
                   <span className="whitespace-nowrap">#{request.id.slice(0, 8).toUpperCase()} · {request.subject || "General"}</span>
@@ -382,7 +394,7 @@ export default function RequestWorkspace({
             </div>
             <div className="flex items-center gap-2 shrink-0">
               {isHelper && request.status === "proposal_sent" && (
-                <Badge variant="success"><ShieldCheck size={12} /> Proposal Sent</Badge>
+                <StatusBadge tone="blue"><ShieldCheck size={12} /> Proposal Sent</StatusBadge>
               )}
             </div>
           </section>
@@ -421,7 +433,7 @@ export default function RequestWorkspace({
                   <Icon size={16} />
                   {tab.label}
                   {tab.id === "chat" && messages.length > 0 && (
-                    <span className="ml-1 px-1.5 py-0.5 rounded-full bg-gradient-to-br from-primary-container to-secondary-container text-white text-xs font-bold">
+                    <span className="ml-1 px-1.5 py-0.5 rounded-full bg-primary text-white text-xs font-bold">
                       {messages.length}
                     </span>
                   )}
@@ -566,7 +578,7 @@ export default function RequestWorkspace({
             {view === "chat" && (
               <div className="lg:hidden flex flex-col gap-3">
                 {contactCard}
-                <div className="h-[70dvh] min-h-[420px]">{chatPanel}</div>
+                <div className="h-[calc(100dvh-22rem)] min-h-[280px]">{chatPanel}</div>
               </div>
             )}
           </div>

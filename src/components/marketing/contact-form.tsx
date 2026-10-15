@@ -23,7 +23,7 @@ export default function ContactForm() {
   if (submitted) {
     return (
       <Card className="p-6 sm:p-10 border border-outline-variant/50 shadow-md shadow-ink-900/5 text-center">
-<div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+<div className="w-16 h-16 bg-success-tint rounded-full flex items-center justify-center mx-auto mb-6">
             <MaterialIcon name="check_circle" size={32} className="text-primary" />
           </div>
         <h2 className="font-display text-2xl font-bold text-on-surface mb-3">Message Sent!</h2>

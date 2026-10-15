@@ -24,10 +24,10 @@ type Tone = { icon: React.ComponentType<{ size?: number; className?: string }>; 
 const typeConfig: Record<string, Tone> = {
   proposal: { icon: FileText, tone: "bg-secondary-container text-on-secondary-container" },
   request: { icon: Inbox, tone: "bg-primary-container text-on-primary" },
-  payment: { icon: Wallet, tone: "bg-emerald-100 text-emerald-700" },
+  payment: { icon: Wallet, tone: "bg-success-tint text-success" },
   message: { icon: MessageSquare, tone: "bg-primary-container text-on-primary" },
   delivery: { icon: ShoppingBag, tone: "bg-tertiary-container text-on-tertiary" },
-  revision: { icon: RotateCcw, tone: "bg-amber-100 text-amber-700" },
+  revision: { icon: RotateCcw, tone: "bg-accent-tint text-on-accent-tint" },
   completed: { icon: CheckCircle2, tone: "bg-success text-white" },
   system: { icon: Settings, tone: "bg-surface-container-high text-on-surface-variant" },
 };

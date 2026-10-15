@@ -61,7 +61,7 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
                 href={`/resources/${guide.category}/${guide.slug}`}
                 className={`group relative overflow-hidden bg-white rounded-2xl p-6 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}
               >
-                <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${tone.hairline}`} aria-hidden="true" />
+                <span className={`absolute inset-x-0 top-0 h-1 ${tone.hairline}`} aria-hidden="true" />
                 <div className="flex items-center gap-2 mb-3">
                   <span className={`text-xs font-semibold ${tone.text}`}>{guide.readingMinutes} min read</span>
                 </div>
@@ -83,7 +83,7 @@ export default async function CategoryPage({ params }: { params: Promise<Params>
             </Link>
             <Link
               href="/requests/new"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-container text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-primary-container/20"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-primary-container/20"
             >
               Looking for one-to-one help?
               <ArrowRight className="w-4 h-4" />

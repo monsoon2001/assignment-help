@@ -24,30 +24,30 @@ const footerLinks = {
 
 export default function Footer() {
   return (
-    <footer className="bg-surface-container-high border-t border-outline-variant/50">
+    <footer className="bg-ink-900 border-t border-white/10 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 sm:gap-x-10 gap-y-8 items-start">
           <div className="col-span-2 sm:col-span-2 lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-primary-container rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <MaterialIcon name="school" size={18} className="text-on-primary" />
               </div>
-              <span className="font-display font-bold text-xl text-on-surface">Acadivo</span>
+              <span className="font-display font-bold text-xl text-white">Acadivo</span>
             </Link>
-            <p className="text-sm text-on-surface-variant leading-relaxed max-w-md">
+            <p className="text-sm on-band-muted leading-relaxed max-w-md">
               Connect with verified peer helpers for academic guidance and support across all subjects.
             </p>
           </div>
 
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category} className={category === "Legal" ? "col-span-2 sm:col-span-2 lg:col-span-1" : ""}>
-              <h3 className="font-semibold text-on-surface text-sm mb-3">{category}</h3>
+              <h3 className="font-semibold text-white text-sm mb-3">{category}</h3>
               <ul className="space-y-2">
                 {links.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-on-surface-variant hover:text-primary transition-colors"
+                      className="text-sm text-white/70 hover:text-white transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -58,12 +58,12 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="mt-10 pt-6 border-t border-outline-variant/50">
+        <div className="mt-10 pt-6 border-t border-white/10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-on-surface-variant">
+            <p className="text-sm on-band-muted">
               &copy; {new Date().getFullYear()} Acadivo. All rights reserved.
             </p>
-            <p className="text-xs text-on-surface-variant text-center md:text-right max-w-md">
+            <p className="text-xs on-band-muted text-center md:text-right max-w-md">
               Acadivo is an academic peer guidance platform. All helpers provide guidance and tutoring
               — they do not complete assignments on behalf of students.
             </p>

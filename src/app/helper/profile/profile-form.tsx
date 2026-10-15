@@ -129,7 +129,7 @@ export default function HelperProfile({
         </Card>
 
         {state.message && (
-          <p className={`text-sm rounded-lg px-3 py-2 ${state.ok ? "text-success bg-emerald-50" : "text-error bg-error-container/30"}`}>
+          <p className={`text-sm rounded-lg px-3 py-2 ${state.ok ? "text-success bg-success-tint" : "text-error bg-error-container/30"}`}>
             {state.message}
           </p>
         )}

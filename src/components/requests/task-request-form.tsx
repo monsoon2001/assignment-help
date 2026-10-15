@@ -319,7 +319,7 @@ export default function TaskRequestForm({
           <button
             type="button"
             onClick={() => setFilesOpen(true)}
-            className="flex items-center justify-center gap-2 w-full py-2 border border-dashed border-primary-container/50 bg-primary-container/5 rounded-xl text-on-surface-variant hover:border-primary-container hover:bg-primary-container/10 transition-all cursor-pointer"
+            className="flex items-center justify-center gap-2 w-full py-2 border border-dashed border-primary-container/50 bg-primary-container/5 rounded-xl text-on-surface-variant hover:border-primary-container hover:bg-primary-hover/10 transition-all cursor-pointer"
           >
             <Upload className="w-4 h-4" />
             <span className="text-sm font-medium">
@@ -330,7 +330,7 @@ export default function TaskRequestForm({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center justify-center gap-2 w-full py-2 border border-dashed border-outline-variant rounded-xl text-on-surface-variant hover:border-primary-container hover:bg-primary-container/5 transition-all cursor-pointer"
+            className="flex items-center justify-center gap-2 w-full py-2 border border-dashed border-outline-variant rounded-xl text-on-surface-variant hover:border-primary-container hover:bg-primary-hover/5 transition-all cursor-pointer"
           >
             <Upload className="w-4 h-4" />
             <span className="text-sm font-medium">+ Upload assignment instructions</span>
@@ -446,7 +446,7 @@ export default function TaskRequestForm({
                 <button
                   type="button"
                   onClick={() => setFilesOpen(false)}
-                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium bg-primary-container text-on-primary hover:bg-primary transition-colors cursor-pointer"
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium bg-primary-container text-on-primary hover:bg-primary-hover transition-colors cursor-pointer"
                 >
                   Done
                 </button>

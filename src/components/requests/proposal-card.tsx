@@ -74,7 +74,7 @@ export default function ProposalCard({
     surchargePercent
   );
   const localResolved =
-    localCurrency !== currency && localAmount !== null && localAmount > 0
+    localAmount !== null && localAmount > 0
       ? { currency: localCurrency, amount: localAmount }
       : null;
 
@@ -139,11 +139,6 @@ export default function ProposalCard({
               </span>
               <span className="text-xs text-on-surface-variant font-medium">{displayCurrency}</span>
             </div>
-            {localResolved && (
-              <p className="text-xs text-on-surface-variant mt-1">
-                Helper&apos;s quote: {formatCurrency(basePrice, currency)}
-              </p>
-            )}
           </div>
           <div className="flex flex-col justify-center sm:pl-3">
             <span className="text-xs text-secondary uppercase font-semibold tracking-wider">

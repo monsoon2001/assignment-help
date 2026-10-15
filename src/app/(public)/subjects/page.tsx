@@ -34,7 +34,7 @@ export default function SubjectsPage() {
           return (
           <div key={group.category} className="mb-10 sm:mb-16 last:mb-0">
             <div className="flex items-center gap-3 mb-6">
-              <span className={`h-1 w-10 rounded-full bg-gradient-to-r ${groupTone.hairline}`} aria-hidden="true" />
+              <span className={`h-1 w-10 rounded-full ${groupTone.hairline}`} aria-hidden="true" />
               <h2 className="font-display text-2xl font-bold text-on-surface">{group.category}</h2>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -44,7 +44,7 @@ export default function SubjectsPage() {
                   href={`/subjects/${s.slug}`}
                   className={`relative overflow-hidden bg-white rounded-2xl p-6 border ${groupTone.card} shadow-sm ${groupTone.cardHover} transition-all group`}
                 >
-                  <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${groupTone.hairline}`} aria-hidden="true" />
+                  <span className={`absolute inset-x-0 top-0 h-1 ${groupTone.hairline}`} aria-hidden="true" />
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${groupTone.iconTile}`}>
                     <MaterialIcon name={s.icon} size={24} className={groupTone.icon} />
                   </div>

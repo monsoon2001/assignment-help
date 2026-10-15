@@ -35,7 +35,7 @@ type ToneTokens = {
 };
 
 const BLUE_TONE: ToneTokens = {
-  header: "bg-gradient-to-b from-surface-container-low/60 to-surface-container-lowest",
+  header: "bg-surface-container-low",
   text: "text-primary",
   hoverText: "hover:text-primary",
   chip: "bg-primary-fixed text-on-primary-fixed",
@@ -44,13 +44,13 @@ const BLUE_TONE: ToneTokens = {
   card: "border-outline-variant/40",
   cardHover: "hover:border-primary-container/50 hover:shadow-md",
   band: "band-soft",
-  button: "bg-primary hover:bg-primary-container text-white transition-colors",
-  btn: "from-primary-container to-primary",
-  hairline: "from-primary-container to-primary-fixed",
+  button: "bg-primary hover:bg-primary-hover text-white transition-colors",
+  btn: "bg-primary",
+  hairline: "bg-primary",
 };
 
 const TEAL_TONE: ToneTokens = {
-  header: "bg-gradient-to-b from-surface-container-low/60 to-surface-container-lowest",
+  header: "bg-surface-container-low",
   text: "text-accent-teal",
   hoverText: "hover:text-accent-teal",
   chip: "bg-accent-teal-container text-accent-teal",
@@ -59,13 +59,13 @@ const TEAL_TONE: ToneTokens = {
   card: "border-outline-variant/40",
   cardHover: "hover:border-accent-teal/35 hover:shadow-md",
   band: "band-soft",
-  button: "bg-primary hover:bg-primary-container text-white transition-colors",
-  btn: "from-primary-container to-primary",
-  hairline: "from-accent-teal to-accent-teal-container",
+  button: "bg-primary hover:bg-primary-hover text-white transition-colors",
+  btn: "bg-primary",
+  hairline: "bg-primary",
 };
 
 const GREEN_TONE: ToneTokens = {
-  header: "bg-gradient-to-b from-surface-container-low/60 to-surface-container-lowest",
+  header: "bg-surface-container-low",
   text: "text-accent-green",
   hoverText: "hover:text-accent-green",
   chip: "bg-accent-green-container text-accent-green",
@@ -74,13 +74,13 @@ const GREEN_TONE: ToneTokens = {
   card: "border-outline-variant/40",
   cardHover: "hover:border-accent-green/35 hover:shadow-md",
   band: "band-soft",
-  button: "bg-primary hover:bg-primary-container text-white transition-colors",
-  btn: "from-primary-container to-primary",
-  hairline: "from-accent-green to-accent-green-container",
+  button: "bg-primary hover:bg-primary-hover text-white transition-colors",
+  btn: "bg-primary",
+  hairline: "bg-primary",
 };
 
 const AMBER_TONE: ToneTokens = {
-  header: "bg-gradient-to-b from-surface-container-low/60 to-surface-container-lowest",
+  header: "bg-surface-container-low",
   text: "text-accent-amber",
   hoverText: "hover:text-accent-amber",
   chip: "bg-accent-amber-container text-accent-amber",
@@ -89,13 +89,13 @@ const AMBER_TONE: ToneTokens = {
   card: "border-outline-variant/40",
   cardHover: "hover:border-accent-amber/40 hover:shadow-md",
   band: "band-soft",
-  button: "bg-primary hover:bg-primary-container text-white transition-colors",
-  btn: "from-primary-container to-primary",
-  hairline: "from-accent-amber to-accent-amber-container",
+  button: "bg-primary hover:bg-primary-hover text-white transition-colors",
+  btn: "bg-primary",
+  hairline: "bg-primary",
 };
 
 const ROSE_TONE: ToneTokens = {
-  header: "bg-gradient-to-b from-surface-container-low/60 to-surface-container-lowest",
+  header: "bg-surface-container-low",
   text: "text-accent-rose",
   hoverText: "hover:text-accent-rose",
   chip: "bg-accent-rose-container text-accent-rose",
@@ -104,9 +104,9 @@ const ROSE_TONE: ToneTokens = {
   card: "border-outline-variant/40",
   cardHover: "hover:border-accent-rose/35 hover:shadow-md",
   band: "band-soft",
-  button: "bg-primary hover:bg-primary-container text-white transition-colors",
-  btn: "from-primary-container to-primary",
-  hairline: "from-accent-rose to-accent-rose-container",
+  button: "bg-primary hover:bg-primary-hover text-white transition-colors",
+  btn: "bg-primary",
+  hairline: "bg-primary",
 };
 
 export const PAGE_TONES: Record<PageTone, ToneTokens> = {
@@ -180,7 +180,6 @@ export function CtaBand({
 }) {
   return (
     <section className="relative overflow-hidden py-12 sm:py-16 band-ink" aria-labelledby="cta-heading">
-      <div className="absolute inset-0 band-ink-grid" aria-hidden="true" />
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {eyebrow && (
           <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full on-band-chip border text-xs font-semibold mb-4">

@@ -36,7 +36,7 @@ export default function ServicesPage() {
                     key={s.name}
                     className={`relative overflow-hidden bg-white rounded-2xl p-5 border ${groupTone.card} shadow-sm ${groupTone.cardHover} transition-all flex flex-col`}
                   >
-                    <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${groupTone.hairline}`} aria-hidden="true" />
+                    <span className={`absolute inset-x-0 top-0 h-1 ${groupTone.hairline}`} aria-hidden="true" />
                     <h3 className="font-semibold text-on-surface mb-1.5 pt-1">{s.name}</h3>
                     <p className="text-base text-on-surface-variant leading-relaxed flex-1">{s.desc}</p>
                     {GUIDE_BY_SERVICE[s.name] && (
@@ -56,7 +56,7 @@ export default function ServicesPage() {
         </div>
 
         <div className="mt-16 text-center bg-white rounded-2xl p-8 sm:p-12 border border-primary-container/30 shadow-md shadow-primary-container/10 relative overflow-hidden">
-          <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary-container to-primary" aria-hidden="true" />
+          <span className="absolute inset-x-0 top-0 h-1 bg-primary" aria-hidden="true" />
           <h2 className="font-display text-2xl sm:text-3xl font-bold text-on-surface mb-3">Want to learn the process first?</h2>
           <p className="text-on-surface-variant mb-8 max-w-lg mx-auto leading-relaxed">
             Our free student guides explain step by step how to approach each of these tasks, with examples and

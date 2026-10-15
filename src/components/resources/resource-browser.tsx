@@ -106,7 +106,7 @@ export default function ResourceBrowser() {
                 href={resourcePath(guide)}
                 className={`group relative flex flex-col overflow-hidden bg-white rounded-2xl p-6 pt-7 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}
               >
-                <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${tone.hairline}`} aria-hidden="true" />
+                <span className={`absolute inset-x-0 top-0 h-1 ${tone.hairline}`} aria-hidden="true" />
                 {category && (
                   <span className={`text-xs font-semibold mb-3 self-start rounded-full px-3 py-1 ${tone.chip}`}>
                     {category.name}

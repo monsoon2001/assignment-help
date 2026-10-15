@@ -108,8 +108,8 @@ export default async function OrderConfirmedPage({
   return (
     <div className="w-full max-w-xl mx-auto flex flex-col gap-5 py-4">
       <div className="text-center flex flex-col items-center gap-3">
-        <span className="w-16 h-16 rounded-full bg-success/10 text-emerald-600 flex items-center justify-center">
-          <CheckCircle2 size={34} className="fill-emerald-50" />
+        <span className="w-16 h-16 rounded-full bg-success/10 text-success flex items-center justify-center">
+          <CheckCircle2 size={34} className="fill-success-tint" />
         </span>
         <div className="inline-flex items-center gap-2">
           <Badge variant="secondary" className="gap-1"><Verified size={12} /> Payment confirmed</Badge>
@@ -136,7 +136,7 @@ export default async function OrderConfirmedPage({
           <div>
             <p className="text-xs text-on-surface-variant uppercase tracking-wide">Milestone</p>
             <p className="text-sm font-semibold text-on-surface mt-0.5 inline-flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> In Progress
+              <span className="w-2 h-2 rounded-full bg-success inline-block" /> In Progress
             </p>
             <p className="text-xs text-on-surface-variant">Step 2 of 4</p>
           </div>

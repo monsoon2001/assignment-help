@@ -27,12 +27,11 @@ export default function HowItWorksPage() {
             return (
             <div key={step.num} className="relative">
               {i < steps.length - 1 && (
-                <div className="absolute left-6 top-14 bottom-0 w-px bg-gradient-to-b from-primary-container/60 via-outline-variant/30 to-transparent hidden sm:block" />
+                <div className="absolute left-6 top-14 bottom-0 w-px bg-line hidden sm:block" />
               )}
               <div className="flex gap-6">
                 <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center font-display font-bold text-lg shrink-0 relative z-10 shadow-lg text-white"
-                  style={{ background: "linear-gradient(135deg, #2b4bf0, #466bf2)", boxShadow: "0 4px 16px rgba(43,75,240,0.35)" }}
+                  className="w-12 h-12 rounded-full flex items-center justify-center font-display font-bold text-lg shrink-0 relative z-10 shadow-lg text-white bg-primary"
                 >
                   {step.num}
                 </div>
@@ -60,11 +59,10 @@ export default function HowItWorksPage() {
         </div>
 
         <div className="mt-16 text-center bg-white rounded-2xl p-8 sm:p-12 border border-primary-container/30 shadow-md shadow-primary-container/10 relative overflow-hidden">
-          <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary-container to-primary" aria-hidden="true" />
+          <span className="absolute inset-x-0 top-0 h-1 bg-primary" aria-hidden="true" />
           <h2 className="font-display text-3xl font-bold text-on-surface mb-3">Ready to get started?</h2>
           <p className="text-on-surface-variant mb-8 max-w-lg mx-auto leading-relaxed">Get matched with a verified helper in your subject and start improving your grades with Acadivo.</p>
-          <Link href="/requests/new" className="inline-flex items-center gap-2 px-8 py-3.5 text-white rounded-xl font-semibold text-sm transition-all shadow-lg shadow-primary-container/30 hover:shadow-xl hover:shadow-primary-container/40 hover:-translate-y-0.5"
-            style={{ background: "linear-gradient(135deg, #2b4bf0, #466bf2)" }}>
+          <Link href="/requests/new" className="inline-flex items-center gap-2 px-8 py-3.5 text-white rounded-xl font-semibold text-sm bg-primary hover:bg-primary-hover transition-colors shadow-lg shadow-primary/30">
             Request Help
             <ArrowRight className="w-4 h-4" />
           </Link>

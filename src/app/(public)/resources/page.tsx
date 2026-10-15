@@ -50,7 +50,7 @@ export default function ResourcesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <section className="mb-10 sm:mb-16">
           <div className="flex items-center gap-3 mb-2">
-            <span className="h-1 w-10 rounded-full bg-gradient-to-r from-primary-container to-primary-fixed" aria-hidden="true" />
+            <span className="h-1 w-10 rounded-full bg-primary" aria-hidden="true" />
             <h2 className="font-display text-2xl font-bold text-on-surface">Featured Guides</h2>
           </div>
           <p className="text-on-surface-variant mb-6">Start with the questions students search for most.</p>
@@ -63,7 +63,7 @@ export default function ResourcesPage() {
                 href={resourcePath(guide)}
                 className={`group relative overflow-hidden bg-white rounded-2xl p-6 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}
               >
-                <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${tone.hairline}`} aria-hidden="true" />
+                <span className={`absolute inset-x-0 top-0 h-1 ${tone.hairline}`} aria-hidden="true" />
                 <span className={`text-xs font-semibold mb-3 inline-block rounded-full px-3 py-1 ${tone.chip}`}>
                   {CATEGORY_BY_SLUG.get(guide.category)?.name}
                 </span>
@@ -97,7 +97,7 @@ export default function ResourcesPage() {
                   href={`/resources/${category.slug}`}
                   className={`group relative overflow-hidden bg-white rounded-2xl p-6 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}
                 >
-                  <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${tone.hairline}`} aria-hidden="true" />
+                  <span className={`absolute inset-x-0 top-0 h-1 ${tone.hairline}`} aria-hidden="true" />
                   <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${tone.iconTile}`}>
                     <MaterialIcon name={category.icon} size={24} className={tone.icon} />
                   </div>

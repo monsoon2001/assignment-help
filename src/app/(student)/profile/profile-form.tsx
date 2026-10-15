@@ -6,8 +6,7 @@ import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import Select from "@/components/ui/select";
 import Avatar from "@/components/ui/avatar";
-import StarRating from "@/components/ui/star-rating";
-import { Save, Mail, GraduationCap, MapPin } from "lucide-react";
+import { Save, Mail, GraduationCap, BookOpen, MapPin } from "lucide-react";
 import { COUNTRY_OPTIONS } from "@/lib/currency";
 import { saveStudentProfile, type StudentProfileResult } from "./actions";
 
@@ -52,32 +51,38 @@ export default function StudentProfileForm({
   return (
     <div className="w-full max-w-6xl mx-auto flex flex-col gap-6">
       <div>
-        <h1 className="font-display font-bold text-2xl text-on-surface">Profile Settings</h1>
+        <h1 className="font-display font-bold text-2xl text-on-surface">Profile</h1>
         <p className="text-sm text-on-surface-variant mt-0.5">Manage your personal details, academics, and security</p>
       </div>
 
-      <section className="rounded-2xl bg-surface-container-lowest border border-outline-variant p-6 flex flex-col sm:flex-row sm:items-center gap-5">
-        <Avatar name={displayName} size="lg" src={avatarUrl ?? undefined} />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <h2 className="font-display font-bold text-xl text-on-surface">{displayName}</h2>
+      <section className="relative overflow-hidden rounded-3xl border border-outline-variant/60 bg-surface-container-lowest">
+        <div className="h-24 sm:h-28 bg-primary" />
+        <div className="px-5 sm:px-7 pb-6">
+          <div className="flex items-end gap-4 -mt-11">
+            <Avatar name={displayName} size="lg" src={avatarUrl ?? undefined} className="ring-4 ring-surface-container-lowest" />
+            <div className="pb-1 min-w-0">
+              <h2 className="font-display font-bold text-xl text-on-surface truncate">{displayName}</h2>
+              <p className="text-sm text-on-surface-variant flex items-center gap-1.5 min-w-0">
+                <Mail size={14} className="shrink-0" /> <span className="truncate">{email || "—"}</span>
+              </p>
+            </div>
           </div>
-          <p className="text-sm text-on-surface-variant mt-1 flex items-center gap-1.5 flex-wrap">
-            <Mail size={14} /> {email}
+
+          <div className="mt-5 flex flex-wrap gap-2 text-xs">
             {institution && (
-              <>
-                <span className="w-1 h-1 rounded-full bg-outline-variant inline-block mx-1" />
-                <GraduationCap size={14} /> {institution}
-              </>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-container-low px-3 py-1.5 font-medium text-on-surface-variant">
+                <GraduationCap size={13} className="text-primary" /> {institution}
+              </span>
             )}
-          </p>
-          <p className="text-xs text-on-surface-variant mt-1.5 flex items-center gap-1.5">
-            <MapPin size={13} />{levelOfStudy ? <>{levelOfStudy}{memberSince ? ` · Member since ${memberSince}` : ""}</> : memberSince ? <>Member since {memberSince}</> : "Student member"}
-          </p>
-        </div>
-        <div className="flex sm:flex-col gap-2 sm:min-w-30">
-          <StarRating rating={4.6} reviewCount={21} />
-          <p className="text-xs text-on-surface-variant">Students you&apos;ve worked with rate reliability</p>
+            {levelOfStudy && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-container-low px-3 py-1.5 font-medium text-on-surface-variant">
+                <BookOpen size={13} className="text-primary" /> {levelOfStudy}
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-container-low px-3 py-1.5 font-medium text-on-surface-variant">
+              <MapPin size={13} className="text-primary" /> {memberSince ? `Member since ${memberSince}` : "Student member"}
+            </span>
+          </div>
         </div>
       </section>
 
@@ -141,7 +146,7 @@ export default function StudentProfileForm({
           </Card>
 
           {state.message && (
-            <p className={`text-sm rounded-lg px-3 py-2 ${state.ok ? "text-success bg-emerald-50" : "text-error bg-error-container/30"}`}>
+            <p className={`text-sm rounded-lg px-3 py-2 ${state.ok ? "text-success bg-success-tint" : "text-error bg-error-container/30"}`}>
               {state.message}
             </p>
           )}

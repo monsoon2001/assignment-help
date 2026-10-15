@@ -1,12 +1,12 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import Card from "@/components/ui/card";
-import Badge from "@/components/ui/badge";
+import StatusBadge from "@/components/ui/status-badge";
 import Avatar from "@/components/ui/avatar";
 import { FileText, Eye } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
-import { requestStatusVariant } from "@/lib/status-meta";
+import { requestStatusTone } from "@/lib/status-meta";
 import { EmptyState } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
@@ -43,9 +43,9 @@ export default async function AdminRequestsPage() {
 
       <div className="flex flex-wrap gap-2">
         {Object.entries(statusCounts).map(([status, count]) => (
-          <Badge key={status} variant={requestStatusVariant(status)}>
+          <StatusBadge key={status} tone={requestStatusTone(status)}>
             {status.replaceAll("_", " ")} · {count}
-          </Badge>
+          </StatusBadge>
         ))}
       </div>
 
@@ -84,9 +84,9 @@ export default async function AdminRequestsPage() {
                       {proposalRows.length}
                     </td>
                     <td className="px-3 sm:px-6 py-4">
-                      <Badge variant={requestStatusVariant(request.status)}>
+                      <StatusBadge tone={requestStatusTone(request.status)}>
                         {request.status.replaceAll("_", " ")}
-                      </Badge>
+                      </StatusBadge>
                     </td>
                     <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">{formatDate(request.deadline)}</td>
                     <td className="px-3 sm:px-6 py-4 text-right">

@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { ArrowRight, MessageSquare } from "lucide-react";
 import Card from "@/components/ui/card";
-import Badge from "@/components/ui/badge";
+import StatusBadge from "@/components/ui/status-badge";
 import Avatar from "@/components/ui/avatar";
 import Button from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
@@ -135,7 +135,7 @@ export default function MessagesInbox({
                   </div>
                   <p className="text-xs font-medium text-on-surface truncate">{t.title}</p>
                   <p className="text-xs text-on-surface-variant truncate mt-0.5">{t.lastPreview}</p>
-                  <Badge variant={t.statusVariant} className="mt-2">{t.statusLabel}</Badge>
+                  <StatusBadge tone={t.statusTone} className="mt-2">{t.statusLabel}</StatusBadge>
                 </div>
               </Link>
             ))}

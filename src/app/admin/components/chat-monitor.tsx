@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { useTransition } from "react";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
+import StatusBadge from "@/components/ui/status-badge";
+import { orderStatusTone } from "@/lib/status-meta";
 import Avatar from "@/components/ui/avatar";
 import Button from "@/components/ui/button";
 import { MessageSquare, Flag, ShieldAlert, ChevronDown, ChevronUp, Check, X } from "lucide-react";
@@ -133,7 +135,7 @@ export default function ChatMonitor({
                     {thread.title}
                   </p>
                   {thread.kind === "order" && thread.status && (
-                    <Badge variant="outline">{thread.status.replaceAll("_", " ")}</Badge>
+                    <StatusBadge tone={orderStatusTone(thread.status)}>{thread.status.replaceAll("_", " ")}</StatusBadge>
                   )}
                   {pendingFlags.length > 0 && (
                     <Badge variant="danger">{pendingFlags.length} flag</Badge>

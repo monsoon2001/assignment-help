@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { unwrapRow } from "@/lib/embedded";
-import { orderStatusVariant, requestStatusVariant, type BadgeVariant } from "@/lib/status-meta";
+import { orderStatusTone, requestStatusTone, type StatusTone } from "@/lib/status-meta";
 
 export type ThreadCounterpart = { id: string; name: string | null; avatar_url: string | null } | null;
 
@@ -10,7 +10,7 @@ export type Thread = {
   title: string;
   counterpart: ThreadCounterpart;
   statusLabel: string;
-  statusVariant: BadgeVariant;
+  statusTone: StatusTone;
   link: string;
   lastAt: number;
   lastPreview: string | null;
@@ -144,14 +144,14 @@ export async function buildThreads(
       const row = r as { id: string; title: string; status: string; created_at: string };
       const last = latestByRequest.get(row.id);
       const label = (isHelper ? HELPER_REQUEST_LABEL : REQUEST_LABEL)[row.status] ?? row.status;
-      const meta = { label, variant: requestStatusVariant(row.status) };
+      const meta = { label, tone: requestStatusTone(row.status) };
       return {
         key: `request-${row.id}`,
         kind: "request" as const,
         title: row.title,
         counterpart: r.counterpart,
-        statusLabel: meta?.label ?? row.status,
-        statusVariant: (meta?.variant ?? "outline") as Thread["statusVariant"],
+        statusLabel: meta.label || row.status,
+        statusTone: meta.tone,
         link: isHelper ? `/helper/requests/${row.id}` : `/requests/${row.id}`,
         lastAt: last ? new Date(last.created_at).getTime() : new Date(row.created_at).getTime(),
         lastPreview: last?.body ?? "No messages yet",
@@ -160,14 +160,14 @@ export async function buildThreads(
     ...orders.map((o) => {
       const row = o as { id: string; status: string; created_at: string };
       const last = latestByOrder.get(row.id);
-      const meta = { label: ORDER_LABEL[row.status] ?? row.status, variant: orderStatusVariant(row.status) };
+      const meta = { label: ORDER_LABEL[row.status] ?? row.status, tone: orderStatusTone(row.status) };
       return {
         key: `order-${row.id}`,
         kind: "order" as const,
         title: o.makeTitle,
         counterpart: o.counterpart,
-        statusLabel: meta?.label ?? row.status,
-        statusVariant: (meta?.variant ?? "outline") as Thread["statusVariant"],
+        statusLabel: meta.label || row.status,
+        statusTone: meta.tone,
         link: isHelper ? `/helper/orders/${row.id}` : `/orders/${row.id}`,
         lastAt: last ? new Date(last.created_at).getTime() : new Date(row.created_at).getTime(),
         lastPreview: last?.body ?? "No messages yet",

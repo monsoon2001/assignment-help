@@ -17,11 +17,11 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
-          <label className="text-sm font-medium text-on-surface">{label}</label>
+          <label className="text-sm font-medium text-ink">{label}</label>
         )}
         <select
           ref={ref}
-          className={`w-full h-11 px-3.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all appearance-none cursor-pointer ${className}`}
+          className={`w-full h-11 px-3.5 bg-surface border border-line rounded-lg text-sm text-ink focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer ${className}`}
           {...props}
         >
           {placeholder && (

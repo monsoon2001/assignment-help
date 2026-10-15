@@ -1,77 +1,90 @@
-export type BadgeVariant = "primary" | "secondary" | "success" | "warning" | "danger" | "outline";
+/**
+ * The single status → colour mapping for the whole app. Every student, helper
+ * and admin screen reads from here (via the shared StatusBadge) so a given
+ * state always shows the same text and colour.
+ */
+export type StatusTone =
+  | "slate"
+  | "blue"
+  | "blueStrong"
+  | "amber"
+  | "orange"
+  | "indigo"
+  | "green"
+  | "red";
 
 export interface StatusMeta {
   label: string;
-  variant: BadgeVariant;
+  tone: StatusTone;
 }
 
 const ORDER_STATUS: Record<string, StatusMeta> = {
-  payment_pending: { label: "Payment Pending", variant: "warning" },
-  in_progress: { label: "In Progress", variant: "primary" },
-  delivered: { label: "Delivered", variant: "success" },
-  revision_requested: { label: "Revision Requested", variant: "warning" },
-  completed: { label: "Completed", variant: "success" },
-  disputed: { label: "Under Review", variant: "danger" },
+  payment_pending: { label: "Payment Pending", tone: "blueStrong" },
+  in_progress: { label: "In Progress", tone: "amber" },
+  delivered: { label: "Delivered", tone: "indigo" },
+  revision_requested: { label: "Revision Requested", tone: "orange" },
+  completed: { label: "Completed", tone: "green" },
+  disputed: { label: "Under Review", tone: "red" },
 };
 
 const REQUEST_STATUS: Record<string, StatusMeta> = {
-  requested: { label: "Open", variant: "primary" },
-  proposal_sent: { label: "Reviewing", variant: "warning" },
-  accepted: { label: "Accepted", variant: "success" },
-  declined: { label: "Declined", variant: "outline" },
-  cancelled: { label: "Cancelled", variant: "outline" },
+  requested: { label: "Open", tone: "slate" },
+  proposal_sent: { label: "Reviewing", tone: "blue" },
+  accepted: { label: "Accepted", tone: "blueStrong" },
+  declined: { label: "Declined", tone: "slate" },
+  cancelled: { label: "Cancelled", tone: "slate" },
 };
 
 const PROPOSAL_STATUS: Record<string, StatusMeta> = {
-  pending: { label: "Pending", variant: "primary" },
-  accepted: { label: "Accepted", variant: "success" },
-  declined: { label: "Declined", variant: "outline" },
+  pending: { label: "Pending", tone: "blue" },
+  accepted: { label: "Accepted", tone: "blueStrong" },
+  declined: { label: "Declined", tone: "slate" },
 };
 
 const PAYMENT_STATUS: Record<string, StatusMeta> = {
-  paid: { label: "Paid", variant: "success" },
-  pending: { label: "Pending", variant: "warning" },
-  processing: { label: "Processing", variant: "warning" },
-  refunded: { label: "Refunded", variant: "danger" },
+  paid: { label: "Paid", tone: "green" },
+  pending: { label: "Pending", tone: "blueStrong" },
+  processing: { label: "Processing", tone: "blueStrong" },
+  refunded: { label: "Refunded", tone: "red" },
 };
 
 const USER_STATUS: Record<string, StatusMeta> = {
-  active: { label: "Active", variant: "success" },
-  suspended: { label: "Suspended", variant: "danger" },
-  pending: { label: "Pending", variant: "warning" },
+  active: { label: "Active", tone: "green" },
+  suspended: { label: "Suspended", tone: "red" },
+  pending: { label: "Pending", tone: "blueStrong" },
 };
 
 export function orderStatusMeta(status: string | null | undefined): StatusMeta {
-  return ORDER_STATUS[status ?? ""] ?? { label: status ?? "—", variant: "outline" };
+  return ORDER_STATUS[status ?? ""] ?? { label: status ?? "—", tone: "slate" };
 }
 
 export function requestStatusMeta(status: string | null | undefined): StatusMeta {
-  return REQUEST_STATUS[status ?? ""] ?? { label: status ?? "—", variant: "outline" };
+  return REQUEST_STATUS[status ?? ""] ?? { label: status ?? "—", tone: "slate" };
 }
 
 export function proposalStatusMeta(status: string | null | undefined): StatusMeta {
-  return PROPOSAL_STATUS[status ?? ""] ?? { label: status ?? "—", variant: "outline" };
+  return PROPOSAL_STATUS[status ?? ""] ?? { label: status ?? "—", tone: "slate" };
 }
 
 export function paymentStatusMeta(status: string | null | undefined): StatusMeta {
-  return PAYMENT_STATUS[status ?? ""] ?? { label: status ?? "—", variant: "outline" };
+  return PAYMENT_STATUS[status ?? ""] ?? { label: status ?? "—", tone: "slate" };
 }
 
 export function userStatusMeta(status: string | null | undefined): StatusMeta {
-  return USER_STATUS[status ?? ""] ?? { label: status ?? "—", variant: "outline" };
+  return USER_STATUS[status ?? ""] ?? { label: status ?? "—", tone: "slate" };
 }
 
-export const orderStatusVariant = (status: string | null | undefined): BadgeVariant =>
-  orderStatusMeta(status).variant;
+export const orderStatusTone = (status: string | null | undefined): StatusTone =>
+  orderStatusMeta(status).tone;
 
-export const requestStatusVariant = (status: string | null | undefined): BadgeVariant =>
-  requestStatusMeta(status).variant;
+export const requestStatusTone = (status: string | null | undefined): StatusTone =>
+  requestStatusMeta(status).tone;
 
-export const proposalStatusVariant = (status: string | null | undefined): BadgeVariant =>
-  proposalStatusMeta(status).variant;
+export const proposalStatusTone = (status: string | null | undefined): StatusTone =>
+  proposalStatusMeta(status).tone;
 
-export const paymentStatusVariant = (status: string | null | undefined): BadgeVariant =>
-  paymentStatusMeta(status).variant;
+export const paymentStatusTone = (status: string | null | undefined): StatusTone =>
+  paymentStatusMeta(status).tone;
 
-export const userStatusVariant = (status: string | null | undefined): BadgeVariant =>
-  userStatusMeta(status).variant;
+export const userStatusTone = (status: string | null | undefined): StatusTone =>
+  userStatusMeta(status).tone;

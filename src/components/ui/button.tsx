@@ -9,13 +9,13 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
   ({ className = "", variant = "primary", size = "md", href, ...props }, ref) => {
-    const base = "inline-flex items-center justify-center font-medium transition-colors rounded-xl disabled:opacity-50 disabled:pointer-events-none cursor-pointer";
+    const base = "inline-flex items-center justify-center font-medium transition-colors rounded-xl disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer";
     const variants: Record<string, string> = {
-      primary: "bg-primary-container text-on-primary hover:bg-primary shadow-sm",
-      secondary: "bg-secondary-container text-on-secondary-container hover:bg-secondary",
-      outline: "border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container-low",
-      ghost: "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface",
-      danger: "bg-error text-on-error hover:bg-danger",
+      primary: "bg-primary text-white hover:bg-primary-hover active:bg-primary-dark shadow-sm",
+      secondary: "bg-surface text-ink border border-line hover:bg-primary-tint",
+      outline: "border border-line bg-surface text-ink hover:bg-primary-tint",
+      ghost: "text-ink-soft hover:bg-canvas hover:text-ink",
+      danger: "bg-danger text-white hover:bg-danger-hover",
     };
     const sizes: Record<string, string> = {
       sm: "px-3 py-1.5 min-h-11 min-w-11 text-sm gap-1.5",

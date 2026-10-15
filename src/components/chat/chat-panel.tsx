@@ -108,8 +108,8 @@ export default function ChatPanel({
       <div className={`flex items-center gap-3 ${compact ? "px-3 py-2" : "px-5 py-3"} border-b border-outline-variant bg-surface-container-low/60`}>
         <div className="min-w-0 flex-1">
           <p className={`${compact ? "text-[13px]" : "text-sm"} font-semibold text-on-surface`}>{title}</p>
-          <p className="text-xs text-emerald-600 inline-flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+          <p className="text-xs text-success inline-flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-success inline-block" />
             Live · messages sync instantly
           </p>
         </div>
@@ -144,7 +144,7 @@ export default function ChatPanel({
                       className={`inline-flex items-center gap-2 mt-1.5 px-3 py-2 rounded-lg text-xs font-medium ${
                         isMine
                           ? "bg-white/20 text-white hover:bg-white/30"
-                          : "bg-primary-container/10 text-primary hover:bg-primary-container/20"
+                          : "bg-primary-container/10 text-primary hover:bg-primary-hover/20"
                       }`}
                     >
                       <FileText size={14} />
@@ -239,7 +239,7 @@ export default function ChatPanel({
           <button
             onClick={onSend}
             disabled={sending || (!draft.trim() && files.length === 0)}
-            className="w-10 h-10 shrink-0 rounded-xl bg-primary-container text-on-primary flex items-center justify-center hover:bg-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="w-10 h-10 shrink-0 rounded-xl bg-primary-container text-on-primary flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             {sending ? <Loader2 size={17} className="animate-spin" /> : <Send size={17} />}
           </button>

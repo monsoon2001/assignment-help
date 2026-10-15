@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Card from "@/components/ui/card";
-import Badge from "@/components/ui/badge";
+import StatusBadge from "@/components/ui/status-badge";
 import Avatar from "@/components/ui/avatar";
 import { CreditCard } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
 import { formatCurrency, normalizeCurrency } from "@/lib/currency";
-import { paymentStatusVariant, orderStatusVariant } from "@/lib/status-meta";
+import { paymentStatusTone, orderStatusTone } from "@/lib/status-meta";
 import RefundButton from "@/app/admin/components/refund-button";
 import { EmptyState } from "@/components/ui/states";
 
@@ -39,7 +39,7 @@ export default async function AdminPaymentsPage() {
           <h1 className="font-display text-2xl font-bold text-on-surface">Payments</h1>
           <p className="text-on-surface-variant mt-1">All payment transactions and refunds.</p>
         </div>
-        <Badge variant="success">{paidCount} paid</Badge>
+        <StatusBadge tone="green">{paidCount} paid</StatusBadge>
       </div>
 
       {error ? (
@@ -110,21 +110,21 @@ export default async function AdminPaymentsPage() {
                     </td>
                     <td className="px-3 sm:px-4 py-4">
                       {payment.disputed ? (
-                        <Badge variant="danger">Disputed</Badge>
+                        <StatusBadge tone="red">Disputed</StatusBadge>
                       ) : payout === "paid" ? (
-                        <Badge variant="success">Paid</Badge>
+                        <StatusBadge tone="green">Paid</StatusBadge>
                       ) : payout === "on_hold" ? (
-                        <Badge variant="warning">On hold</Badge>
+                        <StatusBadge tone="blueStrong">On hold</StatusBadge>
                       ) : (
-                        <Badge variant="outline">Unpaid</Badge>
+                        <StatusBadge tone="slate">Unpaid</StatusBadge>
                       )}
                     </td>
                     <td className="px-3 sm:px-4 py-4">
-                      <Badge variant={orderStatusVariant(order?.status)}>{order?.status ?? "—"}</Badge>
+                      <StatusBadge tone={orderStatusTone(order?.status)}>{order?.status ?? "—"}</StatusBadge>
                     </td>
                     <td className="px-3 sm:px-4 py-4 text-sm text-on-surface-variant">{formatDate(payment.created_at)}</td>
                     <td className="px-3 sm:px-4 py-4">
-                      <Badge variant={paymentStatusVariant(payment.status)}>{payment.status}</Badge>
+                      <StatusBadge tone={paymentStatusTone(payment.status)}>{payment.status}</StatusBadge>
                     </td>
                     <td className="px-3 sm:px-4 py-4 text-right">
                       {payment.status === "paid" ? (

@@ -68,7 +68,7 @@ export default function AboutPage() {
               const tone = PAGE_TONES.blue;
               return (
               <div key={v.title} className={`relative overflow-hidden rounded-2xl bg-white p-6 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}>
-                <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${tone.hairline}`} aria-hidden="true" />
+                <span className={`absolute inset-x-0 top-0 h-1 ${tone.hairline}`} aria-hidden="true" />
                 <span className={`inline-flex w-12 h-12 rounded-xl items-center justify-center mb-4 ${tone.iconTile}`}>
                   <MaterialIcon name={v.icon} size={28} className={tone.icon} />
                 </span>

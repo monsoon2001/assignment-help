@@ -12,14 +12,14 @@ import {
 } from "lucide-react";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
-import Badge from "@/components/ui/badge";
+import StatusBadge from "@/components/ui/status-badge";
 import Avatar from "@/components/ui/avatar";
 import Textarea from "@/components/ui/textarea";
 import { createClient } from "@/lib/supabase/client";
 import { realtimeTopic } from "@/lib/supabase/realtime";
 import { uploadOrderFile } from "@/lib/order-files";
 import { normalizeCurrency, formatCurrency } from "@/lib/currency";
-import { orderStatusMeta, paymentStatusVariant } from "@/lib/status-meta";
+import { orderStatusMeta, paymentStatusTone } from "@/lib/status-meta";
 import { markThreadNotificationsRead } from "@/lib/notifications";
 import ChatPanel, { type ChatMessageRow, timeLabel, fileNameFromUrl } from "@/components/chat/chat-panel";
 import SecureFileLink from "@/components/ui/secure-file-link";
@@ -450,7 +450,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
           <div>
             <div className="flex items-center gap-3 flex-wrap">
               <h1 className="font-display font-bold text-xl text-on-surface">{title}</h1>
-              <Badge variant={meta.variant} dot className="shrink-0">{meta.label}</Badge>
+              <StatusBadge tone={meta.tone} dot className="shrink-0">{meta.label}</StatusBadge>
             </div>
             <p className="text-xs text-on-surface-variant mt-1">
               #{order.id.slice(0, 8).toUpperCase()} · {subject} · {paidLabel}
@@ -503,7 +503,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
               <Icon size={16} />
               {tab.label}
               {tab.id === "chat" && messages.length > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-gradient-to-br from-primary-container to-secondary-container text-white text-xs font-bold">
+                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-primary text-white text-xs font-bold">
                   {messages.length}
                 </span>
               )}
@@ -595,9 +595,9 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                 <h2 className="font-display font-semibold text-on-surface inline-flex items-center gap-2">
                   <Receipt size={16} className="text-primary" /> Payment
                 </h2>
-                <Badge variant={payment?.status ? paymentStatusVariant(payment.status) : "warning"}>
+                <StatusBadge tone={payment?.status ? paymentStatusTone(payment.status) : "blueStrong"}>
                   {payment?.status === "paid" ? "Paid" : "Awaiting Payment"}
-                </Badge>
+                </StatusBadge>
               </div>
               <div className="flex flex-wrap items-center gap-3 text-sm">
                 <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
@@ -640,12 +640,12 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                   <p className="font-display font-semibold text-on-surface">{order.helper?.name ?? "Acadivo Helper"}</p>
                   <p className="text-xs text-on-surface-variant truncate">Assigned mentor</p>
                 </div>
-                <Badge variant="success" className="shrink-0"><ShieldCheck size={12} /> Verified</Badge>
+                <StatusBadge tone="green" className="shrink-0"><ShieldCheck size={12} /> Verified</StatusBadge>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <div className="flex items-center gap-1">
                   {[1, 2, 3, 4, 5].map((n) => (
-                    <Star key={n} size={13} className="fill-amber-400 text-amber-400" />
+                    <Star key={n} size={13} className="fill-accent text-accent" />
                   ))}
                 </div>
                 <span className="font-semibold text-on-surface">Expert</span>
@@ -656,7 +656,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
       )}
 
       {activeTab === "chat" && (
-        <div className="h-[70dvh] min-h-[420px] lg:hidden">
+        <div className="h-[calc(100dvh-20rem)] min-h-[280px] lg:hidden">
           <ChatPanel
             fill
             filesBucket="order-files"
@@ -708,7 +708,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                     <div className="flex items-center gap-2 text-xs text-on-surface-variant mb-2">
                       <span
                         className={`w-2 h-2 rounded-full inline-block ${
-                          d.revision_note ? "bg-warning" : "bg-emerald-500"
+                          d.revision_note ? "bg-warning" : "bg-success"
                         }`}
                       />
                       {d.revision_note ? "Changes requested" : "Delivered"} {timeLabel(d.created_at)}
@@ -826,7 +826,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
             {isStudent && order.status === "completed" && (
               <Card className="p-5 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 size={18} className="text-emerald-600" />
+                  <CheckCircle2 size={18} className="text-success" />
                   <div>
                     <p className="font-semibold text-on-surface">Order completed</p>
                     <p className="text-xs text-on-surface-variant">Share your experience below.</p>

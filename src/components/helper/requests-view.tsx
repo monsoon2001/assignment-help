@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Card from "@/components/ui/card";
-import Badge from "@/components/ui/badge";
+import StatusBadge from "@/components/ui/status-badge";
 import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
 import { BookOpen, Calendar, MessageSquare } from "lucide-react";
@@ -124,9 +124,9 @@ export default function HelperRequestsView({
                           <h2 className="font-semibold text-on-surface">
                             {req.title}
                           </h2>
-                          <Badge variant={alreadyProposed ? "success" : "warning"} dot>
+                          <StatusBadge tone={alreadyProposed ? "blue" : "slate"} dot>
                             {alreadyProposed ? "Proposal Sent" : "New Request"}
-                          </Badge>
+                          </StatusBadge>
                         </div>
                         <p className="text-sm text-on-surface-variant">
                           Sent by {req.student?.name || "Student"} &middot; {timeAgo(req.created_at)}

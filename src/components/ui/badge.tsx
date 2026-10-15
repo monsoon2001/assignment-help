@@ -1,18 +1,20 @@
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: "primary" | "secondary" | "success" | "warning" | "danger" | "outline";
+  variant?: "primary" | "secondary" | "blue" | "success" | "warning" | "danger" | "indigo" | "outline";
   className?: string;
   dot?: boolean;
 }
 
 export default function Badge({ children, variant = "primary", className = "", dot = false }: BadgeProps) {
   const variants: Record<string, string> = {
-    primary: "bg-primary-container text-on-primary",
-    secondary: "bg-secondary-container text-on-secondary-container",
-    success: "bg-emerald-50 text-emerald-700",
-    warning: "bg-amber-50 text-amber-700",
-    danger: "bg-error-container text-error",
-    outline: "bg-surface-container text-on-surface-variant",
+    primary: "bg-primary text-white",
+    secondary: "bg-surface text-ink border border-line",
+    blue: "bg-primary-tint text-primary-hover",
+    success: "bg-success-tint text-success",
+    warning: "bg-accent-tint text-on-accent-tint",
+    danger: "bg-danger-tint text-danger",
+    indigo: "bg-tone-indigo-bg text-tone-indigo",
+    outline: "bg-canvas text-ink-soft border border-line",
   };
   return (
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${variants[variant]} ${className}`}>

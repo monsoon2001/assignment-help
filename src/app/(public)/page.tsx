@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CheckCircle, ArrowRight } from "lucide-react";
 import { MaterialIcon } from "@/lib/icons-map";
 import PriceEstimateForm from "@/components/marketing/price-estimate-form";
+import AssistanceCta from "@/components/marketing/assistance-cta";
 import TestimonialCarousel, { type Testimonial } from "@/components/marketing/testimonial-carousel";
 import { createClient } from "@/lib/supabase/server";
 import { SERVICE_TYPES, SUBJECTS } from "@/lib/constants";
@@ -107,7 +108,7 @@ const TILE = "bg-primary-fixed";
 const ICON = "text-primary";
 const LINK = "text-primary";
 const STEP_BADGE = "bg-primary text-white shadow-primary-container/20";
-const BAR = "bg-gradient-to-r from-primary-container to-primary-fixed";
+const BAR = "bg-primary";
 
 // Nine subjects promoted on the homepage; every subject page stays reachable
 // from /subjects.
@@ -226,7 +227,7 @@ export default async function HomePage() {
   };
 
   return (
-    <>
+    <div className="home-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
@@ -261,7 +262,7 @@ export default async function HomePage() {
       </div>
 
       {/* Services Marquee */}
-      <div className="bg-gradient-to-r from-ink-900 via-ink-800 to-primary-container overflow-hidden py-3 select-none">
+      <div className="bg-ink-900 overflow-hidden py-3 select-none">
         <div className="flex w-max animate-[marquee_38s_linear_infinite] hover:[animation-play-state:paused]">
           {[0, 1].map((dup) => (
             <div key={dup} className="flex items-center" aria-hidden={dup === 1}>
@@ -282,7 +283,7 @@ export default async function HomePage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden band-hero">
         <div
-          className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-section"
+          className="absolute inset-x-0 bottom-0 h-24 bg-section"
           aria-hidden="true"
         />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-20">
@@ -295,7 +296,7 @@ export default async function HomePage() {
               </span>
               <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold text-on-surface leading-tight">
                 Get Help from a Verified{" "}
-                <span className="bg-gradient-to-r from-primary-container to-primary bg-clip-text text-transparent">
+                <span className="text-primary">
                   Assignment Helper
                 </span>
               </h1>
@@ -341,7 +342,7 @@ export default async function HomePage() {
             {/* Right Column - Price Estimate Form */}
             <div
               id="estimate"
-              className="scroll-mt-24 bg-surface-container-lowest rounded-2xl shadow-xl shadow-primary-container/15 ring-1 ring-outline-variant/50 border border-outline-variant/50 p-6 sm:p-8"
+              className="hidden lg:block scroll-mt-24 bg-surface-container-lowest rounded-2xl shadow-xl shadow-primary-container/15 ring-1 ring-outline-variant/50 border border-outline-variant/50 p-6 sm:p-8"
             >
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-10 h-10 bg-primary-fixed rounded-xl flex items-center justify-center shrink-0">
@@ -359,6 +360,11 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Mobile: hero form is hidden, so open it in a sheet from here */}
+      <div className="lg:hidden max-w-7xl mx-auto px-4 sm:px-6 py-5">
+        <AssistanceCta />
+      </div>
 
       {/* Core Academic Services */}
       <section className="py-12 sm:py-16 bg-section">
@@ -440,7 +446,7 @@ export default async function HomePage() {
               <li key={step.num} className="relative group">
                 {i < STEPS.length - 1 && (
                   <span
-                    className="hidden lg:block absolute top-6 left-[calc(50%+2.25rem)] right-[-1.25rem] h-px bg-gradient-to-r from-primary/40 to-primary/10"
+                    className="hidden lg:block absolute top-6 left-[calc(50%+2.25rem)] right-[-1.25rem] h-px bg-primary-tint"
                     aria-hidden="true"
                   />
                 )}
@@ -497,7 +503,7 @@ export default async function HomePage() {
           <div className="mt-8 text-center">
             <Link
               href="/sign-up"
-              className="inline-flex items-center gap-2 px-7 py-3 bg-primary hover:bg-primary-container text-on-primary rounded-xl font-semibold text-sm hover:from-primary hover:to-primary transition-all shadow-md shadow-primary-container/30"
+              className="inline-flex items-center gap-2 px-7 py-3 bg-primary hover:bg-primary-hover text-on-primary rounded-xl font-semibold text-sm hover:from-primary hover:to-primary transition-all shadow-md shadow-primary-container/30"
             >
               Start Your First Request
               <ArrowRight className="w-4 h-4" />
@@ -791,7 +797,6 @@ export default async function HomePage() {
 
       {/* Final CTA */}
       <section className="relative overflow-hidden py-14 sm:py-20 band-ink" aria-labelledby="cta-heading">
-        <div className="absolute inset-0 band-ink-grid" aria-hidden="true" />
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 bg-white/12 ring-1 ring-white/25">
@@ -811,7 +816,7 @@ export default async function HomePage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/requests/new"
-                className="px-7 py-3 bg-white text-ink-900 rounded-xl font-semibold text-sm hover:bg-primary-fixed transition-colors shadow-lg shadow-ink-900/40 inline-flex items-center gap-2"
+                className="px-7 py-3 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-hover transition-colors shadow-lg shadow-primary/30 inline-flex items-center gap-2"
               >
                 Request Help
                 <ArrowRight className="w-4 h-4" />
@@ -846,6 +851,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }

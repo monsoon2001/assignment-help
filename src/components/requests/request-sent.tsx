@@ -55,7 +55,7 @@ export default function RequestSent({
           <h1 className="font-display font-bold text-2xl text-on-surface">Request not found</h1>
           <p className="text-sm text-on-surface-variant mt-2">{error}</p>
           <Link href="/requests" className="inline-block mt-6">
-            <span className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-container text-on-primary font-semibold text-sm hover:bg-primary transition-colors">
+            <span className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-container text-on-primary font-semibold text-sm hover:bg-primary-hover transition-colors">
               Back to My Requests <ArrowRight size={16} />
             </span>
           </Link>

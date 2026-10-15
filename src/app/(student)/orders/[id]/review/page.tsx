@@ -56,11 +56,11 @@ export default async function OrderReviewPage({
   return (
     <div className="w-full max-w-3xl mx-auto flex flex-col gap-5">
       <div className="text-center flex flex-col items-center gap-2">
-        <span className="w-14 h-14 rounded-full bg-success/10 text-emerald-600 flex items-center justify-center">
-          <CheckCircle2 size={28} className="fill-emerald-50" />
+        <span className="w-14 h-14 rounded-full bg-success/10 text-success flex items-center justify-center">
+          <CheckCircle2 size={28} className="fill-success-tint" />
         </span>
         <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
-          <Star size={13} className="text-amber-500" /> Order Complete
+          <Star size={13} className="text-accent" /> Order Complete
         </div>
         <h1 className="font-display text-2xl font-bold text-on-surface">
           How was your experience?

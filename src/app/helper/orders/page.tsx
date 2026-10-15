@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import Card from "@/components/ui/card";
-import Badge from "@/components/ui/badge";
+import StatusBadge from "@/components/ui/status-badge";
 import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
 import { Clock, DollarSign } from "lucide-react";
@@ -101,7 +101,7 @@ export default async function HelperOrders() {
                           <h2 className="font-semibold text-on-surface">
                             {title}
                           </h2>
-                          <Badge variant={meta.variant} dot>{meta.label}</Badge>
+                          <StatusBadge tone={meta.tone} dot>{meta.label}</StatusBadge>
                         </div>
                         <p className="text-sm text-on-surface-variant">
                           #{order.id.slice(0, 8).toUpperCase()} &middot; Student: {order.student?.name || "Student"} &middot; {subject}

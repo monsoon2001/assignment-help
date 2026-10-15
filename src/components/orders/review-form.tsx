@@ -69,7 +69,7 @@ export default function ReviewForm({
                 size={32}
                 className={
                   n <= (hover || rating)
-                    ? "fill-amber-400 text-amber-400"
+                    ? "fill-accent text-accent"
                     : "text-outline-variant"
                 }
               />

@@ -346,7 +346,7 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
                   <p className="text-on-surface-variant mb-5">{resource.service.body}</p>
                   <Link
                     href={resource.service.href}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-container text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity"
                   >
                     {resource.service.cta}
                     <ArrowRight className="w-4 h-4" />

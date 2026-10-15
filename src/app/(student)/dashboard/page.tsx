@@ -18,10 +18,10 @@ import {
 } from "lucide-react";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
-import Badge from "@/components/ui/badge";
+import StatusBadge from "@/components/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
 import { unwrapRow } from "@/lib/embedded";
-import { requestStatusVariant } from "@/lib/status-meta";
+import { requestStatusTone } from "@/lib/status-meta";
 
 export const dynamic = "force-dynamic";
 
@@ -192,7 +192,7 @@ export default async function DashboardPage() {
           title: "Complete payment",
           body: `Payment pending for "${o.requestTitle}". Pay to start the work.`,
           createdAt: o.created_at,
-          tone: "bg-amber-100 text-amber-700",
+          tone: "bg-accent-tint text-on-accent-tint",
           icon: AlertTriangle,
           dot: true,
         });
@@ -209,7 +209,7 @@ export default async function DashboardPage() {
           title: "Work delivered",
           body: `Work delivered for "${o.requestTitle}". Review and approve or request revision.`,
           createdAt: o.updated_at,
-          tone: "bg-emerald-100 text-emerald-700",
+          tone: "bg-success-tint text-success",
           icon: Package,
           dot: true,
         });
@@ -226,7 +226,7 @@ export default async function DashboardPage() {
           title: "Revision in progress",
           body: `Revision requested for "${o.requestTitle}". Helper is working on it.`,
           createdAt: o.updated_at,
-          tone: "bg-amber-100 text-amber-700",
+          tone: "bg-accent-tint text-on-accent-tint",
           icon: RotateCcw,
           dot: true,
         });
@@ -323,7 +323,7 @@ export default async function DashboardPage() {
   const stats = [
     { icon: FileText, label: "Open requests", value: String(activeCount), href: "/requests", tone: "bg-primary-container text-on-primary" },
     { icon: Clock, label: "Awaiting reply", value: String(awaitingCount), href: "/requests", tone: "bg-secondary-container text-on-secondary-container" },
-    { icon: CheckCircle2, label: "Completed orders", value: String(completedCount), href: "/orders", tone: "bg-emerald-100 text-emerald-700" },
+    { icon: CheckCircle2, label: "Completed orders", value: String(completedCount), href: "/orders", tone: "bg-success-tint text-success" },
   ];
 
   return (
@@ -347,18 +347,18 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4" aria-label="At a glance">
+      <section className="grid grid-cols-3 gap-2.5 sm:gap-4" aria-label="At a glance">
         {stats.map((s) => {
           const Icon = s.icon;
           return (
             <Link key={s.label} href={s.href} className="group">
-              <Card className="p-5 flex items-center gap-4 transition-shadow group-hover:shadow-md" hover>
-                <span className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${s.tone}`}>
-                  <Icon size={20} />
+              <Card className="h-full p-3 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 transition-shadow group-hover:shadow-md" hover>
+                <span className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 ${s.tone}`}>
+                  <Icon size={18} />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-2xl font-display font-bold text-on-surface">{s.value}</p>
-                  <p className="text-xs text-on-surface-variant truncate">{s.label}</p>
+                  <p className="text-xl sm:text-2xl font-display font-bold text-on-surface leading-none">{s.value}</p>
+                  <p className="text-[11px] sm:text-xs text-on-surface-variant mt-1 sm:mt-0 leading-tight">{s.label}</p>
                 </div>
               </Card>
             </Link>
@@ -425,7 +425,7 @@ export default async function DashboardPage() {
           )}
 
           {requests.map((r) => {
-            const meta = { label: STATUS_LABEL[r.status] ?? r.status, variant: requestStatusVariant(r.status) };
+            const meta = { label: STATUS_LABEL[r.status] ?? r.status, tone: requestStatusTone(r.status) };
             const proposalId = acceptedByRequest.get(r.id);
             const orderId = proposalId ? orderByProposal.get(proposalId) : undefined;
             const overdue = r.status === "requested" && isPastResponseWindow(r.sent_at);
@@ -440,9 +440,9 @@ export default async function DashboardPage() {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="font-display font-semibold text-on-surface truncate">{r.title}</h3>
-                        <Badge variant={meta.variant} dot>
+                        <StatusBadge tone={meta.tone} dot>
                           {meta.label}
-                        </Badge>
+                        </StatusBadge>
                       </div>
                       <p className="text-xs text-on-surface-variant mt-0.5">
                         {r.subject || "General"}

@@ -1,84 +1,160 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #f8f9ff;
-  --color-surface: #f8f9ff;
-  --color-surface-bright: #f8f9ff;
-  --color-surface-dim: #cbdbf5;
-  --color-surface-container: #e5eeff;
-  --color-surface-container-low: #eff4ff;
-  --color-surface-container-high: #dce9ff;
-  --color-surface-container-highest: #d3e4fe;
+  /* ======================================================================
+     Canonical colour system — the single source of truth.
+     These semantic names are what new code should use. The Tailwind-default
+     Material tonal tokens further down are compatibility aliases that resolve
+     to the same palette, so older utilities stay on-brand.
+     ====================================================================== */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-dark: #1e40af;
+  --color-primary-tint: #eff6ff;
+  --color-primary-tint-line: #bfdbfe;
+
+  --color-accent: #f59e0b;
+  --color-accent-tint: #fef3c7;
+  --color-on-accent-tint: #78350f;
+
+  --color-canvas: #f8fafc;
+  --color-surface: #ffffff;
+  --color-line: #e2e8f0;
+  --color-ink: #0f172a;
+  --color-ink-soft: #475569;
+
+  --color-success: #15803d;
+  --color-success-tint: #dcfce7;
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+  --color-danger-tint: #fee2e2;
+  --color-dark: #0f172a;
+
+  /* Status badge tones — exact text/background pairs. One row per state. */
+  --color-tone-slate: #475569;
+  --color-tone-slate-bg: #f1f5f9;
+  --color-tone-blue: #1d4ed8;
+  --color-tone-blue-bg: #eff6ff;
+  --color-tone-blue-strong: #1d4ed8;
+  --color-tone-blue-strong-bg: #dbeafe;
+  --color-tone-amber: #78350f;
+  --color-tone-amber-bg: #fef3c7;
+  --color-tone-orange: #9a3412;
+  --color-tone-orange-bg: #ffedd5;
+  --color-tone-indigo: #4338ca;
+  --color-tone-indigo-bg: #eef2ff;
+  --color-tone-green: #15803d;
+  --color-tone-green-bg: #dcfce7;
+  --color-tone-red: #b91c1c;
+  --color-tone-red-bg: #fee2e2;
+
+  /* Third-party brand mark (Google sign-in) — must not be recoloured. */
+  --color-google-blue: #4285f4;
+  --color-google-green: #34a853;
+  --color-google-yellow: #fbbc05;
+  --color-google-red: #ea4335;
+
+  /* Canvas + surfaces — mostly white and cool grey (the 60%). */
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-bright: #ffffff;
+  --color-surface-dim: #e2e8f0;
   --color-surface-container-lowest: #ffffff;
-  --color-surface-variant: #d3e4fe;
-  --color-surface-tint: #2b4bf0;
+  --color-surface-container-low: #f1f5f9;
+  --color-surface-container: #e2e8f0;
+  --color-surface-container-high: #cbd5e1;
+  --color-surface-container-highest: #94a3b8;
+  --color-surface-variant: #e2e8f0;
+  --color-surface-tint: #2563eb;
+  --color-section: #f1f5f9;
 
-  --color-on-surface: #0b1c30;
-  --color-on-surface-variant: #464555;
-  --color-on-background: #0b1c30;
-  --color-section: #f3f5f9;
+  /* Text (the 30% of neutrals). */
+  --color-on-surface: #0f172a;
+  --color-on-surface-variant: #475569;
+  --color-on-background: #0f172a;
 
-  --color-primary: #2b4bf0;
-  --color-primary-container: #466bf2;
+  /* Primary blue — actions only. */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-dark: #1e40af;
+  --color-primary-tint: #eff6ff;
+  --color-primary-container: #2563eb;
   --color-on-primary: #ffffff;
   --color-on-primary-container: #ffffff;
-  --color-primary-fixed: #dbe5ff;
-  --color-primary-fixed-dim: #b6c8ff;
-  --color-on-primary-fixed: #0a1f5c;
-  --color-on-primary-fixed-variant: #2349cf;
+  --color-primary-fixed: #eff6ff;
+  --color-primary-fixed-dim: #bfdbfe;
+  --color-on-primary-fixed: #1e40af;
+  --color-on-primary-fixed-variant: #1d4ed8;
 
-  --color-secondary: #565e74;
-  --color-secondary-container: #dae2fd;
-  --color-on-secondary: #ffffff;
-  --color-on-secondary-container: #5c647a;
-  --color-secondary-fixed: #dae2fd;
-  --color-secondary-fixed-dim: #bec6e0;
-  --color-on-secondary-fixed: #131b2e;
-  --color-on-secondary-fixed-variant: #3f465c;
+  /* Neutral slate secondary. */
+  --color-secondary: #e2e8f0;
+  --color-secondary-container: #f1f5f9;
+  --color-on-secondary: #0f172a;
+  --color-on-secondary-container: #0f172a;
+  --color-secondary-fixed: #f1f5f9;
+  --color-secondary-fixed-dim: #e2e8f0;
+  --color-on-secondary-fixed: #0f172a;
+  --color-on-secondary-fixed-variant: #475569;
 
-  --color-tertiary: #7e3000;
-  --color-tertiary-container: #a44100;
-  --color-on-tertiary: #ffffff;
-  --color-on-tertiary-container: #ffd2be;
-  --color-tertiary-fixed: #ffdbcc;
-  --color-tertiary-fixed-dim: #ffb695;
-  --color-on-tertiary-fixed: #351000;
-  --color-on-tertiary-fixed-variant: #7b2f00;
+  /* Tertiary = indigo, for the "Delivered" status family. */
+  --color-tertiary: #4338ca;
+  --color-tertiary-container: #eef2ff;
+  --color-on-tertiary: #4338ca;
+  --color-on-tertiary-container: #4338ca;
+  --color-tertiary-fixed: #eef2ff;
+  --color-tertiary-fixed-dim: #c7d2fe;
+  --color-on-tertiary-fixed: #312e81;
+  --color-on-tertiary-fixed-variant: #4338ca;
 
-  --color-error: #ba1a1a;
-  --color-error-container: #ffdad6;
+  /* Danger / error. */
+  --color-error: #dc2626;
+  --color-error-container: #fee2e2;
   --color-on-error: #ffffff;
-  --color-on-error-container: #93000a;
+  --color-on-error-container: #7f1d1d;
 
-  --color-outline: #777587;
-  --color-outline-variant: #c7c4d8;
+  /* Lines. */
+  --color-outline: #94a3b8;
+  --color-outline-variant: #e2e8f0;
 
-  --color-inverse-surface: #213145;
-  --color-inverse-on-surface: #eaf1ff;
-  --color-inverse-primary: #a8c2ff;
+  --color-inverse-surface: #0f172a;
+  --color-inverse-on-surface: #f8fafc;
+  --color-inverse-primary: #bfdbfe;
 
-  --color-success: #16a34a;
-  --color-warning: #d97706;
+  /* Semantic status. */
+  --color-success: #15803d;
+  --color-success-container: #dcfce7;
+  --color-on-success-container: #14532d;
+  --color-warning: #b45309;
+  --color-warning-container: #fef3c7;
+  --color-on-warning-container: #78350f;
   --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+  --color-danger-container: #fee2e2;
 
-  /* Non-purple page accents: teal, green, amber, rose. These live only in
-     small touches (icon tiles, chips, hairlines) — never as section fills. */
-  --color-accent-teal: #0f766e;
-  --color-accent-teal-container: #ccfbf1;
-  --color-accent-teal-fixed: #ccfbf1;
-  --color-accent-green: #047857;
-  --color-accent-green-container: #d1fae5;
-  --color-accent-green-fixed: #d1fae5;
+  /* Amber accent — small highlights only (stars, in-progress). */
+  --color-accent: #f59e0b;
+  --color-accent-container: #fef3c7;
+  --color-on-accent-container: #78350f;
+
+  /* Extra marketing-page themes, kept inside the blue/amber/green/red family
+     so nothing drifts off-palette. */
+  --color-accent-teal: #2563eb;
+  --color-accent-teal-container: #eff6ff;
+  --color-accent-teal-fixed: #eff6ff;
+  --color-accent-green: #15803d;
+  --color-accent-green-container: #dcfce7;
+  --color-accent-green-fixed: #dcfce7;
   --color-accent-amber: #b45309;
-  --color-accent-amber-container: #fdf0cd;
-  --color-accent-amber-fixed: #fdf0cd;
-  --color-accent-rose: #be123c;
-  --color-accent-rose-container: #ffe0e4;
-  --color-accent-rose-fixed: #ffe0e4;
+  --color-accent-amber-container: #fef3c7;
+  --color-accent-amber-fixed: #fef3c7;
+  --color-accent-rose: #dc2626;
+  --color-accent-rose-container: #fee2e2;
+  --color-accent-rose-fixed: #fee2e2;
 
-  --color-ink-900: #120f3d;
-  --color-ink-800: #1c1757;
-  --color-ink-700: #2a2178;
+  /* Dark section (footer, final CTA band). */
+  --color-ink-900: #0f172a;
+  --color-ink-800: #1e293b;
+  --color-ink-700: #334155;
 
   --font-sans: var(--font-inter);
   --font-display: var(--font-plus-jakarta-sans);
@@ -106,6 +182,16 @@ html {
 @media (max-width: 639px) {
   :root {
     --spacing: 0.21rem;
+  }
+}
+
+/* The public homepage on phones: a touch more type and breathing room than the
+   app's dense mobile scale, so the marketing page reads as a landing page
+   rather than a cramped form. Scoped to the homepage wrapper only. */
+@media (max-width: 639px) {
+  .home-page {
+    font-size: 1.07rem;
+    --spacing: 0.255rem;
   }
 }
 
@@ -156,8 +242,8 @@ h6 {
    These are written directly (not via @theme) so they always ship to the
    client — @theme-inline colours are only inlined into generated utilities. */
 :root {
-  --bp-section: #f3f5f9;
-  --bp-section-strong: #e4eaf4;
+  --bp-section: #f1f5f9;
+  --bp-section-strong: #e2e8f0;
 }
 
 @keyframes toast-in {
@@ -211,19 +297,14 @@ h6 {
   }
 }
 
-/* Action cards on the student dashboard: a red "pay attention" ring whose
-   gradient slides around the card so urgent items catch the eye. The ring is
-   painted with a masked pseudo-element so it sits on top of the card's own
-   background without disturbing its radius or content. */
-@keyframes action-card-border {
-  to {
-    background-position: 300% 0;
-  }
-}
-
+/* Action cards on the student dashboard: a red "pay attention" ring so urgent
+   items catch the eye. The ring is painted with a masked pseudo-element so it
+   sits on top of the card's own background without disturbing its radius or
+   content. */
 .action-card {
   position: relative;
-  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.12), 0 6px 18px -10px rgba(220, 38, 38, 0.45);
+  box-shadow: 0 0 0 1px var(--color-danger-tint),
+    0 6px 18px -10px color-mix(in srgb, var(--color-danger) 45%, transparent);
 }
 
 .action-card::after {
@@ -232,27 +313,12 @@ h6 {
   inset: 0;
   border-radius: inherit;
   padding: 2px;
-  background: linear-gradient(
-    90deg,
-    #fecaca 0%,
-    #ef4444 25%,
-    #b91c1c 50%,
-    #ef4444 75%,
-    #fecaca 100%
-  );
-  background-size: 300% 100%;
-  animation: action-card-border 4s linear infinite;
+  background: var(--color-danger);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
   pointer-events: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .action-card::after {
-    animation: none;
-  }
 }
 
 /* Public section bands -------------------------------------------------------
@@ -266,30 +332,12 @@ h6 {
 /* The hero: white with two barely-there corner tints so the estimate card and
    the headline each sit on a slightly different plane. */
 @utility band-hero {
-  background-color: var(--color-surface-container-lowest);
-  background-image:
-    radial-gradient(52rem 26rem at 8% -6%, color-mix(in oklab, var(--color-primary-fixed) 75%, transparent), transparent 68%),
-    radial-gradient(46rem 24rem at 96% 4%, color-mix(in oklab, var(--bp-section-strong) 90%, transparent), transparent 66%),
-    linear-gradient(180deg, var(--bp-section) 0%, var(--color-surface-container-lowest) 55%);
+  background-color: var(--color-surface);
 }
 
-/* The dark hero and closing CTA bands: a deep indigo wash, a soft corner glow
-   and a barely-there grid so the flat fill still has depth. */
+/* The dark hero and closing CTA bands: a flat deep-ink fill. */
 @utility band-ink {
   background-color: var(--color-ink-900);
-  background-image:
-    radial-gradient(70rem 32rem at 88% -12%, color-mix(in oklab, var(--color-primary-container) 55%, transparent), transparent 62%),
-    radial-gradient(46rem 26rem at 2% 108%, color-mix(in oklab, var(--color-primary-container) 30%, transparent), transparent 60%),
-    linear-gradient(160deg, var(--color-ink-900) 0%, var(--color-ink-800) 55%, var(--color-ink-700) 100%);
-}
-
-@utility band-ink-grid {
-  background-image:
-    linear-gradient(to right, rgb(255 255 255 / 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(255 255 255 / 0.07) 1px, transparent 1px);
-  background-size: 68px 68px;
-  -webkit-mask-image: radial-gradient(75% 60% at 50% 0%, black, transparent 78%);
-  mask-image: radial-gradient(75% 60% at 50% 0%, black, transparent 78%);
 }
 
 @utility on-band {

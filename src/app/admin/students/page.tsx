@@ -1,13 +1,13 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import Card from "@/components/ui/card";
-import Badge from "@/components/ui/badge";
+import StatusBadge from "@/components/ui/status-badge";
 import Avatar from "@/components/ui/avatar";
 import Button from "@/components/ui/button";
 import { User } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { setUserStatus } from "@/app/admin/actions";
-import { userStatusVariant } from "@/lib/status-meta";
+import { userStatusTone } from "@/lib/status-meta";
 import EditUserForm from "@/app/admin/components/edit-user-form";
 import { EmptyState } from "@/components/ui/states";
 
@@ -74,9 +74,9 @@ export default async function AdminStudentsPage({
                   <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">{user.email}</td>
                   <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">{formatDate(user.created_at)}</td>
                   <td className="px-3 sm:px-6 py-4">
-                    <Badge variant={userStatusVariant(user.status)}>
+                    <StatusBadge tone={userStatusTone(user.status)}>
                       {user.status ?? "active"}
-                    </Badge>
+                    </StatusBadge>
                   </td>
                   <td className="px-3 sm:px-6 py-4">
                     <div className="flex items-center justify-end gap-2">

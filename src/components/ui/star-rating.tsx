@@ -17,7 +17,7 @@ export default function StarRating({ rating, maxRating = 5, size = 16, showValue
           <Star
             key={i}
             size={size}
-            className={i < Math.floor(rating) ? "fill-amber-400 text-amber-400" : "text-outline-variant"}
+            className={i < Math.floor(rating) ? "fill-accent text-accent" : "text-outline-variant"}
           />
         ))}
       </div>

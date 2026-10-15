@@ -191,8 +191,8 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
             </p>
           )}
           {logs.length === 0 && (
-            <p className="text-xs text-emerald-600 inline-flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+            <p className="text-xs text-success inline-flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-success inline-block" />
               Support desk · messages sync live
             </p>
           )}
@@ -313,7 +313,7 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
             <button
               type="submit"
               disabled={sending || !draft.trim()}
-              className="w-10 h-10 shrink-0 rounded-xl bg-primary-container text-on-primary flex items-center justify-center hover:bg-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="w-10 h-10 shrink-0 rounded-xl bg-primary-container text-on-primary flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
               aria-label="Send message"
             >
               <Send size={17} />

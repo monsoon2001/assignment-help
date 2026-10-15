@@ -87,10 +87,10 @@ export default async function HelperEarnings() {
   const maxMonth = chart.reduce((m, [, v]) => Math.max(m, v), 0);
 
   const summaryStats = [
-    { label: "Total Earned", value: fmtTotal, icon: DollarSign, color: "bg-emerald-100 text-emerald-700" },
+    { label: "Total Earned", value: fmtTotal, icon: DollarSign, color: "bg-success-tint text-success" },
     { label: "This Month", value: fmtMonth, icon: TrendingUp, color: "bg-primary-container text-on-primary" },
     { label: "Completed Orders", value: String(completedCount ?? 0), icon: CheckCircle, color: "bg-secondary-container text-on-secondary-container" },
-    { label: "Payouts", value: String(rows.length), icon: Clock, color: "bg-amber-100 text-amber-700" },
+    { label: "Payouts", value: String(rows.length), icon: Clock, color: "bg-accent-tint text-on-accent-tint" },
   ];
 
   return (
@@ -226,7 +226,7 @@ export default async function HelperEarnings() {
                           <Badge variant="outline">{methodLabel(p.method)}</Badge>
                         </td>
                         <td className="px-3 sm:px-6 py-4 text-right">
-                          <span className="text-sm font-semibold text-emerald-600">
+                          <span className="text-sm font-semibold text-success">
                             +{formatCurrency(Number(p.amount_sent_cad))}
                           </span>
                           {p.amount_received !== null && p.received_currency && (

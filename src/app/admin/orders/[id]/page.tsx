@@ -3,12 +3,13 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
+import StatusBadge from "@/components/ui/status-badge";
 import Avatar from "@/components/ui/avatar";
 import { ArrowLeft, Mail, Package, Star } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
 import { formatCurrency, normalizeCurrency } from "@/lib/currency";
-import { orderStatusVariant, paymentStatusVariant } from "@/lib/status-meta";
+import { orderStatusTone, paymentStatusTone } from "@/lib/status-meta";
 import { EmptyState } from "@/components/ui/states";
 import { fileNameFromStoredUrl } from "@/lib/signed-files";
 import { createSignedFileUrl } from "@/lib/signed-files.server";
@@ -70,7 +71,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
         </Link>
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="font-display text-2xl font-bold text-on-surface">Order</h1>
-          <Badge variant={orderStatusVariant(order.status)}>{order.status.replaceAll("_", " ")}</Badge>
+          <StatusBadge tone={orderStatusTone(order.status)}>{order.status.replaceAll("_", " ")}</StatusBadge>
         </div>
         <p className="text-sm text-on-surface-variant mt-1">
           <span className="font-mono text-xs">{order.id}</span> · Created {formatDate(order.created_at)}
@@ -130,9 +131,9 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
                   </p>
                   <p className="text-xs text-on-surface-variant font-mono mt-0.5">{payment.stripe_payment_intent_id ?? "No payment intent"}</p>
                 </div>
-                <Badge variant={paymentStatusVariant(payment.status)}>
+                <StatusBadge tone={paymentStatusTone(payment.status)}>
                   {payment.status}
-                </Badge>
+                </StatusBadge>
               </div>
             ))}
           </div>
@@ -180,9 +181,9 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
         </div>
         {reviews.data ? (
           <div className="p-5 flex items-start gap-3">
-            <span className="flex items-center gap-0.5 text-amber-500">
+            <span className="flex items-center gap-0.5 text-accent">
               {Array.from({ length: reviews.data.rating }).map((_, i) => (
-                <Star key={i} size={15} className="fill-amber-500" />
+                <Star key={i} size={15} className="fill-accent" />
               ))}
             </span>
             <div>

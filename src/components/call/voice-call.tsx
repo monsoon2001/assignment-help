@@ -639,7 +639,7 @@ export function VoiceCallProvider({
         createPortal(
           <div className="fixed inset-0 z-[120] pointer-events-none">
             {phase === "incoming" && !minimized && (
-              <div className="absolute inset-0 pointer-events-auto" style={{ background: "rgba(0,0,0,0.4)" }} />
+              <div className="absolute inset-0 pointer-events-auto bg-ink/40" />
             )}
 
             {minimized && (phase === "incoming" || phase === "outgoing" || phase === "active") && (
@@ -674,7 +674,7 @@ export function VoiceCallProvider({
                     </button>
                   </div>
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success-container/30 text-success text-xs font-semibold mb-5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
                     Incoming Call
                   </span>
                   <div className="flex flex-col items-center">
@@ -697,7 +697,7 @@ export function VoiceCallProvider({
                       <button
                         onClick={() => void accept()}
                         aria-label="Accept call"
-                        className="w-14 h-14 rounded-full bg-emerald-500 text-white flex items-center justify-center hover:bg-emerald-600 transition-colors cursor-pointer"
+                        className="w-14 h-14 rounded-full bg-success text-white flex items-center justify-center hover:bg-success transition-colors cursor-pointer"
                       >
                         <Phone size={20} />
                       </button>
@@ -844,7 +844,7 @@ function MiniCallBubble({
       <div className="leading-tight">
         <p className="text-sm font-semibold text-on-surface">{name}</p>
         <p className="text-xs text-on-surface-variant inline-flex items-center gap-1">
-          {live && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />}
+          {live && <span className="w-1.5 h-1.5 rounded-full bg-success inline-block" />}
           {live ? `In call · ${timer}` : "Calling…"}
           {muted && <MicOff size={11} className="text-warning ml-0.5" />}
         </p>
@@ -903,7 +903,7 @@ function CallPanel({
           <div className="min-w-0 text-left leading-tight">
             <p className="font-display font-bold text-sm text-on-surface truncate">{name}</p>
             <p className="text-xs text-on-surface-variant truncate inline-flex items-center gap-1">
-              {live && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />}
+              {live && <span className="w-1.5 h-1.5 rounded-full bg-success inline-block" />}
               {subtitle}
             </p>
           </div>
@@ -920,14 +920,14 @@ function CallPanel({
         <div className="relative">
           <Avatar name={name} src={avatarUrl} size="lg" className={live ? "" : "grayscale"} />
           {live && (
-            <span className="absolute -bottom-0 -right-0 w-4 h-4 rounded-full bg-emerald-500 ring-2 ring-surface-container-lowest" />
+            <span className="absolute -bottom-0 -right-0 w-4 h-4 rounded-full bg-success ring-2 ring-surface-container-lowest" />
           )}
         </div>
         <h3 className="font-display font-bold text-lg text-on-surface mt-3">{name}</h3>
         <p className="text-sm text-on-surface-variant mt-0.5 inline-flex items-center gap-1.5">
           {live ? (
             <>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-success inline-block" />
               In call · {timer}
             </>
           ) : (
@@ -935,7 +935,7 @@ function CallPanel({
           )}
         </p>
         {live && peerMuted && (
-          <p className="text-xs font-medium text-amber-600 mt-1.5 inline-flex items-center gap-1.5">
+          <p className="text-xs font-medium text-warning mt-1.5 inline-flex items-center gap-1.5">
             <MicOff size={12} />
             {name} muted the call
           </p>

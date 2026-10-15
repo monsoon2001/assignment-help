@@ -75,7 +75,7 @@ export default async function ServiceDetailPage({
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href="/#estimate"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-primary-container text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-primary-container/20"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-primary-container/20"
             >
               Get matched with a helper
               <ArrowRight className="h-4 w-4" />

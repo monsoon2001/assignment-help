@@ -112,7 +112,7 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
                             aria-hidden="true"
                             className={
                               i < Math.round(t.rating)
-                                ? "h-4 w-4 fill-amber-400 text-amber-400"
+                                ? "h-4 w-4 fill-accent text-accent"
                                 : "h-4 w-4 text-outline-variant"
                             }
                           />
@@ -143,7 +143,7 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
                             {[t.service, t.length].filter(Boolean).join(" · ") || "Verified student"}
                           </p>
                         </div>
-                        <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">
+                        <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-success-tint px-2 py-1 text-xs font-semibold text-success">
                           <BadgeCheck size={11} /> Verified
                         </span>
                       </div>
@@ -175,7 +175,7 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
                 aria-label={`Show testimonials ${i + 1}`}
                 aria-current={i === activePage}
                 className={`h-2 rounded-full transition-all ${
-                  i === activePage ? "w-7 bg-primary hover:bg-primary-container" : "w-2 bg-outline-variant hover:bg-on-surface-variant/50"
+                  i === activePage ? "w-7 bg-primary hover:bg-primary-hover" : "w-2 bg-outline-variant hover:bg-on-surface-variant/50"
                 }`}
               />
             ))}

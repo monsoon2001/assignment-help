@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import Card from "@/components/ui/card";
-import Badge from "@/components/ui/badge";
+import StatusBadge from "@/components/ui/status-badge";
 import Avatar from "@/components/ui/avatar";
 import {
   Users,
@@ -16,7 +16,7 @@ import {
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
 import { formatCurrency, normalizeCurrency } from "@/lib/currency";
-import { orderStatusVariant } from "@/lib/status-meta";
+import { orderStatusTone } from "@/lib/status-meta";
 import { EmptyState } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
@@ -83,20 +83,20 @@ export default async function AdminDashboardPage() {
       label: "Active Requests",
       value: activeRequests.toString(),
       icon: FileText,
-      color: "bg-emerald-100 text-emerald-700",
+      color: "bg-success-tint text-success",
       sub: `${inProgress} orders in progress`,
     },
     {
       label: "Completed Orders",
       value: completedOrders.toString(),
       icon: Briefcase,
-      color: "bg-amber-100 text-amber-700",
+      color: "bg-accent-tint text-on-accent-tint",
     },
     {
       label: "Paid Revenue",
       value: `$${revenue.toLocaleString("en-US", { maximumFractionDigits: 0 })}`,
       icon: DollarSign,
-      color: "bg-emerald-100 text-emerald-700",
+      color: "bg-success-tint text-success",
     },
     {
       label: "Helpers Awaiting Approval",
@@ -180,9 +180,9 @@ export default async function AdminDashboardPage() {
                       </td>
                       <td className="px-3 sm:px-6 py-4 text-sm font-semibold text-on-surface">{formatCurrency(Number(order.price), normalizeCurrency(order.currency))}</td>
                       <td className="px-3 sm:px-6 py-4">
-                        <Badge variant={orderStatusVariant(order.status)}>
+                        <StatusBadge tone={orderStatusTone(order.status)}>
                           {order.status.replaceAll("_", " ")}
-                        </Badge>
+                        </StatusBadge>
                       </td>
                       <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">{formatDate(order.deadline)}</td>
                       <td className="px-3 sm:px-6 py-4 text-right">

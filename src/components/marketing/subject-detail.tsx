@@ -41,7 +41,7 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
           <div className="flex flex-wrap gap-4">
             <Link
               href="/requests/new"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-container text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-primary-container/30"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity shadow-md shadow-primary-container/30"
             >
               Request {subject.name} Help
               <ArrowRight className="w-4 h-4" />
@@ -59,11 +59,11 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
       <section className="py-12 sm:py-16 bg-white band-hero">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center gap-3 mb-8">
-            <span className="h-1 w-10 rounded-full bg-gradient-to-r from-primary-container to-primary-fixed" aria-hidden="true" />
+            <span className="h-1 w-10 rounded-full bg-primary" aria-hidden="true" />
             <h2 className="font-display text-2xl font-bold text-on-surface">
               {subject.name} Help by Topic
             </h2>
-            <span className="h-1 w-10 rounded-full bg-gradient-to-r from-primary-container to-primary-fixed" aria-hidden="true" />
+            <span className="h-1 w-10 rounded-full bg-primary" aria-hidden="true" />
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {subject.subtopics.map((t) => {
@@ -74,7 +74,7 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
                 href="/requests/new"
                 className={`relative overflow-hidden bg-white rounded-2xl p-5 pt-6 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}
               >
-                <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${tone.hairline}`} aria-hidden="true" />
+                <span className={`absolute inset-x-0 top-0 h-1 ${tone.hairline}`} aria-hidden="true" />
                 <h3 className={`font-display font-bold text-on-surface mb-1.5 transition-colors ${tone.text}`}>{t.title}</h3>
                 <p className="text-base text-on-surface-variant leading-relaxed">{t.blurb}</p>
               </Link>

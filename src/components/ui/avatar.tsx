@@ -47,7 +47,7 @@ export default function Avatar({ src, alt, name, role, size = "md", online, clas
         </div>
       )}
       {online !== undefined && (
-        <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full ring-2 ring-surface-container-lowest ${online ? "bg-emerald-500" : "bg-outline"}`} />
+        <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full ring-2 ring-surface-container-lowest ${online ? "bg-success" : "bg-outline"}`} />
       )}
     </div>
   );

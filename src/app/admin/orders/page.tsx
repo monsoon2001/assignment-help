@@ -1,13 +1,13 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import Card from "@/components/ui/card";
-import Badge from "@/components/ui/badge";
+import StatusBadge from "@/components/ui/status-badge";
 import Avatar from "@/components/ui/avatar";
 import { Briefcase, Eye } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { unwrapRow } from "@/lib/embedded";
 import { formatCurrency, normalizeCurrency } from "@/lib/currency";
-import { orderStatusVariant } from "@/lib/status-meta";
+import { orderStatusTone } from "@/lib/status-meta";
 import { EmptyState } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
@@ -73,9 +73,9 @@ export default async function AdminOrdersPage() {
                     </td>
                     <td className="px-3 sm:px-6 py-4 text-sm font-semibold text-on-surface">{formatCurrency(Number(order.price), normalizeCurrency(order.currency))}</td>
                     <td className="px-3 sm:px-6 py-4">
-                      <Badge variant={orderStatusVariant(order.status)}>
+                      <StatusBadge tone={orderStatusTone(order.status)}>
                         {order.status.replaceAll("_", " ")}
-                      </Badge>
+                      </StatusBadge>
                     </td>
                     <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">{formatDate(order.created_at)}</td>
                     <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">{formatDate(order.deadline)}</td>

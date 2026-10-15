@@ -18,22 +18,22 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
-          <label className="text-sm font-medium text-on-surface">{label}</label>
+          <label className="text-sm font-medium text-ink">{label}</label>
         )}
         <div className="relative flex items-center">
           {icon && (
-            <span className="absolute left-3.5 text-on-surface-variant pointer-events-none [&>svg]:w-5 [&>svg]:h-5">
+            <span className="absolute left-3.5 text-ink-soft pointer-events-none [&>svg]:w-5 [&>svg]:h-5">
               {icon}
             </span>
           )}
           <input
             ref={ref}
             type={type}
-            className={`w-full h-11 ${icon ? "pl-11" : "pl-3.5"} pr-4 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all ${sizeClass} ${className}`}
+            className={`w-full h-11 ${icon ? "pl-11" : "pl-3.5"} pr-4 bg-surface border rounded-lg text-sm text-ink placeholder:text-ink-soft focus:outline-none focus:ring-2 transition-all ${error ? "border-danger focus:border-danger focus:ring-danger/20" : "border-line focus:border-primary focus:ring-primary/20"} ${sizeClass} ${className}`}
             {...props}
           />
         </div>
-        {error && <p className="text-xs text-error">{error}</p>}
+        {error && <p className="text-xs text-danger">{error}</p>}
       </div>
     );
   }

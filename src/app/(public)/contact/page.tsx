@@ -33,7 +33,7 @@ export default function ContactPage() {
               { icon: MapPin, label: "Location", value: "Acadivo HQ", sub: "San Francisco, CA" },
             ].map(({ icon: Icon, label, value, sub }) => (
               <div key={label} className="relative overflow-hidden bg-white rounded-2xl p-6 border border-primary-container/25 shadow-sm hover:shadow-md transition-shadow">
-                <span className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-primary-container to-primary-fixed" aria-hidden="true" />
+                <span className="absolute inset-x-0 top-0 h-0.5 bg-primary" aria-hidden="true" />
                 <div className="flex items-start gap-4">
                   <div className="w-11 h-11 bg-primary-fixed rounded-xl flex items-center justify-center shrink-0">
                     <Icon className="w-5 h-5 text-primary" />

@@ -36,7 +36,7 @@ export default function DebugPythonPage() {
           <li>Fix one issue at a time</li>
         </ol>
         <p>Still stuck? Get personalized help from a verified Python tutor.</p>
-        <Link href="/requests/new" className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-container text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity no-underline">
+        <Link href="/requests/new" className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity no-underline">
           Get Python Help
         </Link>
       </div>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import Card from "@/components/ui/card";
-import Badge from "@/components/ui/badge";
+import StatusBadge from "@/components/ui/status-badge";
 import {
   Briefcase,
   DollarSign,
@@ -93,8 +93,8 @@ export default async function HelperDashboard() {
 
   const stats = [
     { label: "Active Projects", value: String(activeOrders.length), icon: Briefcase, href: "/helper/orders", color: "bg-primary-container text-on-primary" },
-    { label: "This Month", value: earningsThisMonth, icon: DollarSign, href: "/helper/earnings", color: "bg-emerald-100 text-emerald-700", small: true },
-    { label: "Awaiting Review", value: String(awaitingReview), icon: Clock, href: "/helper/orders", color: "bg-amber-100 text-amber-700" },
+    { label: "This Month", value: earningsThisMonth, icon: DollarSign, href: "/helper/earnings", color: "bg-success-tint text-success", small: true },
+    { label: "Awaiting Review", value: String(awaitingReview), icon: Clock, href: "/helper/orders", color: "bg-accent-tint text-on-accent-tint" },
   ];
 
   return (
@@ -108,7 +108,7 @@ export default async function HelperDashboard() {
           <p className="text-on-surface-variant text-sm sm:text-base mt-1">
             {incoming.length > 0
               ? `You have ${incoming.length} incoming request${incoming.length === 1 ? "" : "s"} waiting for a proposal.`
-              : "Here&apos;s what needs your attention today."}
+              : "Here's what needs your attention today."}
           </p>
         </div>
         <Link href="/helper/requests">
@@ -120,21 +120,21 @@ export default async function HelperDashboard() {
       </div>
 
       {/* At a glance */}
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4" aria-label="At a glance">
+      <section className="grid grid-cols-3 gap-2.5 sm:gap-4" aria-label="At a glance">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
             <Link key={stat.label} href={stat.href} className="group">
-              <Card className="p-5 transition-shadow group-hover:shadow-md" hover>
-                <div className="flex items-start justify-between">
-                  <div className="min-w-0">
-                    <p className="text-sm text-on-surface-variant">{stat.label}</p>
-                    <p className={`${stat.small ? "text-lg" : "text-2xl"} font-bold text-on-surface mt-1 truncate`}>
+              <Card className="h-full p-3 sm:p-5 transition-shadow group-hover:shadow-md" hover>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0 order-2 sm:order-1">
+                    <p className="text-[11px] sm:text-sm text-on-surface-variant leading-tight">{stat.label}</p>
+                    <p className={`${stat.small ? "text-sm sm:text-lg" : "text-lg sm:text-2xl"} font-bold text-on-surface mt-0.5 sm:mt-1 truncate`}>
                       {stat.value}
                     </p>
                   </div>
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${stat.color}`}>
-                    <Icon size={20} />
+                  <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0 order-1 sm:order-2 ${stat.color}`}>
+                    <Icon size={16} />
                   </div>
                 </div>
               </Card>
@@ -170,7 +170,7 @@ export default async function HelperDashboard() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <h3 className="font-semibold text-on-surface truncate">{order.makeTitle}</h3>
-                        <Badge variant={meta.variant} dot>{meta.label}</Badge>
+                        <StatusBadge tone={meta.tone} dot>{meta.label}</StatusBadge>
                       </div>
                       <p className="text-sm text-on-surface-variant">
                         Student: {order.student?.name ?? "Student"}
