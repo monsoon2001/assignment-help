@@ -58,9 +58,14 @@ export default function StudentProfileForm({
       <section className="relative overflow-hidden rounded-3xl border border-outline-variant/60 bg-surface-container-lowest">
         <div className="h-24 sm:h-28 bg-primary" />
         <div className="px-5 sm:px-7 pb-6">
-          <div className="flex items-end gap-4 -mt-11">
-            <Avatar name={displayName} size="lg" src={avatarUrl ?? undefined} className="ring-4 ring-surface-container-lowest" />
-            <div className="pb-1 min-w-0">
+          <div className="flex items-start gap-4">
+            <Avatar
+              name={displayName}
+              size="lg"
+              src={avatarUrl ?? undefined}
+              className="-mt-11 ring-4 ring-surface-container-lowest"
+            />
+            <div className="min-w-0 pt-1.5">
               <h2 className="font-display font-bold text-xl text-on-surface truncate">{displayName}</h2>
               <p className="text-sm text-on-surface-variant flex items-center gap-1.5 min-w-0">
                 <Mail size={14} className="shrink-0" /> <span className="truncate">{email || "—"}</span>
