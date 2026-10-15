@@ -162,9 +162,10 @@
 
 html {
   /* Tailwind's rem-based type scale is built on this, so the root size sets the
-     whole page's scale. Phones start smaller (more content per screen, no
-     cramped/overflowing bars); from the sm breakpoint up we use the design size. */
-   font-size: 15px;
+     whole page's scale. Phones sit just below the 17px design size (denser
+     bars, more content per screen) but not so far that body copy reads as
+     small; from the sm breakpoint up we use the design size. */
+  font-size: 16px;
   /* Safari boosts font sizes on wide viewports ("text autosizing") on top of
      the rem scale above, which overflows dense bars like the navbar. */
   -webkit-text-size-adjust: 100%;
@@ -182,6 +183,28 @@ html {
 @media (max-width: 639px) {
   :root {
     --spacing: 0.21rem;
+  }
+}
+
+/* Phones: open up the leading slightly. Each text-* utility resolves its
+   line-height from these theme variables, and the explicit leading-* helpers
+   resolve from the leading scale, so redefining both below their design sizes
+   gives multi-line copy more breathing room without changing type size or any
+   layout measurement. Restored at sm. */
+@media (max-width: 639px) {
+  :root {
+    --text-xs--line-height: 1.45;
+    --text-sm--line-height: 1.55;
+    --text-base--line-height: 1.6;
+    --text-lg--line-height: 1.65;
+    --text-xl--line-height: 1.5;
+    --text-2xl--line-height: 1.45;
+    --text-3xl--line-height: 1.3;
+
+    --leading-tight: 1.3;
+    --leading-snug: 1.45;
+    --leading-normal: 1.6;
+    --leading-relaxed: 1.7;
   }
 }
 
