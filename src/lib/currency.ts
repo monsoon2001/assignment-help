@@ -5,6 +5,10 @@
 // location), converts to CAD for its own ledger, and absorbs any processing or
 // foreign-exchange cost. Students never see a fee, a commission or a CAD
 // equivalent — only the single local total they pay.
+//
+// Fees baked into that total:
+//   * Students in Canada pay a flat 3.9% Stripe processing fee.
+//   * Students everywhere else pay 5.9% (processing + currency conversion).
 
 export interface CurrencyMeta {
   code: string;
@@ -247,6 +251,23 @@ export function defaultCurrencyForCountry(country?: string | null): string {
   return currencyForCountry(country) ?? DEFAULT_CURRENCY;
 }
 
+/** True when a saved country resolves to Canada. */
+export function isCanada(country?: string | null): boolean {
+  return isoForCountry(country) === "CA";
+}
+
+/**
+ * Stripe processing fee absorbed by the platform for Canadian students. There is
+ * no currency-conversion fee because the platform settles in CAD.
+ */
+export const CA_PROCESSING_FEE_PERCENT = 3.9;
+
+/**
+ * Processing + currency-conversion buffer for students outside Canada. Used as a
+ * fallback when the admin setting is missing or non-positive.
+ */
+export const INTERNATIONAL_FEE_PERCENT = 5.9;
+
 export function countryNameFor(code?: string | null): string | null {
   if (!code) return null;
   return COUNTRY_META[code.trim().toUpperCase()]?.name ?? null;
@@ -291,9 +312,11 @@ export function convertViaCad(
 
 /**
  * The amount a student pays in their local currency: the helper's quoted base
- * converted at the daily rate, plus the platform's hidden processing/reversal
- * buffer for non-Canadian students. The buffer is never itemised — only the
- * final local total is shown.
+ * converted at the daily rate, plus the platform's processing/conversion fee.
+ * The fee is never itemised — only the final local total is shown.
+ *
+ * `surchargePercent` must already reflect the student's location: 3.9% for
+ * Canada, 5.9% (or the configured international buffer) otherwise.
  */
 export function computeLocalCharge(
   baseAmount: number,
@@ -304,9 +327,7 @@ export function computeLocalCharge(
 ): number | null {
   const converted = convertViaCad(baseAmount, baseCurrency, localCurrency, rates);
   if (converted === null) return null;
-  const withBuffer =
-    normalizeCurrency(localCurrency) === "CAD"
-      ? converted
-      : converted * (1 + (Number.isFinite(surchargePercent) ? surchargePercent : 0) / 100);
-  return roundMoney(withBuffer, localCurrency);
+  const pct = Number.isFinite(surchargePercent) ? surchargePercent : 0;
+  const withFee = converted * (1 + pct / 100);
+  return roundMoney(withFee, localCurrency);
 }

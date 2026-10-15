@@ -32,6 +32,9 @@ const secretKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 const BASE = "http://localhost:3000";
 const PRICE = 100.0;
+// Canadian students pay a flat 3.9% processing fee (no FX conversion).
+const CA_PROCESSING_PERCENT = 3.9;
+const CA_CHARGE = Math.round(PRICE * (1 + CA_PROCESSING_PERCENT / 100) * 100) / 100;
 
 const admin = createClient(url, secretKey, {
   auth: { autoRefreshToken: false, persistSession: false },
@@ -147,8 +150,9 @@ const createdEventIds = [];
   }
 
   const tag = Date.now();
-  // A Canadian student has no FX buffer, so the charge is deterministic (no
-  // network rate is required) — keeps the test hermetic.
+  // A Canadian student is charged a flat 3.9% processing fee (no FX conversion),
+  // so the charge is deterministic (no network rate is required) — keeps the
+  // test hermetic.
   student = await createUser("student", tag, "CA");
   helper = await createUser("helper", tag);
   studentSession = await buildSession(student);
@@ -211,7 +215,7 @@ const createdEventIds = [];
   check("order base amount locked to proposal", Number(orderRow?.base_amount) === PRICE, `got ${orderRow?.base_amount}`);
   check("order base currency is CAD", orderRow?.base_currency === "CAD", `got ${orderRow?.base_currency}`);
   check("order charge locked to CAD for a Canadian student", orderRow?.charge_currency === "CAD", `got ${orderRow?.charge_currency}`);
-  check("order charge amount = base for Canada (no buffer)", Number(orderRow?.charge_amount) === PRICE, `got ${orderRow?.charge_amount}`);
+  check("order charge includes the 3.9% Canadian processing fee", Math.abs(Number(orderRow?.charge_amount) - CA_CHARGE) < 0.01, `got ${orderRow?.charge_amount}`);
   check("order charge locked timestamp set", !!orderRow?.charge_locked_at);
 
   // --- 2. Checkout: charges the locked currency/amount, ignores the client -----
@@ -228,7 +232,7 @@ const createdEventIds = [];
     check("checkout currency matches locked charge (cad)", session.currency === "cad", `got ${session.currency}`);
     check(
       "checkout amount equals locked charge (client ignored)",
-      session.amount_total === Math.round(PRICE * 100),
+      session.amount_total === Math.round(CA_CHARGE * 100),
       `got ${session.amount_total}`
     );
   } else {
@@ -264,7 +268,7 @@ const createdEventIds = [];
     payment_status: "paid",
     payment_intent: piId,
     client_reference_id: orderId,
-    amount_total: Math.round(PRICE * 100),
+    amount_total: Math.round(CA_CHARGE * 100),
     currency: "cad",
     customer_email: student.email,
     metadata: { order_id: orderId },
@@ -287,11 +291,11 @@ const createdEventIds = [];
 
   // --- 6. Ledger values are correct -------------------------------------------
   const pay = (payRows ?? [])[0];
-  check("ledger gross_cad correct", Number(pay?.gross_cad) === PRICE, `got ${pay?.gross_cad}`);
+  check("ledger gross_cad correct", Math.abs(Number(pay?.gross_cad) - CA_CHARGE) < 0.01, `got ${pay?.gross_cad}`);
   check("ledger charge currency recorded", pay?.charge_currency === "CAD", `got ${pay?.charge_currency}`);
-  check("ledger charge amount recorded", Number(pay?.charge_amount) === PRICE, `got ${pay?.charge_amount}`);
+  check("ledger charge amount recorded", Math.abs(Number(pay?.charge_amount) - CA_CHARGE) < 0.01, `got ${pay?.charge_amount}`);
   check("ledger charge_to_cad_rate is 1 for CAD", Number(pay?.charge_to_cad_rate) === 1, `got ${pay?.charge_to_cad_rate}`);
-  check("ledger platform buffer is 0 for Canada", Number(pay?.platform_fee_cad) === 0, `got ${pay?.platform_fee_cad}`);
+  check("ledger platform buffer = 3.9% for Canada", Math.abs(Number(pay?.platform_fee_cad) - CA_PROCESSING_PERCENT) < 0.01, `got ${pay?.platform_fee_cad}`);
   check("ledger payout status starts unpaid", pay?.helper_payout_status === "unpaid", `got ${pay?.helper_payout_status}`);
 
   // --- 7. Partial refund is recorded (no share to reduce) ----------------------
@@ -300,7 +304,7 @@ const createdEventIds = [];
     object: "charge",
     payment_intent: piId,
     amount_refunded: 2500, // 25%
-    amount: Math.round(PRICE * 100),
+    amount: Math.round(CA_CHARGE * 100),
   });
   createdEventIds.push(refunded.id);
   const refRes = await postWebhook(refunded);
@@ -352,7 +356,7 @@ const createdEventIds = [];
     id: `dp_test_${Math.random().toString(36).slice(2, 10)}`,
     object: "dispute",
     payment_intent: piId,
-    amount: Math.round(PRICE * 100),
+    amount: Math.round(CA_CHARGE * 100),
   });
   createdEventIds.push(dispute.id);
   const disRes = await postWebhook(dispute);

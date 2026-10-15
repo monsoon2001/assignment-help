@@ -2,14 +2,17 @@ import "server-only";
 import { adminClient } from "@/lib/supabase/admin";
 import { getCadRates } from "@/lib/fx.server";
 import {
+  CA_PROCESSING_FEE_PERCENT,
   computeLocalCharge,
   currencyForCountry,
   DEFAULT_CURRENCY,
+  INTERNATIONAL_FEE_PERCENT,
+  isCanada,
   normalizeCurrency,
 } from "@/lib/currency";
 
 /**
- * The platform's hidden processing/FX buffer applied to non-Canadian students.
+ * The international processing/FX buffer applied to students outside Canada.
  * Read from the admin-only settings table with the service role; it is never
  * itemised and is only used to derive the single local total.
  */
@@ -22,6 +25,17 @@ export async function getFxSurchargePercent(): Promise<number> {
 
   const pct = Number(data?.fx_surcharge_percent);
   return Number.isFinite(pct) ? pct : 0;
+}
+
+/**
+ * The processing/conversion fee baked into a student's local total: a flat 3.9%
+ * for Canada (processing only — the platform settles in CAD) and the configured
+ * international buffer for everyone else (5.9% by default).
+ */
+export async function getSurchargePercentForCountry(country: string | null): Promise<number> {
+  if (isCanada(country)) return CA_PROCESSING_FEE_PERCENT;
+  const configured = await getFxSurchargePercent();
+  return configured > 0 ? configured : INTERNATIONAL_FEE_PERCENT;
 }
 
 export interface ResolvedCharge {
@@ -43,7 +57,7 @@ export interface ChargeContext {
 export async function getChargeContext(country: string | null): Promise<ChargeContext> {
   const [rates, surchargePercent] = await Promise.all([
     getCadRates(),
-    getFxSurchargePercent(),
+    getSurchargePercentForCountry(country),
   ]);
   return {
     localCurrency: currencyForCountry(country) ?? DEFAULT_CURRENCY,
@@ -69,7 +83,7 @@ export async function resolveLocalCharge(
     return null;
   }
 
-  const surcharge = await getFxSurchargePercent();
+  const surcharge = await getSurchargePercentForCountry(country);
   const localCurrency = currencyForCountry(country) ?? DEFAULT_CURRENCY;
 
   const localAmount = computeLocalCharge(
@@ -90,7 +104,7 @@ export async function resolveLocalCharge(
       baseCurrency,
       DEFAULT_CURRENCY,
       rates,
-      0
+      surcharge
     );
     if (cadAmount !== null && cadAmount > 0) {
       return { currency: DEFAULT_CURRENCY, amount: cadAmount };

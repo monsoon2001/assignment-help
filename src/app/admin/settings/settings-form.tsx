@@ -53,7 +53,7 @@ export default function SettingsForm({ fx }: { fx: FxSettings }) {
         <form action={formAction} className="space-y-4">
           <div className="max-w-xs">
             <Input
-              label="Processing / FX buffer (%)"
+              label="International processing / FX buffer (%)"
               name="surchargePercent"
               type="number"
               min="0"
@@ -73,8 +73,9 @@ export default function SettingsForm({ fx }: { fx: FxSettings }) {
         </form>
         <p className="flex items-start gap-2 text-xs text-on-surface-variant">
           <Globe size={13} className="shrink-0 mt-0.5 text-primary" />
-          Students in Canada are charged the converted total with no buffer. Everyone else pays the
-          converted total plus this buffer, shown only as one local amount.
+          Students in Canada are charged a flat 3.9% processing fee. Everyone else pays this
+          international buffer (default 5.9%) on top of the converted total, shown only as one
+          local amount.
         </p>
       </Card>
 
