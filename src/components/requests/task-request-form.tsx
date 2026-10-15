@@ -248,8 +248,13 @@ export default function TaskRequestForm({
             options={LEVEL_OPTIONS.map((l) => ({ value: l, label: l }))}
           />
         </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="field-pages" className="text-xs font-semibold text-on-surface">Pages</label>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-baseline justify-between gap-2">
+            <label htmlFor="field-pages" className="text-sm font-medium text-ink">Pages</label>
+            <span className="text-xs text-ink-soft whitespace-nowrap">
+              {wordEstimate > 0 ? `Approx. ${wordEstimate.toLocaleString()} words` : "1 page \u2248 250 words"}
+            </span>
+          </div>
           <div className="relative flex items-center">
             <input
               id="field-pages"
@@ -282,9 +287,6 @@ export default function TaskRequestForm({
               </button>
             </span>
           </div>
-          <p className="text-xs text-on-surface-variant">
-            {wordEstimate > 0 ? `Approx. ${wordEstimate.toLocaleString()} words` : "1 page \u2248 250 words"}
-          </p>
         </div>
       </div>
 
