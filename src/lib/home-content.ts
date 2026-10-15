@@ -184,38 +184,38 @@ export const HOME_FAQS: Faq[] = [
 // subject page slug. The shorter `cardDesc` from subject-content.ts still leads.
 export const HOMEPAGE_SUBJECT_DETAIL: Record<string, string> = {
   "english-literature":
-    "Close reading help, poetry and prose interpretation, comparative essays and argument structure for literary analysis and critical responses.",
+    "Close reading, comparative argument and structure, shaped into a response that holds up to critical marking.",
   mathematics:
-    "Step-by-step working for algebra, calculus, geometry and number theory, plus exam technique and how to present a proof or derivation clearly.",
+    "Step-by-step working, exam technique, and clear presentation of proofs and derivations.",
   statistics:
-    "Choosing the right test, running analysis in SPSS or R, reading p-values and confidence intervals, and writing up results that hold up to scrutiny.",
+    "Choosing the right test, running it in SPSS or R, and explaining p-values and confidence intervals clearly.",
   biology:
-    "Cell biology, genetics, ecology and anatomy support, including lab report method sections, results tables and how to explain a pathway or process.",
+    "Support with method sections, results tables, and explaining pathways and processes accurately.",
   chemistry:
-    "Organic, inorganic and physical chemistry problem sets, reaction mechanisms, calculation walkthroughs and lab methodology written up properly.",
+    "Reaction mechanisms, calculation walkthroughs, and lab methodology written up properly.",
   physics:
-    "Mechanics, thermodynamics, electromagnetism and quantum theory worked through clearly, with modelling assumptions and error analysis explained.",
+    "Worked through clearly, with modelling assumptions and error analysis explained.",
   "computer-science":
-    "Programming assignments, algorithm design, data structures, database queries and code walkthroughs with debugging help and testing strategy.",
+    "Code walkthroughs, debugging, testing strategy, and database queries explained as you go.",
   engineering:
-    "Mechanical, civil and electrical engineering problem sets, design work, technical drawings and clear method write-ups for reports.",
+    "Problem sets, design work and technical drawings, with clear method write-ups for reports.",
   "academic-writing":
-    "Structuring research papers, building arguments, paraphrasing, referencing and proofreading so drafts read like your own work, only sharper.",
+    "Structuring arguments, paraphrasing, referencing, and polishing drafts until they read like your own work.",
 };
 
 // Extra detail for the guide category cards, which carry a one-line summary in
 // resources/index.ts. Individual guide cards already use their full description.
 export const HOMEPAGE_GUIDE_DETAIL: Record<string, string> = {
   writing:
-    "Essays, paragraphs, paraphrasing, introductions, conclusions and proofreading — worked through with checklists you can reuse in your next draft.",
+    "Introductions, conclusions and checklists you can reuse in your next draft.",
   research:
-    "Reports, lab write-ups, literature reviews and case studies, including how to structure sections, present findings and reference sources correctly.",
+    "How to structure each section, present findings, and reference sources correctly.",
   citations:
-    "MLA, APA, Harvard and IEEE style, in-text versus footnote citations, building a reference list and staying clear of accidental plagiarism.",
+    "MLA, APA, Harvard and IEEE, in-text versus footnote, and staying clear of accidental plagiarism.",
   projects:
-    "Longer research projects and formal academic writing: scoping a question, working with a supervisor, timelines and drafting a proposal.",
+    "Scoping a question, working with a supervisor, timelines, and drafting a proposal.",
   technical:
-    "Programming assignments, data analysis and statistics writing, with guidance on presenting results, documenting code and explaining your method.",
+    "Presenting results, documenting code, and explaining your method clearly.",
   presentations:
-    "Slide structure, talk tracks and application essays, including how to cut a long draft into a deck that actually persuades.",
+    "Talk tracks, and how to cut a long draft into a deck that actually persuades.",
 };
