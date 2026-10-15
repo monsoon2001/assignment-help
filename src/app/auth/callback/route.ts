@@ -1,3 +1,4 @@
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { roleToHome } from "@/lib/auth";
 import { getIpCountry } from "@/lib/geo.server";
@@ -54,7 +55,7 @@ export async function GET(request: Request) {
   } else if (tokenHash && type) {
     const { error } = await supabase.auth.verifyOtp({
       token_hash: tokenHash,
-      type: type as any,
+      type: type as EmailOtpType,
     });
     if (error) {
       return NextResponse.redirect(
@@ -75,26 +76,18 @@ export async function GET(request: Request) {
 
   await captureSignupCountry(supabase, user.id);
 
-  const emailVerified = (user as any).email_confirmed_at;
-  const wasJustConfirmed =
-    type === "signup" ||
-    type === "email" ||
-    type === "recovery" ||
-    Boolean(emailVerified);
-
-  if (wasJustConfirmed) {
-    const redirect = new URL("/sign-in", url.origin);
-    redirect.searchParams.set("verified", "1");
-    const response = NextResponse.redirect(redirect);
-    response.cookies.set(AUTH_AT_COOKIE, String(Date.now()), authAtCookieOptions());
-    return response;
-  }
-
   const { data: profile } = await supabase
     .from("users")
     .select("role, name")
     .eq("id", user.id)
     .maybeSingle();
+
+  const emailVerified = user.email_confirmed_at;
+  const wasJustConfirmed =
+    type === "signup" ||
+    type === "email" ||
+    type === "recovery" ||
+    Boolean(emailVerified);
 
   // Sync a Google profile picture (and a missing name) from the OAuth identity
   // into the users table so every surface — helper listings, chats, admin —
@@ -119,11 +112,16 @@ export async function GET(request: Request) {
     await supabase.from("users").update(updates).eq("id", user.id);
   }
 
+  // The user already has a session, so we must redirect straight to their
+  // destination. Sending them to /sign-in (even to show a "verified" notice)
+  // would bounce them off the proxy's auth-route guard onto their home and
+  // discard `next` — losing the saved request draft they were filling in.
   const home = roleToHome(profile?.role);
   const target =
     next && next !== "/" && next.startsWith("/") && !next.startsWith("//") ? next : home;
   const redirect = new URL(target, url.origin);
   redirect.searchParams.set("signedIn", "1");
+  if (wasJustConfirmed) redirect.searchParams.set("verified", "1");
   const created = user.created_at ? new Date(user.created_at).getTime() : 0;
   const isNew =
     Number.isFinite(created) &&
