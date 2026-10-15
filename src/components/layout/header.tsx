@@ -332,6 +332,13 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                   </Button>
                 </Link>
               )}
+              {menuItems.length > 0 && (
+                <Link href={dashboardHref} className="md:hidden">
+                  <Button variant="ghost" size="sm" aria-label="Dashboard">
+                    <LayoutDashboard size={18} />
+                  </Button>
+                </Link>
+              )}
               <Link href={dashboardHref} className="hidden md:inline-flex">
                 <Button variant="ghost" size="sm" aria-label="Dashboard">
                   <LayoutDashboard size={16} />
@@ -358,9 +365,10 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
               </Link>
               <Link
                 href={profileHref}
+                aria-label="Your profile"
                 className="flex items-center gap-2 pl-1 pr-1 min-h-11 group"
               >
-                <span className="block max-w-28 sm:max-w-none truncate text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
+                <span className="hidden sm:block max-w-28 sm:max-w-none truncate text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
                   Hi, {firstName}
                 </span>
                 <Avatar name={userName ?? "User"} src={avatarUrl ?? undefined} role={role} size="md" online className="cursor-pointer" />
@@ -560,6 +568,43 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                 </div>
               );
             })}
+
+            {userId && (
+              <div className="mt-1 border-t border-outline-variant/30 pt-3">
+                <p className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
+                  Account
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { href: dashboardHref, label: "Dashboard", icon: LayoutDashboard },
+                    { href: messagesHref, label: "Messages", icon: MessageSquare },
+                    { href: notificationsHref, label: "Notifications", icon: Bell },
+                    { href: profileHref, label: "Profile", icon: User },
+                  ].map(({ href, label, icon: Icon }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={closeMobileMenu}
+                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors min-h-11"
+                    >
+                      <Icon size={17} />
+                      <span className="truncate">{label}</span>
+                    </Link>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeMobileMenu();
+                    setSignOutDialogOpen(true);
+                  }}
+                  className="mt-2 flex w-full items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-error hover:bg-error-container/30 transition-colors min-h-11 cursor-pointer"
+                >
+                  <LogOut size={17} />
+                  Sign out
+                </button>
+              </div>
+            )}
           </nav>
           </div>,
           document.body
