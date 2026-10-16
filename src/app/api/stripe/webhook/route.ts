@@ -65,6 +65,10 @@ export async function POST(request: Request) {
       await handleChargeRefunded(event.data.object);
     } else if (event.type === "charge.dispute.created") {
       await handleDisputeCreated(event.data.object);
+    } else if (event.type === "payment_intent.succeeded") {
+      await handlePaymentIntentSucceeded(event.data.object);
+    } else if (event.type === "charge.succeeded") {
+      await handleChargeSucceeded(event.data.object);
     }
   } catch (err) {
     console.error("webhook: handler failure", err);
@@ -118,30 +122,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   let balanceTransactionId: string | null = null;
 
   if (intentId) {
-    try {
-      const paymentIntent = await stripe.paymentIntents.retrieve(intentId, {
-        expand: ["latest_charge.balance_transaction"],
-      });
-      const charge = paymentIntent.latest_charge;
-      if (charge && typeof charge !== "string") {
-        receiptUrl = charge.receipt_url ?? null;
-        const bt = charge.balance_transaction;
-        if (bt && typeof bt !== "string") {
-          balanceTransactionId = bt.id;
-          const fee = round2(bt.fee / 100);
-          const feeCurrency = normalizeCurrency(bt.currency);
-          if (feeCurrency === "CAD") {
-            stripeFeeCad = fee;
-          } else {
-            const rate = await rateBetween(feeCurrency, "CAD");
-            stripeFeeCad = rate === null ? null : round2(fee * rate);
-          }
-        }
-      }
-    } catch (err) {
-      // Best-effort: the payment still records without the exact fee.
-      console.error("webhook: failed to fetch charge/balance transaction", err);
-    }
+    const info = await fetchStripeFee(intentId);
+    receiptUrl = info.receiptUrl;
+    stripeFeeCad = info.stripeFeeCad;
+    balanceTransactionId = info.balanceTransactionId;
   }
 
   const chargeCurrency = normalizeCurrency(
@@ -209,6 +193,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     throw paymentError;
   }
 
+  // The initial fee lookup can race the balance transaction (it may not be
+  // settled when the checkout event lands), and a duplicate delivery is ignored
+  // by the upsert above. Backfill the fee/net on the existing row when missing.
+  if (intentId) {
+    await backfillPaymentFee(intentId);
+  }
+
   // The webhook is the ONLY writer that transitions an order to in_progress.
   // The status filter makes double delivery harmless.
   const { error: orderError } = await adminClient
@@ -224,6 +215,101 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   revalidatePath(`/orders/${orderId}`, "page");
   revalidatePath(`/orders/${orderId}/confirmed`, "page");
+}
+
+/**
+ * Reads the receipt URL and the real Stripe fee (converted to CAD) from a
+ * payment intent's latest charge + balance transaction. Best-effort: any lookup
+ * failure yields nulls so the caller still records the payment.
+ */
+async function fetchStripeFee(intentId: string): Promise<{
+  receiptUrl: string | null;
+  stripeFeeCad: number | null;
+  balanceTransactionId: string | null;
+}> {
+  let receiptUrl: string | null = null;
+  let stripeFeeCad: number | null = null;
+  let balanceTransactionId: string | null = null;
+
+  try {
+    const paymentIntent = await stripe.paymentIntents.retrieve(intentId, {
+      expand: ["latest_charge.balance_transaction"],
+    });
+    const charge = paymentIntent.latest_charge;
+    if (charge && typeof charge !== "string") {
+      receiptUrl = charge.receipt_url ?? null;
+      const bt = charge.balance_transaction;
+      if (bt && typeof bt !== "string") {
+        balanceTransactionId = bt.id;
+        const fee = round2(bt.fee / 100);
+        const feeCurrency = normalizeCurrency(bt.currency);
+        if (feeCurrency === "CAD") {
+          stripeFeeCad = fee;
+        } else {
+          const rate = await rateBetween(feeCurrency, "CAD");
+          stripeFeeCad = rate === null ? null : round2(fee * rate);
+        }
+      }
+    }
+  } catch (err) {
+    console.error("webhook: failed to fetch charge/balance transaction", err);
+  }
+
+  return { receiptUrl, stripeFeeCad, balanceTransactionId };
+}
+
+/**
+ * Fills in the Stripe fee / net / receipt on an already-recorded payment when
+ * they are still missing — e.g. the balance transaction had not settled when
+ * the checkout webhook first ran, or the row was inserted by an earlier event.
+ */
+async function backfillPaymentFee(intentId: string): Promise<void> {
+  const { data: payment } = await adminClient
+    .from("payments")
+    .select("gross_cad, stripe_fee_cad")
+    .eq("stripe_payment_intent_id", intentId)
+    .maybeSingle();
+  if (!payment) return;
+  if (payment.stripe_fee_cad !== null && payment.stripe_fee_cad !== undefined) return;
+
+  const info = await fetchStripeFee(intentId);
+  const updates: Record<string, unknown> = {};
+  if (info.receiptUrl) updates.receipt_url = info.receiptUrl;
+  if (info.balanceTransactionId) updates.stripe_balance_transaction_id = info.balanceTransactionId;
+  if (info.stripeFeeCad !== null) {
+    updates.stripe_fee_cad = info.stripeFeeCad;
+    const gross = Number(payment.gross_cad ?? 0);
+    if (gross > 0) updates.net_cad = round2(gross - info.stripeFeeCad);
+  }
+  if (Object.keys(updates).length === 0) return;
+
+  const { error } = await adminClient
+    .from("payments")
+    .update(updates)
+    .eq("stripe_payment_intent_id", intentId)
+    .is("stripe_fee_cad", null);
+  if (error) {
+    console.error("webhook: fee backfill failed", error);
+    return;
+  }
+  revalidatePath("/admin/payments");
+}
+
+async function handlePaymentIntentSucceeded(intent: Stripe.PaymentIntent) {
+  const intentId = typeof intent === "string" ? intent : intent?.id;
+  if (!intentId) return;
+  // A succeeded intent can arrive before or after checkout.session.completed;
+  // backfill only fills the fee when it is still missing.
+  await backfillPaymentFee(intentId);
+}
+
+async function handleChargeSucceeded(charge: Stripe.Charge) {
+  const intentId =
+    typeof charge.payment_intent === "string"
+      ? charge.payment_intent
+      : (charge.payment_intent?.id ?? null);
+  if (!intentId) return;
+  await backfillPaymentFee(intentId);
 }
 
 async function handleChargeRefunded(charge: Stripe.Charge) {
