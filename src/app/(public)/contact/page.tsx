@@ -30,7 +30,7 @@ export default function ContactPage() {
           <div className="lg:col-span-2 space-y-5">
             {[
               { icon: Mail, label: "Email Us", value: "support@acadivo.com", sub: "We respond within 24 hours" },
-              { icon: Clock, label: "Support Hours", value: "Monday – Friday: 9AM – 8PM EST", sub: "Weekend support available via email" },
+              { icon: Clock, label: "Support Hours", value: "Monday – Friday, 9AM – 8PM (UTC)", sub: "Weekend support available via email" },
               { icon: MapPin, label: "Location", value: "Online, worldwide", sub: "Supporting students across time zones" },
             ].map(({ icon: Icon, label, value, sub }) => (
               <div key={label} className="relative overflow-hidden bg-white rounded-2xl p-6 border border-primary-container/25 shadow-sm hover:shadow-md transition-shadow">

@@ -121,7 +121,7 @@ export default async function RequestsPage() {
           <p className="text-xs leading-relaxed text-on-surface-variant mt-1">
             Revisions are <span className="font-semibold text-on-surface">unlimited until you&apos;re fully satisfied</span>{" "}
             with the delivered work. Helpers are expected to address scope-matching feedback; entirely new
-            requirements may open a new request. Disputes are mediated by the Academic Integrity Office.
+            requirements may open a new request. Disputes are mediated by our academic integrity team.
           </p>
         </div>
       </Card>
