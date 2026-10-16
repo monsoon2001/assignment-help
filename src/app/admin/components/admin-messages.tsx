@@ -54,6 +54,7 @@ const selectedIdRef = useRef<string | null>(null);
   const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const cardScrollRef = useRef<HTMLDivElement | null>(null);
+  const forceScrollRef = useRef(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -109,6 +110,7 @@ const selectedIdRef = useRef<string | null>(null);
   }, []);
 
   const openThread = useCallback(async (helperId: string) => {
+    forceScrollRef.current = true;
     setSelectedId(helperId);
     setUnread((u) => ({ ...u, [helperId]: 0 }));
     if (!supabaseRef.current || !me) return;
@@ -141,9 +143,15 @@ const selectedIdRef = useRef<string | null>(null);
   useEffect(() => {
     const el = cardScrollRef.current;
     if (!el) return;
+    const force = forceScrollRef.current;
     const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 140;
-    if (nearBottom) bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (force) {
+      forceScrollRef.current = false;
+      el.scrollTop = el.scrollHeight;
+    } else if (nearBottom) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, selectedId]);
 
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault();
@@ -169,8 +177,8 @@ const selectedIdRef = useRef<string | null>(null);
   }, [messages, logs]);
 
   return (
-    <div className="grid lg:grid-cols-[280px_1fr] gap-6">
-      <Card className="overflow-hidden h-fit lg:max-h-[70vh] lg:overflow-y-auto">
+    <div className="grid lg:grid-cols-[280px_1fr] gap-6 lg:items-stretch">
+      <Card className="overflow-hidden h-fit max-h-[40vh] overflow-y-auto lg:max-h-none lg:h-[calc(100dvh-12rem)]">
         <div className="p-4 border-b border-outline-variant/30">
           <h2 className="font-display font-semibold text-on-surface">Helpers</h2>
           <p className="text-xs text-on-surface-variant">Message any helper directly</p>
@@ -202,10 +210,10 @@ const selectedIdRef = useRef<string | null>(null);
         </div>
       </Card>
 
-      <Card className="flex flex-col min-h-[60vh]">
+      <Card className="flex flex-col h-[calc(100dvh-12rem)] min-h-[420px]">
         {selected ? (
           <>
-            <div className="p-4 border-b border-outline-variant/30 flex items-center gap-3">
+            <div className="p-4 border-b border-outline-variant/30 flex items-center gap-3 shrink-0">
               <Avatar name={selected.name ?? "Helper"} src={selected.avatar_url ?? undefined} role="helper" size="md" />
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-on-surface">{selected.name ?? "Helper"}</p>
@@ -225,7 +233,7 @@ const selectedIdRef = useRef<string | null>(null);
               </Button>
             </div>
 
-            <div ref={cardScrollRef} className="flex-1 overflow-y-auto p-5 space-y-3 bg-surface-container-low/40">
+            <div ref={cardScrollRef} className="flex-1 min-h-0 overflow-y-auto p-5 space-y-3 bg-surface-container-low/40 overscroll-contain">
               {timeline.length === 0 && (
                 <p className="text-center text-sm text-on-surface-variant py-10">
                   No messages yet. Say hi!
@@ -274,7 +282,7 @@ const selectedIdRef = useRef<string | null>(null);
               <div ref={bottomRef} />
             </div>
 
-            <form onSubmit={sendMessage} className="p-4 border-t border-outline-variant/30 flex items-center gap-3">
+            <form onSubmit={sendMessage} className="p-4 border-t border-outline-variant/30 flex items-center gap-3 shrink-0">
               <Input
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
