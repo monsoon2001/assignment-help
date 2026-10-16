@@ -9,7 +9,7 @@ import { NextResponse } from "next/server";
 // "use client" supabase browser client into this server route.
 const DESIGNATED_HELPER_ID =
   process.env.NEXT_PUBLIC_DESIGNATED_HELPER_ID?.trim() ||
-  "bc7a1271-c9bf-4c76-9afe-401098ab6491";
+  "7c981abd-85b5-4005-86c0-9cfffd6d9bf1";
 
 /**
  * Best-effort: record the country the account first signed up from. The saved
