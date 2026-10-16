@@ -10,6 +10,7 @@ import { normalizeCurrency } from "@/lib/currency";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import Avatar from "@/components/ui/avatar";
+import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 import CheckoutPanel from "@/components/orders/checkout-panel";
 
 export const dynamic = "force-dynamic";
@@ -44,9 +45,8 @@ export default async function OrderPaymentPage({
     redirect("/requests");
   }
 
-  const proposal = unwrapRow<{ request: { title: string; country: string | null }[] | { title: string; country: string | null } | null; helper: { id: string; name: string }[] | { id: string; name: string } | null }>(orderRow.proposal);
+  const proposal = unwrapRow<{ request: { title: string; country: string | null }[] | { title: string; country: string | null } | null }>(orderRow.proposal);
   const request = unwrapRow<{ title: string; country: string | null }>(proposal?.request);
-  const helper = unwrapRow<{ id: string; name: string }>(proposal?.helper);
 
   const chargeAmount =
     orderRow.charge_amount !== null && Number.isFinite(Number(orderRow.charge_amount))
@@ -62,7 +62,7 @@ export default async function OrderPaymentPage({
     deadline: orderRow.deadline as string | null,
     title: request?.title ?? "Acadivo Order",
     country: request?.country ?? null,
-    helperName: helper?.name ?? "Acadivo Helper",
+    helperName: ACADIVO_HELPER_NAME,
   };
 
   if (order.status !== "payment_pending") {

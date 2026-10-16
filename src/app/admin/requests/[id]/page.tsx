@@ -31,13 +31,13 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
 
   const { data: request } = await adminClient
     .from("requests")
-    .select("id, title, description, subject, deadline, status, file_urls, created_at, student:users!requests_student_id_fkey(id, name, email), proposals:proposals(id, price, currency, description, revisions_included, status, created_at, helper:users(id, name))")
+    .select("id, title, description, subject, deadline, status, file_urls, created_at, student:users!requests_student_id_fkey(id, name, email, avatar_url), proposals:proposals(id, price, currency, description, revisions_included, status, created_at, helper:users(id, name, avatar_url))")
     .eq("id", id)
     .maybeSingle();
 
   if (!request) notFound();
 
-  const student = unwrapRow<{ id: string; name: string | null; email: string | null }>(request.student);
+  const student = unwrapRow<{ id: string; name: string | null; email: string | null; avatar_url: string | null }>(request.student);
   const proposals = (request.proposals as unknown as ProposalRow[]) ?? [];
 
   const attachedFiles = (request.file_urls as string[] | undefined) ?? [];
@@ -105,7 +105,7 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
         <Card className="p-6 h-fit">
           <h2 className="font-display text-lg font-semibold text-on-surface mb-4">Student</h2>
           <div className="flex items-center gap-3">
-            <Avatar name={student?.name ?? "Student"} size="md" />
+            <Avatar name={student?.name ?? "Student"} src={student?.avatar_url ?? undefined} size="md" />
             <div>
               <p className="text-sm font-medium text-on-surface">{student?.name ?? "Unnamed"}</p>
               <p className="text-xs text-on-surface-variant">{student?.email}</p>
@@ -125,10 +125,10 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
           <div className="divide-y divide-outline-variant/20">
             {proposals.map((raw) => {
               const { helper: helperRaw, ...proposal } = raw;
-              const helper = unwrapRow<{ name: string | null }>(helperRaw);
+              const helper = unwrapRow<{ name: string | null; avatar_url: string | null }>(helperRaw);
               return (
               <div key={proposal.id} className="p-6 flex flex-col sm:flex-row sm:items-start gap-4">
-                <Avatar name={helper?.name ?? "Helper"} role="helper" size="md" />
+                  <Avatar name={helper?.name ?? "Helper"} src={helper?.avatar_url ?? undefined} role="helper" size="md" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold text-on-surface">{helper?.name ?? "Helper"}</p>

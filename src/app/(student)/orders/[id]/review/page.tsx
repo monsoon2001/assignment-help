@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { unwrapRow } from "@/lib/embedded";
 import Card from "@/components/ui/card";
 import Avatar from "@/components/ui/avatar";
+import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 import ReviewForm from "@/components/orders/review-form";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +32,7 @@ export default async function OrderReviewPage({
 
   const { data: orderRow } = await supabase
     .from("orders")
-    .select("id, status, student_id, helper:users!orders_helper_id_fkey(id, name), proposal:proposals(request:requests(title))")
+    .select("id, status, student_id, proposal:proposals(request:requests(title))")
     .eq("id", id)
     .maybeSingle();
 
@@ -39,7 +40,6 @@ export default async function OrderReviewPage({
     notFound();
   }
 
-  const helper = unwrapRow<{ id: string; name: string }>(orderRow.helper);
   const proposal = unwrapRow<{ request: { title: string }[] | { title: string } | null }>(orderRow.proposal);
   const title = unwrapRow<{ title: string }>(proposal?.request)?.title ?? "Order";
 
@@ -73,9 +73,9 @@ export default async function OrderReviewPage({
 
       <Card className="p-5">
         <div className="flex items-center gap-3 mb-4">
-          <Avatar name={helper?.name || "Helper"} role="helper" size="lg" online />
+          <Avatar name={ACADIVO_HELPER_NAME} role="helper" size="lg" online />
           <div className="min-w-0 flex-1">
-            <p className="font-display font-semibold text-on-surface">{helper?.name || "Acadivo Helper"}</p>
+            <p className="font-display font-semibold text-on-surface">{ACADIVO_HELPER_NAME}</p>
             <p className="text-xs text-on-surface-variant truncate">{title}</p>
           </div>
           <div className="hidden sm:flex items-center gap-2 text-xs text-on-surface-variant">
@@ -83,7 +83,7 @@ export default async function OrderReviewPage({
             Verified mentor
           </div>
         </div>
-        <ReviewForm orderId={id} helperName={helper?.name ?? "Helper"} />
+        <ReviewForm orderId={id} helperName={ACADIVO_HELPER_NAME} />
       </Card>
     </div>
   );

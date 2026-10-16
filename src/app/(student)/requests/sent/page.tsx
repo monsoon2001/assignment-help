@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 import RequestSent from "@/components/requests/request-sent";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +18,7 @@ export default async function RequestSentPage({
   const supabase = await createClient();
   const { data: request, error } = await supabase
     .from("requests")
-    .select("id, title, description, subject, deadline, created_at, helper:users!requests_helper_id_fkey(name)")
+    .select("id, title, description, subject, deadline, created_at")
     .eq("id", id)
     .maybeSingle();
 
@@ -25,15 +26,13 @@ export default async function RequestSentPage({
     return <RequestSent id="" title="" error="We couldn't find that request." />;
   }
 
-  const helper = Array.isArray(request.helper) ? request.helper[0] ?? null : request.helper;
-
   return (
     <RequestSent
       id={request.id}
       title={request.title}
       subject={request.subject}
       deadline={request.deadline}
-      helperName={helper?.name ?? null}
+      helperName={ACADIVO_HELPER_NAME}
     />
   );
 }

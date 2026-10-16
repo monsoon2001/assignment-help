@@ -25,6 +25,7 @@ import { fetchRequestMessages, sendRequestMessage } from "@/lib/request-chat";
 import { submitProposal } from "@/lib/proposals";
 import { CHARGE_CURRENCIES, currencyFlag, currencyName, DEFAULT_CURRENCY } from "@/lib/currency";
 import { markThreadNotificationsRead } from "@/lib/notifications";
+import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 import { requestStatusTone } from "@/lib/status-meta";
 import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
 
@@ -265,6 +266,11 @@ export default function RequestWorkspace({
   const isHelper = mode === "helper";
   const meta = { label: STATUS_LABEL[request.status] ?? request.status, tone: requestStatusTone(request.status) };
   const otherParty = isHelper ? request.student : request.helper;
+  // Students only ever see the branded helper identity — never the real
+  // name/photo. Helpers still see the actual student they're working with.
+  const otherPartyName = isHelper
+    ? otherParty?.name || "Student"
+    : ACADIVO_HELPER_NAME;
   const overdue =
     !isHelper && request.status === "requested" && isPastResponseWindow(request.sent_at);
 
@@ -322,10 +328,10 @@ export default function RequestWorkspace({
   const contactCard = (
     <Card className="p-3 shrink-0">
       <div className="flex items-center gap-3">
-        <Avatar name={otherParty?.name || (isHelper ? "Student" : "Helper")} role={isHelper ? "student" : "helper"} size="md" online />
+        <Avatar name={otherPartyName} role={isHelper ? "student" : "helper"} size="md" online />
         <div className="min-w-0 flex-1">
           <p className="font-display font-semibold text-sm text-on-surface">
-            {otherParty?.name || (isHelper ? "Student" : "Acadivo Helper")}
+            {otherPartyName}
           </p>
           <p className="text-xs text-on-surface-variant truncate">
             {isHelper ? "Student who requested help" : "Expert assigned to your request"}
@@ -358,6 +364,7 @@ export default function RequestWorkspace({
       onSend={sendMessage}
       bottomRef={bottomRef}
       currentUserId={currentUserId}
+      counterpartName={isHelper ? undefined : ACADIVO_HELPER_NAME}
     />
   );
 

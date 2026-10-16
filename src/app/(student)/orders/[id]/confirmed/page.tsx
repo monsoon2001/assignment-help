@@ -11,6 +11,7 @@ import Badge from "@/components/ui/badge";
 import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
 import PaymentConfirming from "./pending-confirm";
+import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 import { normalizeCurrency, formatCurrency } from "@/lib/currency";
 
 export const dynamic = "force-dynamic";
@@ -50,8 +51,7 @@ export default async function OrderConfirmedPage({
 
   if (!orderRow) notFound();
 
-  const proposal = unwrapRow<{ request: { title: string }[] | { title: string } | null; helper: { id: string; name: string }[] | { id: string; name: string } | null }>(orderRow.proposal);
-  const helper = unwrapRow<{ id: string; name: string }>(proposal?.helper);
+  const proposal = unwrapRow<{ request: { title: string }[] | { title: string } | null }>(orderRow.proposal);
   const title = unwrapRow<{ title: string }>(proposal?.request)?.title ?? "Acadivo Order";
 
   // Confirm the checkout session is genuinely bound to this order before
@@ -118,7 +118,7 @@ export default async function OrderConfirmedPage({
           You&apos;re all set — your order is officially active.
         </h1>
         <p className="text-sm text-on-surface-variant max-w-md">
-          {helper?.name} has received your assignment brief and work has started.
+          {ACADIVO_HELPER_NAME} has received your assignment brief and work has started.
         </p>
       </div>
 
@@ -143,8 +143,8 @@ export default async function OrderConfirmedPage({
           <div>
             <p className="text-xs text-on-surface-variant uppercase tracking-wide">Helper</p>
             <div className="flex items-center gap-2 mt-1">
-              <Avatar name={helper?.name || "Helper"} role="helper" size="sm" />
-              <p className="text-sm font-semibold text-on-surface truncate">{helper?.name || "Acadivo Helper"}</p>
+              <Avatar name={ACADIVO_HELPER_NAME} role="helper" size="sm" />
+              <p className="text-sm font-semibold text-on-surface truncate">{ACADIVO_HELPER_NAME}</p>
             </div>
           </div>
         </div>
@@ -177,7 +177,7 @@ export default async function OrderConfirmedPage({
         </Link>
         <Link href={`/orders/${orderRow.id}`}>
           <Button variant="outline" className="w-full justify-center">
-            <MessageSquare size={15} /> Message {(helper?.name || "Helper").split(" ")[0]}
+            <MessageSquare size={15} /> Message {ACADIVO_HELPER_NAME}
           </Button>
         </Link>
       </div>

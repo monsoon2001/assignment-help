@@ -11,6 +11,7 @@ import Button from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { realtimeTopic } from "@/lib/supabase/realtime";
 import { buildThreads, type Thread } from "@/lib/threads";
+import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 
 export default function MessagesInbox({
   initialThreads,
@@ -123,11 +124,15 @@ export default function MessagesInbox({
                 href={t.link}
                 className="flex items-start gap-3 p-4 hover:bg-surface-container-low transition-colors group"
               >
-                <Avatar name={t.counterpart?.name ?? fallbackName} size="md" src={t.counterpart?.avatar_url ?? undefined} />
+                <Avatar
+                  name={isHelper ? t.counterpart?.name ?? fallbackName : ACADIVO_HELPER_NAME}
+                  size="md"
+                  src={isHelper ? t.counterpart?.avatar_url ?? undefined : undefined}
+                />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-semibold text-on-surface truncate group-hover:underline">
-                      {t.counterpart?.name ?? fallbackName}
+                      {isHelper ? t.counterpart?.name ?? fallbackName : ACADIVO_HELPER_NAME}
                     </p>
                     <span className="text-xs text-on-surface-variant shrink-0">
                       {new Date(t.lastAt).toLocaleDateString([], { month: "short", day: "numeric" })}

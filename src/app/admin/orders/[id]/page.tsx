@@ -31,7 +31,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
 
   const { data: order } = await adminClient
     .from("orders")
-    .select("id, status, price, currency, deadline, created_at, student:users!orders_student_id_fkey(id, name, email), helper:users!orders_helper_id_fkey(id, name, email), proposal:proposals(id, currency, description, revisions_included, created_at, request:requests(title, description))")
+    .select("id, status, price, currency, deadline, created_at, student:users!orders_student_id_fkey(id, name, email, avatar_url), helper:users!orders_helper_id_fkey(id, name, email, avatar_url), proposal:proposals(id, currency, description, revisions_included, created_at, request:requests(title, description))")
     .eq("id", id)
     .maybeSingle();
 
@@ -46,8 +46,8 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
 
   const proposal = unwrapRow<{ description: string | null; revisions_included: number; created_at: string; request: unknown }>(order.proposal);
   const request = unwrapRow<{ title: string; description: string | null }>(proposal?.request);
-  const student = unwrapRow<{ id: string; name: string | null; email: string | null }>(order.student);
-  const helper = unwrapRow<{ id: string; name: string | null; email: string | null }>(order.helper);
+  const student = unwrapRow<{ id: string; name: string | null; email: string | null; avatar_url: string | null }>(order.student);
+  const helper = unwrapRow<{ id: string; name: string | null; email: string | null; avatar_url: string | null }>(order.helper);
 
   const deliveryFiles = new Map<string, { label: string; url: string | null }[]>();
   await Promise.all(
@@ -92,7 +92,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
         <Card className="p-6">
           <h2 className="font-display text-lg font-semibold text-on-surface mb-4">Student</h2>
           <div className="flex items-center gap-3">
-            <Avatar name={student?.name ?? "Student"} size="md" />
+            <Avatar name={student?.name ?? "Student"} src={student?.avatar_url ?? undefined} size="md" />
             <div className="min-w-0">
               <p className="text-sm font-medium text-on-surface truncate">{student?.name ?? "Unnamed"}</p>
               <p className="text-xs text-on-surface-variant truncate flex items-center gap-1">
@@ -105,7 +105,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
         <Card className="p-6">
           <h2 className="font-display text-lg font-semibold text-on-surface mb-4">Helper</h2>
           <div className="flex items-center gap-3">
-            <Avatar name={helper?.name ?? "Helper"} role="helper" size="md" />
+            <Avatar name={helper?.name ?? "Helper"} src={helper?.avatar_url ?? undefined} role="helper" size="md" />
             <div className="min-w-0">
               <p className="text-sm font-medium text-on-surface truncate">{helper?.name ?? "Unnamed"}</p>
               <p className="text-xs text-on-surface-variant truncate flex items-center gap-1">

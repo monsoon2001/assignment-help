@@ -12,7 +12,14 @@ export default async function ProfilePage() {
 
   let name = user?.user_metadata?.full_name ?? user?.user_metadata?.name ?? "";
   const email = user?.email ?? "";
-  let avatarUrl: string | null = null;
+  // Google/OAuth accounts carry the real profile photo in auth metadata. Fall
+  // back to it when the users row has not been backfilled yet, and persist it so
+  // every other surface picks it up too.
+  const metaAvatar =
+    (user?.user_metadata?.avatar_url as string | undefined) ??
+    (user?.user_metadata?.picture as string | undefined) ??
+    null;
+  let avatarUrl: string | null = metaAvatar;
   let memberSince: number | null = null;
   let institution = "";
   let levelOfStudy = "";
@@ -26,11 +33,15 @@ export default async function ProfilePage() {
       .single();
     if (profile) {
       name = profile.name ?? name;
-      avatarUrl = profile.avatar_url;
+      avatarUrl = profile.avatar_url ?? metaAvatar;
       memberSince = new Date(profile.created_at).getFullYear();
       institution = profile.institution ?? "";
       levelOfStudy = profile.level_of_study ?? "";
       country = profile.country ?? "";
+
+      if (!profile.avatar_url && metaAvatar) {
+        await supabase.from("users").update({ avatar_url: metaAvatar }).eq("id", user.id);
+      }
     }
   }
 

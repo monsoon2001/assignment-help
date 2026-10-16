@@ -23,9 +23,9 @@ export default function Avatar({ src, alt, name, role, size = "md", online, clas
       ? "?"
       : (parts.length === 1 ? parts[0][0] : parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   const [error, setError] = useState(false);
-  // Google accounts use their own profile photo. Non-Google helpers get a female
-  // portrait (assigned by name). Students/admins without a Google photo fall back
-  // to their first+last initials.
+  // Google accounts use their own profile photo. Non-Google helpers get a stable
+  // assistant portrait (assigned by name). The branded "Acadivo Helper" identity
+  // and students/admins without a Google photo fall back to initials.
   const resolvedSrc = avatarFor(name, src, role);
 
   return (

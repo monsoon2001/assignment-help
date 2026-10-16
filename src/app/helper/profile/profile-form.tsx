@@ -6,10 +6,8 @@ import Card from "@/components/ui/card";
 import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
-import Badge from "@/components/ui/badge";
 import Avatar from "@/components/ui/avatar";
-import StarRating from "@/components/ui/star-rating";
-import { Save, X, Plus, Mail, UserPlus } from "lucide-react";
+import { Save, Mail, UserPlus } from "lucide-react";
 import { saveHelperProfile, type HelperProfileResult } from "./actions";
 
 export default function HelperProfile({
@@ -19,10 +17,7 @@ export default function HelperProfile({
   lastName = "",
   email = "",
   hourlyRate = 20,
-  rating = 0,
-  reviewCount = 0,
   initialBio = "",
-  initialSubjects = [],
 }: {
   name?: string;
   avatarUrl?: string | null;
@@ -30,10 +25,7 @@ export default function HelperProfile({
   lastName?: string;
   email?: string;
   hourlyRate?: number;
-  rating?: number;
-  reviewCount?: number;
   initialBio?: string;
-  initialSubjects?: string[];
 }) {
   const [state, formAction, pending] = useActionState<HelperProfileResult, FormData>(
     saveHelperProfile,
@@ -41,26 +33,13 @@ export default function HelperProfile({
   );
 
   const [bio, setBio] = useState(initialBio);
-  const [subjects, setSubjects] = useState<string[]>(initialSubjects);
-  const [newSubject, setNewSubject] = useState("");
-
-  const addSubject = () => {
-    if (newSubject.trim() && !subjects.some((s) => s.toLowerCase() === newSubject.trim().toLowerCase())) {
-      setSubjects([...subjects, newSubject.trim()]);
-      setNewSubject("");
-    }
-  };
-
-  const removeSubject = (s: string) => {
-    setSubjects(subjects.filter((sub) => sub !== s));
-  };
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold text-on-surface">Profile Settings</h1>
-          <p className="text-on-surface-variant mt-1">Manage your helper profile and the subjects you cover.</p>
+          <p className="text-on-surface-variant mt-1">Manage the details on your helper profile.</p>
         </div>
       </div>
 
@@ -70,7 +49,7 @@ export default function HelperProfile({
             <Avatar name={name || firstName || "Acadivo Helper"} role="helper" size="lg" src={avatarUrl ?? undefined} />
             <div>
               <h2 className="font-display text-lg font-semibold text-on-surface">{name || `${firstName} ${lastName}` || "Acadivo Helper"}</h2>
-              <StarRating rating={rating} reviewCount={reviewCount} />
+              <p className="text-sm text-on-surface-variant">Helper profile</p>
             </div>
           </div>
           <h2 className="font-display text-lg font-semibold text-on-surface">Basic Information</h2>
@@ -89,43 +68,6 @@ export default function HelperProfile({
           </div>
           <Input name="hourlyRate" label="Hourly Rate ($)" defaultValue={String(hourlyRate)} type="number" min={0} step="0.01" />
           <Textarea name="bio" label="Bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={4} placeholder="Introduce yourself to students. Tell them what you help with and how you work." />
-        </Card>
-
-        <Card className="p-6 space-y-4">
-          <h2 className="font-display text-lg font-semibold text-on-surface">Subjects</h2>
-          <p className="text-sm text-on-surface-variant">Add or remove the subjects you can help with. These appear as badges on your profile.</p>
-          <div className="flex flex-wrap gap-2">
-            {subjects.length === 0 && (
-              <span className="text-sm text-on-surface-variant">No subjects yet. Add some below.</span>
-            )}
-            {subjects.map((s) => (
-              <Badge key={s} variant="secondary" className="pr-1">
-                {s}
-                <button type="button" onClick={() => removeSubject(s)} className="ml-1 p-0.5 rounded-full hover:bg-secondary-container transition-colors">
-                  <X size={12} />
-                </button>
-              </Badge>
-            ))}
-          </div>
-          <input type="hidden" name="subjects" value="" />
-          {subjects.map((s) => (
-            <input key={s} type="hidden" name="subjects" value={s} />
-          ))}
-          <div className="flex items-center gap-2">
-            <Input
-              placeholder="Add a subject, e.g. Biology"
-              value={newSubject}
-              onChange={(e) => setNewSubject(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addSubject();
-                }
-              }}
-              className="flex-1"
-            />
-            <Button type="button" variant="outline" onClick={addSubject}><Plus size={16} />Add</Button>
-          </div>
         </Card>
 
         {state.message && (

@@ -22,6 +22,7 @@ import StatusBadge from "@/components/ui/status-badge";
 import { createClient } from "@/lib/supabase/server";
 import { unwrapRow } from "@/lib/embedded";
 import { requestStatusTone } from "@/lib/status-meta";
+import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 
 export const dynamic = "force-dynamic";
 
@@ -446,7 +447,7 @@ export default async function DashboardPage() {
                       </div>
                       <p className="text-xs text-on-surface-variant mt-0.5">
                         {r.subject || "General"}
-                        {r.helper?.name ? ` · ${r.helper.name}` : ""}
+                        {r.helper ? ` · ${ACADIVO_HELPER_NAME}` : ""}
                       </p>
                     </div>
                   </div>

@@ -12,12 +12,15 @@ export default async function HelperProfilePage() {
 
   let name = user?.user_metadata?.full_name ?? user?.user_metadata?.name ?? "";
   const email = user?.email ?? "";
-  let avatarUrl: string | null = null;
+  // Fall back to the Google/OAuth profile photo in auth metadata when the users
+  // row has no avatar yet, so the helper always sees their real picture here.
+  const metaAvatar =
+    (user?.user_metadata?.avatar_url as string | undefined) ??
+    (user?.user_metadata?.picture as string | undefined) ??
+    null;
+  let avatarUrl: string | null = metaAvatar;
   let bio = "";
-  let subjects: string[] = [];
   let hourlyRate = 20;
-  let rating = 0;
-  let reviewCount = 0;
 
   if (user) {
     const { data: profile } = await supabase
@@ -27,26 +30,18 @@ export default async function HelperProfilePage() {
       .single();
     if (profile) {
       name = profile.name ?? name;
-      avatarUrl = profile.avatar_url;
+      avatarUrl = profile.avatar_url ?? metaAvatar;
     }
 
     const { data: helperProfile } = await supabase
       .from("helper_profiles")
-      .select("bio, subjects, hourly_rate, rating_avg")
+      .select("bio, hourly_rate")
       .eq("user_id", user.id)
       .maybeSingle();
     if (helperProfile) {
       bio = helperProfile.bio ?? "";
-      subjects = helperProfile.subjects ?? [];
       hourlyRate = Number(helperProfile.hourly_rate ?? 20);
-      rating = Number(helperProfile.rating_avg ?? 0);
     }
-
-    const { count } = await supabase
-      .from("helper_reviews")
-      .select("id", { count: "exact", head: true })
-      .eq("helper_id", user.id);
-    reviewCount = count ?? 0;
   }
 
   const parts = name.trim().split(/\s+/);
@@ -61,10 +56,7 @@ export default async function HelperProfilePage() {
       lastName={lastName}
       email={email}
       hourlyRate={hourlyRate}
-      rating={rating}
-      reviewCount={reviewCount}
       initialBio={bio}
-      initialSubjects={subjects.length > 0 ? subjects : undefined}
     />
   );
 }

@@ -26,7 +26,7 @@ export default async function AdminOrdersPage() {
 
   const { data: orders, error } = await adminClient
     .from("orders")
-    .select("id, status, price, currency, deadline, created_at, student:users!orders_student_id_fkey(id, name), helper:users!orders_helper_id_fkey(id, name)")
+    .select("id, status, price, currency, deadline, created_at, student:users!orders_student_id_fkey(id, name, avatar_url), helper:users!orders_helper_id_fkey(id, name, avatar_url)")
     .order("created_at", { ascending: false })
     .limit(200);
 
@@ -55,19 +55,19 @@ export default async function AdminOrdersPage() {
             </thead>
             <tbody>
               {orders.map((order) => {
-                const student = unwrapRow<{ id: string; name: string | null }>(order.student);
-                const helper = unwrapRow<{ id: string; name: string | null }>(order.helper);
+                const student = unwrapRow<{ id: string; name: string | null; avatar_url: string | null }>(order.student);
+                const helper = unwrapRow<{ id: string; name: string | null; avatar_url: string | null }>(order.helper);
                 return (
                   <tr key={order.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
                     <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <Avatar name={student?.name ?? "Student"} size="sm" />
+                        <Avatar name={student?.name ?? "Student"} src={student?.avatar_url ?? undefined} size="sm" />
                         <span className="text-sm text-on-surface">{student?.name ?? "—"}</span>
                       </div>
                     </td>
                     <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <Avatar name={helper?.name ?? "Helper"} role="helper" size="sm" />
+                        <Avatar name={helper?.name ?? "Helper"} src={helper?.avatar_url ?? undefined} role="helper" size="sm" />
                         <span className="text-sm text-on-surface">{helper?.name ?? "—"}</span>
                       </div>
                     </td>

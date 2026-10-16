@@ -10,6 +10,7 @@ import Avatar from "@/components/ui/avatar";
 import { acceptProposal, declineProposal } from "@/lib/orders";
 import { computeLocalCharge, normalizeCurrency, formatCurrency, DEFAULT_CURRENCY } from "@/lib/currency";
 import { proposalStatusMeta } from "@/lib/status-meta";
+import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 
 export type RequestProposal = {
   id: string;
@@ -161,10 +162,10 @@ export default function ProposalCard({
       </div>
 
       <div className="flex items-center gap-2.5 px-3 pb-2.5">
-        <Avatar name={proposal.helper?.name || "Helper"} role="helper" size="sm" />
+        <Avatar name={ACADIVO_HELPER_NAME} role="helper" size="sm" />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold text-on-surface truncate">
-            {proposal.helper?.name || "Acadivo Helper"}
+            {ACADIVO_HELPER_NAME}
           </p>
           <p className="text-xs text-on-surface-variant">
             Proposed {new Date(proposal.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}

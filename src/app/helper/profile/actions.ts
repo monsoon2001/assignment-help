@@ -23,10 +23,6 @@ export async function saveHelperProfile(
   const lastName = String(formData.get("lastName") ?? "").trim();
   const bio = String(formData.get("bio") ?? "").trim();
   const hourlyRate = Number(formData.get("hourlyRate"));
-  const subjects = formData
-    .getAll("subjects")
-    .map((s) => String(s).trim())
-    .filter(Boolean);
 
   const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
 
@@ -41,7 +37,6 @@ export async function saveHelperProfile(
     .from("helper_profiles")
     .update({
       bio: bio ? bio : null,
-      subjects,
       hourly_rate: Number.isFinite(hourlyRate) && hourlyRate >= 0 ? hourlyRate : 20,
     })
     .eq("user_id", user.id);

@@ -44,7 +44,7 @@ export default function ChatPanel({
   compact = false,
   className = "",
   messages, draft, setDraft, files, setFiles, sending, error, onSend, bottomRef, currentUserId,
-  filesBucket,
+  filesBucket, counterpartName,
 }: {
   title?: string;
   /** When true the panel fills its parent's height instead of using a viewport clamp. */
@@ -64,6 +64,12 @@ export default function ChatPanel({
   currentUserId?: string;
   /** Storage bucket that hosted this chat's attachments (request-files or order-files). */
   filesBucket?: StorageBucket;
+  /**
+   * Display name for the other party's messages. Student views pass the
+   * branded "Acadivo Helper" label so the helper's real name/photo never leaks
+   * through the message avatars.
+   */
+  counterpartName?: string;
 }) {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -126,7 +132,11 @@ export default function ChatPanel({
           return (
             <div key={m.id} className={`flex ${isMine ? "justify-end" : "justify-start"} gap-2`}>
               {!isMine && (
-                <Avatar name={(m.sender && !Array.isArray(m.sender) ? m.sender.name : null) || "U"} size="sm" className="mt-1" />
+                <Avatar
+                  name={counterpartName || (m.sender && !Array.isArray(m.sender) ? m.sender.name : null) || "U"}
+                  size="sm"
+                  className="mt-1"
+                />
               )}
               <div className={`max-w-[78%] ${isMine ? "items-end text-right" : "items-start"}`}>
                 <div

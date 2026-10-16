@@ -20,6 +20,7 @@ import { realtimeTopic } from "@/lib/supabase/realtime";
 import { uploadOrderFile } from "@/lib/order-files";
 import { normalizeCurrency, formatCurrency } from "@/lib/currency";
 import { orderStatusMeta, paymentStatusTone } from "@/lib/status-meta";
+import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 import { markThreadNotificationsRead } from "@/lib/notifications";
 import ChatPanel, { type ChatMessageRow, timeLabel, fileNameFromUrl } from "@/components/chat/chat-panel";
 import SecureFileLink from "@/components/ui/secure-file-link";
@@ -297,7 +298,9 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
           : "")
       : "Awaiting payment";
 
-  const logoName = order.helper?.name || "Helper";
+  // Students see the branded helper identity; helpers see their own real name.
+  const helperDisplayName = isHelper ? order.helper?.name || "Helper" : ACADIVO_HELPER_NAME;
+  const logoName = helperDisplayName;
 
   async function sendMessage() {
     const text = draft.trim();
@@ -637,7 +640,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
               <div className="flex items-center gap-3 mb-2">
                 <Avatar name={logoName} role="helper" size="md" online />
                 <div className="min-w-0 flex-1">
-                  <p className="font-display font-semibold text-on-surface">{order.helper?.name ?? "Acadivo Helper"}</p>
+                  <p className="font-display font-semibold text-on-surface">{helperDisplayName}</p>
                   <p className="text-xs text-on-surface-variant truncate">Assigned mentor</p>
                 </div>
                 <StatusBadge tone="green" className="shrink-0"><ShieldCheck size={12} /> Verified</StatusBadge>
@@ -670,6 +673,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
             onSend={sendMessage}
             bottomRef={bottomRef}
             currentUserId={currentUserId}
+            counterpartName={isHelper ? undefined : ACADIVO_HELPER_NAME}
           />
         </div>
       )}
@@ -927,6 +931,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
           <div className="h-full">
             <ChatPanel
               fill
+              filesBucket="order-files"
               messages={messages}
               draft={draft}
               setDraft={setDraft}
@@ -937,6 +942,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
               onSend={sendMessage}
               bottomRef={bottomRef}
               currentUserId={currentUserId}
+              counterpartName={isHelper ? undefined : ACADIVO_HELPER_NAME}
             />
           </div>
         </div>
