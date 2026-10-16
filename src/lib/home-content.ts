@@ -14,45 +14,45 @@ export const STEPS: Step[] = [
   {
     num: "1",
     icon: "edit_note",
-    title: "Describe your assignment",
-    desc: "Share exactly what you need so your helper can judge the right fit.",
+    title: "Tell us what you're stuck on",
+    desc: "One short form. Subject, deadline and roughly how long it needs to be.",
     points: [
-      "Pick subject, help type and academic level",
-      "Add deadline and expected length",
-      "Upload brief, rubric or any reference files",
+      "Pick the subject, help type and level",
+      "Add the deadline and length you're working to",
+      "Paste the brief or attach the rubric if you have it",
     ],
   },
   {
     num: "2",
     icon: "group_add",
-    title: "Get matched with a helper",
-    desc: "Your brief goes straight to our verified subject helper.",
+    title: "A helper reads it and replies",
+    desc: "Your request goes to a verified helper who works in that subject, not a bidding pool.",
     points: [
-      "One verified helper for your subject",
-      "Review their written proposal",
-      "Approve the scope and timeline",
+      "A real person who knows the subject",
+      "They read your actual brief",
+      "They answer you in the request thread",
     ],
   },
   {
     num: "3",
     icon: "receipt_long",
-    title: "Approve the proposal",
-    desc: "Every quote gives scope, timeline and price in writing.",
+    title: "You agree the plan and the price",
+    desc: "You get the scope, the timeline and the cost in writing. Nothing starts until you're happy with it.",
     points: [
-      "Know exactly what you'll get and when",
-      "Request tweaks if anything isn't clear",
-      "Pay only when the plan looks right for you",
+      "Scope and deadline spelled out",
+      "Ask anything before you commit",
+      "You pay only once you approve",
     ],
   },
   {
     num: "4",
     icon: "task_alt",
-    title: "Get it done — review and revise",
-    desc: "Track progress and request revisions within the agreed scope.",
+    title: "Work together, then revise",
+    desc: "Ask for changes in the same thread. Revisions inside the agreed scope are included.",
     points: [
-      "Stay in touch in one secure workspace",
-      "Ask for tweaks until it meets the brief",
-      "Leave a review when you're satisfied",
+      "Everything in one workspace",
+      "Revise until it matches the brief",
+      "Leave a review when you're done",
     ],
   },
 ];
@@ -67,81 +67,52 @@ export type Benefit = {
 export const BENEFITS: Benefit[] = [
   {
     icon: "request_quote",
-    title: "You see the price before you pay",
-    desc: "Your helper quotes the scope, timeline and cost up front, so you see the full cost before you commit instead of discovering a surprise invoice later.",
-    points: ["Fixed quote per request", "No bidding wars", "Re-quote if the brief changes"],
+    title: "You know the price before you pay",
+    desc: "Your helper writes out what you'll get, when, and what it costs. No bidding, no hourly meter running, no invoice you didn't see coming.",
+    points: ["One fixed quote per request", "Re-quoted if the brief changes", "Nothing charged until you accept"],
   },
   {
     icon: "verified_user",
-    title: "Vetted subject helpers",
-    desc: "Every helper is reviewed before they can receive requests, and they specialise in the subjects and help types they actually cover.",
-    points: ["Credential and identity checks", "Subject specialisms", "Ratings from completed orders only"],
+    title: "Helpers who actually know the subject",
+    desc: "We check who a helper is before they can take requests, and they only cover the subjects they're genuinely good at.",
+    points: ["Identity and credential checks", "Subject specialists, not generalists", "Reviews from finished orders only"],
   },
   {
     icon: "menu_book",
-    title: "Guidance, not ghostwriting",
-    desc: "Helpers tutor, review and explain. You keep the thinking and the authorship, which keeps the work safe to submit and useful to learn from.",
-    points: ["Feedback with reasoning", "Drafts stay yours", "Academic integrity built in"],
+    title: "Help you can learn from",
+    desc: "Helpers explain and give feedback instead of handing you a finished file. You keep the thinking, and the work stays yours to stand behind.",
+    points: ["Comments and reasoning, not rewrites", "Your draft stays your draft", "Built around your integrity policy"],
   },
   {
     icon: "chat",
-    title: "Direct message thread",
-    desc: "Talk to the person doing the work, not a support queue. Share files, ask follow-up questions and keep the whole history in one place.",
-    points: ["One thread per request", "File sharing built in", "Progress status updates"],
+    title: "One thread, not a support queue",
+    desc: "You talk to the person doing the work. Send files, ask the follow-up question, keep the whole history in one place.",
+    points: ["A single thread per request", "Share files as you go", "See progress without chasing"],
   },
   {
     icon: "replay",
-    title: "Unlimited revisions",
-    desc: "If the agreed scope is not met, ask for changes as many times as needed at no extra cost. New work outside the scope is quoted separately.",
-    points: ["No revision deadlines", "No extra fees in scope", "Scope agreed in the proposal"],
+    title: "Revisions until it's right",
+    desc: "If it misses the scope you agreed, ask again — as many times as you need, at no extra cost. New work outside the scope gets its own quote.",
+    points: ["No revision deadline", "No extra charge inside scope", "Scope agreed up front"],
   },
   {
     icon: "lock",
-    title: "Private by default",
-    desc: "Briefs, files and messages stay inside the platform. Payment is handled by Acadivo so card details are never shared with helpers.",
-    points: ["Secure payments", "Private threads and files", "No card details shared"],
+    title: "Your work stays between us",
+    desc: "Briefs, files and messages live on the platform, and payment runs through Acadivo so your card is never handed to a helper.",
+    points: ["Private threads and files", "Payment handled by us", "Helpers never see your card"],
   },
 ];
 
-export type ComparisonRow = {
-  criterion: string;
-  acadivo: string;
-  freelancer: string;
-  aiTool: string;
+// The comparison table that used to live here read like every other generated
+// landing page. A short, straight answer does the same job and sounds like a
+// person wrote it.
+export const TEAM_NOTE = {
+  title: "A straight answer about what this is",
+  paragraphs: [
+    "Most assignment-help sites will not say this out loud, so we will: paying a stranger to write your essay is a bad deal. You learn nothing from it and you cannot defend it if you are asked about it.",
+    "Acadivo is a tutoring and academic-support platform. Helpers explain, review and coach. You do the thinking, you keep the authorship, and you pay for clear guidance instead of a black box. Your institution's rules still apply to you, so use us the way you would use a tutor.",
+  ],
 };
-
-export const COMPARISON: ComparisonRow[] = [
-  {
-    criterion: "Who does the work",
-    acadivo: "A verified human helper in your subject",
-    freelancer: "Any bidder, credentials often unverified",
-    aiTool: "A model — no subject accountability",
-  },
-  {
-    criterion: "Price visibility",
-    acadivo: "Quoted in writing before you pay",
-    freelancer: "Often negotiated privately, scope unclear",
-    aiTool: "Subscription, with unclear limits",
-  },
-  {
-    criterion: "Academic authorship",
-    acadivo: "Guidance and feedback you build on",
-    freelancer: "Often written for submission as-is",
-    aiTool: "Generated text you own the risk of",
-  },
-  {
-    criterion: "Revisions",
-    acadivo: "Unlimited within the agreed scope",
-    freelancer: "Depends on the individual",
-    aiTool: "Re-prompting, no accountability",
-  },
-  {
-    criterion: "Dispute handling",
-    acadivo: "Mediated by our academic integrity team",
-    freelancer: "Effectively none once paid",
-    aiTool: "None",
-  },
-];
 
 export type Faq = { q: string; a: string };
 

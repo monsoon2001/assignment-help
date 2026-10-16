@@ -11,12 +11,12 @@ import { SUBJECT_CONTENT } from "@/lib/subject-content";
 import { RESOURCE_CATEGORIES, ALL_RESOURCES } from "@/lib/resources";
 import {
   BENEFITS,
-  COMPARISON,
   HOMEPAGE_GUIDE_DETAIL,
   HOMEPAGE_SUBJECT_DETAIL,
   HOME_FAQS,
   HOME_SERVICE_COUNT,
   STEPS,
+  TEAM_NOTE,
 } from "@/lib/home-content";
 import FaqAccordion from "@/components/marketing/faq-accordion";
 import { CURATED_TESTIMONIALS, THIN_REVIEW_MIN_LENGTH } from "@/lib/home-testimonials";
@@ -108,7 +108,6 @@ const TILE = "bg-primary-fixed";
 const ICON = "text-primary";
 const LINK = "text-primary";
 const STEP_BADGE = "bg-primary text-white shadow-primary-container/20";
-const BAR = "bg-primary";
 
 // Nine subjects promoted on the homepage; every subject page stays reachable
 // from /subjects.
@@ -292,7 +291,7 @@ export default async function HomePage() {
             <div className="space-y-5">
               <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed border border-outline-variant/50 text-primary text-xs sm:text-sm font-semibold">
                 <MaterialIcon name="emoji_objects" size={16} />
-                Independent Peer Guidance
+                Tutoring, not ghostwriting
               </span>
               <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold text-on-surface leading-tight">
                 Get Help from a Verified{" "}
@@ -301,25 +300,24 @@ export default async function HomePage() {
                 </span>
               </h1>
               <p className="text-base sm:text-lg text-on-surface-variant leading-relaxed max-w-xl">
-                Tell us what you&apos;re working on and we&apos;ll route it straight to our verified academic
-                helper. Discuss your requirements in the request chat, receive a personalized proposal before
-                you pay, and keep the authorship of your own work. Every quote states the scope and price in
-                writing.
+                Tell us what you&apos;re working on — the subject, the deadline, the brief if you have it. A real
+                helper in that subject reads it, comes back with a plan and a price in writing, and you decide
+                from there. No bidding, no surprise invoice, and the work stays yours.
               </p>
 
               {/* Trust Checkmarks */}
-              <div className="flex flex-col sm:flex-row gap-4 text-sm text-on-surface-variant font-medium">
+              <div className="flex flex-col sm:flex-row gap-x-5 gap-y-2.5 text-sm text-on-surface-variant font-medium">
                 <span className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-primary shrink-0" />
-                  Original support
+                  A person in your subject, not a bot
                 </span>
                 <span className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-primary shrink-0" />
-                  Verified subject experts
+                  Price agreed in writing first
                 </span>
                 <span className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-primary shrink-0" />
-                  Satisfaction guaranteed
+                  Revisions until it fits the brief
                 </span>
               </div>
 
@@ -330,10 +328,10 @@ export default async function HomePage() {
                 </span>
                 <div>
                   <p className="text-base font-semibold text-on-surface leading-relaxed">
-                    Covering {SUBJECTS.length} subjects
+                    {SUBJECTS.length} subjects, {HOME_SERVICE_COUNT} kinds of help
                   </p>
                   <p className="text-base text-on-surface-variant leading-relaxed">
-                    {HOME_SERVICE_COUNT} types of help, from essays to lab reports
+                    from a literature essay to a lab report to a stubborn line of code
                   </p>
                 </div>
               </div>
@@ -369,55 +367,46 @@ export default async function HomePage() {
       {/* Core Academic Services */}
       <section className="py-12 sm:py-16 bg-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center mb-8 sm:mb-12">
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-4">
-              <MaterialIcon name="auto_stories" size={16} />
-              Our Services
-            </span>
-            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-4">Core Academic Services</h2>
-            <p className="text-on-surface-variant max-w-2xl mx-auto text-base sm:text-lg">Comprehensive academic guidance across every stage of your coursework</p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((service) => {
-              return (
-              <div
-                key={service.title}
-                className={`group relative overflow-hidden rounded-2xl bg-white p-6 pt-8 border border-outline-variant/30 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all ${CARD}`}
-              >
-                <span className={`absolute inset-x-0 top-0 h-1 ${BAR}`} aria-hidden="true" />
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${TILE}`}>
-                    <MaterialIcon name={service.icon} size={24} className={ICON} />
-                  </div>
-                  <h3 className="font-display font-bold text-lg text-on-surface leading-tight">{service.title}</h3>
-                </div>
-                <p className="text-base text-on-surface-variant leading-relaxed mb-4">{service.desc}</p>
-                <ul className="hidden sm:block space-y-2 mb-5">
-                  {service.items.map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-base text-on-surface-variant leading-relaxed">
-                      <CheckCircle className={`w-4 h-4 shrink-0 mt-0.5 ${ICON}`} />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={service.guide.href}
-                  className={`mt-auto inline-flex items-center gap-1.5 text-sm font-semibold hover:underline ${LINK}`}
-                >
-                  {service.guide.label}
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-              );
-            })}
+          <div className="max-w-2xl mb-8 sm:mb-10">
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-3">
+              What we can help with
+            </h2>
+            <p className="text-base sm:text-lg text-on-surface-variant leading-relaxed">
+              Not a menu of fixed packages. Tell us the task and a helper in that subject will tell you
+              whether they can help, and what it would involve.
+            </p>
           </div>
 
-          <div className="text-center mt-10">
+          <div className="grid sm:grid-cols-2 gap-x-10">
+            {services.map((service) => (
+              <div
+                key={service.title}
+                className="flex items-start gap-4 border-b border-outline-variant/50 py-5"
+              >
+                <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${TILE}`}>
+                  <MaterialIcon name={service.icon} size={22} className={ICON} />
+                </span>
+                <div className="min-w-0">
+                  <h3 className="font-display text-lg font-bold text-on-surface">{service.title}</h3>
+                  <p className="mt-1 text-base text-on-surface-variant leading-relaxed">{service.desc}</p>
+                  <Link
+                    href={service.guide.href}
+                    className={`mt-2 inline-flex items-center gap-1.5 text-sm font-semibold hover:underline ${LINK}`}
+                  >
+                    {service.guide.label}
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8">
             <Link
               href="/services"
-              className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium border border-outline-variant rounded-xl text-on-surface hover:bg-surface-container-low transition-colors"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
             >
-              Explore All Services
+              See every type of help
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -428,16 +417,12 @@ export default async function HomePage() {
       <section className="py-12 sm:py-16 bg-white" aria-labelledby="how-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-8">
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">
-              <MaterialIcon name="route" size={16} />
-              Simple Process
-            </span>
             <h2 id="how-heading" className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-2">
-              How getting assignment help works
+              How getting help works
             </h2>
-            <p className="text-base text-on-surface-variant leading-relaxed">
-              Four steps from brief to delivered work. You stay in control at every stage — the helper never
-              starts without an approved proposal.
+            <p className="text-base sm:text-lg text-on-surface-variant leading-relaxed">
+              Four steps, and you stay in charge the whole way. Nothing starts until you have said yes to
+              the plan.
             </p>
           </div>
 
@@ -459,22 +444,13 @@ export default async function HomePage() {
                 <div
                   className={`h-full rounded-2xl border border-outline-variant/30 bg-white p-6 pt-7 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg ${CARD}`}
                 >
-                  <div className="mb-3 flex items-center gap-3">
-                    <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${TILE}`}>
-                      <MaterialIcon name={step.icon} size={22} />
-                    </span>
-                    <h3 className="font-display text-lg font-bold leading-snug text-on-surface">
-                      {step.title}
-                    </h3>
-                  </div>
-                  <p className="mt-3 text-base leading-relaxed text-on-surface-variant">{step.desc}</p>
-                  <ul className="hidden sm:block mt-4 space-y-2 border-t border-outline-variant/30 pt-4">
+                  <h3 className="font-display text-lg font-bold leading-snug text-on-surface">
+                    {step.title}
+                  </h3>
+                  <p className="mt-2 text-base leading-relaxed text-on-surface-variant">{step.desc}</p>
+                  <ul className="mt-4 space-y-1.5 border-t border-outline-variant/30 pt-4">
                     {step.points.map((point) => (
-                      <li
-                        key={point}
-                        className="flex items-start gap-2 text-sm leading-snug text-on-surface-variant"
-                      >
-                        <CheckCircle className={`mt-0.5 h-4 w-4 shrink-0 ${ICON}`} />
+                      <li key={point} className="text-sm leading-snug text-on-surface-variant">
                         {point}
                       </li>
                     ))}
@@ -518,88 +494,42 @@ export default async function HomePage() {
       {/* Why Students Choose Us */}
       <section className="py-12 sm:py-16 bg-white" aria-labelledby="why-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-8">
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">
-              <MaterialIcon name="thumb_up" size={16} />
-              Why Acadivo
-            </span>
-            <h2 id="why-heading" className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-2">
-              Why students choose Acadivo
-            </h2>
-            <p className="text-base text-on-surface-variant leading-relaxed">
-              We&apos;re built around the parts of assignment help that usually go wrong: unclear scope,
-              unknown pricing, and work you cannot account for. Here is what changes when a verified subject
-              helper is doing the guiding.
-            </p>
-          </div>
+          <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-10 lg:gap-16">
+            <div>
+              <h2 id="why-heading" className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-3">
+                Why people use us
+              </h2>
+              <p className="text-base sm:text-lg text-on-surface-variant leading-relaxed">
+                Most of what goes wrong with assignment help is boring: unclear scope, a price you didn&apos;t
+                see coming, and work you can&apos;t account for. Here&apos;s what we do about each of those.
+              </p>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {BENEFITS.map((benefit) => {
-              return (
-              <div
-                key={benefit.title}
-                className={`bg-white rounded-2xl p-6 border border-outline-variant/30 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all ${CARD}`}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <span className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${TILE}`}>
-                    <MaterialIcon name={benefit.icon} size={22} className={ICON} />
-                  </span>
-                  <h3 className="font-display text-lg font-bold leading-snug text-on-surface">
-                    {benefit.title}
-                  </h3>
-                </div>
-                <p className="text-base text-on-surface-variant leading-relaxed mb-4">{benefit.desc}</p>
-                <ul className="hidden sm:block space-y-2">
-                  {benefit.points.map((point) => (
-                    <li
-                      key={point}
-                      className="flex items-start gap-2 text-sm leading-snug text-on-surface-variant"
-                    >
-                      <CheckCircle className={`mt-0.5 h-4 w-4 shrink-0 ${ICON}`} />
-                      {point}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              );
-            })}
-          </div>
-
-          {/* Comparison */}
-          <div className="mt-8 overflow-x-auto">
-            <table className="w-full min-w-0 sm:min-w-160 text-sm border-collapse bg-white rounded-2xl overflow-hidden border border-outline-variant/30 shadow-sm">
-              <caption className="sr-only">
-                Acadivo compared with hiring a freelance writer and using an AI writing tool
-              </caption>
-              <thead>
-                <tr className="bg-primary-fixed/50 text-left">
-                  <th scope="col" className="px-4 py-3 font-display font-bold text-on-surface text-sm">
-                    What matters
-                  </th>
-                  <th scope="col" className="px-4 py-3 font-display font-bold text-primary text-sm">
-                    Acadivo
-                  </th>
-                  <th scope="col" className="hidden sm:table-cell px-4 py-3 font-display font-bold text-on-surface text-sm">
-                    Freelance writer
-                  </th>
-                  <th scope="col" className="hidden sm:table-cell px-4 py-3 font-display font-bold text-on-surface text-sm">
-                    AI writing tool
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {COMPARISON.map((row) => (
-                  <tr key={row.criterion} className="border-t border-outline-variant/30 align-top">
-                    <th scope="row" className="px-4 py-3 text-left font-medium text-on-surface text-sm">
-                      {row.criterion}
-                    </th>
-                    <td className="px-4 py-3 text-sm text-on-surface bg-primary-fixed/30 font-medium">{row.acadivo}</td>
-                    <td className="hidden sm:table-cell px-4 py-3 text-sm text-on-surface-variant">{row.freelancer}</td>
-                    <td className="hidden sm:table-cell px-4 py-3 text-sm text-on-surface-variant">{row.aiTool}</td>
-                  </tr>
+              <div className="mt-7 rounded-2xl border border-outline-variant/40 bg-primary-fixed/40 p-6">
+                <h3 className="font-display text-lg font-bold text-on-surface mb-2">
+                  {TEAM_NOTE.title}
+                </h3>
+                {TEAM_NOTE.paragraphs.map((paragraph, index) => (
+                  <p
+                    key={index}
+                    className="mt-2 text-base text-on-surface-variant leading-relaxed"
+                  >
+                    {paragraph}
+                  </p>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </div>
+
+            <ul className="grid sm:grid-cols-2 lg:grid-cols-1 gap-x-8">
+              {BENEFITS.map((benefit) => (
+                <li
+                  key={benefit.title}
+                  className="border-b border-outline-variant/40 py-4"
+                >
+                  <h3 className="font-display text-base font-bold text-on-surface">{benefit.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-on-surface-variant">{benefit.desc}</p>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
@@ -609,10 +539,6 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
             <div className="max-w-2xl">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-xs font-semibold mb-3">
-                <MaterialIcon name="category" size={16} />
-                All Subjects
-              </span>
               <h2
                 id="subjects-heading"
                 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-2"
@@ -620,8 +546,8 @@ export default async function HomePage() {
                 Assignment help by subject
               </h2>
               <p className="text-base text-on-surface-variant leading-relaxed">
-                From literature and history through mathematics, physics, computer science, engineering and
-                nursing. Open a subject to see the topics covered and the help types available.
+                Pick the field you&apos;re working in. Open a subject to see the topics covered and the kind
+                of help available in it.
               </p>
             </div>
             <Link
@@ -669,10 +595,6 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
             <div className="max-w-2xl">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">
-                <MaterialIcon name="menu_book" size={16} />
-                Free Study Guides
-              </span>
               <h2
                 id="guides-heading"
                 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-2"
@@ -734,10 +656,6 @@ export default async function HomePage() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl mx-auto text-center mb-8">
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">
-              <MaterialIcon name="format_quote" size={16} />
-              Testimonials
-            </span>
             <h2
               id="testimonials-heading"
               className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-2"
@@ -774,16 +692,12 @@ export default async function HomePage() {
       <section className="py-12 sm:py-16 bg-white" aria-labelledby="faq-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-8">
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed text-primary text-sm font-semibold mb-3">
-              <MaterialIcon name="help" size={16} />
-              FAQ
-            </span>
             <h2 id="faq-heading" className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-2">
               Assignment help questions, answered
             </h2>
             <p className="text-base text-on-surface-variant leading-relaxed">
-              The short version of how matching, pricing, revisions and academic integrity work on Acadivo.
-              More detail on the{" "}
+              Quick answers on matching, pricing, revisions and academic integrity. There&apos;s more detail on
+              the{" "}
               <Link href="/faq" className="text-primary font-semibold hover:underline">
                 full FAQ page
               </Link>
@@ -809,9 +723,8 @@ export default async function HomePage() {
               Ready to get help with your next assignment?
             </h2>
             <p className="on-band-muted mb-7 max-w-2xl mx-auto leading-relaxed text-base">
-              Work one-on-one with a verified subject helper across {SUBJECTS.length} subjects and{" "}
-              {HOME_SERVICE_COUNT} types of assignment help. Send your brief, agree the scope and price
-              in writing, and only pay once it looks right.
+              Tell a helper in your subject what you&apos;re working on. You&apos;ll get the plan and the price
+              in writing, and you only pay once it looks right.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
