@@ -3,14 +3,26 @@ import { createClient as createBrowserClient } from "@/lib/supabase/client";
 const DRAFT_KEY = "acadivo:pending-request";
 
 /**
- * The platform routes every new task request to a single designated helper
- * account. Students no longer browse or choose a helper. Override the account
- * with NEXT_PUBLIC_DESIGNATED_HELPER_ID (the default is Sanchita Acharya /
+ * Fallback helper account. The live choice is stored in platform_settings and
+ * can be switched by an admin from /admin/helpers; this constant is only used
+ * when that lookup is unavailable. Students never browse or choose a helper.
+ * Override with NEXT_PUBLIC_DESIGNATED_HELPER_ID (default: Sanchita Acharya /
  * sanchitaa286@gmail.com).
  */
 export const DESIGNATED_HELPER_ID =
   process.env.NEXT_PUBLIC_DESIGNATED_HELPER_ID?.trim() ||
   "7c981abd-85b5-4005-86c0-9cfffd6d9bf1";
+
+/**
+ * The helper every new request is routed to right now. Admins switch the active
+ * helper from /admin/helpers; falls back to DESIGNATED_HELPER_ID if the read
+ * fails so submitting a request can never be blocked by a transient error.
+ */
+export async function getActiveHelperId(): Promise<string> {
+  const supabase = createBrowserClient();
+  const { data } = await supabase.rpc("active_helper_id");
+  return typeof data === "string" && data.length > 0 ? data : DESIGNATED_HELPER_ID;
+}
 
 export interface NewRequestInput {
   title: string;
@@ -122,6 +134,8 @@ export async function submitRequest(
     return { error: "You must be signed in to submit a request." };
   }
 
+  const helperId = await getActiveHelperId();
+
   const fileUrls: string[] = [];
   for (const file of input.files ?? []) {
     const path = `${user.id}/${crypto.randomUUID()}-${file.name}`;
@@ -140,7 +154,7 @@ export async function submitRequest(
     .from("requests")
     .insert({
       student_id: user.id,
-      helper_id: DESIGNATED_HELPER_ID,
+      helper_id: helperId,
       title: input.title,
       description: input.description ?? null,
       subject: input.subject ?? null,

@@ -4,11 +4,12 @@ import Card from "@/components/ui/card";
 import StatusBadge from "@/components/ui/status-badge";
 import Avatar from "@/components/ui/avatar";
 import Button from "@/components/ui/button";
-import { Star, UserCheck } from "lucide-react";
+import { Crown, UserCheck, Users } from "lucide-react";
 import { requireAdmin, adminClient } from "@/lib/admin";
 import { setUserStatus } from "@/app/admin/actions";
 import { userStatusTone } from "@/lib/status-meta";
 import EditUserForm from "@/app/admin/components/edit-user-form";
+import ActiveHelperRadio from "@/app/admin/components/active-helper-radio";
 import { EmptyState } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
@@ -30,68 +31,112 @@ export default async function AdminHelpersPage({
   await requireAdmin();
   const { edit: editId, clear } = await searchParams;
 
-  const { data: users, error } = await adminClient
-    .from("users")
-    .select("id, name, email, avatar_url, role, status, created_at, profile:helper_profiles(subjects, rating_avg, bio)")
-    .eq("role", "helper")
-    .order("created_at", { ascending: false })
-    .limit(200);
+  const [{ data: users, error }, { data: settings }] = await Promise.all([
+    adminClient
+      .from("users")
+      .select("id, name, email, avatar_url, role, status, created_at")
+      .eq("role", "helper")
+      .order("created_at", { ascending: false })
+      .limit(200),
+    adminClient.from("platform_settings").select("active_helper_id").eq("id", true).maybeSingle(),
+  ]);
 
-  const editing = !clear && editId ? (users ?? []).find((u) => u.id === editId) : null;
+  const activeHelperId = settings?.active_helper_id ?? null;
+  const helpers = users ?? [];
+  const activeHelper = helpers.find((u) => u.id === activeHelperId) ?? null;
+  const editing = !clear && editId ? helpers.find((u) => u.id === editId) : null;
+  const pendingCount = helpers.filter((u) => u.status === "pending").length;
+  const activeCount = helpers.filter((u) => u.status === "active").length;
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-on-surface">Helpers</h1>
-        <p className="text-on-surface-variant mt-1">Approve, suspend, and manage helper profiles.</p>
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <div>
+          <h1 className="font-display text-2xl font-bold text-on-surface">Helpers</h1>
+          <p className="text-on-surface-variant mt-1">Approve, suspend, and manage helper profiles.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <StatusBadge tone="green">{activeCount} active</StatusBadge>
+          {pendingCount > 0 && <StatusBadge tone="blueStrong">{pendingCount} pending</StatusBadge>}
+        </div>
       </div>
+
+      {/* Routing control — the single helper every new request is sent to. */}
+      <Card className="overflow-hidden">
+        <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between bg-primary-tint/60">
+          <div className="flex items-center gap-4 min-w-0">
+            <span className="w-12 h-12 rounded-2xl bg-primary-container text-on-primary flex items-center justify-center shrink-0">
+              <Crown size={22} />
+            </span>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary">Active helper · request routing</p>
+              {activeHelper ? (
+                <div className="mt-0.5 flex items-center gap-2 min-w-0">
+                  <Avatar name={activeHelper.name ?? "Helper"} src={activeHelper.avatar_url ?? undefined} role="helper" size="sm" />
+                  <p className="font-display font-semibold text-on-surface truncate">
+                    {activeHelper.name ?? "Unnamed helper"}
+                  </p>
+                  <StatusBadge tone="green">Receiving requests</StatusBadge>
+                </div>
+              ) : (
+                <p className="font-display font-semibold text-on-surface mt-0.5">No active helper set</p>
+              )}
+              <p className="text-sm text-on-surface-variant mt-1">
+                Every new student request is routed to this helper. Switch it when one helper is unavailable.
+              </p>
+            </div>
+          </div>
+          {activeHelper && !editing && (
+            <span className="text-xs text-on-surface-variant sm:text-right shrink-0">{activeHelper.email}</span>
+          )}
+        </div>
+      </Card>
 
       {editing && <EditUserForm user={editing} listPath="helpers" />}
 
       {error ? (
         <Card className="p-6 text-sm text-error">{error.message}</Card>
-      ) : users && users.length > 0 ? (
+      ) : helpers.length > 0 ? (
         <Card className="overflow-x-auto">
-          <table className="w-full min-w-[640px]">
+          <table className="w-full min-w-[720px]">
             <thead>
               <tr className="border-b border-outline-variant/30">
                 <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Helper</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Subjects</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Rating</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Active helper</th>
                 <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Joined</th>
                 <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Status</th>
                 <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => {
-                const profile = user.profile as unknown as { subjects?: string[]; rating_avg?: number; bio?: string } | null;
+              {helpers.map((user) => {
+                const isActive = user.id === activeHelperId;
                 return (
-                  <tr key={user.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
+                  <tr
+                    key={user.id}
+                    className={`border-b border-outline-variant/20 last:border-0 transition-colors ${
+                      isActive ? "bg-primary-tint/40" : "hover:bg-surface-container-low/50"
+                    }`}
+                  >
                     <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center gap-3">
                         <Avatar name={user.name ?? "Helper"} src={user.avatar_url ?? undefined} role="helper" size="sm" />
-                        <div>
-                          <p className="text-sm font-medium text-on-surface">{user.name ?? "Unnamed"}</p>
-                          <p className="text-xs text-on-surface-variant">{user.email}</p>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium text-on-surface truncate">{user.name ?? "Unnamed"}</p>
+                            {isActive && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-primary-container text-on-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide shrink-0">
+                                <Crown size={10} />
+                                Active
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-on-surface-variant truncate">{user.email}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-3 sm:px-6 py-4">
-                      <div className="flex flex-wrap gap-1 max-w-xs">
-                        {(profile?.subjects ?? []).slice(0, 3).map((s) => (
-                          <span key={s} className="px-2 py-0.5 rounded-full bg-surface-container-low text-xs text-on-surface-variant">
-                            {s}
-                          </span>
-                        ))}
-                        {(profile?.subjects?.length ?? 0) === 0 && <span className="text-xs text-on-surface-variant">No subjects set</span>}
-                      </div>
-                    </td>
-                    <td className="px-3 sm:px-6 py-4">
-                      <span className="inline-flex items-center gap-1 text-sm font-semibold text-on-surface">
-                        <Star size={13} className="text-accent fill-accent" />
-                        {Number(profile?.rating_avg ?? 0).toFixed(1)}
-                      </span>
+                      <ActiveHelperRadio helperId={user.id} active={isActive} />
                     </td>
                     <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">{formatDate(user.created_at)}</td>
                     <td className="px-3 sm:px-6 py-4">
@@ -110,11 +155,11 @@ export default async function AdminHelpersPage({
                           <input type="hidden" name="userId" value={user.id} />
                           <input type="hidden" name="status" value={user.status === "suspended" ? "active" : "suspended"} />
                           <Button size="sm" variant={user.status === "suspended" ? "secondary" : "danger"} type="submit">
-                            {user.status === "suspended" ? "Activate" : "Suspend"}
+                            {user.status === "suspended" ? "Unsuspend" : "Suspend"}
                           </Button>
                         </form>
                         <Link href={`/admin/helpers?edit=${user.id}`}>
-                          <Button size="sm" variant="outline">Edit</Button>
+                          <Button size="sm" variant="ghost" type="button">Edit</Button>
                         </Link>
                       </div>
                     </td>
@@ -128,10 +173,17 @@ export default async function AdminHelpersPage({
         <EmptyState
           icon={<UserCheck size={24} className="text-primary" />}
           title="No helpers yet"
-          message="Helper accounts will appear here as helpers join the platform."
+          message="Helper accounts appear here so you can approve them and choose who receives new requests."
           actionHref="/admin/students"
           actionLabel="View students"
         />
+      )}
+
+      {helpers.length > 0 && (
+        <p className="flex items-center gap-2 text-xs text-on-surface-variant">
+          <Users size={13} className="text-primary" />
+          {helpers.length} helper account{helpers.length === 1 ? "" : "s"} total. The active helper receives all new requests.
+        </p>
       )}
     </div>
   );

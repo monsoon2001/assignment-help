@@ -102,8 +102,19 @@ export async function GET(request: Request) {
         ? metadata.picture
         : null;
   const metaName = typeof metadata.name === "string" ? metadata.name : null;
+
+  // The active helper gets the same branded-identity treatment as the built-in
+  // default, even after an admin switches which helper receives requests.
+  let activeHelperId = DESIGNATED_HELPER_ID;
+  try {
+    const { data: activeId } = await supabase.rpc("active_helper_id");
+    if (typeof activeId === "string" && activeId.length > 0) activeHelperId = activeId;
+  } catch {
+    // Fall back to the built-in default.
+  }
+
   if (
-    user.id !== DESIGNATED_HELPER_ID &&
+    user.id !== activeHelperId &&
     (googleAvatar || (metaName && !profile?.name))
   ) {
     const updates: Record<string, unknown> = {};

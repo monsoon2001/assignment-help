@@ -69,6 +69,47 @@ export async function updateUser(_prev: ActionResult, formData: FormData): Promi
   return { ok: true, message: "User updated." };
 }
 
+/**
+ * Switches which helper account receives every new student request. The active
+ * helper is stored on platform_settings and read by the student request form
+ * through the public.active_helper_id() function.
+ */
+export async function setActiveHelper(formData: FormData): Promise<void> {
+  const adminId = await requireAdmin();
+  const helperId = clean(formData.get("helperId"));
+  if (!helperId) return;
+
+  const { data: helper } = await adminClient
+    .from("users")
+    .select("id, role")
+    .eq("id", helperId)
+    .maybeSingle();
+  if (!helper || helper.role !== "helper") return;
+
+  const { data: before } = await adminClient
+    .from("platform_settings")
+    .select("active_helper_id")
+    .eq("id", true)
+    .maybeSingle();
+
+  if (before?.active_helper_id === helperId) return;
+
+  const { error } = await adminClient
+    .from("platform_settings")
+    .update({ active_helper_id: helperId, updated_at: new Date().toISOString() })
+    .eq("id", true);
+
+  if (error) return;
+
+  await logAdminAction(adminId, "set_active_helper", helperId, {
+    from: before?.active_helper_id ?? null,
+    to: helperId,
+  });
+
+  revalidatePath("/admin", "layout");
+  revalidatePath("/admin/helpers");
+}
+
 export async function requestRefund(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
   const adminId = await requireAdmin();
   const paymentId = clean(formData.get("paymentId"));
