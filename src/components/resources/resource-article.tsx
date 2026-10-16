@@ -141,7 +141,6 @@ function Checklist({ items, title }: { items: string[]; title: string }) {
 
 export default function ResourceArticle({ resource }: { resource: Resource }) {
   const category = CATEGORY_BY_SLUG.get(resource.category);
-  const path = resourcePath(resource);
   const related = relatedResources(resource);
 
   const contentIds = contentSectionIds(resource.sections.map((section) => section.heading));
@@ -153,22 +152,6 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
     { label: "Common Mistakes", id: "common-mistakes" },
     { label: "Related Guides", id: "related-guides" },
   ];
-
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://acadivo.com" },
-      { "@type": "ListItem", position: 2, name: "Resources", item: "https://acadivo.com/resources" },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: category?.name ?? "Guides",
-        item: `https://acadivo.com/resources/${resource.category}`,
-      },
-      { "@type": "ListItem", position: 4, name: resource.title, item: `https://acadivo.com${path}` },
-    ],
-  };
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -182,7 +165,6 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
 
       <PageHeader

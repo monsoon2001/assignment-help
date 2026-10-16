@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import { PageHeader } from "@/components/marketing/page-shell";
+
+export const metadata: Metadata = {
+  title: "Terms of Service | Acadivo",
+  description:
+    "Acadivo's terms of service: academic integrity, accounts, payments in CAD, unlimited in-scope revisions, refunds, and limitation of liability.",
+  alternates: { canonical: "/terms" },
+};
 
 const sections = [
   { title: "1. Acceptance of Terms", content: "By accessing or using Acadivo (\"the Platform\"), you agree to be bound by these Terms of Service. If you do not agree, please do not use our services. These terms apply to all users, including students seeking help and helpers providing guidance." },

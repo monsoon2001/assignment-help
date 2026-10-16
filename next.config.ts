@@ -12,6 +12,23 @@ const securityHeaders = [
   },
 ];
 
+// Authed and transactional areas carry no indexable content — the pages
+// themselves also set `robots: noindex`, this header is the belt to that
+// suspenders and covers client-rendered layouts (admin) that cannot export
+// metadata.
+const noIndexAreas = [
+  "/admin/:path*",
+  "/helper/:path*",
+  "/dashboard/:path*",
+  "/requests/:path*",
+  "/orders/:path*",
+  "/messages/:path*",
+  "/notifications/:path*",
+  "/profile/:path*",
+  "/sign-in",
+  "/sign-up",
+];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
@@ -28,6 +45,10 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      ...noIndexAreas.map((source) => ({
+        source,
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      })),
     ];
   },
 };

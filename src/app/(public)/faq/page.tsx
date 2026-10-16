@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CtaBand, PageHeader } from "@/components/marketing/page-shell";
 import FaqList from "@/components/marketing/faq-list";
+import { faqJsonLd, jsonLdScript } from "@/lib/seo";
 
 const frequentlyAskedQuestions = [
   { q: "What is Acadivo?", a: "Acadivo is an academic peer guidance platform that connects students with verified subject-matter helpers. Our helpers provide tutoring, editing, and guidance to help you improve your writing and understand coursework concepts — they do not complete assignments on your behalf." },
@@ -22,11 +23,16 @@ const frequentlyAskedQuestions = [
 export const metadata: Metadata = {
   title: "FAQ | Acadivo",
   description: "Frequently asked questions about Acadivo tutoring, helper verification, pricing, revisions, and payments.",
+  alternates: { canonical: "/faq" },
 };
 
-export default function FAQPage() {
+export default function FaqPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(faqJsonLd(frequentlyAskedQuestions))}
+      />
       <PageHeader
         title="Frequently Asked Questions"
         subtitle="Everything you need to know about Acadivo."

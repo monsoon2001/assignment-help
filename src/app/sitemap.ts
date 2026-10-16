@@ -2,8 +2,7 @@ import type { MetadataRoute } from "next";
 import { SUBJECT_CONTENT } from "@/lib/subject-content";
 import { ALL_RESOURCES, RESOURCE_CATEGORIES, resourcePath } from "@/lib/resources";
 import { SERVICE_PAGES } from "@/lib/services";
-
-const BASE_URL = "https://acadivo.com";
+import { SITE_URL as BASE_URL } from "@/lib/seo";
 
 const STATIC_ROUTES = [
   "",

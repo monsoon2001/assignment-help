@@ -18,13 +18,6 @@ export const metadata: Metadata = {
   description:
     "Free student guides for essays, reports, research, citations, presentations, and technical coursework. Step-by-step explanations with practical examples and checklists.",
   alternates: { canonical: "https://acadivo.com/resources" },
-  openGraph: {
-    title: "Student Guides & Academic Writing Resources | Acadivo",
-    description:
-      "Practical guides for essays, reports, research, citations, presentations, and technical coursework.",
-    type: "website",
-    url: "https://acadivo.com/resources",
-  },
 };
 
 export default function ResourcesPage() {

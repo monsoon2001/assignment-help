@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import { PageHeader } from "@/components/marketing/page-shell";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy | Acadivo",
+  description:
+    "How Acadivo collects, uses, shares, and protects your data, including cookies, retention, and your rights over your personal information.",
+  alternates: { canonical: "/privacy" },
+};
 
 const sections = [
   { title: "1. Information We Collect", content: "We collect information you provide directly: name, email address, academic details, payment information, and communication content. We also collect usage data including device information, IP addresses, browsing patterns, and interaction data to improve our services." },

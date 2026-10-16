@@ -45,13 +45,6 @@ export const metadata: Metadata = {
     "citation help",
   ],
   alternates: { canonical: SITE_URL },
-  openGraph: {
-    title: HERO_TITLE,
-    description: HERO_DESCRIPTION,
-    url: SITE_URL,
-    siteName: "Acadivo",
-    type: "website",
-  },
 };
 
 const marqueeItems = SERVICE_TYPES;

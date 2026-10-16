@@ -25,13 +25,6 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     title: resource.seoTitle,
     description: resource.description,
     alternates: { canonical: url },
-    openGraph: {
-      title: resource.seoTitle,
-      description: resource.ogDescription,
-      type: "article",
-      url,
-      siteName: "Acadivo",
-    },
     twitter: {
       card: "summary_large_image",
       title: resource.seoTitle,

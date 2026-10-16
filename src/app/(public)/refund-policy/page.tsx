@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import { PageHeader } from "@/components/marketing/page-shell";
+
+export const metadata: Metadata = {
+  title: "Refund Policy | Acadivo",
+  description:
+    "Acadivo's refund policy: unlimited in-scope revisions, scope changes, refund eligibility, disputes, and how to contact support within 14 days.",
+  alternates: { canonical: "/refund-policy" },
+};
 
 const sections = [
   { title: "Overview", content: "When you accept a helper's quote you pay for the helper's time and expertise, and work begins immediately, so payments are generally non-refundable. However, if the delivered work does not match the agreed scope, you can request a refund. In the meantime, revisions are unlimited — helpers keep revising until you are fully satisfied with the delivered work." },

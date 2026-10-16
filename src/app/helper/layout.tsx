@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Header from "@/components/layout/header";
 import HelperNav from "@/components/layout/helper-nav";
 import RoleBottomNav from "@/components/layout/role-bottom-nav";
@@ -6,6 +7,10 @@ import { VoiceCallProvider } from "@/components/call/voice-call";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default async function HelperLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();

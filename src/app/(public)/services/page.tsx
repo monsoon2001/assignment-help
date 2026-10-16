@@ -1,9 +1,17 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import Button from "@/components/ui/button";
 import { CtaBand, PAGE_TONES, PageHeader } from "@/components/marketing/page-shell";
 import { MaterialIcon } from "@/lib/icons-map";
 import { GUIDE_BY_SERVICE, SERVICE_GROUPS } from "@/lib/services";
+
+export const metadata: Metadata = {
+  title: "Services | Assignment, Writing, Editing & Study Help | Acadivo",
+  description:
+    "See every type of academic help Acadivo offers — essays, reports, research, proofreading, editing, citations, presentations, and study support from a verified helper.",
+  alternates: { canonical: "/services" },
+};
 
 export default function ServicesPage() {
   return (

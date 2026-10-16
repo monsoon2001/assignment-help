@@ -10,8 +10,7 @@ import {
 import { STEPS } from "@/lib/home-content";
 import { ALL_RESOURCES, resourcePath } from "@/lib/resources";
 import { CtaBand, PageHeader } from "@/components/marketing/page-shell";
-
-const SITE_URL = "https://acadivo.com";
+import { SITE_URL, jsonLdScript } from "@/lib/seo";
 
 export const dynamicParams = false;
 
@@ -33,7 +32,6 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical: `${SITE_URL}/services/${service.slug}` },
-    openGraph: { title, description, type: "website", url: `${SITE_URL}/services/${service.slug}` },
   };
 }
 
@@ -57,8 +55,22 @@ export default async function ServiceDetailPage({
   const guide = ALL_RESOURCES.find((resource) => resourcePath(resource) === guideHref);
   const siblings = service.group.services.filter((item) => item.slug !== service.slug);
 
+  const serviceSchema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: `${service.name} Assignment Help`,
+    description: `${service.desc} Send your brief to our verified helper, agree the scope and price in writing, and pay only once the proposal looks right.`,
+    serviceType: service.name,
+    provider: { "@type": "Organization", name: "Acadivo", url: SITE_URL },
+    areaServed: { "@type": "Country", name: "Canada" },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(serviceSchema)}
+      />
       <PageHeader
         title={`${service.name} Assignment Help`}
         subtitle={service.desc}

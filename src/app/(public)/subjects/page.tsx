@@ -9,13 +9,6 @@ export const metadata = {
   description:
     "Explore assignment help by subject. Get a verified helper for computer science, statistics, mathematics, business, academic writing, science, engineering, and more.",
   alternates: { canonical: "https://acadivo.com/subjects" },
-  openGraph: {
-    title: "Assignment Help by Subject | Acadivo",
-    description:
-      "Browse assignment help by subject, see topics covered, and send your brief to our verified helper before you pay.",
-    type: "website",
-    url: "https://acadivo.com/subjects",
-  },
 };
 
 export default function SubjectsPage() {

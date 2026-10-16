@@ -22,12 +22,6 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     title: `${known.name} Guides | Acadivo`,
     description: `${known.description} Browse all ${known.name.toLowerCase()} guides on Acadivo.`,
     alternates: { canonical: `https://acadivo.com/resources/${known.slug}` },
-    openGraph: {
-      title: `${known.name} Guides | Acadivo`,
-      description: known.description,
-      type: "website",
-      url: `https://acadivo.com/resources/${known.slug}`,
-    },
   };
 }
 

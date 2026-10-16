@@ -1,7 +1,15 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import { CtaBand, PAGE_TONES, PageHeader } from "@/components/marketing/page-shell";
 import { MaterialIcon } from "@/lib/icons-map";
+
+export const metadata: Metadata = {
+  title: "How It Works | Get a Quote Before You Pay | Acadivo",
+  description:
+    "See how Acadivo works in four steps: send your brief, get matched with a verified helper, review a written quote, and get revisions until it fits the brief.",
+  alternates: { canonical: "/how-it-works" },
+};
 
 const steps = [
   { num: "1", title: "Tell us what you need", desc: "Describe your assignment, select the subject, academic level, deadline, and any specific requirements. Upload files like rubrics, lecture notes, or drafts if you have them.", icon: "edit_note", details: ["Select subject and help type", "Describe your requirements", "Set your deadline", "Upload reference files"] },

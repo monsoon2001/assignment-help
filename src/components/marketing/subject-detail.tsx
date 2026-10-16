@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle } from "lucide-react";
+import { CheckCircle, ArrowRight } from "lucide-react";
 import { MaterialIcon } from "@/lib/icons-map";
 import type { SubjectContent } from "@/lib/subject-content";
+import { faqJsonLd, jsonLdScript } from "@/lib/seo";
 import { CtaBand, PAGE_TONES, PageHeader } from "./page-shell";
 
 const TONE = PAGE_TONES.blue;
@@ -17,6 +18,10 @@ const STEPS = [
 export default function SubjectDetail({ subject }: { subject: SubjectContent }) {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(faqJsonLd(subject.faqs))}
+      />
       <PageHeader
         title={subject.h1}
         subtitle={subject.intro}

@@ -6,6 +6,7 @@ import ContactForm from "@/components/marketing/contact-form";
 export const metadata: Metadata = {
   title: "Contact | Acadivo",
   description: "Have a question, need help, or want to provide feedback? Get in touch with the Acadivo team.",
+  alternates: { canonical: "/contact" },
 };
 
 export default function ContactPage() {
@@ -30,7 +31,7 @@ export default function ContactPage() {
             {[
               { icon: Mail, label: "Email Us", value: "support@acadivo.com", sub: "We respond within 24 hours" },
               { icon: Clock, label: "Support Hours", value: "Monday – Friday: 9AM – 8PM EST", sub: "Weekend support available via email" },
-              { icon: MapPin, label: "Location", value: "Acadivo HQ", sub: "San Francisco, CA" },
+              { icon: MapPin, label: "Location", value: "Online, worldwide", sub: "Supporting students across time zones" },
             ].map(({ icon: Icon, label, value, sub }) => (
               <div key={label} className="relative overflow-hidden bg-white rounded-2xl p-6 border border-primary-container/25 shadow-sm hover:shadow-md transition-shadow">
                 <span className="absolute inset-x-0 top-0 h-0.5 bg-primary" aria-hidden="true" />

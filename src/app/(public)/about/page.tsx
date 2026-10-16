@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import { CtaBand, PAGE_TONES, PageHeader } from "@/components/marketing/page-shell";
 import { MaterialIcon } from "@/lib/icons-map";
 import { SUBJECTS, SERVICE_TYPES, ACADEMIC_LEVELS } from "@/lib/constants";
+
+export const metadata: Metadata = {
+  title: "About Acadivo | Peer Academic Guidance Platform",
+  description:
+    "Acadivo connects students with verified peer helpers for tutoring, editing, and academic guidance across every subject — you learn, you write, we guide.",
+  alternates: { canonical: "/about" },
+};
 
 const values = [
   { icon: "school", title: "Academic Integrity First", desc: "We believe in genuine learning. Our helpers guide and teach — they don't do the work for you. Every interaction is designed to build your understanding." },

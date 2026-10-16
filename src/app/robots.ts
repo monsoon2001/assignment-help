@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next'
+import { SITE_URL } from '@/lib/seo'
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -6,12 +7,21 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
       disallow: [
-        '/admin/',
-        '/helper/',
-        '/student/',
         '/api/',
+        '/auth/',
+        '/admin',
+        '/helper',
+        '/dashboard',
+        '/requests',
+        '/orders',
+        '/messages',
+        '/notifications',
+        '/profile',
+        '/sign-in',
+        '/sign-up',
       ],
     },
-    sitemap: 'https://acadivo.com/sitemap.xml',
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   }
 }

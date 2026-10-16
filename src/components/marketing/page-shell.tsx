@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronRight, ArrowRight } from "lucide-react";
 import { MaterialIcon } from "@/lib/icons-map";
+import { breadcrumbJsonLd, jsonLdScript } from "@/lib/seo";
 
 /**
  * Every public page shares the same page-header band, section bands and
@@ -134,6 +135,10 @@ export function PageHeader({
 }) {
   return (
     <div className="border-b border-outline-variant/40 bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(breadcrumbJsonLd(crumbs))}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6">
         <nav className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm mb-3" aria-label="Breadcrumb">
           {crumbs.map((crumb, i) => (

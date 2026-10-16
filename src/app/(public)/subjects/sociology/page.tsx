@@ -8,12 +8,6 @@ export const metadata: Metadata = {
   title: subject.title,
   description: subject.description,
   alternates: { canonical: `https://acadivo.com/subjects/sociology` },
-  openGraph: {
-    title: subject.title,
-    description: subject.ogDescription,
-    type: "website",
-    url: `https://acadivo.com/subjects/sociology`,
-  },
 };
 
 export default function Page() {
