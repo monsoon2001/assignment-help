@@ -1,6 +1,6 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
-import { roleToHome } from "@/lib/auth";
+import { roleToHome, safeNextPath } from "@/lib/auth";
 import { getIpCountry } from "@/lib/geo.server";
 import { AUTH_AT_COOKIE, authAtCookieOptions } from "@/lib/session-timebox";
 import { NextResponse } from "next/server";
@@ -128,8 +128,7 @@ export async function GET(request: Request) {
   // would bounce them off the proxy's auth-route guard onto their home and
   // discard `next` — losing the saved request draft they were filling in.
   const home = roleToHome(profile?.role);
-  const target =
-    next && next !== "/" && next.startsWith("/") && !next.startsWith("//") ? next : home;
+  const target = safeNextPath(next) ?? home;
   const redirect = new URL(target, url.origin);
   redirect.searchParams.set("signedIn", "1");
   if (wasJustConfirmed) redirect.searchParams.set("verified", "1");

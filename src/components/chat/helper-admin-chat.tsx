@@ -144,8 +144,19 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
 
   useEffect(() => {
     const el = listRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [timeline.length]);
+    if (!el) return;
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+      raf2 = requestAnimationFrame(() => {
+        el.scrollTop = el.scrollHeight;
+      });
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, [timeline]);
 
   useEffect(() => {
     if (!emojiOpen) return;

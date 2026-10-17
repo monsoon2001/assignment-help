@@ -7,7 +7,7 @@ import { GraduationCap, Mail, ArrowRight, Building2, Lock, Loader2 } from "lucid
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
-import { roleToHome } from "@/lib/auth";
+import { roleToHome, safeNextPath } from "@/lib/auth";
 import { stampAuthAtCookie } from "@/lib/session-timebox";
 
 export default function SignInPage() {
@@ -33,8 +33,7 @@ function SignInForm() {
   function nextPath(): string {
     if (typeof window === "undefined") return "/";
     const next = new URLSearchParams(window.location.search).get("next");
-    if (next && next.startsWith("/") && !next.startsWith("//")) return next;
-    return "/";
+    return safeNextPath(next) ?? "/";
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -96,7 +95,7 @@ function SignInForm() {
 
   return (
     <div className="m-auto w-full max-w-md">
-      <div className="rounded-3xl border border-line bg-surface p-5 shadow-xl shadow-primary/5 sm:p-7">
+      <div className="animate-rise-in rounded-3xl border border-line bg-surface p-5 shadow-xl shadow-primary/5 sm:p-7">
         <div className="mb-5 flex flex-col items-center text-center">
           <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-fixed text-primary">
             <GraduationCap size={24} />

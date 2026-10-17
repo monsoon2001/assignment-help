@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { revalidatePath } from "next/cache";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { adminClient } from "@/lib/supabase/admin";
 import { normalizeCurrency } from "@/lib/currency";
 import { rateBetween } from "@/lib/fx.server";
+import { notifyOrderActivity } from "@/lib/notify.server";
 
 export const dynamic = "force-dynamic";
 
@@ -215,6 +216,20 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   revalidatePath(`/orders/${orderId}`, "page");
   revalidatePath(`/orders/${orderId}/confirmed`, "page");
+
+  after(() =>
+    notifyOrderActivity(orderId, () => ({
+      type: "payment",
+      message: "Payment confirmed — your order is now in progress.",
+      link: `/orders/${orderId}`,
+      emailSubject: "Payment confirmed — work has started",
+      emailBody:
+        "We received your payment and the helper can begin. You'll get another email as soon as work is delivered.",
+      emailLinkLabel: "Open the order",
+      audience: ["student", "helper", "admin"],
+      inAppRoles: ["admin"],
+    }))
+  );
 }
 
 /**
@@ -348,6 +363,25 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
     console.error("webhook: refund update failed", error);
     throw error;
   }
+
+  if (payment.order_id) {
+    after(() =>
+      notifyOrderActivity(payment.order_id!, () => ({
+        type: "payment",
+        message: fullyRefunded
+          ? "This order has been refunded."
+          : "A partial refund was issued on this order.",
+        link: `/orders/${payment.order_id}`,
+        emailSubject: fullyRefunded ? "Order refunded" : "A refund was issued",
+        emailBody: fullyRefunded
+          ? "Your order has been fully refunded. Depending on your bank, the amount may take a few days to appear."
+          : "A refund was issued for part of your order. The remaining balance stays with the order.",
+        emailLinkLabel: "View the order",
+        audience: ["student", "helper", "admin"],
+        inAppRoles: ["student", "helper", "admin"],
+      }))
+    );
+  }
 }
 
 async function handleDisputeCreated(dispute: Stripe.Dispute) {
@@ -380,5 +414,19 @@ async function handleDisputeCreated(dispute: Stripe.Dispute) {
       .from("orders")
       .update({ status: "disputed" })
       .eq("id", payment.order_id);
+
+    after(() =>
+      notifyOrderActivity(payment.order_id!, () => ({
+        type: "warning",
+        message: "A payment dispute was opened on this order.",
+        link: `/orders/${payment.order_id}`,
+        emailSubject: "A payment dispute was opened",
+        emailBody:
+          "A payment dispute was opened for this order. The helper payout is on hold while it is reviewed. No action is needed unless our support team reaches out.",
+        emailLinkLabel: "View the order",
+        audience: ["student", "helper", "admin"],
+        inAppRoles: ["student", "helper", "admin"],
+      }))
+    );
   }
 }

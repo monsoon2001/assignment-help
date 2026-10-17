@@ -376,3 +376,28 @@ h6 {
   border-color: rgb(255 255 255 / 0.18);
   color: var(--color-on-primary);
 }
+
+/* Entrance helpers ----------------------------------------------------------
+   Small, quick and unobtrusive. `animate-fade-in` is for content that mounts in
+   place (cards, list rows); both respect reduced-motion via the global guard. */
+@utility animate-fade-in {
+  animation: fade-in 0.28s ease-out both;
+}
+
+@utility animate-rise-in {
+  animation: dialog-in 0.24s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

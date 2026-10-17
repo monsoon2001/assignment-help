@@ -14,13 +14,13 @@ import {
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import { safeNextPath } from "@/lib/auth";
 
 export default function SignUpPage() {
   const supabase = createClient();
   // Preserved so a visitor who started the request form before signing up lands
   // back on it with their saved draft.
-  const nextParam = useSearchParams().get("next");
-  const next = nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "";
+  const next = safeNextPath(useSearchParams().get("next")) ?? "";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -92,7 +92,7 @@ export default function SignUpPage() {
 
   return (
     <div className="m-auto w-full max-w-md">
-      <div className="rounded-3xl border border-line bg-surface p-5 shadow-xl shadow-primary/5 sm:p-7">
+      <div className="animate-rise-in rounded-3xl border border-line bg-surface p-5 shadow-xl shadow-primary/5 sm:p-7">
         <div className="mb-5 flex flex-col items-center text-center">
           <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-fixed text-primary">
             <GraduationCap size={24} />

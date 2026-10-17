@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
 import { normalizeCurrency } from "@/lib/currency";
+import { notifyActivity } from "@/lib/notify-client";
 
 export interface NewProposalInput {
   request_id: string;
@@ -53,5 +54,6 @@ export async function submitProposal(
     return { error: updateError.message };
   }
 
+  notifyActivity("proposal.created", data.id);
   return { id: data.id };
 }

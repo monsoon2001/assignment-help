@@ -81,10 +81,10 @@ export default async function OrderPaymentPage({
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
         <Card className="p-5 sm:p-6 flex flex-col gap-4 relative overflow-hidden">
-          <div className="absolute -top-20 -right-20 h-52 w-52 rounded-full bg-primary-fixed/30 blur-3xl pointer-events-none" />
+          <div className="absolute inset-x-0 top-0 h-1 bg-primary" />
 
           <div>
-            <Badge variant="secondary" dot className="shrink-0">Session Locked &amp; Secure</Badge>
+            <Badge variant="secondary" dot className="shrink-0">Encrypted checkout</Badge>
             <h1 className="font-display text-lg font-bold text-on-surface mt-3">Review and Pay</h1>
           </div>
 

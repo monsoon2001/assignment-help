@@ -169,7 +169,7 @@ export default function NotificationsView({
             <button
               key={n.id}
               onClick={() => handleOpen(n)}
-              className={`w-full text-left p-5 flex items-start gap-4 transition-colors cursor-pointer ${
+              className={`animate-fade-in w-full text-left p-5 flex items-start gap-4 transition-colors cursor-pointer ${
                 n.read ? "" : "bg-surface-container-low/60 hover:bg-surface-container-low"
               } hover:bg-surface-container-low`}
             >

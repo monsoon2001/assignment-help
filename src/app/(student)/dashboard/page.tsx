@@ -8,7 +8,6 @@ import {
   Clock,
   RefreshCcw,
   MessageSquare,
-  ShoppingBag,
   RotateCcw,
   Package,
   AlertTriangle,

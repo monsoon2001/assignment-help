@@ -31,6 +31,33 @@ so the `{{ .Token }}` placeholder must be added in the dashboard:
 Without step 3 the user receives a confirmation link instead of a code, and the "Enter the 6-digit
 code" screen will never match the message that was sent.
 
+## Status-change email notifications
+
+Major activities email the student, the helper and every admin so nobody has to keep the portal open:
+new request, new proposal, proposal accepted/declined, payment confirmed, delivery submitted,
+revision requested, order completed, refund and payment dispute.
+
+Setup (optional — without a key the app still runs and just logs that email was skipped):
+
+```bash
+RESEND_API_KEY=re_xxx
+EMAIL_FROM="Acadivo <notifications@your-verified-domain.com>"
+```
+
+- Sender lives in `src/lib/email.server.ts` (Resend HTTP API, no extra dependency).
+- Fan-out lives in `src/lib/notify.server.ts`; browser-originated events call `POST /api/notify`
+  via `src/lib/notify-client.ts`, server paths (order accept, Stripe webhook) call it directly.
+- Emails are dispatched with Next's `after()` so they never add latency to the user's response.
+- In-app bell rows are still created by the existing Postgres triggers; email is additional.
+
+## Security notes
+
+- Orders are inserted only by `POST /api/orders/accept` using the service role; the client-facing
+  orders INSERT policy was dropped (`20261016000001_harden_order_insert.sql`) so the charge amount
+  can never be forged from the browser. **Apply this migration.**
+- A Content-Security-Policy is set in `next.config.ts`.
+- Redirect targets are sanitised with `safeNextPath()` (`src/lib/auth.ts`).
+
 ## Payments (multi-currency local charge, platform-collected)
 
 All charges are collected by Acadivo's **own Stripe account**. There is **no Stripe Connect**, no

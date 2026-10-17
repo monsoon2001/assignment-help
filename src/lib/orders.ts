@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { notifyActivity } from "@/lib/notify-client";
 
 export interface ProposalForAccept {
   proposal_id: string;
@@ -78,5 +79,6 @@ export async function declineProposal(
       .eq("id", request_id);
   }
 
+  notifyActivity("proposal.declined", proposal_id);
   return { ok: true };
 }

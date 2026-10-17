@@ -82,10 +82,25 @@ export default function ChatPanel({
   const [emojiOpen, setEmojiOpen] = useState(false);
   const emojiRef = useRef<HTMLDivElement | null>(null);
 
+  // Keep the newest message in view: jump to the bottom on mount and whenever
+  // the conversation changes. A second rAF pass handles late layout (fonts,
+  // wrapped lines, attachment chips) that can grow the scroll height after the
+  // first paint and otherwise leave the view stuck on the oldest message.
   useEffect(() => {
     const el = messageListRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [messages.length]);
+    if (!el) return;
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+      raf2 = requestAnimationFrame(() => {
+        el.scrollTop = el.scrollHeight;
+      });
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, [messages]);
 
   useEffect(() => {
     if (!emojiOpen) return;
@@ -108,7 +123,7 @@ export default function ChatPanel({
       className={`flex flex-col overflow-hidden ${
         fill
           ? "h-full min-h-0"
-          : "h-[clamp(300px,calc(100vh-320px),480px)] sm:h-[clamp(360px,calc(100vh-300px),560px)] xl:h-[clamp(400px,calc(100vh-280px),600px)]"
+          : "h-[clamp(300px,calc(100dvh-320px),480px)] sm:h-[clamp(360px,calc(100dvh-300px),560px)] xl:h-[clamp(400px,calc(100dvh-280px),600px)]"
       } ${className}`}
     >
       <div className={`flex items-center gap-3 ${compact ? "px-3 py-2" : "px-5 py-3"} border-b border-outline-variant bg-surface-container-low/60`}>

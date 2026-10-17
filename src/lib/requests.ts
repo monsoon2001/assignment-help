@@ -1,4 +1,5 @@
 import { createClient as createBrowserClient } from "@/lib/supabase/client";
+import { notifyActivity } from "@/lib/notify-client";
 
 const DRAFT_KEY = "acadivo:pending-request";
 
@@ -169,5 +170,6 @@ export async function submitRequest(
   if (error) {
     return { error: error.message };
   }
+  notifyActivity("request.created", data.id);
   return { id: data.id };
 }

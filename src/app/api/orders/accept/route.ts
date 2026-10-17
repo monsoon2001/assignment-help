@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { unwrapRow } from "@/lib/embedded";
 import { createClient } from "@/lib/supabase/server";
+import { adminClient } from "@/lib/supabase/admin";
 import { resolveLocalCharge } from "@/lib/charge.server";
 import { normalizeCurrency } from "@/lib/currency";
+import { notifyOrderActivity } from "@/lib/notify.server";
 
 export const dynamic = "force-dynamic";
 
@@ -104,8 +106,12 @@ export async function POST(request: Request) {
     );
   }
 
+  // Insert with the service role: the financial columns are computed here from
+  // the proposal and the student's local currency, never from client input, so
+  // the client-facing orders INSERT policy is intentionally removed (see the
+  // harden_order_insert migration).
   const now = new Date().toISOString();
-  const { data: order, error: insertError } = await supabase
+  const { data: order, error: insertError } = await adminClient
     .from("orders")
     .insert({
       proposal_id: proposal.id,
@@ -150,6 +156,23 @@ export async function POST(request: Request) {
   if (proposalUpdateError) {
     return NextResponse.json({ error: proposalUpdateError.message }, { status: 500 });
   }
+
+  // Run after the response so the email fan-out never slows the student's
+  // redirect to the payment screen.
+  after(() =>
+    notifyOrderActivity(order.id, () => ({
+      type: "payment",
+      message: "A proposal was accepted — an order is ready for payment.",
+      link: `/orders/${order.id}`,
+      emailSubject: "Proposal accepted — payment is next",
+      emailBody:
+        "A proposal for this request was just accepted and an order has been created. The student now needs to complete payment for the work to begin.",
+      emailLinkLabel: "Open the order",
+      audience: ["student", "helper", "admin"],
+      inAppRoles: ["helper", "admin"],
+      actorId: user.id,
+    }))
+  );
 
   return NextResponse.json({ orderId: order.id });
 }

@@ -22,6 +22,7 @@ import { normalizeCurrency, formatCurrency } from "@/lib/currency";
 import { orderStatusMeta, paymentStatusTone } from "@/lib/status-meta";
 import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 import { markThreadNotificationsRead } from "@/lib/notifications";
+import { notifyActivity } from "@/lib/notify-client";
 import ChatPanel, { type ChatMessageRow, timeLabel, fileNameFromUrl } from "@/components/chat/chat-panel";
 import SecureFileLink from "@/components/ui/secure-file-link";
 import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
@@ -359,6 +360,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
         .eq("id", orderId);
       if (statusError) throw new Error(statusError.message);
 
+      notifyActivity("order.delivered", orderId);
       setDeliveryMessage("");
       setDeliveryFiles([]);
       await Promise.all([loadDeliveries(), loadOrder()]);
@@ -392,6 +394,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
         .eq("id", orderId);
       if (statusError) throw new Error(statusError.message);
 
+      notifyActivity("order.revision_requested", orderId);
       setRevisionNote("");
       setRevisionOpen(false);
       await Promise.all([loadDeliveries(), loadOrder()]);
@@ -411,6 +414,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
       setDeliveryError(error.message);
       return;
     }
+    if (status === "completed") notifyActivity("order.completed", orderId);
     await loadOrder();
   }
 
@@ -645,14 +649,10 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                 </div>
                 <StatusBadge tone="green" className="shrink-0"><ShieldCheck size={12} /> Verified</StatusBadge>
               </div>
-              <div className="flex items-center gap-2 text-sm">
-                <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <Star key={n} size={13} className="fill-accent text-accent" />
-                  ))}
-                </div>
-                <span className="font-semibold text-on-surface">Expert</span>
-              </div>
+              <p className="text-xs text-on-surface-variant flex items-center gap-1.5">
+                <Check size={13} className="text-success shrink-0" />
+                ID-verified peer helper · rated after every completed order
+              </p>
             </Card>
             </div>
         </div>
