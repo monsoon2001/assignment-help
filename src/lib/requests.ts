@@ -139,10 +139,24 @@ export async function submitRequest(
 
   const fileUrls: string[] = [];
   for (const file of input.files ?? []) {
+    if (file.size === 0) {
+      return { error: `${file.name} is empty. Please choose a file that contains content.` };
+    }
+
+    let content: ArrayBuffer;
+    try {
+      content = await file.arrayBuffer();
+    } catch (error) {
+      const reason = error instanceof Error ? ` ${error.message}` : "";
+      return { error: `We couldn't read ${file.name}.${reason}` };
+    }
+
     const path = `${user.id}/${crypto.randomUUID()}-${file.name}`;
     const { error: uploadError } = await supabase.storage
       .from("request-files")
-      .upload(path, file);
+      .upload(path, content, {
+        contentType: file.type || "application/octet-stream",
+      });
     if (uploadError) {
       return { error: uploadError.message };
     }
