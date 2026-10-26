@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { CtaBand, PAGE_TONES, PageHeader } from "@/components/marketing/page-shell";
+import { CtaBand, PageHeader } from "@/components/marketing/page-shell";
 import { MaterialIcon } from "@/lib/icons-map";
 import { SUBJECT_GROUPS, SUBJECT_CONTENT } from "@/lib/subject-content";
+import { accentForSubject } from "@/lib/accent-styles";
 
 export const metadata = {
   title: "Assignment Help by Subject | Browse All Subjects | Acadivo",
@@ -22,32 +23,37 @@ export default function SubjectsPage() {
 
       <div className="band-soft">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        {SUBJECT_GROUPS.map((group) => {
-          const groupTone = PAGE_TONES.blue;
+        {SUBJECT_GROUPS.map((group, groupIndex) => {
+          const groupTone = accentForSubject(group.subjects[0]?.slug ?? String(groupIndex));
           return (
           <div key={group.category} className="mb-10 sm:mb-16 last:mb-0">
             <div className="flex items-center gap-3 mb-6">
-              <span className={`h-1 w-10 rounded-full ${groupTone.hairline}`} aria-hidden="true" />
+              <span className={`h-9 w-1 rounded-full ${groupTone.hairline}`} aria-hidden="true" />
               <h2 className="font-display text-2xl font-bold text-on-surface">{group.category}</h2>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {group.subjects.map((s) => (
+              {group.subjects.map((s) => {
+                const accent = accentForSubject(s.slug);
+                return (
                 <Link
                   key={s.slug}
                   href={`/subjects/${s.slug}`}
-                  className={`relative overflow-hidden bg-white rounded-2xl p-6 border ${groupTone.card} shadow-sm ${groupTone.cardHover} transition-all group`}
+                  className={`group flex min-h-64 flex-col rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${accent.cardHover}`}
                 >
-                  <span className={`absolute inset-x-0 top-0 h-1 ${groupTone.hairline}`} aria-hidden="true" />
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${groupTone.iconTile}`}>
-                    <MaterialIcon name={s.icon} size={24} className={groupTone.icon} />
+                  <div className="mb-4 flex items-center gap-3">
+                    <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${accent.tile}`}>
+                      <MaterialIcon name={s.icon} size={24} className={accent.icon} />
+                    </span>
+                    <h3 className={`font-display font-bold transition-colors ${accent.text}`}>{s.name}</h3>
                   </div>
-                  <h3 className={`font-display font-bold text-on-surface mb-2 transition-colors ${groupTone.text}`}>{s.name}</h3>
-                  <p className="text-base text-on-surface-variant leading-relaxed mb-3">{s.cardDesc}</p>
-                  <p className={`text-xs font-semibold ${groupTone.text} sm:opacity-0 sm:group-hover:opacity-100 transition-opacity`}>
-                    {s.subtopics.length} topics <ArrowRight size={12} className="inline-block -mt-0.5" />
+                  <p className="mb-4 flex-1 text-base leading-relaxed text-on-surface-variant">{s.cardDesc}</p>
+                  <p className={`inline-flex items-center gap-1.5 text-sm font-semibold ${accent.text}`}>
+                    Explore {s.subtopics.length} topics
+                    <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
                   </p>
                 </Link>
-              ))}
+                );
+              })}
             </div>
           </div>
           );

@@ -9,6 +9,7 @@ import {
   resourcePath,
   RESOURCE_BY_SLUG,
 } from "@/lib/resources";
+import { accentForGuideCategory } from "@/lib/accent-styles";
 
 function slugify(heading: string): string {
   return heading
@@ -285,18 +286,21 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
               <section id="related-guides" className="mb-12 scroll-mt-24">
                 <h2 className="font-display text-2xl font-bold text-on-surface mb-5">Related Guides</h2>
                 <div className="grid sm:grid-cols-2 gap-4">
-                  {related.map((item) => (
-                    <Link
-                      key={item.slug}
-                      href={resourcePath(item)}
-                      className="group bg-white border border-outline-variant/30 rounded-xl p-4 shadow-sm hover:border-primary-container/60 hover:shadow-md transition-all"
-                    >
-                      <p className="font-semibold text-on-surface mb-1 text-primary transition-colors">
-                        {item.title}
-                      </p>
-                      <p className="text-base text-on-surface-variant leading-relaxed">{item.readingMinutes} min read</p>
-                    </Link>
-                  ))}
+                  {related.map((item) => {
+                    const accent = accentForGuideCategory(item.category);
+                    return (
+                      <Link
+                        key={item.slug}
+                        href={resourcePath(item)}
+                        className={`group rounded-xl border border-outline-variant/30 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md ${accent.cardHover}`}
+                      >
+                        <p className={`mb-1 font-semibold transition-colors ${accent.text}`}>
+                          {item.title}
+                        </p>
+                        <p className="text-base leading-relaxed text-on-surface-variant">{item.readingMinutes} min read</p>
+                      </Link>
+                    );
+                  })}
                 </div>
               </section>
             )}

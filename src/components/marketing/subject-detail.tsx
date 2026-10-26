@@ -2,10 +2,9 @@ import Link from "next/link";
 import { CheckCircle, ArrowRight } from "lucide-react";
 import { MaterialIcon } from "@/lib/icons-map";
 import type { SubjectContent } from "@/lib/subject-content";
+import { accentForSubject } from "@/lib/accent-styles";
 import { faqJsonLd, jsonLdScript } from "@/lib/seo";
-import { CtaBand, PAGE_TONES, PageHeader } from "./page-shell";
-
-const TONE = PAGE_TONES.blue;
+import { CtaBand, PageHeader } from "./page-shell";
 
 const STEPS = [
   { num: "1", title: "Tell us what you're working on", desc: "Share your assignment topic, details, and requirements." },
@@ -16,6 +15,8 @@ const STEPS = [
 ];
 
 export default function SubjectDetail({ subject }: { subject: SubjectContent }) {
+  const accent = accentForSubject(subject.slug);
+
   return (
     <>
       <script
@@ -63,24 +64,23 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
 
       <section className="py-12 sm:py-16 bg-white band-hero">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <span className="h-1 w-10 rounded-full bg-primary" aria-hidden="true" />
+          <div className="mb-8 flex items-center justify-center gap-3">
+            <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${accent.tile}`}>
+              <MaterialIcon name={subject.icon} size={20} className={accent.icon} />
+            </span>
             <h2 className="font-display text-2xl font-bold text-on-surface">
               {subject.name} Help by Topic
             </h2>
-            <span className="h-1 w-10 rounded-full bg-primary" aria-hidden="true" />
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {subject.subtopics.map((t) => {
-              const tone = TONE;
               return (
               <Link
                 key={t.title}
                 href="/requests/new"
-                className={`relative overflow-hidden bg-white rounded-2xl p-5 pt-6 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}
+                className={`bg-white rounded-2xl p-5 border border-outline-variant/40 shadow-sm ${accent.cardHover} transition-all hover:-translate-y-0.5 hover:shadow-md`}
               >
-                <span className={`absolute inset-x-0 top-0 h-1 ${tone.hairline}`} aria-hidden="true" />
-                <h3 className={`font-display font-bold text-on-surface mb-1.5 transition-colors ${tone.text}`}>{t.title}</h3>
+                <h3 className={`font-display font-bold mb-1.5 transition-colors ${accent.text}`}>{t.title}</h3>
                 <p className="text-base text-on-surface-variant leading-relaxed">{t.blurb}</p>
               </Link>
               );
@@ -100,11 +100,10 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {STEPS.map((s) => {
-              const tone = TONE;
               return (
-              <div key={s.num} className={`bg-white rounded-2xl p-6 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}>
+              <div key={s.num} className={`bg-white rounded-2xl p-6 border border-outline-variant/40 shadow-sm ${accent.cardHover} transition-all`}>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-9 h-9 ${tone.iconTile} rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${tone.icon}`}>
+                  <div className={`w-9 h-9 ${accent.tile} rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${accent.icon}`}>
                     {s.num}
                   </div>
                   <h3 className="font-display font-bold text-on-surface text-sm sm:text-base">{s.title}</h3>
@@ -124,7 +123,7 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
           </h2>
           <div className="space-y-4">
             {subject.faqs.map((f, i) => (
-              <details key={i} className="bg-white rounded-xl border border-outline-variant/30 p-6 group hover:border-primary-container/60 transition-colors">
+              <details key={i} className={`bg-white rounded-xl border border-outline-variant/30 p-6 group ${accent.cardHover} transition-colors`}>
                 <summary className="cursor-pointer list-none flex items-center justify-between gap-4 text-on-surface font-medium">
                   {f.q}
                   <MaterialIcon name="expand_more" size={20} className="transition-transform shrink-0 group-open:rotate-180" />

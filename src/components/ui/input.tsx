@@ -29,7 +29,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             type={type}
-            className={`w-full h-11 ${icon ? "pl-11" : "pl-3.5"} pr-4 bg-surface border rounded-lg text-sm text-ink placeholder:text-ink-soft focus:outline-none focus:ring-2 transition-all ${error ? "border-danger focus:border-danger focus:ring-danger/20" : "border-line focus:border-primary focus:ring-primary/20"} ${sizeClass} ${className}`}
+            className={`site-control w-full h-11 ${icon ? "pl-11" : "pl-3.5"} pr-4 bg-surface border rounded-xl text-sm text-ink placeholder:text-ink-soft focus:outline-none focus:ring-2 transition-all duration-150 ${error ? "border-danger focus:border-danger focus:ring-danger/20" : "border-line focus:border-primary focus:ring-primary/20"} ${sizeClass} ${className}`}
             {...props}
           />
         </div>

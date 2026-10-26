@@ -20,6 +20,13 @@ import {
 } from "@/lib/home-content";
 import FaqAccordion from "@/components/marketing/faq-accordion";
 import { CURATED_TESTIMONIALS, THIN_REVIEW_MIN_LENGTH } from "@/lib/home-testimonials";
+import {
+  accentForFeaturedGuide,
+  accentForGuideCategory,
+  accentForIndex,
+  accentForSubject,
+  DARK_LINK,
+} from "@/lib/accent-styles";
 
 export const dynamic = "force-dynamic";
 
@@ -94,22 +101,16 @@ const services = [
   },
 ];
 
-// One accent family for every card: white surface, soft blue tile, blue
-// icon and link. Variety comes from the content, not from a colour wheel.
-const CARD = "hover:border-primary-container/60";
-const TILE = "bg-primary-fixed";
-const ICON = "text-primary";
-const LINK = "text-primary";
-const STEP_BADGE = "bg-primary text-white shadow-primary-container/20";
-
+// Shared default for process cards. Subject and service cards pick up their
+// own accents from `accent-styles`.
 // Nine subjects promoted on the homepage; every subject page stays reachable
 // from /subjects.
 const HOMEPAGE_SUBJECTS = [
   "english-literature",
-  "mathematics",
+  "chemistry",
   "statistics",
   "biology",
-  "chemistry",
+  "mathematics",
   "physics",
   "computer-science",
   "engineering",
@@ -181,6 +182,7 @@ export default async function HomePage() {
       description: category.description,
       detail: HOMEPAGE_GUIDE_DETAIL[category.slug] ?? "",
       meta: `${ALL_RESOURCES.filter((r) => r.category === category.slug).length} guides`,
+      accent: accentForGuideCategory(category.slug),
     })),
     ...ALL_RESOURCES.filter((resource) => resource.featured)
       .slice(0, 3)
@@ -190,8 +192,9 @@ export default async function HomePage() {
         icon: "auto_stories",
         title: resource.title,
         description: resource.description,
-        detail: HOMEPAGE_GUIDE_DETAIL[resource.category] ?? "",
+        detail: "",
         meta: `${resource.readingMinutes} min read`,
+        accent: accentForFeaturedGuide(resource.slug, resource.category),
       })),
   ];
 
@@ -229,30 +232,6 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(siteSchema) }}
       />
 
-      {/* Trust Banner */}
-      <div className="bg-section border-b border-outline-variant/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-center gap-x-5 gap-y-1 text-xs font-medium text-on-surface-variant flex-wrap">
-          <span className="flex items-center gap-1.5">
-            <MaterialIcon name="verified" size={16} className="text-primary" />
-            Verified subject helpers
-          </span>
-          <span className="text-outline-variant" aria-hidden="true">
-            |
-          </span>
-          <span className="flex items-center gap-1.5">
-            <MaterialIcon name="request_quote" size={16} className="text-primary" />
-            Quote before you pay
-          </span>
-          <span className="hidden sm:inline text-outline-variant" aria-hidden="true">
-            |
-          </span>
-          <span className="flex items-center gap-1.5">
-            <MaterialIcon name="replay" size={16} className="text-primary" />
-            Unlimited revisions in scope
-          </span>
-        </div>
-      </div>
-
       {/* Services Marquee */}
       <div className="bg-ink-900 overflow-hidden py-3 select-none">
         <div className="flex w-max animate-[marquee_38s_linear_infinite] hover:[animation-play-state:paused]">
@@ -281,10 +260,10 @@ export default async function HomePage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-20">
           <div className="grid lg:grid-cols-[1fr_minmax(0,640px)] gap-8 lg:gap-10 items-start">
             {/* Left Column */}
-            <div className="space-y-5">
+            <div className="space-y-5 home-enter">
               <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed border border-outline-variant/50 text-primary text-xs sm:text-sm font-semibold">
-                <MaterialIcon name="emoji_objects" size={16} />
-                Tutoring, not ghostwriting
+                <MaterialIcon name="verified_user" size={16} />
+                100% human help, never AI
               </span>
               <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold text-on-surface leading-tight">
                 Get Help from a Verified{" "}
@@ -302,15 +281,15 @@ export default async function HomePage() {
               <div className="flex flex-col sm:flex-row gap-x-5 gap-y-2.5 text-sm text-on-surface-variant font-medium">
                 <span className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-primary shrink-0" />
-                  A person in your subject, not a bot
+                  Verified subject helpers
                 </span>
                 <span className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-primary shrink-0" />
-                  Price agreed in writing first
+                  Quote before you pay
                 </span>
                 <span className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-primary shrink-0" />
-                  Revisions until it fits the brief
+                  Unlimited revisions in scope
                 </span>
               </div>
 
@@ -333,14 +312,14 @@ export default async function HomePage() {
             {/* Right Column - Price Estimate Form */}
             <div
               id="estimate"
-              className="hidden lg:block scroll-mt-24 bg-surface-container-lowest rounded-2xl shadow-xl shadow-primary-container/15 ring-1 ring-outline-variant/50 border border-outline-variant/50 p-6 sm:p-8"
+              className="hidden lg:block scroll-mt-24 bg-surface-container-lowest rounded-2xl shadow-xl shadow-primary-container/15 ring-1 ring-outline-variant/50 border border-outline-variant/50 p-6 sm:p-8 home-enter home-enter-delay"
             >
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-10 h-10 bg-primary-fixed rounded-xl flex items-center justify-center shrink-0">
                   <MaterialIcon name="calculate" size={20} className="text-primary" />
                 </div>
                 <div>
-                  <h2 className="font-display font-bold text-on-surface leading-tight">
+                  <h2 className="estimate-heading font-display font-bold text-on-surface leading-tight">
                     Let&apos;s understand your assignment
                   </h2>
                   <p className="text-base text-on-surface-variant leading-relaxed">Share a few details to get started</p>
@@ -371,33 +350,36 @@ export default async function HomePage() {
           </div>
 
           <div className="grid sm:grid-cols-2 gap-x-10">
-            {services.map((service) => (
+            {services.map((service, index) => {
+              const accent = accentForIndex(index);
+              return (
               <div
                 key={service.title}
                 className="flex items-start gap-4 border-b border-outline-variant/50 py-5"
               >
-                <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${TILE}`}>
-                  <MaterialIcon name={service.icon} size={22} className={ICON} />
+                <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${accent.tile}`}>
+                  <MaterialIcon name={service.icon} size={22} className={accent.icon} />
                 </span>
                 <div className="min-w-0">
-                  <h3 className="font-display text-lg font-bold text-on-surface">{service.title}</h3>
+                  <h3 className={`font-display text-lg font-bold ${accent.text}`}>{service.title}</h3>
                   <p className="mt-1 text-base text-on-surface-variant leading-relaxed">{service.desc}</p>
                   <Link
                     href={service.guide.href}
-                    className={`mt-2 inline-flex items-center gap-1.5 text-sm font-semibold hover:underline ${LINK}`}
+                    className={`mt-2 inline-flex items-center gap-1.5 text-sm font-semibold hover:underline ${DARK_LINK}`}
                   >
                     {service.guide.label}
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="mt-8">
             <Link
               href="/services"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+              className={`inline-flex items-center gap-2 text-sm font-semibold hover:underline ${DARK_LINK}`}
             >
               See every type of help
               <ArrowRight className="w-4 h-4" />
@@ -420,24 +402,26 @@ export default async function HomePage() {
           </div>
 
           <ol className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-5">
-            {STEPS.map((step, i) => (
+            {STEPS.map((step, i) => {
+              const accent = accentForIndex(i);
+              return (
               <li key={step.num} className="relative group">
                 {i < STEPS.length - 1 && (
                   <span
-                    className="hidden lg:block absolute top-6 left-[calc(50%+2.25rem)] right-[-1.25rem] h-px bg-primary-tint"
+                    className={`hidden lg:block absolute top-6 left-[calc(50%+2.25rem)] right-[-1.25rem] h-px ${accent.hairline} opacity-20`}
                     aria-hidden="true"
                   />
                 )}
                 <span
-                  className={`absolute -top-4 left-6 z-10 flex h-9 w-9 items-center justify-center rounded-full ${STEP_BADGE} font-display text-base font-bold shadow-md ring-4 ring-background transition-transform group-hover:scale-105`}
+                  className={`absolute -top-4 left-6 z-10 flex h-9 w-9 items-center justify-center rounded-full ${accent.tile} ${accent.text} font-display text-base font-bold shadow-md ring-4 ring-background transition-transform group-hover:scale-105`}
                   aria-hidden="true"
                 >
                   {step.num}
                 </span>
                 <div
-                  className={`h-full rounded-2xl border border-outline-variant/30 bg-white p-6 pt-7 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg ${CARD}`}
+                  className={`h-full rounded-2xl border border-outline-variant/30 bg-white p-6 pt-7 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg ${accent.cardHover}`}
                 >
-                  <h3 className="font-display text-lg font-bold leading-snug text-on-surface">
+                  <h3 className={`font-display text-lg font-bold leading-snug ${accent.text}`}>
                     {step.title}
                   </h3>
                   <p className="mt-2 text-base leading-relaxed text-on-surface-variant">{step.desc}</p>
@@ -450,7 +434,8 @@ export default async function HomePage() {
                   </ul>
                 </div>
               </li>
-            ))}
+              );
+            })}
           </ol>
 
           <div className="mt-8 grid sm:grid-cols-3 gap-4">
@@ -497,7 +482,7 @@ export default async function HomePage() {
                 see coming, and work you can&apos;t account for. Here&apos;s what we do about each of those.
               </p>
 
-              <div className="mt-7 rounded-2xl border border-outline-variant/40 bg-primary-fixed/40 p-6">
+              <div                             className="mt-7 rounded-2xl border border-outline-variant/40 bg-surface-container-low p-6">
                 <h3 className="font-display text-lg font-bold text-on-surface mb-2">
                   {TEAM_NOTE.title}
                 </h3>
@@ -513,15 +498,18 @@ export default async function HomePage() {
             </div>
 
             <ul className="grid sm:grid-cols-2 lg:grid-cols-1 gap-x-8">
-              {BENEFITS.map((benefit) => (
+              {BENEFITS.map((benefit, index) => {
+                const accent = accentForIndex(index + 2);
+                return (
                 <li
                   key={benefit.title}
-                  className="border-b border-outline-variant/40 py-4"
+                  className={`border-b border-outline-variant/40 py-4 ${accent.cardHover}`}
                 >
-                  <h3 className="font-display text-base font-bold text-on-surface">{benefit.title}</h3>
+                  <h3 className={`font-display text-base font-bold ${accent.text}`}>{benefit.title}</h3>
                   <p className="mt-1 text-sm leading-relaxed text-on-surface-variant">{benefit.desc}</p>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           </div>
         </div>
@@ -554,17 +542,18 @@ export default async function HomePage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {homepageSubjects.map((s) => {
+              const accent = accentForSubject(s.slug);
               return (
               <Link
                 key={s.slug}
                 href={`/subjects/${s.slug}`}
-                className={`group flex flex-col bg-white rounded-2xl p-5 border border-outline-variant/30 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all ${CARD}`}
+                className={`group flex flex-col bg-white rounded-2xl p-5 border border-outline-variant/30 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ${accent.cardHover}`}
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <span className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${TILE}`}>
-                    <MaterialIcon name={s.icon} size={20} className={ICON} />
+                  <span className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${accent.tile}`}>
+                    <MaterialIcon name={s.icon} size={20} className={accent.icon} />
                   </span>
-                  <h3 className={`font-display text-base font-bold text-on-surface transition-colors leading-snug ${LINK}`}>
+                  <h3 className={`font-display text-base font-bold transition-colors leading-snug ${accent.text}`}>
                     {s.name}
                   </h3>
                 </div>
@@ -572,7 +561,7 @@ export default async function HomePage() {
                 {s.detail && (
                   <p className="hidden sm:block mt-2 text-base text-on-surface-variant/90 leading-relaxed">{s.detail}</p>
                 )}
-                <p className={`mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold ${LINK}`}>
+                <p className={`mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold ${DARK_LINK}`}>
                   {s.name} help topics
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </p>
@@ -614,24 +603,24 @@ export default async function HomePage() {
               <Link
                 key={guide.key}
                 href={guide.href}
-                className={`group flex flex-col rounded-2xl border border-outline-variant/30 bg-white p-5 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 ${CARD}`}
+                className={`group flex flex-col rounded-2xl border border-outline-variant/30 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${guide.accent.cardHover}`}
               >
                 <div className="mb-3 flex items-start justify-between gap-3">
-                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${TILE}`}>
-                    <MaterialIcon name={guide.icon} size={20} className={ICON} />
+                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${guide.accent.tile}`}>
+                    <MaterialIcon name={guide.icon} size={20} className={guide.accent.icon} />
                   </span>
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold bg-primary-fixed text-primary`}>
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${guide.accent.tile} ${guide.accent.text}`}>
                     {guide.meta}
                   </span>
                 </div>
-                <h3 className={`font-display text-base font-bold leading-snug text-on-surface transition-colors ${LINK}`}>
+                <h3 className={`font-display text-base font-bold leading-snug transition-colors ${guide.accent.text}`}>
                   {guide.title}
                 </h3>
                 <p className="mt-2 text-base leading-relaxed text-on-surface-variant">{guide.description}</p>
                 {guide.detail && (
                   <p className="hidden sm:block mt-2 text-base leading-relaxed text-on-surface-variant/90">{guide.detail}</p>
                 )}
-                <span className={`mt-4 inline-flex items-center gap-1.5 text-sm font-semibold ${LINK}`}>
+                <span className={`mt-4 inline-flex items-center gap-1.5 text-sm font-semibold ${guide.accent.text}`}>
                   Read the guide
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </span>

@@ -9,7 +9,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
   ({ className = "", variant = "primary", size = "md", href, ...props }, ref) => {
-    const base = "inline-flex items-center justify-center font-medium transition-colors rounded-xl disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer";
+    const base = "site-control inline-flex items-center justify-center font-medium transition-all duration-150 rounded-xl enabled:active:translate-y-px disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none";
     const variants: Record<string, string> = {
       primary: "bg-primary text-white hover:bg-primary-hover active:bg-primary-dark shadow-sm",
       secondary: "bg-surface text-ink border border-line hover:bg-primary-tint",

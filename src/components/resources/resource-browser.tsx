@@ -5,9 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Search, Clock, X } from "lucide-react";
 import Button from "@/components/ui/button";
 import { ALL_RESOURCES, CATEGORY_BY_SLUG, resourcePath } from "@/lib/resources";
-import { PAGE_TONES } from "@/components/marketing/page-shell";
-
-const TONE = PAGE_TONES.blue;
+import { accentForGuideCategory, accentForIndex } from "@/lib/accent-styles";
 
 export default function ResourceBrowser() {
   const [query, setQuery] = useState("");
@@ -68,7 +66,7 @@ export default function ResourceBrowser() {
             aria-pressed={active === category.slug}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               active === category.slug
-                ? "bg-primary text-on-primary border border-primary"
+                ? `${accentForGuideCategory(category.slug).tile} ${accentForGuideCategory(category.slug).text} border border-current`
                 : "bg-white border border-outline-variant/60 text-on-surface-variant hover:border-primary-container hover:text-primary"
             }`}
           >
@@ -99,29 +97,28 @@ export default function ResourceBrowser() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {results.map((guide) => {
             const category = CATEGORY_BY_SLUG.get(guide.category);
-            const tone = TONE;
+            const accent = accentForIndex(ALL_RESOURCES.indexOf(guide));
             return (
               <Link
                 key={guide.slug}
                 href={resourcePath(guide)}
-                className={`group relative flex flex-col overflow-hidden bg-white rounded-2xl p-6 pt-7 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}
+                className={`group flex min-h-64 flex-col rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${accent.cardHover}`}
               >
-                <span className={`absolute inset-x-0 top-0 h-1 ${tone.hairline}`} aria-hidden="true" />
                 {category && (
-                  <span className={`text-xs font-semibold mb-3 self-start rounded-full px-3 py-1 ${tone.chip}`}>
+                  <span className={`mb-4 self-start rounded-full px-3 py-1 text-xs font-semibold ${accent.tile} ${accent.text}`}>
                     {category.name}
                   </span>
                 )}
-                <h3 className={`font-display font-bold text-on-surface mb-2 transition-colors ${tone.text}`}>
+                <h3 className={`mb-2 font-display font-bold leading-snug transition-colors ${accent.text}`}>
                   {guide.title}
                 </h3>
-                <p className="text-base text-on-surface-variant leading-relaxed line-clamp-3 mb-4">{guide.description}</p>
+                <p className="mb-4 flex-1 text-base leading-relaxed text-on-surface-variant line-clamp-3">{guide.description}</p>
                 <div className="mt-auto flex items-center justify-between">
                   <span className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant">
                     <Clock className="w-3.5 h-3.5" />
                     {guide.readingMinutes} min read
                   </span>
-                  <span className={`text-sm font-semibold sm:opacity-0 sm:group-hover:opacity-100 transition-opacity ${tone.text}`}>
+                  <span className={`inline-flex items-center gap-1 text-sm font-semibold ${accent.text}`}>
                     Read Guide <ArrowRight size={14} className="inline-block -mt-0.5" />
                   </span>
                 </div>

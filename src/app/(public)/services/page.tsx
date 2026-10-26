@@ -2,9 +2,10 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import Button from "@/components/ui/button";
-import { CtaBand, PAGE_TONES, PageHeader } from "@/components/marketing/page-shell";
+import { CtaBand, PageHeader } from "@/components/marketing/page-shell";
 import { MaterialIcon } from "@/lib/icons-map";
 import { GUIDE_BY_SERVICE, SERVICE_GROUPS } from "@/lib/services";
+import { accentForIndex, accentForService } from "@/lib/accent-styles";
 
 export const metadata: Metadata = {
   title: "Services | Assignment, Writing, Editing & Study Help | Acadivo",
@@ -25,12 +26,12 @@ export default function ServicesPage() {
       <div className="band-soft">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
         <div className="space-y-16">
-          {SERVICE_GROUPS.map((group) => {
-            const groupTone = PAGE_TONES.blue;
+          {SERVICE_GROUPS.map((group, groupIndex) => {
+            const groupTone = accentForIndex(groupIndex);
             return (
             <div key={group.title} id={group.id} className="scroll-mt-24">
               <div className="flex items-start gap-3 mb-8">
-                <span className={`w-11 h-11 rounded-xl ${groupTone.iconTile} ${groupTone.icon} flex items-center justify-center shrink-0`}>
+                <span className={`w-11 h-11 rounded-xl ${groupTone.tile} ${groupTone.icon} flex items-center justify-center shrink-0`}>
                   <MaterialIcon name={group.icon} size={24} />
                 </span>
                 <div>
@@ -39,24 +40,40 @@ export default function ServicesPage() {
                 </div>
               </div>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {group.services.map((s) => (
+                {group.services.map((s) => {
+                  const accent = accentForService(s.slug);
+                  return (
                   <div
                     key={s.name}
-                    className={`relative overflow-hidden bg-white rounded-2xl p-5 border ${groupTone.card} shadow-sm ${groupTone.cardHover} transition-all flex flex-col`}
+                    className={`group flex min-h-56 flex-col rounded-2xl border border-outline-variant/40 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${accent.cardHover}`}
                   >
-                    <span className={`absolute inset-x-0 top-0 h-1 ${groupTone.hairline}`} aria-hidden="true" />
-                    <h3 className="font-semibold text-on-surface mb-1.5 pt-1">{s.name}</h3>
-                    <p className="text-base text-on-surface-variant leading-relaxed flex-1">{s.desc}</p>
-                    {GUIDE_BY_SERVICE[s.name] && (
+                    <div className="mb-4 flex items-center gap-3">
+                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${accent.tile}`}>
+                        <MaterialIcon name={group.icon} size={20} className={accent.icon} />
+                      </span>
+                      <h3 className={`font-display font-bold leading-snug ${accent.text}`}>{s.name}</h3>
+                    </div>
+                    <p className="flex-1 text-base leading-relaxed text-on-surface-variant">{s.desc}</p>
+                    <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1">
                       <Link
-                        href={GUIDE_BY_SERVICE[s.name]}
-                        className={`text-xs font-semibold ${groupTone.text} hover:underline mt-3 inline-flex items-center min-h-11`}
+                        href={`/services/${s.slug}`}
+                        className={`inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold hover:underline ${accent.text}`}
                       >
-                        Read the free guide &rarr;
+                        Explore service
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                       </Link>
-                    )}
+                      {GUIDE_BY_SERVICE[s.name] && (
+                        <Link
+                          href={GUIDE_BY_SERVICE[s.name]}
+                          className="inline-flex min-h-11 items-center text-sm font-semibold text-on-surface-variant hover:text-on-surface hover:underline"
+                        >
+                          Free guide
+                        </Link>
+                      )}
+                    </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
             );
@@ -64,7 +81,6 @@ export default function ServicesPage() {
         </div>
 
         <div className="mt-16 text-center bg-white rounded-2xl p-8 sm:p-12 border border-primary-container/30 shadow-md shadow-primary-container/10 relative overflow-hidden">
-          <span className="absolute inset-x-0 top-0 h-1 bg-primary" aria-hidden="true" />
           <h2 className="font-display text-2xl sm:text-3xl font-bold text-on-surface mb-3">Want to learn the process first?</h2>
           <p className="text-on-surface-variant mb-8 max-w-lg mx-auto leading-relaxed">
             Our free student guides explain step by step how to approach each of these tasks, with examples and

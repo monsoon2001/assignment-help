@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight, Search } from "lucide-react";
-import { CtaBand, PAGE_TONES, PageHeader } from "@/components/marketing/page-shell";
+import { CtaBand, PageHeader } from "@/components/marketing/page-shell";
 import { MaterialIcon } from "@/lib/icons-map";
 import ResourceBrowser from "@/components/resources/resource-browser";
 import {
@@ -12,6 +12,7 @@ import {
   guidesByCategory,
   resourcePath,
 } from "@/lib/resources";
+import { accentForFeaturedGuide, accentForGuideCategory } from "@/lib/accent-styles";
 
 export const metadata: Metadata = {
   title: "Student Guides & Academic Writing Resources | Acadivo",
@@ -42,31 +43,34 @@ export default function ResourcesPage() {
       <section className="py-12 sm:py-16 band-soft">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <section className="mb-10 sm:mb-16">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="h-1 w-10 rounded-full bg-primary" aria-hidden="true" />
-            <h2 className="font-display text-2xl font-bold text-on-surface">Featured Guides</h2>
-          </div>
+          <h2 className="font-display text-2xl font-bold text-on-surface mb-2">Featured Guides</h2>
           <p className="text-on-surface-variant mb-6">Start with the questions students search for most.</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {FEATURED_RESOURCES.map((guide) => {
-              const tone = PAGE_TONES.blue;
+              const accent = accentForFeaturedGuide(guide.slug, guide.category);
               return (
               <Link
                 key={guide.slug}
                 href={resourcePath(guide)}
-                className={`group relative overflow-hidden bg-white rounded-2xl p-6 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}
+                className={`group flex min-h-64 flex-col rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${accent.cardHover}`}
               >
-                <span className={`absolute inset-x-0 top-0 h-1 ${tone.hairline}`} aria-hidden="true" />
-                <span className={`text-xs font-semibold mb-3 inline-block rounded-full px-3 py-1 ${tone.chip}`}>
-                  {CATEGORY_BY_SLUG.get(guide.category)?.name}
-                </span>
-                <h3 className={`font-display font-bold text-on-surface mb-2 transition-colors ${tone.text}`}>
+                <div className="mb-4 flex items-center gap-3">
+                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${accent.tile}`}>
+                    <MaterialIcon name={CATEGORY_BY_SLUG.get(guide.category)?.icon ?? "auto_stories"} size={20} className={accent.icon} />
+                  </span>
+                  <span className={`text-xs font-semibold ${accent.text}`}>
+                    {CATEGORY_BY_SLUG.get(guide.category)?.name}
+                  </span>
+                </div>
+                <h3 className={`mb-2 font-display font-bold leading-snug transition-colors ${accent.text}`}>
                   {guide.title}
                 </h3>
-                <p className="text-base text-on-surface-variant leading-relaxed line-clamp-3 mb-4">
+                <p className="mb-4 flex-1 text-base leading-relaxed text-on-surface-variant line-clamp-3">
                   {guide.ogDescription}
                 </p>
-                <span className={`text-sm font-semibold ${tone.text}`}>Read Guide <ArrowRight size={14} className="inline-block -mt-0.5" /></span>
+                <span className={`inline-flex items-center gap-1.5 text-sm font-semibold ${accent.text}`}>
+                  Read guide <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+                </span>
               </Link>
               );
             })}
@@ -83,22 +87,23 @@ export default function ResourcesPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {RESOURCE_CATEGORIES.map((category) => {
               const count = guidesByCategory(category.slug).length;
-              const tone = PAGE_TONES.blue;
+              const accent = accentForGuideCategory(category.slug);
               return (
                 <Link
                   key={category.slug}
                   href={`/resources/${category.slug}`}
-                  className={`group relative overflow-hidden bg-white rounded-2xl p-6 border ${tone.card} shadow-sm ${tone.cardHover} transition-all`}
+                  className={`group flex min-h-64 flex-col rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${accent.cardHover}`}
                 >
-                  <span className={`absolute inset-x-0 top-0 h-1 ${tone.hairline}`} aria-hidden="true" />
-                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${tone.iconTile}`}>
-                    <MaterialIcon name={category.icon} size={24} className={tone.icon} />
+                  <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${accent.tile}`}>
+                    <MaterialIcon name={category.icon} size={24} className={accent.icon} />
                   </div>
-                  <h3 className={`font-display font-bold text-on-surface mb-1.5 transition-colors ${tone.text}`}>
+                  <h3 className={`mb-1.5 font-display font-bold transition-colors ${accent.text}`}>
                     {category.name}
                   </h3>
-                  <p className="text-base text-on-surface-variant leading-relaxed mb-3">{category.description}</p>
-                  <p className={`text-xs font-semibold ${tone.text}`}>{count} guides <ArrowRight size={12} className="inline-block -mt-0.5" /></p>
+                  <p className="mb-4 flex-1 text-base leading-relaxed text-on-surface-variant">{category.description}</p>
+                  <p className={`inline-flex items-center gap-1.5 text-sm font-semibold ${accent.text}`}>
+                    {count} guides <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+                  </p>
                 </Link>
               );
             })}

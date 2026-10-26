@@ -13,7 +13,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         )}
         <textarea
           ref={ref}
-          className={`w-full p-3.5 bg-surface border border-line rounded-lg text-sm text-ink placeholder:text-ink-soft focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none ${className}`}
+          className={`site-control w-full p-3.5 bg-surface border border-line rounded-xl text-sm text-ink placeholder:text-ink-soft focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-150 resize-none ${className}`}
           {...props}
         />
       </div>

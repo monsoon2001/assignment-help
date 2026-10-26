@@ -162,9 +162,9 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
             type="button"
             onClick={() => go(activePage - 1)}
             aria-label="Previous testimonials"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant bg-white text-on-surface-variant transition-colors hover:border-primary-container text-primary"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-outline-variant/60 bg-white text-primary shadow-sm transition-all duration-200 hover:border-primary/40 hover:bg-primary-tint active:scale-95"
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-5 w-5" strokeWidth={1.75} />
           </button>
           <div className="flex items-center gap-2">
             {pages.map((group, i) => (
@@ -184,9 +184,9 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
             type="button"
             onClick={() => go(activePage + 1)}
             aria-label="Next testimonials"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-outline-variant bg-white text-on-surface-variant transition-colors hover:border-primary-container text-primary"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-outline-variant/60 bg-white text-primary shadow-sm transition-all duration-200 hover:border-primary/40 hover:bg-primary-tint active:scale-95"
           >
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className="h-5 w-5" strokeWidth={1.75} />
           </button>
         </div>
       )}

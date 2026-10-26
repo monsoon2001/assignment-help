@@ -264,26 +264,37 @@ export default function TaskRequestForm({
               step={1}
               placeholder="e.g. 3"
               value={values.pages}
-              onChange={(e) => set("pages", e.target.value)}
-              className={`${FIELD_CLASS} pr-9 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+              onKeyDown={(e) => {
+                if (["-", "+", "e", "E", "."].includes(e.key)) e.preventDefault();
+              }}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (!value) {
+                  set("pages", "");
+                  return;
+                }
+                const pageCount = Number(value);
+                set("pages", Number.isFinite(pageCount) ? String(Math.max(0, Math.trunc(pageCount))) : "");
+              }}
+              className={`${FIELD_CLASS} pr-10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
             />
-            <span className="absolute right-1 flex flex-col gap-0.5">
+            <span className="page-count-stepper absolute right-1 top-1/2 flex -translate-y-1/2 flex-col justify-center">
               <button
                 type="button"
                 onClick={() => stepPages(1)}
                 aria-label="Add one page"
-                className="w-6 h-4 flex items-center justify-center rounded text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors cursor-pointer"
+                className="flex h-5 w-7 items-center justify-center rounded-md text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface"
               >
-                <ChevronUp size={14} />
+                <ChevronUp size={14} strokeWidth={2} />
               </button>
               <button
                 type="button"
                 onClick={() => stepPages(-1)}
                 disabled={pages <= 0}
                 aria-label="Remove one page"
-                className="w-6 h-4 flex items-center justify-center rounded text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors cursor-pointer disabled:opacity-40 disabled:pointer-events-none"
+                className="flex h-5 w-7 items-center justify-center rounded-md text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface disabled:opacity-40 disabled:pointer-events-none"
               >
-                <ChevronDown size={14} />
+                <ChevronDown size={14} strokeWidth={2} />
               </button>
             </span>
           </div>

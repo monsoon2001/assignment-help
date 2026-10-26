@@ -11,6 +11,7 @@ import { STEPS } from "@/lib/home-content";
 import { ALL_RESOURCES, resourcePath } from "@/lib/resources";
 import { CtaBand, PageHeader } from "@/components/marketing/page-shell";
 import { SITE_URL, jsonLdScript } from "@/lib/seo";
+import { accentForService, DARK_LINK } from "@/lib/accent-styles";
 
 export const dynamicParams = false;
 
@@ -51,6 +52,7 @@ export default async function ServiceDetailPage({
   const service = getServicePage(slug);
   if (!service) notFound();
 
+  const accent = accentForService(service.slug);
   const guideHref = GUIDE_BY_SERVICE[service.name];
   const guide = ALL_RESOURCES.find((resource) => resourcePath(resource) === guideHref);
   const siblings = service.group.services.filter((item) => item.slug !== service.slug);
@@ -118,7 +120,7 @@ export default async function ServiceDetailPage({
                   key={point}
                   className="flex items-start gap-2.5 rounded-xl border border-outline-variant/50 bg-primary-fixed/30 p-4 text-on-surface-variant"
                 >
-                  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                  <CheckCircle className={`mt-0.5 h-5 w-5 shrink-0 ${accent.icon}`} />
                   {point}
                 </li>
               ))}
@@ -164,7 +166,7 @@ export default async function ServiceDetailPage({
                 </p>
                 <Link
                   href={guideHref}
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline min-h-11 -my-2 px-2 -mx-2"
+                  className={`inline-flex items-center gap-2 text-sm font-semibold hover:underline min-h-11 -my-2 px-2 -mx-2 ${DARK_LINK}`}
                 >
                   Read the guide
                   <ArrowRight className="h-4 w-4" />
@@ -178,22 +180,25 @@ export default async function ServiceDetailPage({
               Other {service.group.title.toLowerCase()} services
             </h2>
             <div className="grid sm:grid-cols-2 gap-3">
-              {siblings.map((item) => (
+              {siblings.map((item) => {
+                const siblingAccent = accentForService(item.slug);
+                return (
                 <Link
                   key={item.slug}
                   href={`/services/${item.slug}`}
-                  className="group rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-4 transition-all hover:border-primary-container/40 hover:shadow-md"
+                  className={`group rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-4 transition-all ${siblingAccent.cardHover} hover:shadow-md`}
                 >
-                  <span className="font-semibold text-primary transition-colors">
+                  <span className={`font-semibold transition-colors ${siblingAccent.text}`}>
                     {item.name}
                   </span>
                   <span className="mt-1 block text-on-surface-variant leading-relaxed">{item.desc}</span>
                 </Link>
-              ))}
+                );
+              })}
             </div>
             <Link
               href="/subjects"
-              className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+              className={`mt-5 inline-flex items-center gap-2 text-sm font-semibold hover:underline ${DARK_LINK}`}
             >
               See every subject we cover
               <ArrowRight className="h-4 w-4" />
@@ -211,7 +216,7 @@ export default async function ServiceDetailPage({
                   <li key={resource.slug}>
                     <Link
                       href={resourcePath(resource)}
-                      className="text-primary transition-colors leading-snug"
+                      className={`${DARK_LINK} transition-colors leading-snug`}
                     >
                       {resource.title}
                     </Link>
@@ -225,7 +230,7 @@ export default async function ServiceDetailPage({
             <p className="text-on-surface-variant leading-relaxed mb-4">{service.group.description}</p>
             <Link
               href={`/services#${service.group.id}`}
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+              className={`inline-flex items-center gap-1.5 text-sm font-semibold hover:underline ${DARK_LINK}`}
             >
               All {service.group.title.toLowerCase()} services
               <ArrowRight className="h-4 w-4" />

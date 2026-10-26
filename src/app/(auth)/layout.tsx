@@ -9,12 +9,6 @@ import { GraduationCap } from "lucide-react";
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative flex h-dvh flex-col overflow-hidden bg-background">
-      {/* A faint graph-paper grid rather than soft gradient blobs — it reads as
-          study/notebook paper and matches the academic tone. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-60 [background-image:linear-gradient(to_right,rgba(37,99,235,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(37,99,235,0.05)_1px,transparent_1px)] [background-size:28px_28px] [mask-image:radial-gradient(circle_at_50%_25%,black,transparent_72%)]"
-      />
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-line" />
 
       <header className="relative z-10 flex shrink-0 items-center justify-between px-5 py-3 sm:px-8">
