@@ -395,15 +395,6 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                   <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary-container ring-2 ring-surface-container-lowest" />
                 </Button>
               </Link>
-              {role !== null && role !== "admin" && pathname !== "/" && (
-                <Link
-                  href="/"
-                  aria-label="Home"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface md:hidden"
-                >
-                  <Home size={22} />
-                </Link>
-              )}
               {role === "student" && pathname.startsWith("/dashboard") && (
                 <Link
                   href="/"
