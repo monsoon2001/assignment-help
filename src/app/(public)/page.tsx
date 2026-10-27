@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CheckCircle, ArrowRight } from "lucide-react";
+import { CheckCircle, ArrowRight, BookOpen, Sparkles, Clock, Users } from "lucide-react";
 import { MaterialIcon } from "@/lib/icons-map";
 import PriceEstimateForm from "@/components/marketing/price-estimate-form";
 import AssistanceCta from "@/components/marketing/assistance-cta";
@@ -444,16 +444,26 @@ export default async function HomePage() {
       {/* Trust band */}
       <section className="py-8 sm:py-10 bg-white border-y border-outline-variant/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {[
-              { value: SUBJECTS.length, label: "Subjects covered" },
-              { value: HOME_SERVICE_COUNT, label: "Kinds of help" },
-              { value: "24h", label: "Typical first reply" },
-              { value: "100%", label: "Human helpers" },
+              { icon: BookOpen, value: SUBJECTS.length, label: "Subjects covered", tint: "bg-primary-tint text-primary" },
+              { icon: Sparkles, value: HOME_SERVICE_COUNT, label: "Kinds of help", tint: "bg-accent-tint text-on-accent-tint" },
+              { icon: Clock, value: "24h", label: "Typical first reply", tint: "bg-success-tint text-success" },
+              { icon: Users, value: "100%", label: "Human helpers", tint: "bg-primary-tint text-primary" },
             ].map((item) => (
-              <div key={item.label}>
-                <p className="font-display text-2xl sm:text-3xl font-bold text-primary">{item.value}</p>
-                <p className="mt-1 text-xs sm:text-sm text-on-surface-variant">{item.label}</p>
+              <div
+                key={item.label}
+                className="flex items-center gap-3 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest px-4 py-3 shadow-sm"
+              >
+                <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${item.tint}`}>
+                  <item.icon className="h-5 w-5" />
+                </span>
+                <div className="min-w-0">
+                  <p className="font-display text-xl sm:text-2xl font-bold text-on-surface leading-none">
+                    {item.value}
+                  </p>
+                  <p className="mt-1 text-xs sm:text-sm text-on-surface-variant truncate">{item.label}</p>
+                </div>
               </div>
             ))}
           </div>
