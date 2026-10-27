@@ -7,9 +7,9 @@
      Material tonal tokens further down are compatibility aliases that resolve
      to the same palette, so older utilities stay on-brand.
      ====================================================================== */
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-dark: #1e40af;
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-dark: #1d4ed8;
   --color-primary-tint: #eff6ff;
   --color-primary-tint-line: #bfdbfe;
 
@@ -33,9 +33,9 @@
   /* Status badge tones — exact text/background pairs. One row per state. */
   --color-tone-slate: #475569;
   --color-tone-slate-bg: #f1f5f9;
-  --color-tone-blue: #1d4ed8;
+  --color-tone-blue: #2563eb;
   --color-tone-blue-bg: #eff6ff;
-  --color-tone-blue-strong: #1d4ed8;
+  --color-tone-blue-strong: #2563eb;
   --color-tone-blue-strong-bg: #dbeafe;
   --color-tone-amber: #78350f;
   --color-tone-amber-bg: #fef3c7;
@@ -87,7 +87,7 @@
   --color-surface-container-high: #cbd5e1;
   --color-surface-container-highest: #94a3b8;
   --color-surface-variant: #e2e8f0;
-  --color-surface-tint: #2563eb;
+  --color-surface-tint: #3b82f6;
   --color-section: #f1f5f9;
 
   /* Text (the 30% of neutrals). */
@@ -96,17 +96,17 @@
   --color-on-background: #0f172a;
 
   /* Primary blue — actions only. */
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-dark: #1e40af;
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-dark: #1d4ed8;
   --color-primary-tint: #eff6ff;
-  --color-primary-container: #2563eb;
+  --color-primary-container: #3b82f6;
   --color-on-primary: #ffffff;
   --color-on-primary-container: #ffffff;
   --color-primary-fixed: #eff6ff;
   --color-primary-fixed-dim: #bfdbfe;
-  --color-on-primary-fixed: #1e40af;
-  --color-on-primary-fixed-variant: #1d4ed8;
+  --color-on-primary-fixed: #1d4ed8;
+  --color-on-primary-fixed-variant: #2563eb;
 
   /* Neutral slate secondary. */
   --color-secondary: #e2e8f0;
@@ -160,7 +160,7 @@
 
   /* Extra marketing-page themes, kept inside the blue/amber/green/red family
      so nothing drifts off-palette. */
-  --color-accent-teal: #2563eb;
+  --color-accent-teal: #3b82f6;
   --color-accent-teal-container: #eff6ff;
   --color-accent-teal-fixed: #eff6ff;
   --color-accent-green: #15803d;
