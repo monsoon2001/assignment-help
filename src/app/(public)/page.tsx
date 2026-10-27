@@ -358,7 +358,7 @@ export default async function HomePage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden band-hero">
+      <section className="relative overflow-hidden band-hero bg-[radial-gradient(circle_at_1px_1px,rgba(37,99,235,0.07)_1px,transparent_0)] bg-[size:28px_28px]">
         <div className="absolute inset-x-0 bottom-0 h-24 bg-section" aria-hidden="true" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-20">
           <div className="grid lg:grid-cols-[1fr_minmax(0,640px)] gap-8 lg:gap-10 items-start">
@@ -682,39 +682,31 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid sm:grid-cols-2 gap-3">
             {homepageSubjects.map((s) => {
               const accent = accentForSubject(s.slug);
               return (
                 <Link
                   key={s.slug}
                   href={`/subjects/${s.slug}`}
-                  className={`group flex flex-col bg-white rounded-2xl p-5 border border-outline-variant/30 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ${accent.cardHover}`}
+                  className={`group flex items-center gap-4 rounded-xl border border-outline-variant/30 bg-white px-4 py-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${accent.cardHover}`}
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <span
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${accent.tile}`}
-                    >
-                      <MaterialIcon name={s.icon} size={20} className={accent.icon} />
-                    </span>
+                  <span
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${accent.tile}`}
+                  >
+                    <MaterialIcon name={s.icon} size={20} className={accent.icon} />
+                  </span>
+                  <div className="min-w-0 flex-1">
                     <h3
-                      className={`font-display text-base font-bold transition-colors leading-snug ${accent.text}`}
+                      className={`font-display text-base font-bold leading-snug ${accent.text}`}
                     >
                       {s.name}
                     </h3>
+                    <p className="truncate text-sm text-on-surface-variant">{s.cardDesc}</p>
                   </div>
-                  <p className="text-base text-on-surface-variant leading-relaxed">{s.cardDesc}</p>
-                  {s.detail && (
-                    <p className="hidden sm:block mt-2 text-base text-on-surface-variant/90 leading-relaxed">
-                      {s.detail}
-                    </p>
-                  )}
-                  <p
-                    className={`mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold ${DARK_LINK}`}
-                  >
-                    {s.name} help topics
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                  </p>
+                  <ArrowRight
+                    className={`h-4 w-4 shrink-0 transition-transform group-hover:translate-x-0.5 ${DARK_LINK}`}
+                  />
                 </Link>
               );
             })}
@@ -747,13 +739,13 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {homepageGuides.map((guide) => {
               return (
                 <Link
                   key={guide.key}
                   href={guide.href}
-                  className={`group flex flex-col rounded-2xl border border-outline-variant/30 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${guide.accent.cardHover}`}
+                  className={`group flex flex-col rounded-xl border border-outline-variant/30 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${guide.accent.cardHover}`}
                 >
                   <div className="mb-3 flex items-start justify-between gap-3">
                     <span
