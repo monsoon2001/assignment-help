@@ -482,7 +482,7 @@ export default async function HomePage() {
                       {service.items.length} ways to help
                     </span>
                   </div>
-                  <h3 className={`font-display text-lg font-bold ${accent.text} mb-2`}>
+                  <h3 className="font-display text-lg font-bold text-on-surface mb-2">
                     {service.title}
                   </h3>
                   <p className="text-base text-on-surface-variant leading-relaxed">
@@ -697,9 +697,7 @@ export default async function HomePage() {
                     <MaterialIcon name={s.icon} size={20} className={accent.icon} />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <h3
-                      className={`font-display text-base font-bold leading-snug ${accent.text}`}
-                    >
+                    <h3 className="font-display text-base font-bold leading-snug text-on-surface">
                       {s.name}
                     </h3>
                     <p className="truncate text-sm text-on-surface-variant">{s.cardDesc}</p>
@@ -759,9 +757,7 @@ export default async function HomePage() {
                       {guide.meta}
                     </span>
                   </div>
-                  <h3
-                    className={`font-display text-base font-bold leading-snug transition-colors ${guide.accent.text}`}
-                  >
+                  <h3 className="font-display text-base font-bold leading-snug text-on-surface">
                     {guide.title}
                   </h3>
                   <p className="mt-2 text-base leading-relaxed text-on-surface-variant">
