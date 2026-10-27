@@ -282,7 +282,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
             <GraduationCap size={20} />
           </span>
           <div className="leading-tight">
-            <p className="font-display font-bold text-on-surface text-base sm:text-lg leading-none">
+            <p className="font-display font-bold text-brand text-base sm:text-lg leading-none">
               Acadivo
             </p>
             <p className="hidden sm:block text-xs uppercase tracking-widest xl:tracking-widest text-on-surface-variant">

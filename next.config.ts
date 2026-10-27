@@ -92,7 +92,6 @@ const nextConfig: NextConfig = {
     const hosts = [
       "www.acadivo.com",
       "acadivo.vercel.app",
-      "*.vercel.app",
     ];
     return hosts.flatMap((host) => [
       {

@@ -29,7 +29,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 sm:gap-x-10 gap-y-8 items-start">
           <div className="col-span-2 sm:col-span-2 lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
                 <MaterialIcon name="school" size={18} className="text-on-primary" />
               </div>
               <span className="font-display font-bold text-xl text-white">Acadivo</span>
