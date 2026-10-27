@@ -360,6 +360,8 @@ export default async function HomePage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden band-hero bg-[radial-gradient(circle_at_1px_1px,rgba(37,99,235,0.07)_1px,transparent_0)] bg-[size:28px_28px]">
         <div className="absolute inset-x-0 bottom-0 h-24 bg-section" aria-hidden="true" />
+        <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary-tint opacity-60 blur-3xl" aria-hidden="true" />
+        <div className="pointer-events-none absolute top-1/3 -left-32 h-64 w-64 rounded-full bg-accent-tint opacity-40 blur-3xl" aria-hidden="true" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-20">
           <div className="grid lg:grid-cols-[1fr_minmax(0,640px)] gap-8 lg:gap-10 items-start">
             {/* Left Column */}
@@ -438,6 +440,25 @@ export default async function HomePage() {
       <div className="lg:hidden max-w-7xl mx-auto px-4 sm:px-6 py-5">
         <AssistanceCta />
       </div>
+
+      {/* Trust band */}
+      <section className="py-8 sm:py-10 bg-white border-y border-outline-variant/40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            {[
+              { value: SUBJECTS.length, label: "Subjects covered" },
+              { value: HOME_SERVICE_COUNT, label: "Kinds of help" },
+              { value: "24h", label: "Typical first reply" },
+              { value: "100%", label: "Human helpers" },
+            ].map((item) => (
+              <div key={item.label}>
+                <p className="font-display text-2xl sm:text-3xl font-bold text-primary">{item.value}</p>
+                <p className="mt-1 text-xs sm:text-sm text-on-surface-variant">{item.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Core Academic Services */}
       <section className="py-12 sm:py-16 bg-section">
@@ -862,11 +883,13 @@ export default async function HomePage() {
       </section>
 
       {/* Final CTA */}
-      <section
-        className="relative overflow-hidden py-14 sm:py-20 band-ink"
-        aria-labelledby="cta-heading"
-      >
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+       <section
+         className="relative overflow-hidden py-14 sm:py-20 band-ink"
+         aria-labelledby="cta-heading"
+       >
+         <div className="pointer-events-none absolute -top-20 -left-20 h-64 w-64 rounded-full bg-primary/30 blur-3xl" aria-hidden="true" />
+         <div className="pointer-events-none absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-accent/20 blur-3xl" aria-hidden="true" />
+         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 bg-white/12 ring-1 ring-white/25">
               <MaterialIcon name="school" size={24} className="text-white/80" />
