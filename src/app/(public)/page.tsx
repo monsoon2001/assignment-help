@@ -575,7 +575,7 @@ export default async function HomePage() {
                   <div
                     className={`h-full rounded-2xl border border-outline-variant/30 bg-white p-6 pt-7 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg ${accent.cardHover}`}
                   >
-                    <h3 className={`font-display text-lg font-bold leading-snug ${accent.text}`}>
+                    <h3 className="font-display text-lg font-bold leading-snug text-on-surface">
                       {step.title}
                     </h3>
                     <p className="mt-2 text-base leading-relaxed text-on-surface-variant">
@@ -664,7 +664,7 @@ export default async function HomePage() {
                     key={benefit.title}
                     className={`border-b border-outline-variant/40 py-4 ${accent.cardHover}`}
                   >
-                    <h3 className={`font-display text-base font-bold ${accent.text}`}>
+                    <h3 className="font-display text-base font-bold text-on-surface">
                       {benefit.title}
                     </h3>
                     <p className="mt-1 text-sm leading-relaxed text-on-surface-variant">
@@ -844,7 +844,7 @@ export default async function HomePage() {
                     >
                       <MaterialIcon name={benefit.icon} size={20} className={accent.icon} />
                     </span>
-                    <h3 className={`font-display text-base font-bold ${accent.text}`}>
+                    <h3 className="font-display text-base font-bold text-on-surface">
                       {benefit.title}
                     </h3>
                     <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">

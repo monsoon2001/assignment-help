@@ -107,7 +107,7 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
                   href="/requests/new"
                   className={`bg-white rounded-2xl p-5 border border-outline-variant/40 shadow-sm ${accent.cardHover} transition-all hover:-translate-y-0.5 hover:shadow-md`}
                 >
-                  <h3 className={`font-display font-bold mb-1.5 transition-colors ${accent.text}`}>
+                  <h3 className="font-display font-bold mb-1.5 text-on-surface">
                     {t.title}
                   </h3>
                   <p className="text-base text-on-surface-variant leading-relaxed">{t.blurb}</p>

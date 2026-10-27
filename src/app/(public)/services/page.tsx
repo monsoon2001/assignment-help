@@ -59,7 +59,7 @@ export default function ServicesPage() {
                             >
                               <MaterialIcon name={group.icon} size={20} className={accent.icon} />
                             </span>
-                            <h3 className={`font-display font-bold leading-snug ${accent.text}`}>
+                            <h3 className="font-display font-bold leading-snug text-on-surface">
                               {s.name}
                             </h3>
                           </div>

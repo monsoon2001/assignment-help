@@ -51,7 +51,7 @@ export default function SubjectsPage() {
                           >
                             <MaterialIcon name={s.icon} size={24} className={accent.icon} />
                           </span>
-                          <h3 className={`font-display font-bold transition-colors ${accent.text}`}>
+                          <h3 className="font-display font-bold text-on-surface">
                             {s.name}
                           </h3>
                         </div>

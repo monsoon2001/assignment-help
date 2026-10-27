@@ -134,12 +134,13 @@ export function PageHeader({
   crumbs?: Crumb[];
 }) {
   return (
-    <div className="border-b border-outline-variant/40 bg-white">
+    <div className="relative overflow-hidden border-b border-outline-variant/40 bg-white">
+      <div className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full bg-primary-tint opacity-50 blur-3xl" aria-hidden="true" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={jsonLdScript(breadcrumbJsonLd(crumbs))}
       />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6">
         <nav
           className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm mb-3"
           aria-label="Breadcrumb"
@@ -196,6 +197,8 @@ export function CtaBand({
       className="relative overflow-hidden py-12 sm:py-16 band-ink"
       aria-labelledby="cta-heading"
     >
+      <div className="pointer-events-none absolute -top-16 -left-16 h-48 w-48 rounded-full bg-primary/25 blur-3xl" aria-hidden="true" />
+      <div className="pointer-events-none absolute -bottom-20 -right-12 h-56 w-56 rounded-full bg-accent/15 blur-3xl" aria-hidden="true" />
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {eyebrow && (
           <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full on-band-chip border text-xs font-semibold mb-4">
