@@ -25,7 +25,7 @@ export default function OpengraphImage() {
             width: 64,
             height: 64,
             borderRadius: 18,
-            background: "#2563EB",
+            background: "#1E3A8A",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -57,7 +57,7 @@ export default function OpengraphImage() {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <div style={{ width: 48, height: 6, borderRadius: 999, background: "#2563EB" }} />
+        <div style={{ width: 48, height: 6, borderRadius: 999, background: "#1E3A8A" }} />
         <div style={{ color: "#94A3B8", fontSize: 28 }}>{SITE_URL.replace("https://", "")}</div>
       </div>
     </div>,
