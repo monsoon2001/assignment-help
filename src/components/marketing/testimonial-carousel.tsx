@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { BadgeCheck, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import Avatar from "@/components/ui/avatar";
 import { MaterialIcon } from "@/lib/icons-map";
@@ -50,24 +50,34 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
     return result;
   }, [count, perView, testimonials]);
 
+  const pagesRef = useRef(pages);
+  pagesRef.current = pages;
+
   // Switching from one card per view to three shrinks the page count, so the
   // current page is clamped during render instead of in an effect.
   const activePage = Math.min(page, pages.length - 1);
 
   const go = useCallback(
     (next: number) => {
-      setPage(((next % pages.length) + pages.length) % pages.length);
+      const len = pagesRef.current.length;
+      if (len === 0) return;
+      setPage(((next % len) + len) % len);
     },
-    [pages.length],
+    [],
   );
 
   useEffect(() => {
-    if (paused || pages.length <= 1) return;
+    if (paused) return;
+    if (pages.length <= 1) return;
     const timer = setInterval(() => {
-      setPage((current) => (current + 1) % pages.length);
+      setPage((current) => {
+        const len = pagesRef.current.length;
+        if (len <= 1) return current;
+        return (current + 1) % len;
+      });
     }, ROTATE_MS);
     return () => clearInterval(timer);
-  }, [pages.length, paused]);
+  }, [paused, pages.length]);
 
   if (count === 0) return null;
 
@@ -82,7 +92,7 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
       <div className="overflow-hidden">
         <div
           className="flex transition-transform duration-500 ease-out"
-          style={{ transform: `translateX(-${activePage * 100}%)` }}
+          style={{ transform: `translateX(-${(activePage / Math.max(pages.length, 1)) * 100}%)` }}
         >
           {pages.map((group, groupIndex) => (
             <div
