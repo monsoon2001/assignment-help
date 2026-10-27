@@ -79,7 +79,10 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
       <div className="overflow-hidden">
         <div
           className="flex transition-transform duration-500 ease-out"
-          style={{ transform: `translateX(-${(safeIndex / Math.max(count, 1)) * 100}%)` }}
+          style={{
+            width: `${count * (100 / Math.max(perView, 1))}%`,
+            transform: `translateX(-${(safeIndex / Math.max(count, 1)) * 100}%)`,
+          }}
         >
           {testimonials.map((t) => {
             const name = t.studentName?.trim() || "Acadivo student";
@@ -87,7 +90,8 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
             return (
               <div
                 key={t.id}
-                className={`shrink-0 px-2 ${perView === 3 ? "w-1/3" : "w-full"}`}
+                className="shrink-0 px-2"
+                style={{ width: `${100 / Math.max(count, 1)}%` }}
               >
                 <figure className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-outline-variant/40 bg-white p-6 sm:p-8 shadow-md shadow-ink-900/5 transition-all duration-300 hover:shadow-2xl hover:shadow-primary-container/20 hover:-translate-y-1">
                   <MaterialIcon
