@@ -77,6 +77,7 @@ interface TaskRequestFormProps {
   error?: string;
   onSubmit: (e: React.FormEvent) => void;
   submitLabel: string;
+  submitVariant?: "primary" | "brand";
   note?: string;
   submitting?: boolean;
   termsAccepted: boolean;
@@ -161,6 +162,7 @@ export default function TaskRequestForm({
   error,
   onSubmit,
   submitLabel,
+  submitVariant = "primary",
   note,
   submitting = false,
   termsAccepted,
@@ -414,7 +416,7 @@ export default function TaskRequestForm({
         </p>
       )}
 
-      <Button type="submit" disabled={submitting} className="w-full h-11">
+      <Button type="submit" variant={submitVariant} disabled={submitting} className="w-full h-11">
         {submitting ? <Loader2 size={16} className="animate-spin" /> : submitLabel}
         {submitting ? (
           <span className="sr-only">Submitting</span>

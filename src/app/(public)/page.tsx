@@ -366,12 +366,12 @@ export default async function HomePage() {
           <div className="grid lg:grid-cols-[1fr_minmax(0,640px)] gap-8 lg:gap-10 items-start">
             {/* Left Column */}
             <div className="space-y-5 home-enter">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed border border-outline-variant/50 text-primary text-xs sm:text-sm font-semibold">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-tint border border-brand-tint text-brand text-xs sm:text-sm font-semibold">
                 <MaterialIcon name="verified_user" size={16} />
                 100% human help, never AI
               </span>
               <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold text-on-surface leading-tight">
-                Get Help from a Verified <span className="text-primary">Assignment Helper</span>
+                Get Help from a Verified <span className="text-brand">Assignment Helper</span>
               </h1>
               <p className="text-base sm:text-lg text-on-surface-variant leading-relaxed max-w-xl">
                 Tell us what you&apos;re working on — the subject, the deadline, the brief if you

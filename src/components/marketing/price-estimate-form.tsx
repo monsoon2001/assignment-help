@@ -141,6 +141,7 @@ export default function PriceEstimateForm() {
       termsAccepted={termsAccepted}
       setTermsAccepted={setTermsAccepted}
       submitLabel="Get My Estimate"
+      submitVariant="brand"
       note="Free estimate — no commitment required"
       submitting={submitting}
     />
