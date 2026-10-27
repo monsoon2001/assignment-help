@@ -29,10 +29,7 @@ export async function getFxSettings(): Promise<FxSettings> {
   };
 }
 
-export async function updateFxSettings(
-  _prev: FxResult,
-  formData: FormData
-): Promise<FxResult> {
+export async function updateFxSettings(_prev: FxResult, formData: FormData): Promise<FxResult> {
   const adminId = await requireAdmin();
 
   const surchargePercent = Number(String(formData.get("surchargePercent") ?? "").trim());

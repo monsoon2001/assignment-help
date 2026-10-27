@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Timer, ShieldCheck, Loader2, DollarSign,
-} from "lucide-react";
+import { Timer, ShieldCheck, Loader2, DollarSign } from "lucide-react";
 import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
 import { acceptProposal, declineProposal } from "@/lib/orders";
-import { computeLocalCharge, normalizeCurrency, formatCurrency, DEFAULT_CURRENCY } from "@/lib/currency";
+import {
+  computeLocalCharge,
+  normalizeCurrency,
+  formatCurrency,
+  DEFAULT_CURRENCY,
+} from "@/lib/currency";
 import { proposalStatusMeta } from "@/lib/status-meta";
 import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 
@@ -72,7 +75,7 @@ export default function ProposalCard({
     currency,
     localCurrency,
     rates,
-    surchargePercent
+    surchargePercent,
   );
   const localResolved =
     localAmount !== null && localAmount > 0
@@ -117,7 +120,9 @@ export default function ProposalCard({
   }
 
   return (
-    <div className={`flex flex-col rounded-xl border border-outline-variant bg-surface-container-lowest shadow-sm overflow-hidden ${className}`}>
+    <div
+      className={`flex flex-col rounded-xl border border-outline-variant bg-surface-container-lowest shadow-sm overflow-hidden ${className}`}
+    >
       <div className="p-2.5 flex flex-col gap-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary-container/10 text-primary text-xs font-semibold uppercase tracking-wide">
@@ -164,11 +169,13 @@ export default function ProposalCard({
       <div className="flex items-center gap-2.5 px-3 pb-2.5">
         <Avatar name={ACADIVO_HELPER_NAME} role="helper" size="sm" />
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold text-on-surface truncate">
-            {ACADIVO_HELPER_NAME}
-          </p>
+          <p className="text-xs font-semibold text-on-surface truncate">{ACADIVO_HELPER_NAME}</p>
           <p className="text-xs text-on-surface-variant">
-            Proposed {new Date(proposal.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+            Proposed{" "}
+            {new Date(proposal.created_at).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            })}
           </p>
         </div>
         {orderId && proposal.status === "accepted" && (

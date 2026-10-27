@@ -2,7 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import {
-  CheckCircle2, Verified, CalendarCheck, MailCheck, MessageSquare, ShieldCheck, Timer, ExternalLink,
+  CheckCircle2,
+  Verified,
+  CalendarCheck,
+  MailCheck,
+  MessageSquare,
+  ShieldCheck,
+  Timer,
+  ExternalLink,
 } from "lucide-react";
 import { stripe } from "@/lib/stripe";
 import { unwrapRow } from "@/lib/embedded";
@@ -44,14 +51,18 @@ export default async function OrderConfirmedPage({
 
   const { data: orderRow } = await supabase
     .from("orders")
-    .select("id, price, currency, charge_amount, charge_currency, status, proposal_id, proposal:proposals(request:requests(title), helper:users(id, name))")
+    .select(
+      "id, price, currency, charge_amount, charge_currency, status, proposal_id, proposal:proposals(request:requests(title), helper:users(id, name))",
+    )
     .eq("id", id)
     .eq("student_id", user.id)
     .maybeSingle();
 
   if (!orderRow) notFound();
 
-  const proposal = unwrapRow<{ request: { title: string }[] | { title: string } | null }>(orderRow.proposal);
+  const proposal = unwrapRow<{ request: { title: string }[] | { title: string } | null }>(
+    orderRow.proposal,
+  );
   const title = unwrapRow<{ title: string }>(proposal?.request)?.title ?? "Acadivo Order";
 
   // Confirm the checkout session is genuinely bound to this order before
@@ -59,8 +70,7 @@ export default async function OrderConfirmedPage({
   let sessionVerified = false;
   try {
     const session = await stripe.checkout.sessions.retrieve(session_id);
-    sessionVerified =
-      session.payment_status === "paid" && session.metadata?.order_id === id;
+    sessionVerified = session.payment_status === "paid" && session.metadata?.order_id === id;
   } catch {
     sessionVerified = false;
   }
@@ -85,7 +95,9 @@ export default async function OrderConfirmedPage({
             <Verified size={12} /> Redirecting to secure checkout… done
           </Badge>
           <h1 className="font-display text-2xl font-bold text-on-surface max-w-sm">
-            {orderRow.status === "payment_pending" ? "Payment received — finalizing…" : "Order confirmed"}
+            {orderRow.status === "payment_pending"
+              ? "Payment received — finalizing…"
+              : "Order confirmed"}
           </h1>
         </div>
         <PaymentConfirming />
@@ -112,7 +124,9 @@ export default async function OrderConfirmedPage({
           <CheckCircle2 size={34} className="fill-success-tint" />
         </span>
         <div className="inline-flex items-center gap-2">
-          <Badge variant="secondary" className="gap-1"><Verified size={12} /> Payment confirmed</Badge>
+          <Badge variant="secondary" className="gap-1">
+            <Verified size={12} /> Payment confirmed
+          </Badge>
         </div>
         <h1 className="font-display text-2xl font-bold text-on-surface max-w-sm">
           You&apos;re all set — your order is officially active.
@@ -124,7 +138,9 @@ export default async function OrderConfirmedPage({
 
       <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest overflow-hidden shadow-sm">
         <div className="px-6 py-4 border-b border-outline-variant">
-          <p className="text-xs text-on-surface-variant">Order #{orderRow.id.slice(0, 8).toUpperCase()}</p>
+          <p className="text-xs text-on-surface-variant">
+            Order #{orderRow.id.slice(0, 8).toUpperCase()}
+          </p>
           <p className="font-display font-semibold text-on-surface mt-0.5">{title}</p>
         </div>
         <div className="px-6 py-5 grid grid-cols-2 sm:grid-cols-3 gap-5">
@@ -144,13 +160,16 @@ export default async function OrderConfirmedPage({
             <p className="text-xs text-on-surface-variant uppercase tracking-wide">Helper</p>
             <div className="flex items-center gap-2 mt-1">
               <Avatar name={ACADIVO_HELPER_NAME} role="helper" size="sm" />
-              <p className="text-sm font-semibold text-on-surface truncate">{ACADIVO_HELPER_NAME}</p>
+              <p className="text-sm font-semibold text-on-surface truncate">
+                {ACADIVO_HELPER_NAME}
+              </p>
             </div>
           </div>
         </div>
         <div className="px-6 py-4 border-t border-outline-variant bg-surface-container-low/40 flex flex-col gap-1.5">
           <p className="text-xs text-on-surface-variant inline-flex items-center gap-1.5">
-            <CalendarCheck size={13} /> Guaranteed delivery per agreed deadline &middot; work may begin immediately
+            <CalendarCheck size={13} /> Guaranteed delivery per agreed deadline &middot; work may
+            begin immediately
           </p>
           {receiptUrl ? (
             <a
@@ -171,9 +190,7 @@ export default async function OrderConfirmedPage({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Link href={`/orders/${orderRow.id}`}>
-          <Button className="w-full justify-center">
-            Open Project Workspace
-          </Button>
+          <Button className="w-full justify-center">Open Project Workspace</Button>
         </Link>
         <Link href={`/orders/${orderRow.id}`}>
           <Button variant="outline" className="w-full justify-center">
@@ -185,8 +202,11 @@ export default async function OrderConfirmedPage({
       <div className="flex items-start gap-2 p-4 rounded-xl bg-surface-container-low">
         <ShieldCheck size={17} className="text-primary shrink-0 mt-0.5" />
         <p className="text-xs leading-relaxed text-on-surface-variant">
-          Protected by the <span className="font-semibold text-on-surface">Acadivo Academic Guarantee</span>:{" "}
-          <span className="font-semibold text-on-surface inline-flex items-center gap-1"><Timer size={11} /> unlimited revisions</span>{" "}
+          Protected by the{" "}
+          <span className="font-semibold text-on-surface">Acadivo Academic Guarantee</span>:{" "}
+          <span className="font-semibold text-on-surface inline-flex items-center gap-1">
+            <Timer size={11} /> unlimited revisions
+          </span>{" "}
           until you&apos;re satisfied. If the delivered work doesn&apos;t match the agreed scope,
           you can request a refund under our Refund Policy.
         </p>

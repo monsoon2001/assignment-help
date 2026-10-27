@@ -3,10 +3,7 @@ import { adminClient } from "@/lib/supabase/admin";
 import { unwrapRow } from "@/lib/embedded";
 import { getCadRates } from "@/lib/fx.server";
 import { convertViaCad, normalizeCurrency } from "@/lib/currency";
-import HelperBalancesClient, {
-  type HelperBalance,
-  type RecentPayout,
-} from "./balances-client";
+import HelperBalancesClient, { type HelperBalance, type RecentPayout } from "./balances-client";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +19,7 @@ export default async function HelperBalancesPage() {
     adminClient
       .from("payments")
       .select(
-        "order_id, order:orders(id, status, price, currency, base_amount, base_currency, helper:users!orders_helper_id_fkey(id, name), proposal:proposals(request:requests(title)))"
+        "order_id, order:orders(id, status, price, currency, base_amount, base_currency, helper:users!orders_helper_id_fkey(id, name), proposal:proposals(request:requests(title)))",
       )
       .eq("status", "paid")
       .eq("helper_payout_status", "unpaid")
@@ -46,13 +43,12 @@ export default async function HelperBalancesPage() {
     if (!order) continue;
     const helper = unwrapRow<{ id: string; name: string | null }>(order.helper);
     if (!helper) continue;
-    const title =
-      unwrapRow<{ request: unknown }>(order.proposal)?.request
-        ? String(
-            unwrapRow<{ request: { title: string | null } | null }>(order.proposal)?.request?.title ??
-              "Untitled order"
-          )
-        : "Untitled order";
+    const title = unwrapRow<{ request: unknown }>(order.proposal)?.request
+      ? String(
+          unwrapRow<{ request: { title: string | null } | null }>(order.proposal)?.request?.title ??
+            "Untitled order",
+        )
+      : "Untitled order";
 
     // Reference value: the helper's quoted amount converted to CAD. The admin
     // still decides the exact amount sent — this is only a starting figure.
@@ -84,7 +80,9 @@ export default async function HelperBalancesPage() {
 
   const { data: payoutRows } = await adminClient
     .from("manual_payouts")
-    .select("id, helper_id, amount_sent_cad, amount_received, received_currency, method, reference, paid_at, order_ids, helper:users!manual_payouts_helper_id_fkey(name)")
+    .select(
+      "id, helper_id, amount_sent_cad, amount_received, received_currency, method, reference, paid_at, order_ids, helper:users!manual_payouts_helper_id_fkey(name)",
+    )
     .order("paid_at", { ascending: false })
     .limit(50);
 

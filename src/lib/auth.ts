@@ -31,14 +31,9 @@ export function safeNextPath(next: string | null | undefined): string | null {
 }
 
 export function isStudentRoute(pathname: string): boolean {
-  return [
-    "/dashboard",
-    "/requests",
-    "/orders",
-    "/messages",
-    "/notifications",
-    "/profile",
-  ].some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  return ["/dashboard", "/requests", "/orders", "/messages", "/notifications", "/profile"].some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  );
 }
 
 export function isHelperRoute(pathname: string): boolean {

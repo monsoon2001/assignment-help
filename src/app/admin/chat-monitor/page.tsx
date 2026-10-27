@@ -9,8 +9,21 @@ export const metadata: Metadata = {
 };
 
 type Participant = { id: string; name: string | null; role: string | null };
-type FlagRow = { id: string; message_id: string; reason: string; status: string; created_at: string };
-type MessageRow = { id: string; body: string | null; sender_id: string; sender?: Participant; created_at: string; flags: FlagRow[] };
+type FlagRow = {
+  id: string;
+  message_id: string;
+  reason: string;
+  status: string;
+  created_at: string;
+};
+type MessageRow = {
+  id: string;
+  body: string | null;
+  sender_id: string;
+  sender?: Participant;
+  created_at: string;
+  flags: FlagRow[];
+};
 
 function asArray<T>(value: unknown): T[] {
   if (Array.isArray(value)) return value as T[];
@@ -41,7 +54,7 @@ export default async function AdminChatMonitorPage() {
   const { data: requestThreads } = await adminClient
     .from("requests")
     .select(
-      "id, title, created_at, student:users!requests_student_id_fkey(id, name, role), helper:users!requests_helper_id_fkey(id, name, role), messages:messages(id, body, sender_id, sender:users(id, name, role), created_at, flags:chat_flags(id, message_id, reason, status, created_at))"
+      "id, title, created_at, student:users!requests_student_id_fkey(id, name, role), helper:users!requests_helper_id_fkey(id, name, role), messages:messages(id, body, sender_id, sender:users(id, name, role), created_at, flags:chat_flags(id, message_id, reason, status, created_at))",
     )
     .order("created_at", { ascending: false })
     .limit(100);
@@ -50,7 +63,7 @@ export default async function AdminChatMonitorPage() {
   const { data: orderThreads } = await adminClient
     .from("orders")
     .select(
-      "id, created_at, status, student:users!orders_student_id_fkey(id, name, role), helper:users!orders_helper_id_fkey(id, name, role), messages:messages(id, body, sender_id, sender:users(id, name, role), created_at, flags:chat_flags(id, message_id, reason, status, created_at))"
+      "id, created_at, status, student:users!orders_student_id_fkey(id, name, role), helper:users!orders_helper_id_fkey(id, name, role), messages:messages(id, body, sender_id, sender:users(id, name, role), created_at, flags:chat_flags(id, message_id, reason, status, created_at))",
     )
     .order("created_at", { ascending: false })
     .limit(100);
@@ -77,7 +90,7 @@ export default async function AdminChatMonitorPage() {
     .filter((t) => t.messages.length > 0)
     .map((t) => {
       const sorted = [...t.messages].sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
       );
       const last = sorted[0];
       return {
@@ -101,7 +114,7 @@ export default async function AdminChatMonitorPage() {
     .limit(50);
 
   const pendingFlags = threads.flatMap((t) =>
-    t.messages.flatMap((m) => m.flags.filter((f) => f.status === "pending"))
+    t.messages.flatMap((m) => m.flags.filter((f) => f.status === "pending")),
   ).length;
 
   return (
@@ -110,8 +123,8 @@ export default async function AdminChatMonitorPage() {
         <div>
           <h1 className="font-display text-2xl font-bold text-on-surface">Chat Monitor</h1>
           <p className="text-on-surface-variant mt-1">
-            Review student–helper conversations. Messages that mention phone numbers,
-            WhatsApp or other off-platform contact are flagged automatically.
+            Review student–helper conversations. Messages that mention phone numbers, WhatsApp or
+            other off-platform contact are flagged automatically.
           </p>
         </div>
         {pendingFlags > 0 && (

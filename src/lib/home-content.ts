@@ -69,25 +69,41 @@ export const BENEFITS: Benefit[] = [
     icon: "request_quote",
     title: "You know the price before you pay",
     desc: "Your helper writes out what you'll get, when, and what it costs. No bidding, no hourly meter running, no invoice you didn't see coming.",
-    points: ["One fixed quote per request", "Re-quoted if the brief changes", "Nothing charged until you accept"],
+    points: [
+      "One fixed quote per request",
+      "Re-quoted if the brief changes",
+      "Nothing charged until you accept",
+    ],
   },
   {
     icon: "verified_user",
     title: "Helpers who actually know the subject",
     desc: "We check who a helper is before they can take requests, and they only cover the subjects they're genuinely good at.",
-    points: ["Identity and credential checks", "Subject specialists, not generalists", "Reviews from finished orders only"],
+    points: [
+      "Identity and credential checks",
+      "Subject specialists, not generalists",
+      "Reviews from finished orders only",
+    ],
   },
   {
     icon: "menu_book",
     title: "Help you can learn from",
     desc: "Helpers explain and give feedback instead of handing you a finished file. You keep the thinking, and the work stays yours to stand behind.",
-    points: ["Comments and reasoning, not rewrites", "Your draft stays your draft", "Built around your integrity policy"],
+    points: [
+      "Comments and reasoning, not rewrites",
+      "Your draft stays your draft",
+      "Built around your integrity policy",
+    ],
   },
   {
     icon: "chat",
     title: "One thread, not a support queue",
     desc: "You talk to the person doing the work. Send files, ask the follow-up question, keep the whole history in one place.",
-    points: ["A single thread per request", "Share files as you go", "See progress without chasing"],
+    points: [
+      "A single thread per request",
+      "Share files as you go",
+      "See progress without chasing",
+    ],
   },
   {
     icon: "replay",
@@ -164,8 +180,7 @@ export const HOMEPAGE_SUBJECT_DETAIL: Record<string, string> = {
     "Support with method sections, results tables, and explaining pathways and processes accurately.",
   chemistry:
     "Reaction mechanisms, calculation walkthroughs, and lab methodology written up properly.",
-  physics:
-    "Worked through clearly, with modelling assumptions and error analysis explained.",
+  physics: "Worked through clearly, with modelling assumptions and error analysis explained.",
   "computer-science":
     "Code walkthroughs, debugging, testing strategy, and database queries explained as you go.",
   engineering:
@@ -177,16 +192,11 @@ export const HOMEPAGE_SUBJECT_DETAIL: Record<string, string> = {
 // Extra detail for the guide category cards, which carry a one-line summary in
 // resources/index.ts. Individual guide cards already use their full description.
 export const HOMEPAGE_GUIDE_DETAIL: Record<string, string> = {
-  writing:
-    "Introductions, conclusions and checklists you can reuse in your next draft.",
-  research:
-    "How to structure each section, present findings, and reference sources correctly.",
+  writing: "Introductions, conclusions and checklists you can reuse in your next draft.",
+  research: "How to structure each section, present findings, and reference sources correctly.",
   citations:
     "MLA, APA, Harvard and IEEE, in-text versus footnote, and staying clear of accidental plagiarism.",
-  projects:
-    "Scoping a question, working with a supervisor, timelines, and drafting a proposal.",
-  technical:
-    "Presenting results, documenting code, and explaining your method clearly.",
-  presentations:
-    "Talk tracks, and how to cut a long draft into a deck that actually persuades.",
+  projects: "Scoping a question, working with a supervisor, timelines, and drafting a proposal.",
+  technical: "Presenting results, documenting code, and explaining your method clearly.",
+  presentations: "Talk tracks, and how to cut a long draft into a deck that actually persuades.",
 };

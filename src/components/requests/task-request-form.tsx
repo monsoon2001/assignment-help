@@ -3,7 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { ArrowRight, CalendarDays, Clock, ChevronUp, ChevronDown, FileText, Loader2, Trash2, Upload, X } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarDays,
+  Clock,
+  ChevronUp,
+  ChevronDown,
+  FileText,
+  Loader2,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
 import { SUBJECTS, SERVICE_TYPES, ACADEMIC_LEVELS, OTHER_OPTION } from "@/lib/constants";
 import Input from "@/components/ui/input";
 import Select from "@/components/ui/select";
@@ -19,8 +30,7 @@ const FIELD_CLASS =
 // Safari renders native date/time widgets tiny and hides the time value when it
 // is empty, so these fields are styled as plain inputs and open the picker from
 // their own icon button.
-const PICKER_CLASS =
-  `${FIELD_CLASS} h-11 text-base appearance-none pr-10 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-date-and-time-value]:w-full [&::-webkit-date-and-time-value]:text-left`;
+const PICKER_CLASS = `${FIELD_CLASS} h-11 text-base appearance-none pr-10 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-date-and-time-value]:w-full [&::-webkit-date-and-time-value]:text-left`;
 export const LAST_DUE_TIME = "23:59";
 export const WORDS_PER_PAGE = 250;
 
@@ -169,7 +179,7 @@ export default function TaskRequestForm({
         (existing) =>
           existing.name === file.name &&
           existing.size === file.size &&
-          existing.lastModified === file.lastModified
+          existing.lastModified === file.lastModified,
       );
       if (!duplicate) merged.push(file);
     }
@@ -177,7 +187,10 @@ export default function TaskRequestForm({
   };
 
   const removeFile = (index: number) => {
-    set("files", values.files.filter((_, i) => i !== index));
+    set(
+      "files",
+      values.files.filter((_, i) => i !== index),
+    );
   };
 
   useEffect(() => {
@@ -255,9 +268,13 @@ export default function TaskRequestForm({
         </div>
         <div className="flex flex-col gap-1.5">
           <div className="flex items-baseline justify-between gap-2">
-            <label htmlFor="field-pages" className="text-sm font-medium text-ink">Pages</label>
+            <label htmlFor="field-pages" className="text-sm font-medium text-ink">
+              Pages
+            </label>
             <span className="text-xs text-ink-soft whitespace-nowrap">
-              {wordEstimate > 0 ? `Approx. ${wordEstimate.toLocaleString()} words` : "1 page \u2248 250 words"}
+              {wordEstimate > 0
+                ? `Approx. ${wordEstimate.toLocaleString()} words`
+                : "1 page \u2248 250 words"}
             </span>
           </div>
           <div className="relative flex items-center">
@@ -279,7 +296,10 @@ export default function TaskRequestForm({
                   return;
                 }
                 const pageCount = Number(value);
-                set("pages", Number.isFinite(pageCount) ? String(Math.max(0, Math.trunc(pageCount))) : "");
+                set(
+                  "pages",
+                  Number.isFinite(pageCount) ? String(Math.max(0, Math.trunc(pageCount))) : "",
+                );
               }}
               className={`${FIELD_CLASS} pr-10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
             />
@@ -341,7 +361,8 @@ export default function TaskRequestForm({
           >
             <Upload className="w-4 h-4" />
             <span className="text-sm font-medium">
-              {values.files.length} file{values.files.length > 1 ? "s" : ""} attached — click to review
+              {values.files.length} file{values.files.length > 1 ? "s" : ""} attached — click to
+              review
             </span>
           </button>
         ) : (
@@ -376,7 +397,11 @@ export default function TaskRequestForm({
         />
         <span>
           I have read and agree to Acadivo&apos;s{" "}
-          <Link href="/terms" className="font-semibold text-primary hover:underline" target="_blank">
+          <Link
+            href="/terms"
+            className="font-semibold text-primary hover:underline"
+            target="_blank"
+          >
             Terms of Service
           </Link>
           .
@@ -389,13 +414,13 @@ export default function TaskRequestForm({
         </p>
       )}
 
-      <Button
-        type="submit"
-        disabled={submitting || !termsAccepted}
-        className="w-full h-11"
-      >
+      <Button type="submit" disabled={submitting || !termsAccepted} className="w-full h-11">
         {submitting ? <Loader2 size={16} className="animate-spin" /> : submitLabel}
-        {submitting ? <span className="sr-only">Submitting</span> : <ArrowRight className="w-4 h-4" />}
+        {submitting ? (
+          <span className="sr-only">Submitting</span>
+        ) : (
+          <ArrowRight className="w-4 h-4" />
+        )}
       </Button>
 
       {note && <p className="text-xs text-on-surface-variant text-center">{note}</p>}
@@ -422,8 +447,8 @@ export default function TaskRequestForm({
                     Attached files
                   </h3>
                   <p className="text-xs text-on-surface-variant mt-0.5">
-                    {values.files.length} file{values.files.length === 1 ? "" : "s"} ready to send with your
-                    request. Remove anything you picked by mistake.
+                    {values.files.length} file{values.files.length === 1 ? "" : "s"} ready to send
+                    with your request. Remove anything you picked by mistake.
                   </p>
                 </div>
                 <button
@@ -443,7 +468,10 @@ export default function TaskRequestForm({
               ) : (
                 <ul className="mt-4 divide-y divide-outline-variant/40 border-y border-outline-variant/40">
                   {values.files.map((file, index) => (
-                    <li key={`${file.name}-${file.size}-${file.lastModified}`} className="flex items-center gap-3 py-2.5">
+                    <li
+                      key={`${file.name}-${file.size}-${file.lastModified}`}
+                      className="flex items-center gap-3 py-2.5"
+                    >
                       <span className="w-9 h-9 rounded-lg bg-surface-container-low border border-outline-variant flex items-center justify-center text-on-surface-variant shrink-0">
                         <FileText size={16} />
                       </span>
@@ -487,7 +515,7 @@ export default function TaskRequestForm({
               </div>
             </div>
           </div>,
-          document.body
+          document.body,
         )}
     </form>
   );

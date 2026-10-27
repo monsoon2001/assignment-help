@@ -24,7 +24,9 @@ export default async function AdminMessagesPage() {
         <p className="text-on-surface-variant mt-1">Direct realtime chat with helpers.</p>
       </div>
 
-      <AdminMessages helpers={(helpers ?? []) as unknown as Parameters<typeof AdminMessages>[0]["helpers"]} />
+      <AdminMessages
+        helpers={(helpers ?? []) as unknown as Parameters<typeof AdminMessages>[0]["helpers"]}
+      />
     </div>
   );
 }

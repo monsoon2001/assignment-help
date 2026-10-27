@@ -76,15 +76,14 @@ export default function RoleBottomNav({
   const scrollHidden = useScrollVisibility();
 
   const isActive = (href: string) =>
-    pathname === href ||
-    (href !== "/dashboard" && href !== "/" && pathname.startsWith(`${href}/`));
+    pathname === href || (href !== "/dashboard" && href !== "/" && pathname.startsWith(`${href}/`));
 
   const navVisibility = hideFrom === "lg" ? "lg:hidden" : "md:hidden";
 
   return (
     <>
       <nav
-        className={`${navVisibility} fixed bottom-0 inset-x-0 z-50 border-t border-outline-variant bg-surface-container-lowest/95 backdrop-blur px-1 pb-[env(safe-area-inset-bottom)] transition-transform duration-300 md:translate-y-0 ${
+        className={`${navVisibility} fixed bottom-0 inset-x-0 z-50 border-t border-outline-variant bg-surface-container-lowest px-1 pb-[env(safe-area-inset-bottom)] transition-transform duration-300 md:translate-y-0 ${
           scrollHidden && !open ? "translate-y-full" : "translate-y-0"
         }`}
         aria-label={`${roleLabel} navigation`}
@@ -129,7 +128,12 @@ export default function RoleBottomNav({
       </nav>
 
       {open && (
-        <div className={`fixed inset-0 z-[80] flex flex-col ${navVisibility}`} role="dialog" aria-modal="true" aria-label="Navigation">
+        <div
+          className={`fixed inset-0 z-[80] flex flex-col ${navVisibility}`}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation"
+        >
           <div
             className="absolute inset-0 bg-black/40 animate-[fade-in_0.15s_ease-out]"
             onClick={() => setOpen(false)}

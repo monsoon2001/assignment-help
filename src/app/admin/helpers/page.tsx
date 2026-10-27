@@ -20,7 +20,11 @@ export const metadata: Metadata = {
 
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 export default async function AdminHelpersPage({
@@ -53,7 +57,9 @@ export default async function AdminHelpersPage({
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-bold text-on-surface">Helpers</h1>
-          <p className="text-on-surface-variant mt-1">Approve, suspend, and manage helper profiles.</p>
+          <p className="text-on-surface-variant mt-1">
+            Approve, suspend, and manage helper profiles.
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <StatusBadge tone="green">{activeCount} active</StatusBadge>
@@ -69,25 +75,37 @@ export default async function AdminHelpersPage({
               <Crown size={22} />
             </span>
             <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-wider text-primary">Active helper · request routing</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                Active helper · request routing
+              </p>
               {activeHelper ? (
                 <div className="mt-0.5 flex items-center gap-2 min-w-0">
-                  <Avatar name={activeHelper.name ?? "Helper"} src={activeHelper.avatar_url ?? undefined} role="helper" size="sm" />
+                  <Avatar
+                    name={activeHelper.name ?? "Helper"}
+                    src={activeHelper.avatar_url ?? undefined}
+                    role="helper"
+                    size="sm"
+                  />
                   <p className="font-display font-semibold text-on-surface truncate">
                     {activeHelper.name ?? "Unnamed helper"}
                   </p>
                   <StatusBadge tone="green">Receiving requests</StatusBadge>
                 </div>
               ) : (
-                <p className="font-display font-semibold text-on-surface mt-0.5">No active helper set</p>
+                <p className="font-display font-semibold text-on-surface mt-0.5">
+                  No active helper set
+                </p>
               )}
               <p className="text-sm text-on-surface-variant mt-1">
-                Every new student request is routed to this helper. Switch it when one helper is unavailable.
+                Every new student request is routed to this helper. Switch it when one helper is
+                unavailable.
               </p>
             </div>
           </div>
           {activeHelper && !editing && (
-            <span className="text-xs text-on-surface-variant sm:text-right shrink-0">{activeHelper.email}</span>
+            <span className="text-xs text-on-surface-variant sm:text-right shrink-0">
+              {activeHelper.email}
+            </span>
           )}
         </div>
       </Card>
@@ -101,11 +119,21 @@ export default async function AdminHelpersPage({
           <table className="w-full min-w-[720px]">
             <thead>
               <tr className="border-b border-outline-variant/30">
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Helper</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Active helper</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Joined</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Status</th>
-                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Actions</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                  Helper
+                </th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                  Active helper
+                </th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                  Joined
+                </th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                  Status
+                </th>
+                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -120,12 +148,19 @@ export default async function AdminHelpersPage({
                   >
                     <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <Avatar name={user.name ?? "Helper"} src={user.avatar_url ?? undefined} role="helper" size="sm" />
+                        <Avatar
+                          name={user.name ?? "Helper"}
+                          src={user.avatar_url ?? undefined}
+                          role="helper"
+                          size="sm"
+                        />
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-on-surface truncate">{user.name ?? "Unnamed"}</p>
+                            <p className="text-sm font-medium text-on-surface truncate">
+                              {user.name ?? "Unnamed"}
+                            </p>
                             {isActive && (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-primary-container text-on-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide shrink-0">
+                              <span className="inline-flex items-center gap-1 rounded-full bg-primary-container text-on-primary px-2 py-0.5 text-xs font-bold uppercase tracking-wide shrink-0">
                                 <Crown size={10} />
                                 Active
                               </span>
@@ -138,9 +173,13 @@ export default async function AdminHelpersPage({
                     <td className="px-3 sm:px-6 py-4">
                       <ActiveHelperRadio helperId={user.id} active={isActive} />
                     </td>
-                    <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">{formatDate(user.created_at)}</td>
+                    <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">
+                      {formatDate(user.created_at)}
+                    </td>
                     <td className="px-3 sm:px-6 py-4">
-                      <StatusBadge tone={userStatusTone(user.status)}>{user.status ?? "active"}</StatusBadge>
+                      <StatusBadge tone={userStatusTone(user.status)}>
+                        {user.status ?? "active"}
+                      </StatusBadge>
                     </td>
                     <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
@@ -148,18 +187,30 @@ export default async function AdminHelpersPage({
                           <form action={setUserStatus}>
                             <input type="hidden" name="userId" value={user.id} />
                             <input type="hidden" name="status" value="active" />
-                            <Button size="sm" variant="secondary" type="submit">Approve</Button>
+                            <Button size="sm" variant="secondary" type="submit">
+                              Approve
+                            </Button>
                           </form>
                         )}
                         <form action={setUserStatus}>
                           <input type="hidden" name="userId" value={user.id} />
-                          <input type="hidden" name="status" value={user.status === "suspended" ? "active" : "suspended"} />
-                          <Button size="sm" variant={user.status === "suspended" ? "secondary" : "danger"} type="submit">
+                          <input
+                            type="hidden"
+                            name="status"
+                            value={user.status === "suspended" ? "active" : "suspended"}
+                          />
+                          <Button
+                            size="sm"
+                            variant={user.status === "suspended" ? "secondary" : "danger"}
+                            type="submit"
+                          >
                             {user.status === "suspended" ? "Unsuspend" : "Suspend"}
                           </Button>
                         </form>
                         <Link href={`/admin/helpers?edit=${user.id}`}>
-                          <Button size="sm" variant="ghost" type="button">Edit</Button>
+                          <Button size="sm" variant="ghost" type="button">
+                            Edit
+                          </Button>
                         </Link>
                       </div>
                     </td>
@@ -182,7 +233,8 @@ export default async function AdminHelpersPage({
       {helpers.length > 0 && (
         <p className="flex items-center gap-2 text-xs text-on-surface-variant">
           <Users size={13} className="text-primary" />
-          {helpers.length} helper account{helpers.length === 1 ? "" : "s"} total. The active helper receives all new requests.
+          {helpers.length} helper account{helpers.length === 1 ? "" : "s"} total. The active helper
+          receives all new requests.
         </p>
       )}
     </div>

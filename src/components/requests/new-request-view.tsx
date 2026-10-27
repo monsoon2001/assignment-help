@@ -14,7 +14,11 @@ import TaskRequestForm, {
   type TaskRequestFormValues,
 } from "@/components/requests/task-request-form";
 import {
-  submitRequest, loadPendingDraft, clearPendingDraft, loadDraftFiles, clearDraftFiles,
+  submitRequest,
+  loadPendingDraft,
+  clearPendingDraft,
+  loadDraftFiles,
+  clearDraftFiles,
 } from "@/lib/requests";
 
 import { OTHER_OPTION, withCustom } from "@/lib/constants";
@@ -29,7 +33,10 @@ const PRICING_BANDS = [
   { label: "Research help (per hour)", from: 20, to: 40 },
 ];
 
-function resolveDraftSelection(options: readonly string[], value?: string): { value: string; custom: string } {
+function resolveDraftSelection(
+  options: readonly string[],
+  value?: string,
+): { value: string; custom: string } {
   if (!value) return { value: "", custom: "" };
   const parsed = withCustom(value);
   if (parsed.isOther) return { value: OTHER_OPTION, custom: parsed.raw };
@@ -38,7 +45,7 @@ function resolveDraftSelection(options: readonly string[], value?: string): { va
     options.find(
       (o) =>
         o.toLowerCase().includes(parsed.value.toLowerCase()) ||
-        parsed.value.toLowerCase().includes(o.toLowerCase())
+        parsed.value.toLowerCase().includes(o.toLowerCase()),
     );
   if (match) return { value: match, custom: "" };
   return { value: OTHER_OPTION, custom: parsed.value };
@@ -62,9 +69,10 @@ function deadlineFromKey(key?: string): string {
 function browserRegion(): string | null {
   if (typeof navigator === "undefined") return null;
   try {
-    const langs = navigator.languages && navigator.languages.length > 0
-      ? navigator.languages
-      : [navigator.language];
+    const langs =
+      navigator.languages && navigator.languages.length > 0
+        ? navigator.languages
+        : [navigator.language];
     for (const lang of langs) {
       const parts = lang.split("-");
       for (let i = parts.length - 1; i >= 0; i--) {
@@ -103,10 +111,7 @@ export default function NewRequestView({
   const [error, setError] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
 
-  const set = useCallback(<K extends TaskRequestField>(
-    key: K,
-    value: TaskRequestFormValues[K]
-  ) => {
+  const set = useCallback(<K extends TaskRequestField>(key: K, value: TaskRequestFormValues[K]) => {
     setValues((prev) => ({ ...prev, [key]: value }));
     setError("");
   }, []);
@@ -155,7 +160,7 @@ export default function NewRequestView({
 
   const effectiveCountry =
     !countryKnown && typeof window !== "undefined"
-      ? countryNameFor(browserRegion()) ?? defaultCountry
+      ? (countryNameFor(browserRegion()) ?? defaultCountry)
       : defaultCountry;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -300,17 +305,16 @@ export default function NewRequestView({
                 <div key={band.label} className="flex items-center justify-between">
                   <span className="text-on-surface-variant">{band.label}</span>
                   <span className="font-semibold text-on-surface">
-                    {formatCurrency(band.from)} –{" "}
-                    {formatCurrency(band.to)}
+                    {formatCurrency(band.from)} – {formatCurrency(band.to)}
                   </span>
                 </div>
               ))}
             </div>
             <p className="text-xs text-on-surface-variant mt-3 leading-relaxed">
-              Indicative guidance in <span className="font-semibold">CAD</span>; you&apos;ll be charged in your
-              local currency at checkout. Your helper responds in the request chat within{" "}
-              <span className="font-semibold">2 hours</span>. Rush orders under 12 hours carry a{" "}
-              <span className="font-semibold">+25%</span> premium.
+              Indicative guidance in <span className="font-semibold">CAD</span>; you&apos;ll be
+              charged in your local currency at checkout. Your helper responds in the request chat
+              within <span className="font-semibold">2 hours</span>. Rush orders under 12 hours
+              carry a <span className="font-semibold">+25%</span> premium.
             </p>
           </Card>
 
@@ -321,13 +325,16 @@ export default function NewRequestView({
             </div>
             <ul className="space-y-2 text-xs text-on-surface-variant leading-relaxed">
               <li className="flex items-start gap-2">
-                <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> Subject-matter experts verified against university records.
+                <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> Subject-matter
+                experts verified against university records.
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> Revisions until you are satisfied with the draft.
+                <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> Revisions until
+                you are satisfied with the draft.
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> You approve each draft and can request revisions until it meets the agreed scope.
+                <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> You approve each
+                draft and can request revisions until it meets the agreed scope.
               </li>
             </ul>
           </Card>

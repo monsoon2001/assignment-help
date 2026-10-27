@@ -32,8 +32,8 @@ export default function CheckoutPanel({
 
         <p className="flex items-start gap-1.5 text-xs text-on-surface-variant leading-relaxed">
           <Lock size={12} className="shrink-0 mt-0.5 text-primary" />
-          You&apos;ll be charged {total} in {currencyName(currency)}. Revisions or a refund under our
-          Refund Policy if the delivered work doesn&apos;t match the agreed scope.
+          You&apos;ll be charged {total} in {currencyName(currency)}. Revisions or a refund under
+          our Refund Policy if the delivered work doesn&apos;t match the agreed scope.
         </p>
       </div>
     </div>

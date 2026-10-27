@@ -50,7 +50,8 @@ export async function POST(request: Request) {
         .eq("id", id)
         .maybeSingle();
       if (!data) return NextResponse.json({ error: "Not found" }, { status: 404 });
-      if (data.student_id !== user.id) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      if (data.student_id !== user.id)
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       await notifyRequestActivity(id, ({ title }) => ({
         type: "request",
         message: `A new request was submitted: ${title}`,
@@ -155,8 +156,7 @@ export async function POST(request: Request) {
             message: "A revision was requested for an order.",
             link: `/orders/${id}`,
             emailSubject: "A revision was requested",
-            emailBody:
-              "The student requested a revision. Review the note and resubmit when ready.",
+            emailBody: "The student requested a revision. Review the note and resubmit when ready.",
             emailLinkLabel: "Open the order",
             audience: ["student", "helper", "admin"],
             inAppRoles: ["admin"],

@@ -8,8 +8,7 @@ import { NextResponse } from "next/server";
 // Mirrors DESIGNATED_HELPER_ID in lib/requests.ts; inlined to avoid pulling the
 // "use client" supabase browser client into this server route.
 const DESIGNATED_HELPER_ID =
-  process.env.NEXT_PUBLIC_DESIGNATED_HELPER_ID?.trim() ||
-  "7c981abd-85b5-4005-86c0-9cfffd6d9bf1";
+  process.env.NEXT_PUBLIC_DESIGNATED_HELPER_ID?.trim() || "7c981abd-85b5-4005-86c0-9cfffd6d9bf1";
 
 /**
  * Best-effort: record the country the account first signed up from. The saved
@@ -23,11 +22,7 @@ async function captureSignupCountry(
   try {
     const country = await getIpCountry();
     if (!country) return;
-    const { data } = await supabase
-      .from("users")
-      .select("country")
-      .eq("id", userId)
-      .maybeSingle();
+    const { data } = await supabase.from("users").select("country").eq("id", userId).maybeSingle();
     if (!data?.country) {
       await supabase.from("users").update({ country }).eq("id", userId);
     }
@@ -84,10 +79,7 @@ export async function GET(request: Request) {
 
   const emailVerified = user.email_confirmed_at;
   const wasJustConfirmed =
-    type === "signup" ||
-    type === "email" ||
-    type === "recovery" ||
-    Boolean(emailVerified);
+    type === "signup" || type === "email" || type === "recovery" || Boolean(emailVerified);
 
   // Sync a Google profile picture (and a missing name) from the OAuth identity
   // into the users table so every surface — helper listings, chats, admin —
@@ -113,10 +105,7 @@ export async function GET(request: Request) {
     // Fall back to the built-in default.
   }
 
-  if (
-    user.id !== activeHelperId &&
-    (googleAvatar || (metaName && !profile?.name))
-  ) {
+  if (user.id !== activeHelperId && (googleAvatar || (metaName && !profile?.name))) {
     const updates: Record<string, unknown> = {};
     if (googleAvatar) updates.avatar_url = googleAvatar;
     if (metaName && !profile?.name) updates.name = metaName;
@@ -133,9 +122,7 @@ export async function GET(request: Request) {
   redirect.searchParams.set("signedIn", "1");
   if (wasJustConfirmed) redirect.searchParams.set("verified", "1");
   const created = user.created_at ? new Date(user.created_at).getTime() : 0;
-  const isNew =
-    Number.isFinite(created) &&
-    Date.now() - created < 60_000;
+  const isNew = Number.isFinite(created) && Date.now() - created < 60_000;
   redirect.searchParams.set("welcome", isNew ? "new" : "back");
   if (user.user_metadata?.name) {
     redirect.searchParams.set("user", String(user.user_metadata.name));

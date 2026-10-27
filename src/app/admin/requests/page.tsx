@@ -17,7 +17,11 @@ export const metadata: Metadata = {
 
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 export default async function AdminRequestsPage() {
@@ -25,7 +29,9 @@ export default async function AdminRequestsPage() {
 
   const { data: requests, error } = await adminClient
     .from("requests")
-    .select("id, title, subject, description, deadline, status, created_at, student:users!requests_student_id_fkey(id, name), proposals:proposals(id, price, status, helper:users(id, name))")
+    .select(
+      "id, title, subject, description, deadline, status, created_at, student:users!requests_student_id_fkey(id, name), proposals:proposals(id, price, status, helper:users(id, name))",
+    )
     .order("created_at", { ascending: false })
     .limit(200);
 
@@ -38,7 +44,9 @@ export default async function AdminRequestsPage() {
     <div className="max-w-7xl mx-auto space-y-6">
       <div>
         <h1 className="font-display text-2xl font-bold text-on-surface">Requests</h1>
-        <p className="text-on-surface-variant mt-1">Review all help requests across the platform.</p>
+        <p className="text-on-surface-variant mt-1">
+          Review all help requests across the platform.
+        </p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -56,12 +64,24 @@ export default async function AdminRequestsPage() {
           <table className="w-full min-w-[640px]">
             <thead>
               <tr className="border-b border-outline-variant/30">
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Request</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Student</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Proposals</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Status</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Deadline</th>
-                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Action</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                  Request
+                </th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                  Student
+                </th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                  Proposals
+                </th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                  Status
+                </th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                  Deadline
+                </th>
+                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -69,10 +89,17 @@ export default async function AdminRequestsPage() {
                 const student = unwrapRow<{ id: string; name: string | null }>(request.student);
                 const proposalRows = (request.proposals as unknown as unknown[] | null) ?? [];
                 return (
-                  <tr key={request.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
+                  <tr
+                    key={request.id}
+                    className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors"
+                  >
                     <td className="px-3 sm:px-6 py-4 max-w-xs">
-                      <p className="text-sm font-medium text-on-surface truncate">{request.title}</p>
-                      {request.subject && <p className="text-xs text-on-surface-variant mt-0.5">{request.subject}</p>}
+                      <p className="text-sm font-medium text-on-surface truncate">
+                        {request.title}
+                      </p>
+                      {request.subject && (
+                        <p className="text-xs text-on-surface-variant mt-0.5">{request.subject}</p>
+                      )}
                     </td>
                     <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center gap-2">
@@ -88,9 +115,14 @@ export default async function AdminRequestsPage() {
                         {request.status.replaceAll("_", " ")}
                       </StatusBadge>
                     </td>
-                    <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">{formatDate(request.deadline)}</td>
+                    <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">
+                      {formatDate(request.deadline)}
+                    </td>
                     <td className="px-3 sm:px-6 py-4 text-right">
-                      <Link href={`/admin/requests/${request.id}`} className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+                      <Link
+                        href={`/admin/requests/${request.id}`}
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                      >
                         <Eye size={14} /> View
                       </Link>
                     </td>

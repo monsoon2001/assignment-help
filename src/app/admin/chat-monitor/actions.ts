@@ -25,19 +25,17 @@ export async function flagMessage(formData: FormData): Promise<void> {
 
   if (!message) return;
 
-  await adminClient
-    .from("chat_flags")
-    .upsert(
-      {
-        message_id: messageId,
-        request_id: message.request_id,
-        order_id: message.order_id,
-        reason,
-        status: "pending",
-        flagged_by: adminId,
-      },
-      { onConflict: "message_id" }
-    );
+  await adminClient.from("chat_flags").upsert(
+    {
+      message_id: messageId,
+      request_id: message.request_id,
+      order_id: message.order_id,
+      reason,
+      status: "pending",
+      flagged_by: adminId,
+    },
+    { onConflict: "message_id" },
+  );
 
   await logAdminAction(adminId, "message_flag", messageId, { reason });
   revalidatePath("/admin/chat-monitor");

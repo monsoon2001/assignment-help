@@ -24,7 +24,10 @@ export default function EditUserForm({
     <Card className="p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-display text-lg font-semibold text-on-surface">Edit user</h2>
-        <Link href={`/admin/${listPath}`} className="text-sm text-on-surface-variant hover:text-on-surface">
+        <Link
+          href={`/admin/${listPath}`}
+          className="text-sm text-on-surface-variant hover:text-on-surface"
+        >
           Close
         </Link>
       </div>
@@ -54,7 +57,9 @@ export default function EditUserForm({
           />
         </div>
         {state.message && (
-          <p className={`text-sm rounded-lg px-3 py-2 ${state.ok ? "text-success bg-success-tint" : "text-error bg-error-container/30"}`}>
+          <p
+            className={`text-sm rounded-lg px-3 py-2 ${state.ok ? "text-success bg-success-tint" : "text-error bg-error-container/30"}`}
+          >
             {state.message}
           </p>
         )}

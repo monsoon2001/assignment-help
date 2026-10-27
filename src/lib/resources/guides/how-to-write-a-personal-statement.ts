@@ -55,10 +55,22 @@ const guide: Resource = {
           t: "table",
           head: ["Weak", "Strong"],
           rows: [
-            ["\"I am highly motivated and determined.\"", "\"I rewrote our society's intake form after watching two committee members abandon it, which halved processing time.\""],
-            ["\"I have excellent communication skills.\"", "\"I presented our findings to a 60-person audience and answered questions I had not anticipated.\""],
-            ["\"I am passionate about engineering.\"", "\"I spent a summer rebuilding a community centre's booking system in Python because the paper process kept failing.\""],
-            ["\"I am a team player.\"", "\"When our project fell apart in week three, I reassigned tasks and moved the deadline rather than escalate.\""],
+            [
+              '"I am highly motivated and determined."',
+              '"I rewrote our society\'s intake form after watching two committee members abandon it, which halved processing time."',
+            ],
+            [
+              '"I have excellent communication skills."',
+              '"I presented our findings to a 60-person audience and answered questions I had not anticipated."',
+            ],
+            [
+              '"I am passionate about engineering."',
+              '"I spent a summer rebuilding a community centre\'s booking system in Python because the paper process kept failing."',
+            ],
+            [
+              '"I am a team player."',
+              '"When our project fell apart in week three, I reassigned tasks and moved the deadline rather than escalate."',
+            ],
           ],
         },
         {
@@ -73,7 +85,7 @@ const guide: Resource = {
         {
           t: "ol",
           v: [
-            "Opening: the specific moment or idea that started it. Avoid \"Since I was five...\" unless you can make it interesting.",
+            'Opening: the specific moment or idea that started it. Avoid "Since I was five..." unless you can make it interesting.',
             "Body: two or three examples that develop the motivation and show relevant experience.",
             "Your direction: what you want to study and the specific question or problem you want to work on.",
             "Closing: what you hope to do with it, briefly.",
@@ -82,7 +94,7 @@ const guide: Resource = {
         {
           t: "note",
           title: "On openings",
-          v: "The first line decides whether a tired reader continues. A specific, slightly unexpected opening outperforms \"In today's competitive world\" every time.",
+          v: 'The first line decides whether a tired reader continues. A specific, slightly unexpected opening outperforms "In today\'s competitive world" every time.',
         },
       ],
     },
@@ -108,7 +120,7 @@ const guide: Resource = {
             "It answers the actual prompt and uses the required word count.",
             "Every example is specific and verifiable.",
             "Nothing is exaggerated or invented.",
-            "No cliches that could appear in any application: \"eager to learn\", \"team player\", \"proven track record\".",
+            'No cliches that could appear in any application: "eager to learn", "team player", "proven track record".',
             "Opening and closing are strong enough to survive being read first and last.",
             "Spelling of the course name and the institution is correct.",
             "Read aloud for rhythm, and have someone else read it for comprehension.",

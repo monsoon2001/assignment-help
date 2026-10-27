@@ -27,10 +27,28 @@ const links: Array<{
   badge?: HelperBadgeKey;
 }> = [
   { key: "dashboard", href: "/helper/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { key: "requests", href: "/helper/requests", label: "Incoming Requests", icon: Inbox, badge: "incomingRequests" },
-  { key: "orders", href: "/helper/orders", label: "Active Orders", icon: Briefcase, badge: "activeOrders" },
+  {
+    key: "requests",
+    href: "/helper/requests",
+    label: "Incoming Requests",
+    icon: Inbox,
+    badge: "incomingRequests",
+  },
+  {
+    key: "orders",
+    href: "/helper/orders",
+    label: "Active Orders",
+    icon: Briefcase,
+    badge: "activeOrders",
+  },
   { key: "earnings", href: "/helper/earnings", label: "Earnings", icon: DollarSign },
-  { key: "messages", href: "/helper/messages", label: "Messages", icon: MessageSquare, badge: "unreadMessages" },
+  {
+    key: "messages",
+    href: "/helper/messages",
+    label: "Messages",
+    icon: MessageSquare,
+    badge: "unreadMessages",
+  },
   { key: "chat-admin", href: "/helper/chat-admin", label: "Chat With Admin", icon: MessagesSquare },
   { key: "profile", href: "/helper/profile", label: "Edit Profile", icon: SquarePen },
 ];

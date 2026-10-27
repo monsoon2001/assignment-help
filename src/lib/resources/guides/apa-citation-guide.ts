@@ -32,7 +32,7 @@ const guide: Resource = {
             ["Two authors", "(Ahmed & Bianchi, 2022) or Ahmed and Bianchi (2022)"],
             ["Three or more authors", "(Ahmed et al., 2022) — use et al. from the first citation"],
             ["Page number", "(Ahmed & Bianchi, 2022, p. 44)"],
-            ["Direct quotation", "\"the text\" (Turing, 1950, p. 440)"],
+            ["Direct quotation", '"the text" (Turing, 1950, p. 440)'],
             ["Group author", "(World Health Organization [WHO], 2021) first, then (WHO, 2021)"],
             ["Same author, same year", "(Ahmed, 2020a) and (Ahmed, 2020b)"],
             ["Two works, different authors", "(Ahmed, 2020; Bianchi, 2021)"],
@@ -82,7 +82,7 @@ const guide: Resource = {
         },
         {
           t: "p",
-          v: "APA 7th edition no longer requires the publisher's location, and you no longer add \"Retrieved from\" before a URL unless the content is designed to change over time.",
+          v: 'APA 7th edition no longer requires the publisher\'s location, and you no longer add "Retrieved from" before a URL unless the content is designed to change over time.',
         },
       ],
     },
@@ -98,7 +98,7 @@ const guide: Resource = {
         },
         {
           t: "p",
-          v: "Note the position of the editors: \"In\" comes before them, and the edition and page numbers sit inside the parentheses.",
+          v: 'Note the position of the editors: "In" comes before them, and the edition and page numbers sit inside the parentheses.',
         },
       ],
     },
@@ -116,7 +116,7 @@ const guide: Resource = {
           t: "ul",
           v: [
             "Include the date only when the page shows one.",
-            "Do not add \"Retrieved from\" unless the page content is designed to change.",
+            'Do not add "Retrieved from" unless the page content is designed to change.',
             "If the author is the same as the site owner, omit the site name.",
           ],
         },
@@ -165,11 +165,11 @@ const guide: Resource = {
           t: "ul",
           v: [
             "Using APA 6th author-list rules.",
-            "Including \"Retrieved from\" before every URL.",
+            'Including "Retrieved from" before every URL.',
             "Formatting titles in title case.",
             "Italicising article titles instead of journal titles.",
             "Adding a location for a publisher.",
-            "Using the old \"Retrieved from https://doi.org\" form for DOIs.",
+            'Using the old "Retrieved from https://doi.org" form for DOIs.',
             "Citing a source you read only in an abstract.",
           ],
         },
@@ -195,7 +195,7 @@ const guide: Resource = {
   mistakes: [
     "Using APA 6th conventions for long author lists.",
     "Italicising the article title rather than the journal name.",
-    "Writing \"Retrieved from\" before a DOI.",
+    'Writing "Retrieved from" before a DOI.',
     "Adding the publisher's city, which APA 7th dropped.",
     "Using title case for article titles.",
     "Citing secondary quotes as if you read the original.",

@@ -13,7 +13,7 @@ const guide: Resource = {
   readingMinutes: 3,
   intro: [
     "MLA 9th edition is used mainly in the humanities — English, history, philosophy, and languages. Where APA leads with author and date, MLA leads with author and page, and its reference list is called Works Cited.",
-    "This guide covers the citation forms you will use most and the details students most often get wrong, particularly the idea of a \"container.\"",
+    'This guide covers the citation forms you will use most and the details students most often get wrong, particularly the idea of a "container."',
   ],
   sections: [
     {
@@ -32,14 +32,14 @@ const guide: Resource = {
             ["Three or more authors", "(Ahmed et al. 112)"],
             ["Two works by the same author", "(Turing 440, 442) or (440, 442)"],
             ["Two authors, same surname", "(A. Ahmed 112) and (B. Ahmed 44)"],
-            ["No author, use title", "(\"Global Health Estimates\")"],
-            ["No author and no page", "(\"Global Health Estimates\") — cite the whole source"],
+            ["No author, use title", '("Global Health Estimates")'],
+            ["No author and no page", '("Global Health Estimates") — cite the whole source'],
             ["Corporate author", "(World Health Organization)"],
           ],
         },
         {
           t: "p",
-          v: "Note that MLA uses \"and\" in parenthetical citations, not the ampersand that APA requires.",
+          v: 'Note that MLA uses "and" in parenthetical citations, not the ampersand that APA requires.',
         },
       ],
       links: [{ label: "How to cite sources in academic writing", slug: "how-to-cite-sources" }],
@@ -81,7 +81,7 @@ const guide: Resource = {
           v: [
             "Titles in title case, italicised.",
             "A reprint shows both the original publication details and the reprint publisher and year.",
-            "Three or more contributors are listed with \"et al.\"",
+            'Three or more contributors are listed with "et al."',
           ],
         },
       ],
@@ -91,13 +91,13 @@ const guide: Resource = {
       blocks: [
         {
           t: "p",
-          v: "Structure: Author Last, First. \"Title of Article.\" Title of Journal, vol. X, no. Y, Year, pp. ZZ–ZZ. Database or DOI.",
+          v: 'Structure: Author Last, First. "Title of Article." Title of Journal, vol. X, no. Y, Year, pp. ZZ–ZZ. Database or DOI.',
         },
         {
           t: "example",
           label: "Example",
           v: [
-            "Ahmed, Nadia, and Luca Bianchi. \"Retrieval Practice and Student Retention: A Meta-Analysis.\" Journal of Educational Psychology, vol. 114, no. 3, 2022, pp. 412–29. doi:10.1037/edu0001234.",
+            'Ahmed, Nadia, and Luca Bianchi. "Retrieval Practice and Student Retention: A Meta-Analysis." Journal of Educational Psychology, vol. 114, no. 3, 2022, pp. 412–29. doi:10.1037/edu0001234.',
           ],
         },
         {
@@ -113,7 +113,7 @@ const guide: Resource = {
           t: "example",
           label: "Example",
           v: [
-            "\"Global Health Estimates.\" World Health Organization, 15 Mar. 2021, www.who.int/data/gho. Accessed 4 Oct. 2026.",
+            '"Global Health Estimates." World Health Organization, 15 Mar. 2021, www.who.int/data/gho. Accessed 4 Oct. 2026.',
           ],
         },
         {
@@ -137,9 +137,9 @@ const guide: Resource = {
           t: "example",
           label: "Examples",
           v: [
-            "\"The Causal Structure of Adolescent Peer Influence\" — capitalise Causal, Structure, Adolescent, Peer, Influence.",
-            "\"Writing at the Edge: A Study of Student Stress\" — capitalise Writing at the Edge because \"the\" follows the colon.",
-            "\"A History of the Modern World\" — \"of\" and \"the\" are lowercase in the middle.",
+            '"The Causal Structure of Adolescent Peer Influence" — capitalise Causal, Structure, Adolescent, Peer, Influence.',
+            '"Writing at the Edge: A Study of Student Stress" — capitalise Writing at the Edge because "the" follows the colon.',
+            '"A History of the Modern World" — "of" and "the" are lowercase in the middle.',
           ],
         },
       ],
@@ -150,12 +150,12 @@ const guide: Resource = {
         {
           t: "ul",
           v: [
-            "Using an ampersand instead of \"and\" in parenthetical citations.",
+            'Using an ampersand instead of "and" in parenthetical citations.',
             "Confusing a Works Cited entry with a footnote.",
             "Citing a container but not the author, or vice versa.",
             "Omitting page numbers for sources that have them.",
-            "Using title case rules incorrectly on short prepositions like \"to\" and \"of\".",
-            "Keeping URLs with \"https://\" when MLA prefers the clean form.",
+            'Using title case rules incorrectly on short prepositions like "to" and "of".',
+            'Keeping URLs with "https://" when MLA prefers the clean form.',
           ],
         },
       ],
@@ -180,7 +180,7 @@ const guide: Resource = {
     },
   ],
   takeaways: [
-    "MLA uses author and page in text, with \"and\" rather than an ampersand.",
+    'MLA uses author and page in text, with "and" rather than an ampersand.',
     "Identify each container: work, then the larger work holding it.",
     "Titles use title case; article titles go in quotation marks.",
     "MLA is used mainly in the humanities, APA in the social and natural sciences.",
@@ -196,7 +196,7 @@ const guide: Resource = {
     "Works Cited is alphabetised and unnumbered",
   ],
   mistakes: [
-    "Using \"&\" in parenthetical citations.",
+    'Using "&" in parenthetical citations.',
     "Italicising article titles instead of container titles.",
     "Omitting page numbers for a paginated source.",
     "Using sentence case where MLA requires title case.",

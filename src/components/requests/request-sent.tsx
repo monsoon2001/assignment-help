@@ -84,12 +84,14 @@ export default function RequestSent({
         <p className="text-base text-on-surface-variant max-w-md mx-auto leading-relaxed">
           {helperName ? (
             <>
-              It&apos;s on its way to <span className="font-semibold text-on-surface">{helperName}</span>. You can chat
-              with them right away on this request — no price until they propose.
+              It&apos;s on its way to{" "}
+              <span className="font-semibold text-on-surface">{helperName}</span>. You can chat with
+              them right away on this request — no price until they propose.
             </>
           ) : (
             <>
-              We&apos;re reaching out to your chosen helper on your behalf. They&apos;ll respond here on this request.
+              We&apos;re reaching out to your chosen helper on your behalf. They&apos;ll respond
+              here on this request.
             </>
           )}
         </p>
@@ -139,7 +141,9 @@ export default function RequestSent({
               <CalendarDays size={16} />
               <span className="text-sm">Requested Deadline</span>
             </div>
-            <span className="text-sm font-medium text-on-surface text-right">{formatDate(deadline ?? null)}</span>
+            <span className="text-sm font-medium text-on-surface text-right">
+              {formatDate(deadline ?? null)}
+            </span>
           </div>
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-on-surface-variant">
@@ -157,7 +161,12 @@ export default function RequestSent({
         <div className="mt-4 pt-4 bg-surface-container-low rounded-lg p-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
             <span className="inline-flex h-7 w-7 rounded-full items-center justify-center bg-primary-container text-on-primary text-xs font-semibold shrink-0">
-              {(helperName ?? "H").split(" ").map((p) => p[0]).join("").toUpperCase().slice(0, 2)}
+              {(helperName ?? "H")
+                .split(" ")
+                .map((p) => p[0])
+                .join("")
+                .toUpperCase()
+                .slice(0, 2)}
             </span>
             <span className="text-xs text-on-surface-variant truncate">
               {helperName ? (
@@ -165,8 +174,10 @@ export default function RequestSent({
                   Sent to <span className="font-semibold text-on-surface">{helperName}</span> ·{" "}
                   {subject || "General"} expert
                 </>
+              ) : subject ? (
+                `${subject} specialist`
               ) : (
-                subject ? `${subject} specialist` : "Assigned expert"
+                "Assigned expert"
               )}
             </span>
           </div>

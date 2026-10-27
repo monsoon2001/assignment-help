@@ -35,12 +35,16 @@ export default function Footer() {
               <span className="font-display font-bold text-xl text-white">Acadivo</span>
             </Link>
             <p className="text-sm on-band-muted leading-relaxed max-w-md">
-              Connect with verified peer helpers for academic guidance and support across all subjects.
+              Connect with verified peer helpers for academic guidance and support across all
+              subjects.
             </p>
           </div>
 
           {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category} className={category === "Legal" ? "col-span-2 sm:col-span-2 lg:col-span-1" : ""}>
+            <div
+              key={category}
+              className={category === "Legal" ? "col-span-2 sm:col-span-2 lg:col-span-1" : ""}
+            >
               <h3 className="font-semibold text-white text-sm mb-3">{category}</h3>
               <ul className="space-y-2">
                 {links.map((link) => (
@@ -64,8 +68,8 @@ export default function Footer() {
               &copy; {new Date().getFullYear()} Acadivo. All rights reserved.
             </p>
             <p className="text-xs on-band-muted text-center md:text-right max-w-md">
-              Acadivo is an academic peer guidance platform. All helpers provide guidance and tutoring
-              — they do not complete assignments on behalf of students.
+              Acadivo is an academic peer guidance platform. All helpers provide guidance and
+              tutoring — they do not complete assignments on behalf of students.
             </p>
           </div>
         </div>

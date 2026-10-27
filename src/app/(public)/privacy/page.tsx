@@ -9,17 +9,61 @@ export const metadata: Metadata = {
 };
 
 const sections = [
-  { title: "1. Information We Collect", content: "We collect information you provide directly: name, email address, academic details, payment information, and communication content. We also collect usage data including device information, IP addresses, browsing patterns, and interaction data to improve our services." },
-  { title: "2. How We Use Your Information", content: "We use your information to provide and improve our services, process payments, match students with helpers, communicate about your account and requests, ensure platform security, and comply with legal obligations. We do not sell your personal information to third parties." },
-  { title: "3. Information Sharing", content: "We share information only as necessary to provide our services: with matched helpers (student name, assignment details), with payment processors (for transaction processing), and with legal authorities when required by law. We never sell your data to advertisers or data brokers." },
-  { title: "4. Data Security", content: "We implement industry-standard security measures including encryption, secure servers, and regular security audits. While no method of transmission is 100% secure, we take reasonable steps to protect your personal information from unauthorized access, disclosure, or destruction." },
-  { title: "5. Data Retention", content: "We retain your information for as long as your account is active or as needed to provide services. Account data is retained for 30 days after deletion request. Communication records are retained for 12 months for quality assurance. Anonymized data may be retained indefinitely for analytics." },
-  { title: "6. Your Rights", content: "You have the right to access, correct, or delete your personal data. You may also request a copy of your data, opt out of non-essential communications, and withdraw consent for data processing. Contact support@acadivo.com to exercise these rights." },
-  { title: "7. Cookies & Tracking", content: "We use essential cookies for platform functionality, analytics cookies to understand usage patterns, and preference cookies to remember your settings. You can manage cookie preferences through your browser settings. We do not use third-party advertising trackers." },
-  { title: "8. Children's Privacy", content: "Acadivo is not intended for users under 13. We do not knowingly collect information from children under 13. If we learn that we have collected such information, we will delete it promptly. Users under 18 must have parental consent to use our services." },
-  { title: "9. International Users", content: "Your data may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place for international data transfers, including standard contractual clauses and encryption during transfer." },
-  { title: "10. Changes to This Policy", content: "We may update this Privacy Policy periodically. Material changes will be communicated via email or through the Platform. Your continued use of Acadivo after changes constitutes acceptance of the updated policy." },
-  { title: "11. Contact Us", content: "For questions about this Privacy Policy or to exercise your data rights, contact our privacy team at privacy@acadivo.com or support@acadivo.com." },
+  {
+    title: "1. Information We Collect",
+    content:
+      "We collect information you provide directly: name, email address, academic details, payment information, and communication content. We also collect usage data including device information, IP addresses, browsing patterns, and interaction data to improve our services.",
+  },
+  {
+    title: "2. How We Use Your Information",
+    content:
+      "We use your information to provide and improve our services, process payments, match students with helpers, communicate about your account and requests, ensure platform security, and comply with legal obligations. We do not sell your personal information to third parties.",
+  },
+  {
+    title: "3. Information Sharing",
+    content:
+      "We share information only as necessary to provide our services: with matched helpers (student name, assignment details), with payment processors (for transaction processing), and with legal authorities when required by law. We never sell your data to advertisers or data brokers.",
+  },
+  {
+    title: "4. Data Security",
+    content:
+      "We implement industry-standard security measures including encryption, secure servers, and regular security audits. While no method of transmission is 100% secure, we take reasonable steps to protect your personal information from unauthorized access, disclosure, or destruction.",
+  },
+  {
+    title: "5. Data Retention",
+    content:
+      "We retain your information for as long as your account is active or as needed to provide services. Account data is retained for 30 days after deletion request. Communication records are retained for 12 months for quality assurance. Anonymized data may be retained indefinitely for analytics.",
+  },
+  {
+    title: "6. Your Rights",
+    content:
+      "You have the right to access, correct, or delete your personal data. You may also request a copy of your data, opt out of non-essential communications, and withdraw consent for data processing. Contact support@acadivo.com to exercise these rights.",
+  },
+  {
+    title: "7. Cookies & Tracking",
+    content:
+      "We use essential cookies for platform functionality, analytics cookies to understand usage patterns, and preference cookies to remember your settings. You can manage cookie preferences through your browser settings. We do not use third-party advertising trackers.",
+  },
+  {
+    title: "8. Children's Privacy",
+    content:
+      "Acadivo is not intended for users under 13. We do not knowingly collect information from children under 13. If we learn that we have collected such information, we will delete it promptly. Users under 18 must have parental consent to use our services.",
+  },
+  {
+    title: "9. International Users",
+    content:
+      "Your data may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place for international data transfers, including standard contractual clauses and encryption during transfer.",
+  },
+  {
+    title: "10. Changes to This Policy",
+    content:
+      "We may update this Privacy Policy periodically. Material changes will be communicated via email or through the Platform. Your continued use of Acadivo after changes constitutes acceptance of the updated policy.",
+  },
+  {
+    title: "11. Contact Us",
+    content:
+      "For questions about this Privacy Policy or to exercise your data rights, contact our privacy team at privacy@acadivo.com or support@acadivo.com.",
+  },
 ];
 
 export default function PrivacyPage() {
@@ -35,9 +79,16 @@ export default function PrivacyPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <div className="space-y-6">
             {sections.map((section) => (
-              <div key={section.title} className="bg-white rounded-2xl border border-outline-variant/30 p-6 shadow-sm hover:border-primary-container/60 transition-colors">
-                <h2 className="font-display text-lg font-bold text-on-surface mb-2">{section.title}</h2>
-                <p className="text-base text-on-surface-variant leading-relaxed">{section.content}</p>
+              <div
+                key={section.title}
+                className="bg-white rounded-2xl border border-outline-variant/30 p-6 shadow-sm hover:border-primary-container/60 transition-colors"
+              >
+                <h2 className="font-display text-lg font-bold text-on-surface mb-2">
+                  {section.title}
+                </h2>
+                <p className="text-base text-on-surface-variant leading-relaxed">
+                  {section.content}
+                </p>
               </div>
             ))}
           </div>

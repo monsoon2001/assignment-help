@@ -10,7 +10,7 @@ export interface HelperProfileResult {
 
 export async function saveHelperProfile(
   _prev: HelperProfileResult,
-  formData: FormData
+  formData: FormData,
 ): Promise<HelperProfileResult> {
   const supabase = await createClient();
 
@@ -44,10 +44,7 @@ export async function saveHelperProfile(
   if (helperError) return { ok: false, message: helperError.message };
 
   if (Object.keys(updates).length > 0) {
-    const { error: userError } = await supabase
-      .from("users")
-      .update(updates)
-      .eq("id", user.id);
+    const { error: userError } = await supabase.from("users").update(updates).eq("id", user.id);
     if (userError) return { ok: false, message: userError.message };
   }
 

@@ -14,11 +14,7 @@ export const metadata: Metadata = {
   title: "Leave a Review | Acadivo",
 };
 
-export default async function OrderReviewPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function OrderReviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   const supabase = await createClient();
@@ -40,7 +36,9 @@ export default async function OrderReviewPage({
     notFound();
   }
 
-  const proposal = unwrapRow<{ request: { title: string }[] | { title: string } | null }>(orderRow.proposal);
+  const proposal = unwrapRow<{ request: { title: string }[] | { title: string } | null }>(
+    orderRow.proposal,
+  );
   const title = unwrapRow<{ title: string }>(proposal?.request)?.title ?? "Order";
 
   const { data: existing } = await supabase
@@ -66,8 +64,8 @@ export default async function OrderReviewPage({
           How was your experience?
         </h1>
         <p className="text-sm text-on-surface-variant max-w-md">
-          Your honest feedback helps fellow students choose the right helper and
-          rewards mentors for outstanding guidance.
+          Your honest feedback helps fellow students choose the right helper and rewards mentors for
+          outstanding guidance.
         </p>
       </div>
 

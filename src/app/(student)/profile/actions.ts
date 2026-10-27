@@ -11,7 +11,7 @@ export interface StudentProfileResult {
 
 export async function saveStudentProfile(
   _prev: StudentProfileResult,
-  formData: FormData
+  formData: FormData,
 ): Promise<StudentProfileResult> {
   const supabase = await createClient();
 

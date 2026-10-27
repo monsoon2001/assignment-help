@@ -2,11 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, CheckCircle } from "lucide-react";
-import {
-  GUIDE_BY_SERVICE,
-  SERVICE_PAGES,
-  getServicePage,
-} from "@/lib/services";
+import { GUIDE_BY_SERVICE, SERVICE_PAGES, getServicePage } from "@/lib/services";
 import { STEPS } from "@/lib/home-content";
 import { ALL_RESOURCES, resourcePath } from "@/lib/resources";
 import { CtaBand, PageHeader } from "@/components/marketing/page-shell";
@@ -43,11 +39,7 @@ const INCLUDED = [
   "Guidance and feedback you build on — you keep the authorship",
 ];
 
-export default async function ServiceDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function ServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const service = getServicePage(slug);
   if (!service) notFound();
@@ -69,10 +61,7 @@ export default async function ServiceDetailPage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={jsonLdScript(serviceSchema)}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdScript(serviceSchema)} />
       <PageHeader
         title={`${service.name} Assignment Help`}
         subtitle={service.desc}
@@ -83,7 +72,6 @@ export default async function ServiceDetailPage({
           { label: service.name },
         ]}
       />
-
       <div className="bg-white border-b border-outline-variant/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-7">
           <div className="flex flex-col sm:flex-row gap-3">
@@ -103,146 +91,167 @@ export default async function ServiceDetailPage({
           </div>
         </div>
       </div>
-
       <div className="bg-white band-hero">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 grid lg:grid-cols-3 gap-10">
-        <div className="lg:col-span-2 space-y-12">
-          <section aria-labelledby="included-heading">
-            <h2
-              id="included-heading"
-              className="font-display text-2xl font-bold text-on-surface mb-4"
-            >
-              What every {service.name.toLowerCase()} request includes
-            </h2>
-            <ul className="grid sm:grid-cols-2 gap-3">
-              {INCLUDED.map((point) => (
-                <li
-                  key={point}
-                  className="flex items-start gap-2.5 rounded-xl border border-outline-variant/50 bg-primary-fixed/30 p-4 text-on-surface-variant"
-                >
-                  <CheckCircle className={`mt-0.5 h-5 w-5 shrink-0 ${accent.icon}`} />
-                  {point}
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section aria-labelledby="steps-heading">
-            <h2 id="steps-heading" className="font-display text-2xl font-bold text-on-surface mb-4">
-              How a {service.name.toLowerCase()} request works
-            </h2>
-            <ol className="grid sm:grid-cols-2 gap-4">
-              {STEPS.map((step, i) => {
-                const accent = accentForStep(i);
-                return (
-                <li
-                  key={step.num}
-                  className={`rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5 ${accent.cardHover}`}
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-display text-sm font-bold ${accent.tile} ${accent.text}`}>
-                      {step.num}
-                    </span>
-                    <h3 className={`font-display text-lg font-bold leading-snug ${accent.text}`}>
-                      {step.title}
-                    </h3>
-                  </div>
-                  <p className="text-on-surface-variant leading-relaxed">{step.desc}</p>
-                </li>
-                );
-              })}
-            </ol>
-          </section>
-
-          {guideHref && (
-            <section aria-labelledby="guide-heading">
-              <h2 id="guide-heading" className="font-display text-2xl font-bold text-on-surface mb-4">
-                Free guide first
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 grid lg:grid-cols-3 gap-10">
+          <div className="lg:col-span-2 space-y-12">
+            <section aria-labelledby="included-heading">
+              <h2
+                id="included-heading"
+                className="font-display text-2xl font-bold text-on-surface mb-4"
+              >
+                What every {service.name.toLowerCase()} request includes
               </h2>
-              <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6">
-                <h3 className="font-display text-xl font-bold text-on-surface mb-2">
-                  {guide?.title ?? "Read the free guide"}
-                </h3>
-                <p className="text-on-surface-variant leading-relaxed mb-4">
-                  {guide?.description ??
-                    "Work through the process yourself with a step-by-step guide — structure, examples and checklists, free and no sign-up required."}
-                </p>
-                <Link
-                  href={guideHref}
-                  className={`inline-flex items-center gap-2 text-sm font-semibold hover:underline min-h-11 -my-2 px-2 -mx-2 ${DARK_LINK}`}
-                >
-                  Read the guide
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </section>
-          )}
-
-          <section aria-labelledby="related-heading">
-            <h2 id="related-heading" className="font-display text-2xl font-bold text-on-surface mb-4">
-              Other {service.group.title.toLowerCase()} services
-            </h2>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {siblings.map((item) => {
-                const siblingAccent = accentForService(item.slug);
-                return (
-                <Link
-                  key={item.slug}
-                  href={`/services/${item.slug}`}
-                  className={`group rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-4 transition-all ${siblingAccent.cardHover} hover:shadow-md`}
-                >
-                  <span className={`font-semibold transition-colors ${siblingAccent.text}`}>
-                    {item.name}
-                  </span>
-                  <span className="mt-1 block text-on-surface-variant leading-relaxed">{item.desc}</span>
-                </Link>
-                );
-              })}
-            </div>
-            <Link
-              href="/subjects"
-              className={`mt-5 inline-flex items-center gap-2 text-sm font-semibold hover:underline ${DARK_LINK}`}
-            >
-              See every subject we cover
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </section>
-        </div>
-
-        <aside className="space-y-4">
-          <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5">
-            <h2 className="font-display text-lg font-bold text-on-surface mb-3">Related guides</h2>
-            <ul className="space-y-2">
-              {ALL_RESOURCES.filter((resource) => resource.category === "writing" || resource.category === "research")
-                .slice(0, 5)
-                .map((resource) => (
-                  <li key={resource.slug}>
-                    <Link
-                      href={resourcePath(resource)}
-                      className={`${DARK_LINK} transition-colors leading-snug`}
-                    >
-                      {resource.title}
-                    </Link>
+              <ul className="grid sm:grid-cols-2 gap-3">
+                {INCLUDED.map((point) => (
+                  <li
+                    key={point}
+                    className="flex items-start gap-2.5 rounded-xl border border-outline-variant/50 bg-primary-fixed/30 p-4 text-on-surface-variant"
+                  >
+                    <CheckCircle className={`mt-0.5 h-5 w-5 shrink-0 ${accent.icon}`} />
+                    {point}
                   </li>
                 ))}
-            </ul>
+              </ul>
+            </section>
+
+            <section aria-labelledby="steps-heading">
+              <h2
+                id="steps-heading"
+                className="font-display text-2xl font-bold text-on-surface mb-4"
+              >
+                How a {service.name.toLowerCase()} request works
+              </h2>
+              <ol className="grid sm:grid-cols-2 gap-4">
+                {STEPS.map((step, i) => {
+                  const accent = accentForStep(i);
+                  return (
+                    <li
+                      key={step.num}
+                      className={`rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5 ${accent.cardHover}`}
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <span
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-display text-sm font-bold ${accent.tile} ${accent.text}`}
+                        >
+                          {step.num}
+                        </span>
+                        <h3
+                          className={`font-display text-lg font-bold leading-snug ${accent.text}`}
+                        >
+                          {step.title}
+                        </h3>
+                      </div>
+                      <p className="text-on-surface-variant leading-relaxed">{step.desc}</p>
+                    </li>
+                  );
+                })}
+              </ol>
+            </section>
+
+            {guideHref && (
+              <section aria-labelledby="guide-heading">
+                <h2
+                  id="guide-heading"
+                  className="font-display text-2xl font-bold text-on-surface mb-4"
+                >
+                  Free guide first
+                </h2>
+                <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-6">
+                  <h3 className="font-display text-xl font-bold text-on-surface mb-2">
+                    {guide?.title ?? "Read the free guide"}
+                  </h3>
+                  <p className="text-on-surface-variant leading-relaxed mb-4">
+                    {guide?.description ??
+                      "Work through the process yourself with a step-by-step guide — structure, examples and checklists, free and no sign-up required."}
+                  </p>
+                  <Link
+                    href={guideHref}
+                    className={`inline-flex items-center gap-2 text-sm font-semibold hover:underline min-h-11 -my-2 px-2 -mx-2 ${DARK_LINK}`}
+                  >
+                    Read the guide
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </section>
+            )}
+
+            <section aria-labelledby="related-heading">
+              <h2
+                id="related-heading"
+                className="font-display text-2xl font-bold text-on-surface mb-4"
+              >
+                Other {service.group.title.toLowerCase()} services
+              </h2>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {siblings.map((item) => {
+                  const siblingAccent = accentForService(item.slug);
+                  return (
+                    <Link
+                      key={item.slug}
+                      href={`/services/${item.slug}`}
+                      className={`group rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-4 transition-all ${siblingAccent.cardHover} hover:shadow-md`}
+                    >
+                      <span className={`font-semibold transition-colors ${siblingAccent.text}`}>
+                        {item.name}
+                      </span>
+                      <span className="mt-1 block text-on-surface-variant leading-relaxed">
+                        {item.desc}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+              <Link
+                href="/subjects"
+                className={`mt-5 inline-flex items-center gap-2 text-sm font-semibold hover:underline ${DARK_LINK}`}
+              >
+                See every subject we cover
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </section>
           </div>
 
-          <div className="rounded-2xl border border-outline-variant/50 bg-primary-fixed/50 p-5">
-            <h2 className="font-display text-lg font-bold text-on-surface mb-2">About this category</h2>
-            <p className="text-on-surface-variant leading-relaxed mb-4">{service.group.description}</p>
-            <Link
-              href={`/services#${service.group.id}`}
-              className={`inline-flex items-center gap-1.5 text-sm font-semibold hover:underline ${DARK_LINK}`}
-            >
-              All {service.group.title.toLowerCase()} services
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </aside>
-      </div>
-      </div>
+          <aside className="space-y-4">
+            <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5">
+              <h2 className="font-display text-lg font-bold text-on-surface mb-3">
+                Related guides
+              </h2>
+              <ul className="space-y-2">
+                {ALL_RESOURCES.filter(
+                  (resource) => resource.category === "writing" || resource.category === "research",
+                )
+                  .slice(0, 5)
+                  .map((resource) => (
+                    <li key={resource.slug}>
+                      <Link
+                        href={resourcePath(resource)}
+                        className={`${DARK_LINK} transition-colors leading-snug`}
+                      >
+                        {resource.title}
+                      </Link>
+                    </li>
+                  ))}
+              </ul>
+            </div>
 
+            <div className="rounded-2xl border border-outline-variant/50 bg-primary-fixed/50 p-5">
+              <h2 className="font-display text-lg font-bold text-on-surface mb-2">
+                About this category
+              </h2>
+              <p className="text-on-surface-variant leading-relaxed mb-4">
+                {service.group.description}
+              </p>
+              <Link
+                href={`/services#${service.group.id}`}
+                className={`inline-flex items-center gap-1.5 text-sm font-semibold hover:underline ${DARK_LINK}`}
+              >
+                All {service.group.title.toLowerCase()} services
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </aside>
+        </div>
+      </div>
       <CtaBand
         eyebrow="handshake"
         title={`Need ${service.name.toLowerCase()} from a verified helper?`}
@@ -252,6 +261,7 @@ export default async function ServiceDetailPage({
           href: "/requests/new",
         }}
         secondary={{ label: "How It Works", href: "/how-it-works" }}
-      />    </>
+      />{" "}
+    </>
   );
 }

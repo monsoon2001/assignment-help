@@ -39,76 +39,109 @@ export default function ResourcesPage() {
         </div>
       </div>
 
-
       <section className="py-12 sm:py-16 band-soft">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <section className="mb-10 sm:mb-16">
-          <h2 className="font-display text-2xl font-bold text-on-surface mb-2">Featured Guides</h2>
-          <p className="text-on-surface-variant mb-6">Start with the questions students search for most.</p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {FEATURED_RESOURCES.map((guide) => {
-              const accent = accentForFeaturedGuide(guide.slug, guide.category);
-              return (
-              <Link
-                key={guide.slug}
-                href={resourcePath(guide)}
-                className={`group flex min-h-64 flex-col rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${accent.cardHover}`}
-              >
-                <div className="mb-4 flex items-center gap-3">
-                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${accent.tile}`}>
-                    <MaterialIcon name={CATEGORY_BY_SLUG.get(guide.category)?.icon ?? "auto_stories"} size={20} className={accent.icon} />
-                  </span>
-                  <span className={`text-xs font-semibold ${accent.text}`}>
-                    {CATEGORY_BY_SLUG.get(guide.category)?.name}
-                  </span>
-                </div>
-                <h3 className={`mb-2 font-display font-bold leading-snug transition-colors ${accent.text}`}>
-                  {guide.title}
-                </h3>
-                <p className="mb-4 flex-1 text-base leading-relaxed text-on-surface-variant line-clamp-3">
-                  {guide.ogDescription}
-                </p>
-                <span className={`inline-flex items-center gap-1.5 text-sm font-semibold ${accent.text}`}>
-                  Read guide <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
-                </span>
-              </Link>
-              );
-            })}
-          </div>
-        </section>
+          <section className="mb-10 sm:mb-16">
+            <h2 className="font-display text-2xl font-bold text-on-surface mb-2">
+              Featured Guides
+            </h2>
+            <p className="text-on-surface-variant mb-6">
+              Start with the questions students search for most.
+            </p>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {FEATURED_RESOURCES.map((guide) => {
+                const accent = accentForFeaturedGuide(guide.slug, guide.category);
+                return (
+                  <Link
+                    key={guide.slug}
+                    href={resourcePath(guide)}
+                    className={`group flex min-h-64 flex-col rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${accent.cardHover}`}
+                  >
+                    <div className="mb-4 flex items-center gap-3">
+                      <span
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${accent.tile}`}
+                      >
+                        <MaterialIcon
+                          name={CATEGORY_BY_SLUG.get(guide.category)?.icon ?? "auto_stories"}
+                          size={20}
+                          className={accent.icon}
+                        />
+                      </span>
+                      <span className={`text-xs font-semibold ${accent.text}`}>
+                        {CATEGORY_BY_SLUG.get(guide.category)?.name}
+                      </span>
+                    </div>
+                    <h3
+                      className={`mb-2 font-display font-bold leading-snug transition-colors ${accent.text}`}
+                    >
+                      {guide.title}
+                    </h3>
+                    <p className="mb-4 flex-1 text-base leading-relaxed text-on-surface-variant line-clamp-3">
+                      {guide.ogDescription}
+                    </p>
+                    <span
+                      className={`inline-flex items-center gap-1.5 text-sm font-semibold ${accent.text}`}
+                    >
+                      Read guide{" "}
+                      <ArrowRight
+                        size={15}
+                        className="transition-transform group-hover:translate-x-0.5"
+                      />
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
 
-        <section className="mb-10 sm:mb-16">
-          <h2 className="font-display text-2xl font-bold text-on-surface mb-6">Browse All Guides</h2>
-          <ResourceBrowser />
-        </section>
+          <section className="mb-10 sm:mb-16">
+            <h2 className="font-display text-2xl font-bold text-on-surface mb-6">
+              Browse All Guides
+            </h2>
+            <ResourceBrowser />
+          </section>
 
-        <section className="border-t border-outline-variant/40 pt-16">
-          <h2 className="font-display text-2xl font-bold text-on-surface mb-6">Browse by Category</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {RESOURCE_CATEGORIES.map((category) => {
-              const count = guidesByCategory(category.slug).length;
-              const accent = accentForGuideCategory(category.slug);
-              return (
-                <Link
-                  key={category.slug}
-                  href={`/resources/${category.slug}`}
-                  className={`group flex min-h-64 flex-col rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${accent.cardHover}`}
-                >
-                  <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${accent.tile}`}>
-                    <MaterialIcon name={category.icon} size={24} className={accent.icon} />
-                  </div>
-                  <h3 className={`mb-1.5 font-display font-bold transition-colors ${accent.text}`}>
-                    {category.name}
-                  </h3>
-                  <p className="mb-4 flex-1 text-base leading-relaxed text-on-surface-variant">{category.description}</p>
-                  <p className={`inline-flex items-center gap-1.5 text-sm font-semibold ${accent.text}`}>
-                    {count} guides <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
-                  </p>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
+          <section className="border-t border-outline-variant/40 pt-16">
+            <h2 className="font-display text-2xl font-bold text-on-surface mb-6">
+              Browse by Category
+            </h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {RESOURCE_CATEGORIES.map((category) => {
+                const count = guidesByCategory(category.slug).length;
+                const accent = accentForGuideCategory(category.slug);
+                return (
+                  <Link
+                    key={category.slug}
+                    href={`/resources/${category.slug}`}
+                    className={`group flex min-h-64 flex-col rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${accent.cardHover}`}
+                  >
+                    <div
+                      className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${accent.tile}`}
+                    >
+                      <MaterialIcon name={category.icon} size={24} className={accent.icon} />
+                    </div>
+                    <h3
+                      className={`mb-1.5 font-display font-bold transition-colors ${accent.text}`}
+                    >
+                      {category.name}
+                    </h3>
+                    <p className="mb-4 flex-1 text-base leading-relaxed text-on-surface-variant">
+                      {category.description}
+                    </p>
+                    <p
+                      className={`inline-flex items-center gap-1.5 text-sm font-semibold ${accent.text}`}
+                    >
+                      {count} guides{" "}
+                      <ArrowRight
+                        size={15}
+                        className="transition-transform group-hover:translate-x-0.5"
+                      />
+                    </p>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
         </div>
       </section>
 

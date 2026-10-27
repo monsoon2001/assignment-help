@@ -37,12 +37,7 @@ export default function PayButton({
   return (
     <div className="flex flex-col gap-3">
       {error && <p className="text-sm text-error">{error}</p>}
-      <Button
-        size="lg"
-        className="w-full justify-center"
-        disabled={loading}
-        onClick={handlePay}
-      >
+      <Button size="lg" className="w-full justify-center" disabled={loading} onClick={handlePay}>
         {loading ? (
           <Loader2 size={18} className="animate-spin" />
         ) : (

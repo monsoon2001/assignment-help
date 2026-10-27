@@ -8,7 +8,9 @@ export const ACADIVO_HELPER_NAME = "Acadivo Helper";
 function isGoogleAvatar(src: string): boolean {
   try {
     const url = new URL(src);
-    return url.protocol === "https:" && /(^|\.)(googleusercontent\.com|ggpht\.com)$/.test(url.hostname);
+    return (
+      url.protocol === "https:" && /(^|\.)(googleusercontent\.com|ggpht\.com)$/.test(url.hostname)
+    );
   } catch {
     return false;
   }

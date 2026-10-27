@@ -25,7 +25,9 @@ export default function FaqList({ items }: { items: readonly FaqEntry[] }) {
           aria-expanded={open}
           className={`w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors ${open ? tone.iconTile : "hover:bg-surface-container-low/50"}`}
         >
-          <span className={`font-semibold pr-4 ${open ? tone.text : "text-on-surface"}`}>{faq.q}</span>
+          <span className={`font-semibold pr-4 ${open ? tone.text : "text-on-surface"}`}>
+            {faq.q}
+          </span>
           <MaterialIcon
             name="expand_more"
             size={20}

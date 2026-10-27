@@ -1,9 +1,7 @@
 import { createClient } from "@/lib/supabase/client";
 import type { ChatMessageRow } from "@/components/chat/chat-panel";
 
-export async function fetchRequestMessages(
-  requestId: string
-): Promise<ChatMessageRow[] | null> {
+export async function fetchRequestMessages(requestId: string): Promise<ChatMessageRow[] | null> {
   const supabase = createClient();
   const { data } = await supabase
     .from("messages")
@@ -16,7 +14,7 @@ export async function fetchRequestMessages(
 export async function sendRequestMessage(
   requestId: string,
   body: string,
-  file?: File | null
+  file?: File | null,
 ): Promise<{ ok: true } | { error: string }> {
   const supabase = createClient();
 
@@ -30,9 +28,7 @@ export async function sendRequestMessage(
   let attachmentUrl: string | null = null;
   if (file) {
     const path = `${user.id}/${crypto.randomUUID()}-${file.name}`;
-    const { error: uploadError } = await supabase.storage
-      .from("request-files")
-      .upload(path, file);
+    const { error: uploadError } = await supabase.storage.from("request-files").upload(path, file);
     if (uploadError) {
       return { error: uploadError.message };
     }

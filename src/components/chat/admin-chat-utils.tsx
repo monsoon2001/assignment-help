@@ -20,9 +20,7 @@ export type CallLog = {
   duration_seconds: number;
 };
 
-export type TimelineItem =
-  | { kind: "message"; msg: AdminMessage }
-  | { kind: "call"; log: CallLog };
+export type TimelineItem = { kind: "message"; msg: AdminMessage } | { kind: "call"; log: CallLog };
 
 export function formatDuration(secs: number): string {
   const m = Math.floor(secs / 60);
@@ -43,15 +41,19 @@ export function callStatusLabel(status: string): string {
 
 export function callIcon(status: string) {
   if (status === "answered") return <PhoneCall size={13} className="text-success" />;
-  if (status === "missed" || status === "failed") return <PhoneMissed size={13} className="text-danger" />;
-  if (status === "declined" || status === "busy") return <PhoneOff size={13} className="text-warning" />;
+  if (status === "missed" || status === "failed")
+    return <PhoneMissed size={13} className="text-danger" />;
+  if (status === "declined" || status === "busy")
+    return <PhoneOff size={13} className="text-warning" />;
   if (status === "cancelled") return <PhoneOff size={13} className="text-on-surface-variant" />;
   return <Phone size={13} className="text-on-surface-variant" />;
 }
 
 export function callColor(status: string) {
   if (status === "answered") return "bg-success-tint border-success-tint text-success";
-  if (status === "missed" || status === "failed") return "bg-danger-tint border-danger-tint text-danger";
-  if (status === "declined" || status === "busy") return "bg-accent-tint border-accent-tint text-on-accent-tint";
+  if (status === "missed" || status === "failed")
+    return "bg-danger-tint border-danger-tint text-danger";
+  if (status === "declined" || status === "busy")
+    return "bg-accent-tint border-accent-tint text-on-accent-tint";
   return "bg-surface-container-high border-outline-variant text-on-surface-variant";
 }

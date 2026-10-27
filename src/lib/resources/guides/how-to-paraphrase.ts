@@ -23,9 +23,24 @@ const guide: Resource = {
           t: "table",
           head: ["", "Length", "Detail", "Use it when"],
           rows: [
-            ["Paraphrase", "Similar to original", "All of it, restated", "You want your own voice and the original's wording will not fit your sentence"],
-            ["Summarise", "Much shorter", "Main point only", "The detail is not needed for your argument"],
-            ["Quote", "Short", "Exact wording", "You need precise wording, terminology, or wording you are analysing"],
+            [
+              "Paraphrase",
+              "Similar to original",
+              "All of it, restated",
+              "You want your own voice and the original's wording will not fit your sentence",
+            ],
+            [
+              "Summarise",
+              "Much shorter",
+              "Main point only",
+              "The detail is not needed for your argument",
+            ],
+            [
+              "Quote",
+              "Short",
+              "Exact wording",
+              "You need precise wording, terminology, or wording you are analysing",
+            ],
           ],
         },
         {
@@ -58,14 +73,14 @@ const guide: Resource = {
           t: "example",
           label: "Original",
           v: [
-            "\"The scarcity of peer-reviewed replication studies means that published effect sizes are likely to be inflated.\"",
+            '"The scarcity of peer-reviewed replication studies means that published effect sizes are likely to be inflated."',
           ],
         },
         {
           t: "example",
           label: "Weak paraphrase (structure unchanged)",
           v: [
-            "\"Because there are few peer-reviewed replication studies, published effect sizes are likely to be exaggerated.\"",
+            '"Because there are few peer-reviewed replication studies, published effect sizes are likely to be exaggerated."',
           ],
         },
         {
@@ -76,7 +91,7 @@ const guide: Resource = {
           t: "example",
           label: "Strong paraphrase (restructured)",
           v: [
-            "\"With so few peer-reviewed replication studies completed, effect sizes reported in the original publications should be treated as potentially inflated.\"",
+            '"With so few peer-reviewed replication studies completed, effect sizes reported in the original publications should be treated as potentially inflated."',
           ],
         },
         {
@@ -95,11 +110,11 @@ const guide: Resource = {
         {
           t: "ul",
           v: [
-            "\"may\" → \"will\", which turns a possibility into a certainty.",
-            "\"is associated with\" → \"causes\", which claims a causal link the author never made.",
-            "\"some\" → \"most\", or \"increases\" → \"increases significantly\", which quantifies without evidence.",
-            "\"critics argue\" → \"it is widely believed\", which removes who is claiming it.",
-            "\"in two studies\" → \"in studies\", which makes a limited finding sound general.",
+            '"may" → "will", which turns a possibility into a certainty.',
+            '"is associated with" → "causes", which claims a causal link the author never made.',
+            '"some" → "most", or "increases" → "increases significantly", which quantifies without evidence.',
+            '"critics argue" → "it is widely believed", which removes who is claiming it.',
+            '"in two studies" → "in studies", which makes a limited finding sound general.',
           ],
         },
         {
@@ -159,7 +174,7 @@ const guide: Resource = {
   ],
   mistakes: [
     "Swapping synonyms while keeping the sentence shape identical.",
-    "Turning \"is associated with\" into \"causes\".",
+    'Turning "is associated with" into "causes".',
     "Removing hedging words and making a tentative claim sound certain.",
     "Paraphrasing a quotation and presenting it as the author's exact words.",
     "Forgetting the citation because the words are now different.",

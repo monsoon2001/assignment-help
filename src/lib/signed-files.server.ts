@@ -14,7 +14,7 @@ import {
  */
 export async function createSignedFileUrl(
   stored: string,
-  bucket: StorageBucket
+  bucket: StorageBucket,
 ): Promise<string | null> {
   const path = pathFromStoredUrl(stored);
   if (!path || !isStorageBucket(bucket)) return null;

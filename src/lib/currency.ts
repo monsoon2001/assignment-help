@@ -210,9 +210,9 @@ const COUNTRY_NAME_ALIASES: Record<string, string> = {
   "great britain": "GB",
   england: "GB",
   "south korea": "KR",
-  "korea": "KR",
+  korea: "KR",
   "republic of korea": "KR",
-  "czechia": "CZ",
+  czechia: "CZ",
 };
 
 export const OTHER_COUNTRY = "Other";
@@ -244,7 +244,7 @@ export function isoForCountry(country?: string | null): string | null {
  */
 export function currencyForCountry(country?: string | null): string | null {
   const iso = isoForCountry(country);
-  return iso ? COUNTRY_META[iso]?.currency ?? null : null;
+  return iso ? (COUNTRY_META[iso]?.currency ?? null) : null;
 }
 
 export function defaultCurrencyForCountry(country?: string | null): string {
@@ -274,10 +274,11 @@ export function countryNameFor(code?: string | null): string | null {
 }
 
 /** Selectable countries for the profile/request forms. */
-export const COUNTRY_OPTIONS: { code: string; name: string; currency: string }[] =
-  Object.entries(COUNTRY_META)
-    .map(([code, meta]) => ({ code, name: meta.name, currency: meta.currency }))
-    .sort((a, b) => a.name.localeCompare(b.name));
+export const COUNTRY_OPTIONS: { code: string; name: string; currency: string }[] = Object.entries(
+  COUNTRY_META,
+)
+  .map(([code, meta]) => ({ code, name: meta.name, currency: meta.currency }))
+  .sort((a, b) => a.name.localeCompare(b.name));
 
 // ============================================================================
 // Local charge computation (pure, safe on both server and client).
@@ -296,7 +297,7 @@ export function convertViaCad(
   amount: number,
   from: string,
   to: string,
-  rates: CadRates | null
+  rates: CadRates | null,
 ): number | null {
   const fromCode = normalizeCurrency(from);
   const toCode = normalizeCurrency(to);
@@ -323,7 +324,7 @@ export function computeLocalCharge(
   baseCurrency: string,
   localCurrency: string,
   rates: CadRates | null,
-  surchargePercent: number
+  surchargePercent: number,
 ): number | null {
   const converted = convertViaCad(baseAmount, baseCurrency, localCurrency, rates);
   if (converted === null || !Number.isFinite(converted) || converted <= 0) return null;

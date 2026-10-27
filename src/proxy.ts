@@ -24,14 +24,14 @@ export async function proxy(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, options),
           );
         },
       },
       realtime: {
         transport: globalThis.WebSocket,
       },
-    }
+    },
   );
 
   const pathname = request.nextUrl.pathname;
@@ -39,11 +39,13 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const protectedArea =
-    isStudentRoute(pathname) ? "student" :
-    isHelperRoute(pathname) ? "helper" :
-    isAdminRoute(pathname) ? "admin" :
-    null;
+  const protectedArea = isStudentRoute(pathname)
+    ? "student"
+    : isHelperRoute(pathname)
+      ? "helper"
+      : isAdminRoute(pathname)
+        ? "admin"
+        : null;
 
   // The query string matters: /requests/new?helper=<id> must survive sign-in.
   const returnTo = pathname + request.nextUrl.search;
@@ -79,11 +81,7 @@ export async function proxy(request: NextRequest) {
   }
 
   let role: string | null = null;
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+  const { data: profile } = await supabase.from("users").select("role").eq("id", user.id).single();
   role = profile?.role ?? null;
 
   const home = roleToHome(role);

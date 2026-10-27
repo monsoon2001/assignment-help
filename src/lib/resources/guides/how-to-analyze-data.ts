@@ -27,10 +27,16 @@ const guide: Resource = {
           t: "table",
           head: ["Question type", "Typical analysis"],
           rows: [
-            ["Is there a difference between groups?", "t-test, ANOVA, or a non-parametric equivalent"],
+            [
+              "Is there a difference between groups?",
+              "t-test, ANOVA, or a non-parametric equivalent",
+            ],
             ["Are two variables related?", "Correlation, or regression if you want a prediction"],
             ["What predicts outcome Y?", "Multiple regression"],
-            ["Does an intervention change outcomes?", "Paired designs, or comparison of change scores"],
+            [
+              "Does an intervention change outcomes?",
+              "Paired designs, or comparison of change scores",
+            ],
             ["How do categories distribute across time?", "Frequency tables and charts"],
             ["What do open-text responses say?", "Thematic coding — a qualitative method"],
           ],
@@ -79,7 +85,11 @@ const guide: Resource = {
             ["Both numeric, one outcome", "Independent groups", "Independent samples t-test"],
             ["Both numeric, one outcome", "Paired / within-subject", "Paired samples t-test"],
             ["One outcome, two or more groups", "Independent groups", "One-way ANOVA"],
-            ["Two numeric variables", "—", "Pearson correlation if assumptions hold, Spearman if not"],
+            [
+              "Two numeric variables",
+              "—",
+              "Pearson correlation if assumptions hold, Spearman if not",
+            ],
             ["Outcome predicted by several variables", "—", "Multiple regression"],
           ],
         },
@@ -113,7 +123,12 @@ const guide: Resource = {
           v: "With a large sample, a trivial difference can be statistically significant. Reporting only significance will make your analysis look naive to any marker who knows this.",
         },
       ],
-      links: [{ label: "How to interpret statistical results", slug: "how-to-interpret-statistical-results" }],
+      links: [
+        {
+          label: "How to interpret statistical results",
+          slug: "how-to-interpret-statistical-results",
+        },
+      ],
     },
     {
       heading: "Visualise Clearly",
@@ -138,8 +153,8 @@ const guide: Resource = {
           t: "example",
           label: "Reporting a result properly",
           v: [
-            "Weak: \"The result was significant (p < .05).\"",
-            "Strong: \"Mean satisfaction was higher in the treatment group (M = 4.2, SD = 0.9) than in control (M = 3.5, SD = 1.1); t(78) = 4.1, p < .001, d = 0.65. The effect is substantial relative to the 1–5 scale and unlikely to be attributable to chance.\"",
+            'Weak: "The result was significant (p < .05)."',
+            'Strong: "Mean satisfaction was higher in the treatment group (M = 4.2, SD = 0.9) than in control (M = 3.5, SD = 1.1); t(78) = 4.1, p < .001, d = 0.65. The effect is substantial relative to the 1–5 scale and unlikely to be attributable to chance."',
           ],
         },
         {
@@ -201,7 +216,10 @@ const guide: Resource = {
   related: [
     { slug: "how-to-interpret-statistical-results", label: "How to Interpret Statistical Results" },
     { slug: "how-to-write-a-lab-report", label: "How to Write a Lab Report" },
-    { slug: "how-to-approach-a-programming-assignment", label: "How to Approach a Programming Assignment" },
+    {
+      slug: "how-to-approach-a-programming-assignment",
+      label: "How to Approach a Programming Assignment",
+    },
   ],
   subjects: [
     { slug: "statistics", label: "Statistics" },

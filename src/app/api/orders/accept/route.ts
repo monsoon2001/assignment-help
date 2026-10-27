@@ -38,14 +38,14 @@ export async function POST(request: Request) {
   if (!user) {
     return NextResponse.json(
       { error: "You must be signed in to accept a proposal." },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
   const { data: proposal, error: proposalError } = await supabase
     .from("proposals")
     .select(
-      "id, helper_id, price, currency, status, request_id, request:requests(id, student_id, status, deadline)"
+      "id, helper_id, price, currency, status, request_id, request:requests(id, student_id, status, deadline)",
     )
     .eq("id", proposalId)
     .maybeSingle();
@@ -66,26 +66,20 @@ export async function POST(request: Request) {
   if (proposal.status !== "pending") {
     return NextResponse.json(
       { error: "This proposal can no longer be accepted." },
-      { status: 409 }
+      { status: 409 },
     );
   }
   if (req.student_id !== user.id) {
     return NextResponse.json(
       { error: "You can only accept proposals on your own requests." },
-      { status: 403 }
+      { status: 403 },
     );
   }
   if (typeof requestId === "string" && req.id !== requestId) {
-    return NextResponse.json(
-      { error: "Proposal does not match this request." },
-      { status: 409 }
-    );
+    return NextResponse.json({ error: "Proposal does not match this request." }, { status: 409 });
   }
   if (req.status !== "requested" && req.status !== "proposal_sent") {
-    return NextResponse.json(
-      { error: "This request has already been resolved." },
-      { status: 409 }
-    );
+    return NextResponse.json({ error: "This request has already been resolved." }, { status: 409 });
   }
 
   const baseAmount = Number(proposal.price);
@@ -101,8 +95,10 @@ export async function POST(request: Request) {
   const charge = await resolveLocalCharge(baseAmount, baseCurrency, profile?.country ?? null);
   if (!charge) {
     return NextResponse.json(
-      { error: "We couldn't determine the price in your local currency. Please try again shortly." },
-      { status: 409 }
+      {
+        error: "We couldn't determine the price in your local currency. Please try again shortly.",
+      },
+      { status: 409 },
     );
   }
 
@@ -134,7 +130,7 @@ export async function POST(request: Request) {
     if (insertError.code === "23505") {
       return NextResponse.json(
         { error: "This proposal has already been accepted." },
-        { status: 409 }
+        { status: 409 },
       );
     }
     console.error("accept: order insert failed", insertError);
@@ -171,7 +167,7 @@ export async function POST(request: Request) {
       audience: ["student", "helper", "admin"],
       inAppRoles: ["helper", "admin"],
       actorId: user.id,
-    }))
+    })),
   );
 
   return NextResponse.json({ orderId: order.id });

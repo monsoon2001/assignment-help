@@ -69,7 +69,7 @@ const guide: Resource = {
       blocks: [
         {
           t: "p",
-          v: "The verb you choose tells the reader how to read the source, and it affects tone. Using \"proves\" for work that only suggests will get your marks cut.",
+          v: 'The verb you choose tells the reader how to read the source, and it affects tone. Using "proves" for work that only suggests will get your marks cut.',
         },
         {
           t: "table",
@@ -78,13 +78,16 @@ const guide: Resource = {
             ["Strong", "demonstrates, establishes, proves, confirms"],
             ["Neutral", "shows, indicates, finds, suggests, reports"],
             ["Tentative", "suggests, may indicate, appears to, is consistent with"],
-            ["Attacking the source", "claims, asserts, argues (often neutral; use critically in disciplines where it implies doubt)"],
+            [
+              "Attacking the source",
+              "claims, asserts, argues (often neutral; use critically in disciplines where it implies doubt)",
+            ],
             ["Citing", "cites, refers to, quotes"],
           ],
         },
         {
           t: "p",
-          v: "\"Argues\" is neutral in most disciplines but implies scepticism in some philosophy and humanities marking schemes. Match your subject's conventions.",
+          v: '"Argues" is neutral in most disciplines but implies scepticism in some philosophy and humanities marking schemes. Match your subject\'s conventions.',
         },
       ],
     },
@@ -99,7 +102,7 @@ const guide: Resource = {
           t: "example",
           label: "APA 7th edition",
           v: [
-            "\"Green (2019) reports that retrieval practice improves retention by 30–40% (as cited in Ahmed & Bianchi, 2022, p. 112).\"",
+            '"Green (2019) reports that retrieval practice improves retention by 30–40% (as cited in Ahmed & Bianchi, 2022, p. 112)."',
             "Then in the reference list: include Ahmed & Bianchi (2022), the work you read. Include Green (2019) only if you have read it.",
           ],
         },
@@ -141,7 +144,9 @@ const guide: Resource = {
           ],
         },
       ],
-      links: [{ label: "How to paraphrase without changing the meaning", slug: "how-to-paraphrase" }],
+      links: [
+        { label: "How to paraphrase without changing the meaning", slug: "how-to-paraphrase" },
+      ],
     },
     {
       heading: "Common Mistakes",
@@ -152,19 +157,21 @@ const guide: Resource = {
             "Mixing two citation styles in one document.",
             "Citing a source you found in a search-result snippet.",
             "Listing references you never cited in the text.",
-            "Using \"et al.\" where the style requires all authors.",
-            "Changing the original page number instead of citing \"p. 44\" for a reprint.",
+            'Using "et al." where the style requires all authors.',
+            'Changing the original page number instead of citing "p. 44" for a reprint.',
             "Copying a reference from a database's export and then reformatting it by hand.",
           ],
         },
       ],
-      links: [{ label: "How to avoid plagiarism in academic writing", slug: "how-to-avoid-plagiarism" }],
+      links: [
+        { label: "How to avoid plagiarism in academic writing", slug: "how-to-avoid-plagiarism" },
+      ],
     },
   ],
   takeaways: [
     "Cite anything that is not yours and not general knowledge.",
     "Choose citation verbs that match how strong the evidence actually is.",
-    "For indirect sources, cite what you read and use \"as cited in\".",
+    'For indirect sources, cite what you read and use "as cited in".',
     "Capture reference details as you cite, then check the list in both directions.",
   ],
   checklist: [
@@ -172,7 +179,7 @@ const guide: Resource = {
     "Every borrowed idea, figure, and quotation has a citation",
     "Direct quotations are exact and include a page number",
     "Citation verbs match the strength of the evidence",
-    "Indirect sources use \"as cited in\" correctly",
+    'Indirect sources use "as cited in" correctly',
     "Every in-text citation appears in the reference list",
     "Every reference is cited in the text",
     "All entries follow one style's punctuation and capitalisation rules",
@@ -181,7 +188,7 @@ const guide: Resource = {
     "Omitting a citation because the idea is widely known.",
     "Citing only what appeared in a search snippet.",
     "Mixing APA and MLA conventions.",
-    "Using \"proves\" where the source only suggests.",
+    'Using "proves" where the source only suggests.',
     "Including uncited works in the bibliography.",
     "Memorising reference formats instead of using a template or reference manager.",
   ],

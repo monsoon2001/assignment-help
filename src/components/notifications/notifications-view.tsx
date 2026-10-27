@@ -3,7 +3,18 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bell, FileText, ShoppingBag, MessageSquare, CheckCircle2, Settings, ChevronRight, Wallet, RotateCcw, Inbox } from "lucide-react";
+import {
+  Bell,
+  FileText,
+  ShoppingBag,
+  MessageSquare,
+  CheckCircle2,
+  Settings,
+  ChevronRight,
+  Wallet,
+  RotateCcw,
+  Inbox,
+} from "lucide-react";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import Button from "@/components/ui/button";
@@ -63,22 +74,25 @@ export default function NotificationsView({
     const supabase = createClient();
     let channel: ReturnType<typeof supabase.channel> | null = null;
 
-    supabase.auth
-      .getUser()
-      .then(({ data }) => {
-        if (!active || !data.user) return;
-        channel = supabase
-          .channel(realtimeTopic(`notifications:${data.user.id}`))
-          .on(
-            "postgres_changes",
-            { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${data.user.id}` },
-            (payload) => {
-              const n = payload.new as AppNotification;
-              setNotifications((prev) => [n, ...prev]);
-            }
-          )
-          .subscribe();
-      });
+    supabase.auth.getUser().then(({ data }) => {
+      if (!active || !data.user) return;
+      channel = supabase
+        .channel(realtimeTopic(`notifications:${data.user.id}`))
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "notifications",
+            filter: `user_id=eq.${data.user.id}`,
+          },
+          (payload) => {
+            const n = payload.new as AppNotification;
+            setNotifications((prev) => [n, ...prev]);
+          },
+        )
+        .subscribe();
+    });
 
     return () => {
       active = false;
@@ -135,7 +149,12 @@ export default function NotificationsView({
         </p>
       </div>
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" onClick={markAllRead} disabled={marking || unreadCount === 0}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={markAllRead}
+          disabled={marking || unreadCount === 0}
+        >
           Mark all read
         </Button>
       </div>
@@ -179,11 +198,15 @@ export default function NotificationsView({
                 n.read ? "" : "bg-surface-container-low/60 hover:bg-surface-container-low"
               } hover:bg-surface-container-low`}
             >
-              <span className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${conf.tone}`}>
+              <span
+                className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${conf.tone}`}
+              >
                 <Icon size={18} />
               </span>
               <div className="min-w-0 flex-1">
-                <p className={`text-sm ${n.read ? "text-on-surface-variant" : "font-semibold text-on-surface"}`}>
+                <p
+                  className={`text-sm ${n.read ? "text-on-surface-variant" : "font-semibold text-on-surface"}`}
+                >
                   {n.message}
                 </p>
                 <div className="flex items-center gap-3 mt-2">
@@ -198,7 +221,11 @@ export default function NotificationsView({
                   )}
                 </div>
               </div>
-              {!n.read && <Badge variant="primary" className="shrink-0 px-2 py-0.5">New</Badge>}
+              {!n.read && (
+                <Badge variant="primary" className="shrink-0 px-2 py-0.5">
+                  New
+                </Badge>
+              )}
             </button>
           );
         })}

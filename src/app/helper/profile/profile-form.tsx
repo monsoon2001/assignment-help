@@ -29,7 +29,7 @@ export default function HelperProfile({
 }) {
   const [state, formAction, pending] = useActionState<HelperProfileResult, FormData>(
     saveHelperProfile,
-    { ok: false, message: "" }
+    { ok: false, message: "" },
   );
 
   const [bio, setBio] = useState(initialBio);
@@ -46,9 +46,16 @@ export default function HelperProfile({
       <form action={formAction} className="space-y-6">
         <Card className="p-6 space-y-6">
           <div className="flex items-center gap-4 pb-5 border-b border-outline-variant">
-            <Avatar name={name || firstName || "Acadivo Helper"} role="helper" size="lg" src={avatarUrl ?? undefined} />
+            <Avatar
+              name={name || firstName || "Acadivo Helper"}
+              role="helper"
+              size="lg"
+              src={avatarUrl ?? undefined}
+            />
             <div>
-              <h2 className="font-display text-lg font-semibold text-on-surface">{name || `${firstName} ${lastName}` || "Acadivo Helper"}</h2>
+              <h2 className="font-display text-lg font-semibold text-on-surface">
+                {name || `${firstName} ${lastName}` || "Acadivo Helper"}
+              </h2>
               <p className="text-sm text-on-surface-variant">Helper profile</p>
             </div>
           </div>
@@ -66,12 +73,28 @@ export default function HelperProfile({
               </span>
             </div>
           </div>
-          <Input name="hourlyRate" label="Hourly Rate ($)" defaultValue={String(hourlyRate)} type="number" min={0} step="0.01" />
-          <Textarea name="bio" label="Bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={4} placeholder="Introduce yourself to students. Tell them what you help with and how you work." />
+          <Input
+            name="hourlyRate"
+            label="Hourly Rate ($)"
+            defaultValue={String(hourlyRate)}
+            type="number"
+            min={0}
+            step="0.01"
+          />
+          <Textarea
+            name="bio"
+            label="Bio"
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            rows={4}
+            placeholder="Introduce yourself to students. Tell them what you help with and how you work."
+          />
         </Card>
 
         {state.message && (
-          <p className={`text-sm rounded-lg px-3 py-2 ${state.ok ? "text-success bg-success-tint" : "text-error bg-error-container/30"}`}>
+          <p
+            className={`text-sm rounded-lg px-3 py-2 ${state.ok ? "text-success bg-success-tint" : "text-error bg-error-container/30"}`}
+          >
             {state.message}
           </p>
         )}

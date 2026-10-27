@@ -1,9 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
 
-export async function uploadOrderFile(
-  orderId: string,
-  file: File
-): Promise<string> {
+export async function uploadOrderFile(orderId: string, file: File): Promise<string> {
   const supabase = createClient();
 
   const {

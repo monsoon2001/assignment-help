@@ -75,7 +75,7 @@ export default async function DashboardPage() {
     supabase
       .from("requests")
       .select(
-        "id, title, subject, description, deadline, file_urls, status, created_at, sent_at, helper:users!requests_helper_id_fkey(id, name), helper_id"
+        "id, title, subject, description, deadline, file_urls, status, created_at, sent_at, helper:users!requests_helper_id_fkey(id, name), helper_id",
       )
       .eq("student_id", user.id)
       .order("created_at", { ascending: false })
@@ -102,7 +102,7 @@ export default async function DashboardPage() {
     (completedOrders ?? []).flatMap((order) => {
       const proposal = unwrapRow<{ request_id: string | null }>(order.proposal);
       return proposal?.request_id ? [proposal.request_id] : [];
-    })
+    }),
   );
 
   const activeIds = requests
@@ -141,7 +141,11 @@ export default async function DashboardPage() {
       .from("orders")
       .select("id, proposal_id, status, updated_at, created_at")
       .in("proposal_id", Array.from(acceptedByRequest.values()));
-    for (const o of (orderRows ?? []) as Array<{ id: string; proposal_id: string; status: string }>) {
+    for (const o of (orderRows ?? []) as Array<{
+      id: string;
+      proposal_id: string;
+      status: string;
+    }>) {
       orderByProposal.set(o.proposal_id, o.id);
     }
   }
@@ -153,13 +157,17 @@ export default async function DashboardPage() {
   // has already become an order.
   const orderListRes = await supabase
     .from("orders")
-    .select("id, status, updated_at, created_at, proposal:proposals(id, request_id, request:requests(id,title))")
+    .select(
+      "id, status, updated_at, created_at, proposal:proposals(id, request_id, request:requests(id,title))",
+    )
     .eq("student_id", user.id)
     .order("updated_at", { ascending: false })
     .limit(30);
 
   const orders = (orderListRes.data ?? []).map((o) => {
-    const prop = unwrapRow<{ id: string | null; request_id: string | null; request: unknown }>(o.proposal);
+    const prop = unwrapRow<{ id: string | null; request_id: string | null; request: unknown }>(
+      o.proposal,
+    );
     const req = unwrapRow<{ id: string | null; title: string | null }>(prop?.request);
     return {
       id: o.id,
@@ -173,7 +181,7 @@ export default async function DashboardPage() {
   });
 
   const requestIdsWithOrders = new Set(
-    orders.flatMap((order) => (order.requestId ? [order.requestId] : []))
+    orders.flatMap((order) => (order.requestId ? [order.requestId] : [])),
   );
 
   // Only proposals that are still awaiting the student's decision are actionable.
@@ -266,12 +274,14 @@ export default async function DashboardPage() {
     if (n.type !== "message") continue;
     const requestId = n.link?.match(/^\/requests\/([^/?]+)/)?.[1];
     const orderId = n.link?.match(/^\/orders\/([^/?]+)/)?.[1];
-    const requestIdForCard =
-      requestId ?? orders.find((o) => o.id === orderId)?.requestId ?? null;
+    const requestIdForCard = requestId ?? orders.find((o) => o.id === orderId)?.requestId ?? null;
     if (!requestIdForCard) continue;
     if (completedRequestIds.has(requestIdForCard)) continue;
     const linkedOrder = orders.find((o) => o.requestId === requestIdForCard);
-    if (linkedOrder && ["completed", "cancelled", "declined", "disputed"].includes(linkedOrder.status)) {
+    if (
+      linkedOrder &&
+      ["completed", "cancelled", "declined", "disputed"].includes(linkedOrder.status)
+    ) {
       continue;
     }
     const key = `notif:${n.id}`;
@@ -297,7 +307,8 @@ export default async function DashboardPage() {
       if (card.key.startsWith("order:")) {
         const oId = card.id;
         const o = orders.find((x) => x.id === oId);
-        if (o && ["completed", "cancelled", "declined", "disputed"].includes(o.status)) return false;
+        if (o && ["completed", "cancelled", "declined", "disputed"].includes(o.status))
+          return false;
         if (o && o.status === "delivered" && card.key.startsWith("order:revision")) return false;
       }
       return true;
@@ -305,16 +316,41 @@ export default async function DashboardPage() {
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 12);
 
-  const firstName = (user.user_metadata?.name ?? user.email ?? "there").toString().trim().split(/\s+/)[0];
-  const activeCount = requests.filter((r) => ["requested", "proposal_sent", "accepted"].includes(r.status)).length;
+  const firstName = (user.user_metadata?.name ?? user.email ?? "there")
+    .toString()
+    .trim()
+    .split(/\s+/)[0];
+  const activeCount = requests.filter((r) =>
+    ["requested", "proposal_sent", "accepted"].includes(r.status),
+  ).length;
   const awaitingCount = requests.filter((r) => r.status === "requested").length;
   const completedCount = completedOrders?.length ?? 0;
-  const nextAction = requests.find((r) => ["requested", "proposal_sent", "accepted"].includes(r.status));
+  const nextAction = requests.find((r) =>
+    ["requested", "proposal_sent", "accepted"].includes(r.status),
+  );
 
   const stats = [
-    { icon: FileText, label: "Open requests", value: String(activeCount), href: "/requests", tone: "bg-primary-container text-on-primary" },
-    { icon: Clock, label: "Awaiting reply", value: String(awaitingCount), href: "/requests", tone: "bg-secondary-container text-on-secondary-container" },
-    { icon: CheckCircle2, label: "Completed orders", value: String(completedCount), href: "/orders", tone: "bg-success-tint text-success" },
+    {
+      icon: FileText,
+      label: "Open requests",
+      value: String(activeCount),
+      href: "/requests",
+      tone: "bg-primary-container text-on-primary",
+    },
+    {
+      icon: Clock,
+      label: "Awaiting reply",
+      value: String(awaitingCount),
+      href: "/requests",
+      tone: "bg-secondary-container text-on-secondary-container",
+    },
+    {
+      icon: CheckCircle2,
+      label: "Completed orders",
+      value: String(completedCount),
+      href: "/orders",
+      tone: "bg-success-tint text-success",
+    },
   ];
 
   return (
@@ -322,7 +358,9 @@ export default async function DashboardPage() {
       <DashboardRefresh userId={user.id} />
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <h1 className="font-display font-bold text-2xl sm:text-3xl text-on-surface">Hi, {firstName}</h1>
+          <h1 className="font-display font-bold text-2xl sm:text-3xl text-on-surface">
+            Hi, {firstName}
+          </h1>
           <p className="text-on-surface-variant text-sm sm:text-base mt-1">
             {nextAction
               ? `"${nextAction.title}" is ${STATUS_LABEL[nextAction.status]?.toLowerCase() ?? "in progress"}.`
@@ -344,13 +382,22 @@ export default async function DashboardPage() {
           const Icon = s.icon;
           return (
             <Link key={s.label} href={s.href} className="group">
-              <Card className="h-full p-3 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 transition-shadow group-hover:shadow-md" hover>
-                <span className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 ${s.tone}`}>
+              <Card
+                className="h-full p-3 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 transition-shadow group-hover:shadow-md"
+                hover
+              >
+                <span
+                  className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 ${s.tone}`}
+                >
                   <Icon size={18} />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-xl sm:text-2xl font-display font-bold text-on-surface leading-none">{s.value}</p>
-                  <p className="text-[11px] sm:text-xs text-on-surface-variant mt-1 sm:mt-0 leading-tight">{s.label}</p>
+                  <p className="text-xl sm:text-2xl font-display font-bold text-on-surface leading-none">
+                    {s.value}
+                  </p>
+                  <p className="text-xs sm:text-xs text-on-surface-variant mt-1 sm:mt-0 leading-tight">
+                    {s.label}
+                  </p>
                 </div>
               </Card>
             </Link>
@@ -370,7 +417,9 @@ export default async function DashboardPage() {
                 <Link key={card.key} href={card.href}>
                   <Card className="action-card p-5 transition-shadow hover:shadow-lg" hover>
                     <div className="flex items-start gap-3">
-                      <span className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${card.tone}`}>
+                      <span
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${card.tone}`}
+                      >
                         <Icon size={18} />
                       </span>
                       <div className="flex-1 min-w-0">
@@ -378,9 +427,13 @@ export default async function DashboardPage() {
                           <p className="font-semibold text-on-surface truncate">{card.title}</p>
                           {card.dot && <span className="w-2 h-2 rounded-full bg-primary" />}
                         </div>
-                        <p className="text-sm text-on-surface-variant line-clamp-2 mt-1">{card.body}</p>
+                        <p className="text-sm text-on-surface-variant line-clamp-2 mt-1">
+                          {card.body}
+                        </p>
                         <div className="flex items-center justify-between mt-3">
-                          <p className="text-xs text-on-surface-variant">{timeAgo(card.createdAt)}</p>
+                          <p className="text-xs text-on-surface-variant">
+                            {timeAgo(card.createdAt)}
+                          </p>
                           <span className="text-sm font-medium text-primary inline-flex items-center gap-1">
                             Act now <ChevronRight size={14} />
                           </span>
@@ -411,27 +464,37 @@ export default async function DashboardPage() {
             <Card className="p-6 sm:p-10 text-center">
               <p className="text-on-surface-variant">You haven&apos;t requested help yet.</p>
               <Link href="/requests/new" className="inline-block mt-4">
-                <Button>Create Your First Request <Sparkles size={15} /></Button>
+                <Button>
+                  Create Your First Request <Sparkles size={15} />
+                </Button>
               </Link>
             </Card>
           )}
 
           {requests.map((r) => {
-            const meta = { label: STATUS_LABEL[r.status] ?? r.status, tone: requestStatusTone(r.status) };
+            const meta = {
+              label: STATUS_LABEL[r.status] ?? r.status,
+              tone: requestStatusTone(r.status),
+            };
             const proposalId = acceptedByRequest.get(r.id);
             const orderId = proposalId ? orderByProposal.get(proposalId) : undefined;
             const overdue = r.status === "requested" && isPastResponseWindow(r.sent_at);
             const target = orderId ? `/requests/${r.id}` : `/requests/${r.id}`;
             return (
               <Card key={r.id} hover className="p-5">
-                <Link href={target} className="flex items-center justify-between gap-4 min-h-11 -my-2">
+                <Link
+                  href={target}
+                  className="flex items-center justify-between gap-4 min-h-11 -my-2"
+                >
                   <div className="flex items-center gap-3 min-w-0">
                     <span className="w-10 h-10 rounded-xl bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0 font-semibold text-sm">
                       {(r.subject || r.title).slice(0, 1).toUpperCase()}
                     </span>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-display font-semibold text-on-surface truncate">{r.title}</h3>
+                        <h3 className="font-display font-semibold text-on-surface truncate">
+                          {r.title}
+                        </h3>
                         <StatusBadge tone={meta.tone} dot>
                           {meta.label}
                         </StatusBadge>
@@ -460,26 +523,38 @@ export default async function DashboardPage() {
         <section>
           <div className="flex items-center justify-between gap-4 mb-3">
             <h2 className="font-display font-bold text-lg text-on-surface">Quick Links</h2>
-            <Link href="/notifications" className="text-sm font-semibold text-primary min-h-11 -my-2 inline-flex items-center hover:underline">
+            <Link
+              href="/notifications"
+              className="text-sm font-semibold text-primary min-h-11 -my-2 inline-flex items-center hover:underline"
+            >
               View all notifications
             </Link>
           </div>
           <Card className="p-4 flex flex-col gap-2">
-            <Link href="/messages" className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-surface-container-low transition-colors">
+            <Link
+              href="/messages"
+              className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-surface-container-low transition-colors"
+            >
               <div className="flex items-center gap-2">
                 <MessageSquare size={16} className="text-primary" />
                 <span className="text-sm text-on-surface">Messages</span>
               </div>
               <ArrowRight size={14} className="text-on-surface-variant" />
             </Link>
-            <Link href="/orders" className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-surface-container-low transition-colors">
+            <Link
+              href="/orders"
+              className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-surface-container-low transition-colors"
+            >
               <div className="flex items-center gap-2">
                 <Package size={16} className="text-primary" />
                 <span className="text-sm text-on-surface">Orders</span>
               </div>
               <ArrowRight size={14} className="text-on-surface-variant" />
             </Link>
-            <Link href="/requests" className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-surface-container-low transition-colors">
+            <Link
+              href="/requests"
+              className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-surface-container-low transition-colors"
+            >
               <div className="flex items-center gap-2">
                 <Inbox size={16} className="text-primary" />
                 <span className="text-sm text-on-surface">My Requests</span>

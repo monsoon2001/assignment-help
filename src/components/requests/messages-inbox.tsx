@@ -52,13 +52,9 @@ export default function MessagesInbox({
 
       channel = client
         .channel(realtimeTopic(`${isHelper ? "h" : "s"}-inbox:${user.id}`))
-        .on(
-          "postgres_changes",
-          { event: "INSERT", schema: "public", table: "messages" },
-          () => {
-            void refresh();
-          }
-        )
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () => {
+          void refresh();
+        })
         .subscribe();
     })();
 
@@ -89,7 +85,9 @@ export default function MessagesInbox({
         </div>
         {!isHelper && (
           <Link href="/requests/new">
-            <Button size="sm"><MessageSquare size={15} /> New Request</Button>
+            <Button size="sm">
+              <MessageSquare size={15} /> New Request
+            </Button>
           </Link>
         )}
       </div>
@@ -99,7 +97,9 @@ export default function MessagesInbox({
           <span className="w-14 h-14 rounded-2xl bg-primary-container/20 flex items-center justify-center">
             <MessageSquare size={26} className="text-primary" />
           </span>
-          <h2 className="text-lg font-display font-semibold text-on-surface">No conversations yet</h2>
+          <h2 className="text-lg font-display font-semibold text-on-surface">
+            No conversations yet
+          </h2>
           <p className="text-sm text-on-surface-variant max-w-md">
             {isHelper
               ? "Students you work with will appear here once they send you a request or order message."
@@ -107,11 +107,15 @@ export default function MessagesInbox({
           </p>
           {isHelper ? (
             <Link href="/helper/requests" className="mt-2">
-              <Button size="sm">Check incoming requests <ArrowRight size={14} /></Button>
+              <Button size="sm">
+                Check incoming requests <ArrowRight size={14} />
+              </Button>
             </Link>
           ) : (
             <Link href="/requests/new" className="mt-2">
-              <Button size="sm">Create your first request <ArrowRight size={14} /></Button>
+              <Button size="sm">
+                Create your first request <ArrowRight size={14} />
+              </Button>
             </Link>
           )}
         </Card>
@@ -125,22 +129,27 @@ export default function MessagesInbox({
                 className="flex items-start gap-3 p-4 hover:bg-surface-container-low transition-colors group"
               >
                 <Avatar
-                  name={isHelper ? t.counterpart?.name ?? fallbackName : ACADIVO_HELPER_NAME}
+                  name={isHelper ? (t.counterpart?.name ?? fallbackName) : ACADIVO_HELPER_NAME}
                   size="md"
-                  src={isHelper ? t.counterpart?.avatar_url ?? undefined : undefined}
+                  src={isHelper ? (t.counterpart?.avatar_url ?? undefined) : undefined}
                 />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-semibold text-on-surface truncate group-hover:underline">
-                      {isHelper ? t.counterpart?.name ?? fallbackName : ACADIVO_HELPER_NAME}
+                      {isHelper ? (t.counterpart?.name ?? fallbackName) : ACADIVO_HELPER_NAME}
                     </p>
                     <span className="text-xs text-on-surface-variant shrink-0">
-                      {new Date(t.lastAt).toLocaleDateString([], { month: "short", day: "numeric" })}
+                      {new Date(t.lastAt).toLocaleDateString([], {
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </span>
                   </div>
                   <p className="text-xs font-medium text-on-surface truncate">{t.title}</p>
                   <p className="text-xs text-on-surface-variant truncate mt-0.5">{t.lastPreview}</p>
-                  <StatusBadge tone={t.statusTone} className="mt-2">{t.statusLabel}</StatusBadge>
+                  <StatusBadge tone={t.statusTone} className="mt-2">
+                    {t.statusLabel}
+                  </StatusBadge>
                 </div>
               </Link>
             ))}
@@ -152,15 +161,19 @@ export default function MessagesInbox({
                 <MessageSquare size={26} className="text-primary" />
               </div>
               <div>
-                <h2 className="font-display font-bold text-lg text-on-surface">Live chats live in the workspace</h2>
+                <h2 className="font-display font-bold text-lg text-on-surface">
+                  Live chats live in the workspace
+                </h2>
                 <p className="text-sm text-on-surface-variant mt-1 max-w-md">
-                  Select a conversation to open its request or order workspace, where
-                  the realtime chat, files, and deliverables live.
+                  Select a conversation to open its request or order workspace, where the realtime
+                  chat, files, and deliverables live.
                 </p>
               </div>
               {threads[0] && (
                 <Link href={threads[0].link} className="mt-2">
-                  <Button>Open latest conversation <ArrowRight size={15} /></Button>
+                  <Button>
+                    Open latest conversation <ArrowRight size={15} />
+                  </Button>
                 </Link>
               )}
             </Card>

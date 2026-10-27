@@ -12,7 +12,7 @@ export interface NewProposalInput {
 }
 
 export async function submitProposal(
-  input: NewProposalInput
+  input: NewProposalInput,
 ): Promise<{ id: string } | { error: string }> {
   const supabase = createClient();
 

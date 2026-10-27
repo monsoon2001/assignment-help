@@ -46,7 +46,7 @@ function renderHtml(message: EmailMessage): string {
     message.link && message.linkLabel
       ? `<tr><td style="padding:4px 24px 20px;">
            <a href="${SITE_URL}${message.link}" style="display:inline-block;background:#2563EB;color:#ffffff;padding:11px 20px;border-radius:10px;font-weight:600;text-decoration:none;font-size:15px;">${escapeHtml(
-             message.linkLabel
+             message.linkLabel,
            )}</a>
          </td></tr>`
       : "";
@@ -60,7 +60,7 @@ function renderHtml(message: EmailMessage): string {
         <td style="padding:24px 24px 8px;">
           <p style="margin:0 0 12px;font-size:16px;font-weight:600;">${escapeHtml(message.subject)}</p>
           <p style="margin:0;font-size:15px;line-height:1.6;color:#475569;white-space:pre-line;">${escapeHtml(
-            message.text
+            message.text,
           )}</p>
         </td>
       </tr>
@@ -86,7 +86,7 @@ export async function sendEmail(message: EmailMessage): Promise<boolean> {
 
   if (!emailEnabled()) {
     console.info(
-      `[email] disabled (set RESEND_API_KEY) — skipped "${message.subject}" to ${recipients.join(", ")}`
+      `[email] disabled (set RESEND_API_KEY) — skipped "${message.subject}" to ${recipients.join(", ")}`,
     );
     return false;
   }

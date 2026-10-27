@@ -35,7 +35,7 @@ const guide: Resource = {
           t: "example",
           label: "Why sample size matters",
           v: [
-            "Two studies report \"significant\" effects on wellbeing.",
+            'Two studies report "significant" effects on wellbeing.',
             "Study A: n = 40, p = .049, d = 0.30 (small effect).",
             "Study B: n = 4,000, p < .001, d = 0.08 (negligible effect).",
             "Study B is more statistically significant and far less practically important.",
@@ -93,7 +93,7 @@ const guide: Resource = {
       blocks: [
         {
           t: "p",
-          v: "\"Not statistically significant\" means the study did not find sufficient evidence to reject the null hypothesis. It does not mean there is no effect.",
+          v: '"Not statistically significant" means the study did not find sufficient evidence to reject the null hypothesis. It does not mean there is no effect.',
         },
         {
           t: "p",
@@ -108,10 +108,19 @@ const guide: Resource = {
           t: "table",
           head: ["Weak phrasing", "Stronger phrasing"],
           rows: [
-            ["\"The result was significant\"", "\"The effect was statistically significant and practically substantial (d = 0.65)\""],
-            ["\"There was no significant difference\"", "\"The study did not detect a difference; the interval (−0.3 to 0.6) cannot rule out a small effect\""],
-            ["\"The variables are related\"", "\"Higher X was associated with higher Y (r = .42, p < .01), though the study design cannot establish causation\""],
-            ["\"p = 0.000\"", "\"p < .001\" — p is never exactly zero"],
+            [
+              '"The result was significant"',
+              '"The effect was statistically significant and practically substantial (d = 0.65)"',
+            ],
+            [
+              '"There was no significant difference"',
+              '"The study did not detect a difference; the interval (−0.3 to 0.6) cannot rule out a small effect"',
+            ],
+            [
+              '"The variables are related"',
+              '"Higher X was associated with higher Y (r = .42, p < .01), though the study design cannot establish causation"',
+            ],
+            ['"p = 0.000"', '"p < .001" — p is never exactly zero'],
           ],
         },
         {
@@ -120,14 +129,13 @@ const guide: Resource = {
             "I reported the specific p-value, not just p < .05.",
             "I reported an effect size or confidence interval.",
             "I stated n for each group.",
-            "I used non-significant rather than \"no difference\" for null results.",
+            'I used non-significant rather than "no difference" for null results.',
             "I did not claim causation from a correlational design.",
             "I explained practical significance where relevant.",
             "I reported the analyses I planned, including null findings.",
           ],
         },
       ],
-
     },
     {
       heading: "Common Mistakes",
@@ -135,7 +143,7 @@ const guide: Resource = {
         {
           t: "ul",
           v: [
-            "Reading p = 0.03 as \"3% chance this is wrong\".",
+            'Reading p = 0.03 as "3% chance this is wrong".',
             "Treating a non-significant result as proof of no effect.",
             "Reporting significance without any effect size.",
             "Claiming causation from a correlation.",
@@ -156,7 +164,7 @@ const guide: Resource = {
     "I reported exact p-values",
     "I reported an effect size or confidence interval",
     "I stated n for each group",
-    "I used \"did not detect\" language for null results",
+    'I used "did not detect" language for null results',
     "I avoided causal claims from correlational data",
     "I discussed practical significance",
     "I reported planned analyses including non-significant ones",
@@ -164,7 +172,7 @@ const guide: Resource = {
   mistakes: [
     "Misinterpreting p-values as probabilities of error.",
     "Reporting only p < .05.",
-    "Writing \"proves\" instead of \"is associated with\".",
+    'Writing "proves" instead of "is associated with".',
     "Claiming no effect from a null result.",
     "Writing p = 0.000.",
     "Reporting correlation coefficients without checking the scatter plot.",

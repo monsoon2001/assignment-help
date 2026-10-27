@@ -34,7 +34,12 @@ const guide: Resource = {
           v: "As a standalone assignment it is usually asked for as a critical review of a specific body of literature. As a chapter it must feed directly into the methodology and discussion that follow.",
         },
       ],
-      links: [{ label: "How to write a strong thesis statement", slug: "how-to-write-a-thesis-statement" }],
+      links: [
+        {
+          label: "How to write a strong thesis statement",
+          slug: "how-to-write-a-thesis-statement",
+        },
+      ],
     },
     {
       heading: "Searching the Literature",
@@ -71,9 +76,27 @@ const guide: Resource = {
           t: "table",
           head: ["Study", "Method", "Sample / data", "Key finding", "Limitation"],
           rows: [
-            ["Ahmed 2021", "Survey", "n = 240 students", "Moderate positive correlation", "Self-reported data; single institution"],
-            ["Bianchi 2022", "Meta-analysis", "18 studies", "Effect smaller than 2021 estimate", "High heterogeneity between studies"],
-            ["Chen 2023", "Longitudinal", "n = 90, 3 years", "Effect not sustained", "Attrition of 22%"],
+            [
+              "Ahmed 2021",
+              "Survey",
+              "n = 240 students",
+              "Moderate positive correlation",
+              "Self-reported data; single institution",
+            ],
+            [
+              "Bianchi 2022",
+              "Meta-analysis",
+              "18 studies",
+              "Effect smaller than 2021 estimate",
+              "High heterogeneity between studies",
+            ],
+            [
+              "Chen 2023",
+              "Longitudinal",
+              "n = 90, 3 years",
+              "Effect not sustained",
+              "Attrition of 22%",
+            ],
           ],
         },
         {
@@ -93,7 +116,7 @@ const guide: Resource = {
           t: "example",
           label: "Summary",
           v: [
-            "\"Ahmed (2021) surveyed 240 students and found a moderate positive correlation between X and Y.\"",
+            '"Ahmed (2021) surveyed 240 students and found a moderate positive correlation between X and Y."',
           ],
         },
         {

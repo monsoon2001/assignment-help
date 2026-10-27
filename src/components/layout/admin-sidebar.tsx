@@ -1,7 +1,16 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, School, ShieldCheck, FileText, ShoppingCart, CreditCard, MessageSquare, Settings } from "lucide-react";
+import {
+  LayoutDashboard,
+  School,
+  ShieldCheck,
+  FileText,
+  ShoppingCart,
+  CreditCard,
+  MessageSquare,
+  Settings,
+} from "lucide-react";
 
 const links = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -21,11 +30,17 @@ export default function AdminSidebar() {
       <div className="flex items-center gap-3 mb-4 px-3">
         <div className="flex items-center gap-2">
           <span className="text-primary-container text-xl">◆</span>
-          <span className="font-display text-lg font-semibold tracking-tight text-on-surface">Acadivo</span>
+          <span className="font-display text-lg font-semibold tracking-tight text-on-surface">
+            Acadivo
+          </span>
         </div>
-        <span className="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-xs font-semibold uppercase tracking-wider">Admin</span>
+        <span className="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-xs font-semibold uppercase tracking-wider">
+          Admin
+        </span>
       </div>
-      <span className="text-xs font-medium text-on-surface-variant uppercase tracking-wider px-3 mb-1">Navigation</span>
+      <span className="text-xs font-medium text-on-surface-variant uppercase tracking-wider px-3 mb-1">
+        Navigation
+      </span>
       {links.map((link) => {
         const Icon = link.icon;
         const active = pathname === link.href;

@@ -34,10 +34,7 @@ export default function PriceEstimateForm() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const restoredRef = useRef(false);
 
-  const set = useCallback(<K extends TaskRequestField>(
-    key: K,
-    value: TaskRequestFormValues[K]
-  ) => {
+  const set = useCallback(<K extends TaskRequestField>(key: K, value: TaskRequestFormValues[K]) => {
     setValues((prev) => ({ ...prev, [key]: value }));
     setError("");
   }, []);
@@ -81,12 +78,12 @@ export default function PriceEstimateForm() {
     const subjectRaw = composeSelection(
       values.subject,
       values.subject === OTHER_OPTION,
-      values.customSubject
+      values.customSubject,
     );
     const helpTypeRaw = composeSelection(
       values.helpType,
       values.helpType === OTHER_OPTION,
-      values.customHelpType
+      values.customHelpType,
     );
 
     if (!subjectRaw) {

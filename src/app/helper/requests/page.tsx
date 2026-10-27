@@ -20,7 +20,9 @@ type RawRequest = {
   student: { id: string; name: string | null }[] | null;
 };
 
-type NormalizedRequest = Omit<RawRequest, "student"> & { student: { id: string; name: string | null } | null };
+type NormalizedRequest = Omit<RawRequest, "student"> & {
+  student: { id: string; name: string | null } | null;
+};
 
 export default async function HelperRequestsPage() {
   const supabase = await createClient();
@@ -34,7 +36,9 @@ export default async function HelperRequestsPage() {
 
   const { data: requests } = await supabase
     .from("requests")
-    .select("id, title, subject, description, deadline, status, created_at, student:users!requests_student_id_fkey(id, name)")
+    .select(
+      "id, title, subject, description, deadline, status, created_at, student:users!requests_student_id_fkey(id, name)",
+    )
     .eq("helper_id", user.id)
     .in("status", ["requested", "proposal_sent"])
     .order("created_at", { ascending: false });
@@ -46,12 +50,13 @@ export default async function HelperRequestsPage() {
 
   const proposedIds = new Set((myProposals ?? []).map((p) => p.request_id));
 
-  const rows: NormalizedRequest[] = ((requests ?? []) as unknown as RawRequest[]).map(
-    (r) => ({
-      ...r,
-      student: (Array.isArray(r.student) ? (r.student[0] ?? null) : r.student) as { id: string; name: string | null } | null,
-    })
-  );
+  const rows: NormalizedRequest[] = ((requests ?? []) as unknown as RawRequest[]).map((r) => ({
+    ...r,
+    student: (Array.isArray(r.student) ? (r.student[0] ?? null) : r.student) as {
+      id: string;
+      name: string | null;
+    } | null,
+  }));
 
   return <HelperRequestsView requests={rows} proposedIds={proposedIds} />;
 }

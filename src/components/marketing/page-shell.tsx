@@ -140,16 +140,24 @@ export function PageHeader({
         dangerouslySetInnerHTML={jsonLdScript(breadcrumbJsonLd(crumbs))}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6">
-        <nav className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm mb-3" aria-label="Breadcrumb">
+        <nav
+          className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm mb-3"
+          aria-label="Breadcrumb"
+        >
           {crumbs.map((crumb, i) => (
             <span key={`${crumb.label}-${i}`} className="flex min-w-0 items-center gap-1.5">
               {i > 0 && <ChevronRight className="w-3 h-3 shrink-0 text-outline-variant" />}
               {crumb.href ? (
-                <Link href={crumb.href} className={`text-on-surface-variant transition-colors inline-flex items-center min-h-11 min-w-11`}>
+                <Link
+                  href={crumb.href}
+                  className={`text-on-surface-variant transition-colors inline-flex items-center min-h-11 min-w-11`}
+                >
                   {crumb.label}
                 </Link>
               ) : (
-                <span className="text-on-surface font-medium truncate max-w-[60vw] sm:max-w-[16rem] inline-block">{crumb.label}</span>
+                <span className="text-on-surface font-medium truncate max-w-[60vw] sm:max-w-[16rem] inline-block">
+                  {crumb.label}
+                </span>
               )}
             </span>
           ))}
@@ -184,14 +192,20 @@ export function CtaBand({
   eyebrow?: string;
 }) {
   return (
-    <section className="relative overflow-hidden py-12 sm:py-16 band-ink" aria-labelledby="cta-heading">
+    <section
+      className="relative overflow-hidden py-12 sm:py-16 band-ink"
+      aria-labelledby="cta-heading"
+    >
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {eyebrow && (
           <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full on-band-chip border text-xs font-semibold mb-4">
             <MaterialIcon name={eyebrow} size={14} className="text-white/70" />
           </span>
         )}
-        <h2 id="cta-heading" className="font-display text-2xl sm:text-3xl font-bold text-white mb-3">
+        <h2
+          id="cta-heading"
+          className="font-display text-2xl sm:text-3xl font-bold text-white mb-3"
+        >
           {title}
         </h2>
         <p className="on-band-muted mb-7 leading-relaxed">{body}</p>

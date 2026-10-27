@@ -9,7 +9,13 @@ interface StarRatingProps {
   reviewCount?: number;
 }
 
-export default function StarRating({ rating, maxRating = 5, size = 16, showValue = true, reviewCount }: StarRatingProps) {
+export default function StarRating({
+  rating,
+  maxRating = 5,
+  size = 16,
+  showValue = true,
+  reviewCount,
+}: StarRatingProps) {
   return (
     <div className="inline-flex items-center gap-1">
       <div className="flex items-center">

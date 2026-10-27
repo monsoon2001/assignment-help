@@ -65,7 +65,12 @@ const howToWriteAnEssay: Resource = {
           v: "A rubric is a grading guide provided by your instructor that explains what criteria will be used to evaluate your work. It usually lists things like argument quality, evidence, structure, and referencing, often weighted by percentage. If you are given a rubric, read it before you start and treat it as your outline.",
         },
       ],
-      links: [{ label: "How to write a strong thesis statement", slug: "how-to-write-a-thesis-statement" }],
+      links: [
+        {
+          label: "How to write a strong thesis statement",
+          slug: "how-to-write-a-thesis-statement",
+        },
+      ],
     },
     {
       heading: "Step 1: Understand the Question",
@@ -78,16 +83,16 @@ const howToWriteAnEssay: Resource = {
           t: "example",
           label: "Example",
           v: [
-            "Question: \"To what extent has social media changed how teenagers form friendships?\"",
+            'Question: "To what extent has social media changed how teenagers form friendships?"',
             "Topic: social media and teenage friendship formation.",
-            "Task: \"to what extent\" asks you to weigh how much, and to argue a degree rather than describe everything.",
+            'Task: "to what extent" asks you to weigh how much, and to argue a degree rather than describe everything.',
             "Scope: teenagers, friendship formation, and the period you define. Not social media in general, and not adult relationships.",
-            "Key instruction: the word \"extent\" means a partial answer with a judgement is expected, not a list of effects.",
+            'Key instruction: the word "extent" means a partial answer with a judgement is expected, not a list of effects.',
           ],
         },
         {
           t: "p",
-          v: "Rewrite the question as a statement you could argue. \"Social media has made teenage friendships more superficial but no less meaningful\" is arguable. \"Social media affects teenagers\" is too vague to build an essay on.",
+          v: 'Rewrite the question as a statement you could argue. "Social media has made teenage friendships more superficial but no less meaningful" is arguable. "Social media affects teenagers" is too vague to build an essay on.',
         },
       ],
     },
@@ -130,14 +135,19 @@ const howToWriteAnEssay: Resource = {
       blocks: [
         {
           t: "p",
-          v: "Your argument is the answer to the question. Before drafting, be able to complete this sentence: \"This essay argues that ___ because ___ and ___.\" The blanks are the position and the reasons.",
+          v: 'Your argument is the answer to the question. Before drafting, be able to complete this sentence: "This essay argues that ___ because ___ and ___." The blanks are the position and the reasons.',
         },
         {
           t: "p",
           v: "Test it against three filters. Is it specific? Does it directly answer the verb in the question? Could a reasonable person disagree with it? If any answer is no, sharpen it.",
         },
       ],
-      links: [{ label: "How to write a strong thesis statement", slug: "how-to-write-a-thesis-statement" }],
+      links: [
+        {
+          label: "How to write a strong thesis statement",
+          slug: "how-to-write-a-thesis-statement",
+        },
+      ],
     },
     {
       heading: "Step 4: Create an Outline",
@@ -179,7 +189,12 @@ const howToWriteAnEssay: Resource = {
           v: "Do not bury the thesis in the last sentence of a long paragraph. Readers (and markers) should not have to hunt for it.",
         },
       ],
-      links: [{ label: "How to write an effective essay introduction", slug: "how-to-write-an-introduction" }],
+      links: [
+        {
+          label: "How to write an effective essay introduction",
+          slug: "how-to-write-an-introduction",
+        },
+      ],
     },
     {
       heading: "Step 6: Write the Body Paragraphs",
@@ -202,7 +217,9 @@ const howToWriteAnEssay: Resource = {
           v: "This is one workable structure, not the only one. Some disciplines favour different orders, and some essays work well as a continuous sequence without explicit signposting. Whatever you choose, each paragraph should do one job and do it well.",
         },
       ],
-      links: [{ label: "How to paraphrase without changing the meaning", slug: "how-to-paraphrase" }],
+      links: [
+        { label: "How to paraphrase without changing the meaning", slug: "how-to-paraphrase" },
+      ],
     },
     {
       heading: "Step 7: Write the Conclusion",
@@ -260,7 +277,9 @@ const howToWriteAnEssay: Resource = {
           ],
         },
       ],
-      links: [{ label: "How to proofread an essay before submission", slug: "how-to-proofread-an-essay" }],
+      links: [
+        { label: "How to proofread an essay before submission", slug: "how-to-proofread-an-essay" },
+      ],
     },
   ],
   takeaways: [
@@ -286,7 +305,7 @@ const howToWriteAnEssay: Resource = {
     "Answering a different question than the one that was set.",
     "Writing a descriptive summary with no position to defend.",
     "Including sources you never actually read in the reference list.",
-    "Starting paragraphs with \"In today's society\" or \"Throughout history\".",
+    'Starting paragraphs with "In today\'s society" or "Throughout history".',
     "Using quotations without any analysis of what they mean.",
     "Letting the conclusion introduce a new argument.",
     "Editing word choice before the structure is sound.",

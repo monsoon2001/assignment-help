@@ -48,7 +48,9 @@ export default async function AdminProfilePage() {
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h2 className="font-display font-bold text-xl text-on-surface">{displayName}</h2>
-            <Badge variant="primary"><Shield size={12} /> Administrator</Badge>
+            <Badge variant="primary">
+              <Shield size={12} /> Administrator
+            </Badge>
           </div>
           <p className="text-sm text-on-surface-variant mt-1 flex items-center gap-1.5">
             <Mail size={14} /> {email}
@@ -58,7 +60,9 @@ export default async function AdminProfilePage() {
 
       <Card className="p-6">
         <h3 className="font-display font-semibold text-on-surface mb-1">Account Information</h3>
-        <p className="text-xs text-on-surface-variant mb-5">Your identity is verified. Email cannot be changed.</p>
+        <p className="text-xs text-on-surface-variant mb-5">
+          Your identity is verified. Email cannot be changed.
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input label="First Name" defaultValue={firstName} />
           <Input label="Last Name" defaultValue={lastName} />
@@ -73,7 +77,8 @@ export default async function AdminProfilePage() {
         <div className="flex items-center gap-2 mt-5 pt-5 border-t border-outline-variant">
           <GraduationCap size={15} className="text-primary shrink-0" />
           <p className="text-xs text-on-surface-variant">
-            Admin credentials are provisioned by the platform team. Contact your setup owner for any account changes.
+            Admin credentials are provisioned by the platform team. Contact your setup owner for any
+            account changes.
           </p>
         </div>
         <Button className="mt-4">Save Changes</Button>

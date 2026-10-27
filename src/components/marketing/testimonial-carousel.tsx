@@ -105,7 +105,10 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
                     />
 
                     <div className="relative flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-0.5" aria-label={`${t.rating.toFixed(1)} out of 5`}>
+                      <div
+                        className="flex items-center gap-0.5"
+                        aria-label={`${t.rating.toFixed(1)} out of 5`}
+                      >
                         {Array.from({ length: 5 }).map((_, i) => (
                           <Star
                             key={i}
@@ -138,9 +141,12 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
                           className="shrink-0"
                         />
                         <div className="min-w-0 flex-1">
-                          <p className="text-base font-semibold text-on-surface truncate leading-relaxed">{firstName}</p>
+                          <p className="text-base font-semibold text-on-surface truncate leading-relaxed">
+                            {firstName}
+                          </p>
                           <p className="text-xs text-on-surface-variant">
-                            {[t.service, t.length].filter(Boolean).join(" · ") || "Verified student"}
+                            {[t.service, t.length].filter(Boolean).join(" · ") ||
+                              "Verified student"}
                           </p>
                         </div>
                         <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-success-tint px-2 py-1 text-xs font-semibold text-success">
@@ -175,7 +181,9 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
                 aria-label={`Show testimonials ${i + 1}`}
                 aria-current={i === activePage}
                 className={`h-2 rounded-full transition-all ${
-                  i === activePage ? "w-7 bg-primary hover:bg-primary-hover" : "w-2 bg-outline-variant hover:bg-on-surface-variant/50"
+                  i === activePage
+                    ? "w-7 bg-primary hover:bg-primary-hover"
+                    : "w-2 bg-outline-variant hover:bg-on-surface-variant/50"
                 }`}
               />
             ))}

@@ -14,7 +14,8 @@ let master: GainNode | null = null;
 function ensureCtx(): AudioContext | null {
   if (typeof window === "undefined") return null;
   const AC: typeof AudioContext | undefined =
-    window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    window.AudioContext ??
+    (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!AC) return null;
   if (!ctx) {
     ctx = new AC();

@@ -45,12 +45,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${BASE_URL}${route}`,
     lastModified,
     changeFrequency: route === "" ? ("daily" as const) : ("weekly" as const),
-    priority: route === ""
-      ? 1
-      : route === "/resources"
-        ? 0.9
-        : route.startsWith("/subjects/") || route.startsWith("/resources/")
-          ? 0.8
-          : 0.6,
+    priority:
+      route === ""
+        ? 1
+        : route === "/resources"
+          ? 0.9
+          : route.startsWith("/subjects/") || route.startsWith("/resources/")
+            ? 0.8
+            : 0.6,
   }));
 }

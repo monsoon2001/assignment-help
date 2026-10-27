@@ -74,7 +74,7 @@ export async function getChargeContext(country: string | null): Promise<ChargeCo
 export async function resolveLocalCharge(
   baseAmount: number,
   baseCurrency: string,
-  country: string | null
+  country: string | null,
 ): Promise<ResolvedCharge | null> {
   if (!Number.isFinite(baseAmount) || baseAmount <= 0) return null;
 
@@ -86,13 +86,7 @@ export async function resolveLocalCharge(
   const surcharge = await getSurchargePercentForCountry(country);
   const localCurrency = currencyForCountry(country) ?? DEFAULT_CURRENCY;
 
-  const localAmount = computeLocalCharge(
-    baseAmount,
-    baseCurrency,
-    localCurrency,
-    rates,
-    surcharge
-  );
+  const localAmount = computeLocalCharge(baseAmount, baseCurrency, localCurrency, rates, surcharge);
   if (localAmount !== null && localAmount > 0) {
     return { currency: localCurrency, amount: localAmount };
   }
@@ -104,7 +98,7 @@ export async function resolveLocalCharge(
       baseCurrency,
       DEFAULT_CURRENCY,
       rates,
-      surcharge
+      surcharge,
     );
     if (cadAmount !== null && cadAmount > 0) {
       return { currency: DEFAULT_CURRENCY, amount: cadAmount };

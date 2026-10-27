@@ -19,7 +19,11 @@ export const metadata: Metadata = {
 
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 export default async function AdminStudentsPage({
@@ -55,24 +59,47 @@ export default async function AdminStudentsPage({
           <table className="w-full min-w-[640px]">
             <thead>
               <tr className="border-b border-outline-variant/30">
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Student</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Email</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Joined</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Status</th>
-                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Actions</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                  Student
+                </th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                  Email
+                </th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                  Joined
+                </th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                  Status
+                </th>
+                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
+                <tr
+                  key={user.id}
+                  className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors"
+                >
                   <td className="px-3 sm:px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <Avatar name={user.name ?? "Student"} src={user.avatar_url ?? undefined} size="sm" />
-                      <span className="text-sm font-medium text-on-surface">{user.name ?? "Unnamed"}</span>
+                      <Avatar
+                        name={user.name ?? "Student"}
+                        src={user.avatar_url ?? undefined}
+                        size="sm"
+                      />
+                      <span className="text-sm font-medium text-on-surface">
+                        {user.name ?? "Unnamed"}
+                      </span>
                     </div>
                   </td>
-                  <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">{user.email}</td>
-                  <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">{formatDate(user.created_at)}</td>
+                  <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">
+                    {user.email}
+                  </td>
+                  <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">
+                    {formatDate(user.created_at)}
+                  </td>
                   <td className="px-3 sm:px-6 py-4">
                     <StatusBadge tone={userStatusTone(user.status)}>
                       {user.status ?? "active"}
@@ -82,13 +109,23 @@ export default async function AdminStudentsPage({
                     <div className="flex items-center justify-end gap-2">
                       <form action={setUserStatus}>
                         <input type="hidden" name="userId" value={user.id} />
-                        <input type="hidden" name="status" value={user.status === "suspended" ? "active" : "suspended"} />
-                        <Button size="sm" variant={user.status === "suspended" ? "secondary" : "danger"} type="submit">
+                        <input
+                          type="hidden"
+                          name="status"
+                          value={user.status === "suspended" ? "active" : "suspended"}
+                        />
+                        <Button
+                          size="sm"
+                          variant={user.status === "suspended" ? "secondary" : "danger"}
+                          type="submit"
+                        >
                           {user.status === "suspended" ? "Activate" : "Suspend"}
                         </Button>
                       </form>
                       <Link href={`/admin/students?edit=${user.id}`}>
-                        <Button size="sm" variant="outline">Edit</Button>
+                        <Button size="sm" variant="outline">
+                          Edit
+                        </Button>
                       </Link>
                     </div>
                   </td>

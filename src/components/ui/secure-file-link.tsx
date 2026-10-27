@@ -75,7 +75,7 @@ export default function SecureFileLink({
       const data = (await res.json()) as { url: string };
       return data.url;
     },
-    [baseBucket, state.error, stored, displayName]
+    [baseBucket, state.error, stored, displayName],
   );
 
   const open = useCallback(
@@ -98,7 +98,7 @@ export default function SecureFileLink({
       })();
       void pending.current;
     },
-    [resolveUrl, state.url]
+    [resolveUrl, state.url],
   );
 
   const download = useCallback(
@@ -122,7 +122,7 @@ export default function SecureFileLink({
         setDownloading(false);
       }
     },
-    [resolveUrl, displayName]
+    [resolveUrl, displayName],
   );
 
   if (!showDownload) {

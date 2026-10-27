@@ -41,17 +41,17 @@ export default function DashboardRefresh({ userId }: { userId: string }) {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "orders", filter: `student_id=eq.${userId}` },
-        refresh
+        refresh,
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "requests", filter: `student_id=eq.${userId}` },
-        refresh
+        refresh,
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${userId}` },
-        refresh
+        refresh,
       )
       .subscribe();
 

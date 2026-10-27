@@ -28,10 +28,12 @@ export default function PaymentConfirming() {
         </div>
       </div>
       <div>
-        <p className="font-display font-semibold text-on-surface text-lg">Confirming your payment…</p>
+        <p className="font-display font-semibold text-on-surface text-lg">
+          Confirming your payment…
+        </p>
         <p className="text-sm text-on-surface-variant mt-1 max-w-md mx-auto">
-          Your payment is being verified securely. This page refreshes automatically
-          and will show your workspace once Stripe confirms the charge.
+          Your payment is being verified securely. This page refreshes automatically and will show
+          your workspace once Stripe confirms the charge.
         </p>
       </div>
       <p className="text-xs text-on-surface-variant inline-flex items-center gap-1.5">

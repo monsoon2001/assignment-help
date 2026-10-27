@@ -13,7 +13,13 @@ import { flagMessage, updateFlagStatus, issueWarning } from "@/app/admin/chat-mo
 
 type ThreadParticipant = { id: string; name: string | null; role: string | null };
 type Flag = { id: string; message_id: string; reason: string; status: string; created_at: string };
-type Warning = { id: string; user_id: string; message_id: string | null; reason: string; created_at: string };
+type Warning = {
+  id: string;
+  user_id: string;
+  message_id: string | null;
+  reason: string;
+  created_at: string;
+};
 
 export type ChatMonitorThread = {
   id: string;
@@ -114,9 +120,7 @@ export default function ChatMonitor({
 
   return (
     <div className="flex flex-col gap-4">
-      {result && (
-        <p className="text-sm text-success px-1">{result}</p>
-      )}
+      {result && <p className="text-sm text-success px-1">{result}</p>}
 
       {threads.map((thread) => {
         const key = `${thread.kind}-${thread.id}`;
@@ -135,7 +139,9 @@ export default function ChatMonitor({
                     {thread.title}
                   </p>
                   {thread.kind === "order" && thread.status && (
-                    <StatusBadge tone={orderStatusTone(thread.status)}>{thread.status.replaceAll("_", " ")}</StatusBadge>
+                    <StatusBadge tone={orderStatusTone(thread.status)}>
+                      {thread.status.replaceAll("_", " ")}
+                    </StatusBadge>
                   )}
                   {pendingFlags.length > 0 && (
                     <Badge variant="danger">{pendingFlags.length} flag</Badge>
@@ -143,7 +149,10 @@ export default function ChatMonitor({
                 </div>
                 <div className="flex items-center gap-1.5 mt-1.5">
                   {thread.participants.map((p, i) => (
-                    <span key={p.id} className="inline-flex items-center gap-1 text-xs text-on-surface-variant">
+                    <span
+                      key={p.id}
+                      className="inline-flex items-center gap-1 text-xs text-on-surface-variant"
+                    >
                       {i > 0 && <span className="text-outline-variant">&middot;</span>}
                       <Avatar name={p.name ?? p.role ?? "User"} size="sm" />
                       {p.name ?? "Unnamed"} ({p.role ?? "user"})
@@ -153,7 +162,9 @@ export default function ChatMonitor({
                 {!open && thread.lastMessage && (
                   <p className="mt-2 text-sm text-on-surface-variant line-clamp-2">
                     {thread.lastMessage.senderName && (
-                      <span className="font-medium text-on-surface">{thread.lastMessage.senderName}: </span>
+                      <span className="font-medium text-on-surface">
+                        {thread.lastMessage.senderName}:{" "}
+                      </span>
                     )}
                     {thread.lastMessage.body}
                     <span className="text-xs text-on-surface-variant/80 ml-2">
@@ -162,9 +173,15 @@ export default function ChatMonitor({
                   </p>
                 )}
               </div>
-              <Button size="sm" variant="outline" onClick={() => setExpanded((e) => ({ ...e, [key]: !open }))}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setExpanded((e) => ({ ...e, [key]: !open }))}
+              >
                 {open ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-                {open ? "Hide" : `${thread.messages.length} message${thread.messages.length !== 1 ? "s" : ""}`}
+                {open
+                  ? "Hide"
+                  : `${thread.messages.length} message${thread.messages.length !== 1 ? "s" : ""}`}
               </Button>
             </div>
 
@@ -189,7 +206,8 @@ export default function ChatMonitor({
                             {sender?.name ?? "Unknown"}
                             {sender?.role && (
                               <span className="normal-case font-normal text-xs text-on-surface-variant">
-                                {" "}· {sender.role}
+                                {" "}
+                                · {sender.role}
                               </span>
                             )}
                           </span>
@@ -198,15 +216,16 @@ export default function ChatMonitor({
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0">
-                          {pendingMsgFlags.length === 0 && !flags.some((f) => f.status !== "dismissed") && (
-                            <button
-                              onClick={() => doFlag(msg.id)}
-                              disabled={pending}
-                              className="text-xs inline-flex items-center gap-1 text-on-surface-variant hover:text-error transition-colors cursor-pointer"
-                            >
-                              <Flag size={12} /> Flag
-                            </button>
-                          )}
+                          {pendingMsgFlags.length === 0 &&
+                            !flags.some((f) => f.status !== "dismissed") && (
+                              <button
+                                onClick={() => doFlag(msg.id)}
+                                disabled={pending}
+                                className="text-xs inline-flex items-center gap-1 text-on-surface-variant hover:text-error transition-colors cursor-pointer"
+                              >
+                                <Flag size={12} /> Flag
+                              </button>
+                            )}
                         </div>
                       </div>
 
@@ -214,61 +233,65 @@ export default function ChatMonitor({
                         {msg.body || <span className="italic">(attachment)</span>}
                       </p>
 
-                      {flags.filter((f) => f.status !== "dismissed").map((f) => (
-                        <div
-                          key={f.id}
-                          className="flex flex-wrap items-center gap-2 p-2.5 rounded-lg bg-error/5 border border-error/20 text-xs"
-                        >
-                          <ShieldAlert size={13} className="text-error shrink-0" />
-                          <span className="text-on-surface font-medium">Flagged:</span>
-                          <span className="text-on-surface-variant">{f.reason}</span>
-                          <span className="text-on-surface-variant">{f.status}</span>
-                          <span className="flex items-center gap-1.5 ml-auto">
-                            {f.status !== "confirmed" && (
+                      {flags
+                        .filter((f) => f.status !== "dismissed")
+                        .map((f) => (
+                          <div
+                            key={f.id}
+                            className="flex flex-wrap items-center gap-2 p-2.5 rounded-lg bg-error/5 border border-error/20 text-xs"
+                          >
+                            <ShieldAlert size={13} className="text-error shrink-0" />
+                            <span className="text-on-surface font-medium">Flagged:</span>
+                            <span className="text-on-surface-variant">{f.reason}</span>
+                            <span className="text-on-surface-variant">{f.status}</span>
+                            <span className="flex items-center gap-1.5 ml-auto">
+                              {f.status !== "confirmed" && (
+                                <button
+                                  onClick={() => doUpdateFlag(f.id, "confirmed")}
+                                  disabled={pending}
+                                  className="inline-flex items-center gap-1 text-success hover:underline cursor-pointer"
+                                >
+                                  <Check size={12} /> Confirm
+                                </button>
+                              )}
+                              {f.status !== "dismissed" && (
+                                <button
+                                  onClick={() => doUpdateFlag(f.id, "dismissed")}
+                                  disabled={pending}
+                                  className="inline-flex items-center gap-1 text-on-surface-variant hover:text-on-surface cursor-pointer"
+                                >
+                                  <X size={12} /> Dismiss
+                                </button>
+                              )}
                               <button
-                                onClick={() => doUpdateFlag(f.id, "confirmed")}
-                                disabled={pending}
-                                className="inline-flex items-center gap-1 text-success hover:underline cursor-pointer"
+                                onClick={() => setOpenWarn((o) => ({ ...o, [warnKey]: !warnOpen }))}
+                                className="inline-flex items-center gap-1 text-error hover:underline cursor-pointer"
                               >
-                                <Check size={12} /> Confirm
+                                <ShieldAlert size={12} /> Warn sender
                               </button>
-                            )}
-                            {f.status !== "dismissed" && (
-                              <button
-                                onClick={() => doUpdateFlag(f.id, "dismissed")}
-                                disabled={pending}
-                                className="inline-flex items-center gap-1 text-on-surface-variant hover:text-on-surface cursor-pointer"
-                              >
-                                <X size={12} /> Dismiss
-                              </button>
-                            )}
-                            <button
-                              onClick={() => setOpenWarn((o) => ({ ...o, [warnKey]: !warnOpen }))}
-                              className="inline-flex items-center gap-1 text-error hover:underline cursor-pointer"
-                            >
-                              <ShieldAlert size={12} /> Warn sender
-                            </button>
-                          </span>
+                            </span>
 
-                          {warnOpen && (
-                            <div className="w-full flex items-center gap-2">
-                              <input
-                                value={reason[warnKey] || ""}
-                                onChange={(e) => setReason((r) => ({ ...r, [warnKey]: e.target.value }))}
-                                placeholder="Warning reason (e.g. sharing phone number)"
-                                className="flex-1 h-9 px-3 text-xs bg-surface-container-lowest border border-outline-variant rounded-lg focus:outline-none focus:border-primary-container"
-                              />
-                              <Button
-                                size="sm"
-                                disabled={!reason[warnKey]?.trim() || pending}
-                                onClick={() => doIssueWarning(msg.senderId, msg.id, warnKey)}
-                              >
-                                Issue warning
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                            {warnOpen && (
+                              <div className="w-full flex items-center gap-2">
+                                <input
+                                  value={reason[warnKey] || ""}
+                                  onChange={(e) =>
+                                    setReason((r) => ({ ...r, [warnKey]: e.target.value }))
+                                  }
+                                  placeholder="Warning reason (e.g. sharing phone number)"
+                                  className="flex-1 h-9 px-3 text-xs bg-surface-container-lowest border border-outline-variant rounded-lg focus:outline-none focus:border-primary-container"
+                                />
+                                <Button
+                                  size="sm"
+                                  disabled={!reason[warnKey]?.trim() || pending}
+                                  onClick={() => doIssueWarning(msg.senderId, msg.id, warnKey)}
+                                >
+                                  Issue warning
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        ))}
                     </div>
                   );
                 })}
@@ -287,9 +310,15 @@ export default function ChatMonitor({
             {warnings.map((w) => {
               const user = allParticipants.get(w.user_id);
               return (
-                <div key={w.id} className="text-sm text-on-surface-variant flex items-center justify-between gap-3 border-b border-outline-variant/10 pb-2 last:border-0">
+                <div
+                  key={w.id}
+                  className="text-sm text-on-surface-variant flex items-center justify-between gap-3 border-b border-outline-variant/10 pb-2 last:border-0"
+                >
                   <span>
-                    <span className="font-medium text-on-surface">{user?.name ?? "Unknown user"}</span> — {w.reason}
+                    <span className="font-medium text-on-surface">
+                      {user?.name ?? "Unknown user"}
+                    </span>{" "}
+                    — {w.reason}
                   </span>
                   <span className="text-xs shrink-0">{formatTime(w.created_at)}</span>
                 </div>

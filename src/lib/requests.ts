@@ -11,8 +11,7 @@ const DRAFT_KEY = "acadivo:pending-request";
  * sanchitaa286@gmail.com).
  */
 export const DESIGNATED_HELPER_ID =
-  process.env.NEXT_PUBLIC_DESIGNATED_HELPER_ID?.trim() ||
-  "7c981abd-85b5-4005-86c0-9cfffd6d9bf1";
+  process.env.NEXT_PUBLIC_DESIGNATED_HELPER_ID?.trim() || "7c981abd-85b5-4005-86c0-9cfffd6d9bf1";
 
 /**
  * The helper every new request is routed to right now. Admins switch the active
@@ -124,7 +123,7 @@ export async function loadDraftFiles(): Promise<File[]> {
 }
 
 export async function submitRequest(
-  input: NewRequestInput
+  input: NewRequestInput,
 ): Promise<{ id: string } | { error: string }> {
   const supabase = createBrowserClient();
 

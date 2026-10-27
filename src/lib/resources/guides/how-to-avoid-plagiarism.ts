@@ -23,14 +23,46 @@ const guide: Resource = {
           t: "table",
           head: ["Situation", "Is it plagiarism?", "Why"],
           rows: [
-            ["Copying a source's wording without quotation marks or a citation", "Yes", "It presents another author's words as your own"],
-            ["Restating an idea in your own words with no citation", "Yes", "The idea itself is still the author's"],
-            ["Using a source's data, image, or table without credit", "Yes", "Creative and research output both require attribution"],
-            ["Citing a source you did not read", "Yes", "This is misrepresentation, regardless of intent"],
-            ["Citing a source found in a search snippet", "Yes", "You cannot vouch for what you have not read"],
-            ["Citing an AI tool's output as a source", "Usually yes", "You cannot cite a tool as though it were a source; check your institution's rules on AI use"],
-            ["Using your own earlier work without citing it", "Usually yes", "Self-plagiarism is still uncredited reuse"],
-            ["Collusion with another student", "Yes", "Submitting joint work as individual work breaks most academic integrity rules"],
+            [
+              "Copying a source's wording without quotation marks or a citation",
+              "Yes",
+              "It presents another author's words as your own",
+            ],
+            [
+              "Restating an idea in your own words with no citation",
+              "Yes",
+              "The idea itself is still the author's",
+            ],
+            [
+              "Using a source's data, image, or table without credit",
+              "Yes",
+              "Creative and research output both require attribution",
+            ],
+            [
+              "Citing a source you did not read",
+              "Yes",
+              "This is misrepresentation, regardless of intent",
+            ],
+            [
+              "Citing a source found in a search snippet",
+              "Yes",
+              "You cannot vouch for what you have not read",
+            ],
+            [
+              "Citing an AI tool's output as a source",
+              "Usually yes",
+              "You cannot cite a tool as though it were a source; check your institution's rules on AI use",
+            ],
+            [
+              "Using your own earlier work without citing it",
+              "Usually yes",
+              "Self-plagiarism is still uncredited reuse",
+            ],
+            [
+              "Collusion with another student",
+              "Yes",
+              "Submitting joint work as individual work breaks most academic integrity rules",
+            ],
           ],
         },
         {
@@ -83,13 +115,15 @@ const guide: Resource = {
         {
           t: "ul",
           v: [
-            "Do not change \"is associated with\" into \"causes\".",
-            "Do not remove hedging — \"may\" and \"suggests\" are part of the claim.",
-            "Do not upgrade \"in two small studies\" into a general finding.",
+            'Do not change "is associated with" into "causes".',
+            'Do not remove hedging — "may" and "suggests" are part of the claim.',
+            'Do not upgrade "in two small studies" into a general finding.',
           ],
         },
       ],
-      links: [{ label: "How to paraphrase without changing the meaning", slug: "how-to-paraphrase" }],
+      links: [
+        { label: "How to paraphrase without changing the meaning", slug: "how-to-paraphrase" },
+      ],
     },
     {
       heading: "Quotations and Direct Copying",
@@ -156,7 +190,7 @@ const guide: Resource = {
     "Copying a sentence and changing two or three words.",
     "Citing a source found in a search snippet.",
     "Transcribing references by hand at the end.",
-    "Leaving out a citation because a paraphrase \"sounds different\".",
+    'Leaving out a citation because a paraphrase "sounds different".',
     "Using a source's figure without credit.",
     "Attributing a claim to an author who did not make it.",
   ],

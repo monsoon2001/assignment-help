@@ -48,8 +48,16 @@ const guide: Resource = {
           head: ["Level", "Example", "Problem"],
           rows: [
             ["Topic", "Social media", "Far too broad"],
-            ["Researchable", "How does social media use relate to adolescent friendship quality?", "Workable but large"],
-            ["Focused", "To what extent does nightly social media use relate to perceived friendship quality among 16–18 year olds?", "Specific enough to design and analyse"],
+            [
+              "Researchable",
+              "How does social media use relate to adolescent friendship quality?",
+              "Workable but large",
+            ],
+            [
+              "Focused",
+              "To what extent does nightly social media use relate to perceived friendship quality among 16–18 year olds?",
+              "Specific enough to design and analyse",
+            ],
           ],
         },
       ],
@@ -86,10 +94,15 @@ const guide: Resource = {
         },
         {
           t: "p",
-          v: "State your decisions honestly. \"We excluded outliers above 3 SD, as pre-specified in our analysis plan\" reads better than hiding an exclusion you decided on after seeing the data — and the second is a genuine integrity problem if undisclosed.",
+          v: 'State your decisions honestly. "We excluded outliers above 3 SD, as pre-specified in our analysis plan" reads better than hiding an exclusion you decided on after seeing the data — and the second is a genuine integrity problem if undisclosed.',
         },
       ],
-      links: [{ label: "How to interpret statistical results", slug: "how-to-interpret-statistical-results" }],
+      links: [
+        {
+          label: "How to interpret statistical results",
+          slug: "how-to-interpret-statistical-results",
+        },
+      ],
     },
     {
       heading: "Results",
@@ -102,11 +115,11 @@ const guide: Resource = {
           t: "checklist",
           v: [
             "Report all planned analyses, including ones that did not reach significance.",
-            "Give exact statistics, not just \"significant\".",
+            'Give exact statistics, not just "significant".',
             "Include effect sizes and confidence intervals where relevant.",
             "Give n for every statistic.",
             "Use tables and figures for anything with more than about three numbers.",
-            "Do not write \"we found that this was significant\" in the results — that is interpretation.",
+            'Do not write "we found that this was significant" in the results — that is interpretation.',
           ],
         },
       ],
@@ -131,7 +144,9 @@ const guide: Resource = {
           ],
         },
       ],
-      links: [{ label: "How to write a literature review", slug: "how-to-write-a-literature-review" }],
+      links: [
+        { label: "How to write a literature review", slug: "how-to-write-a-literature-review" },
+      ],
     },
     {
       heading: "Conclusion",
@@ -150,7 +165,7 @@ const guide: Resource = {
           v: [
             "Causation claimed from correlational data.",
             "Reporting only significant results.",
-            "Reporting \"p < .05\" without the exact value or effect size.",
+            'Reporting "p < .05" without the exact value or effect size.',
             "Interpreting results in the results section.",
             "No ethics statement where human participants or data were involved.",
             "A literature review that is a sequence of summaries.",

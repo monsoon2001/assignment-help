@@ -21,7 +21,7 @@ const guide: Resource = {
       blocks: [
         {
           t: "p",
-          v: "Reading your own writing, you remember what you meant and supply the missing words automatically. That is why a missing \"the\" or an entire dropped clause can survive three rereads.",
+          v: 'Reading your own writing, you remember what you meant and supply the missing words automatically. That is why a missing "the" or an entire dropped clause can survive three rereads.',
         },
         {
           t: "p",
@@ -59,10 +59,12 @@ const guide: Resource = {
         },
         {
           t: "p",
-          v: "Vary sentence openings too. Beginning five consecutive sentences with \"This\" or \"The\" is a common and easily fixed problem.",
+          v: 'Vary sentence openings too. Beginning five consecutive sentences with "This" or "The" is a common and easily fixed problem.',
         },
       ],
-      links: [{ label: "How to write an essay: a step-by-step guide", slug: "how-to-write-an-essay" }],
+      links: [
+        { label: "How to write an essay: a step-by-step guide", slug: "how-to-write-an-essay" },
+      ],
     },
     {
       heading: "Pass 3: References and Citations",
@@ -121,7 +123,7 @@ const guide: Resource = {
             "Page numbers, margins, font, and line spacing match requirements.",
             "Word count is within range, measured accurately.",
             "Table of contents, figures, and tables are numbered and referenced in the text.",
-            "Nothing is left as \"TODO\" or highlighted for attention.",
+            'Nothing is left as "TODO" or highlighted for attention.',
             "Citations and references cross-check in both directions.",
           ],
         },
@@ -147,7 +149,7 @@ const guide: Resource = {
     "Proofreading in one pass while trying to fix everything at once.",
     "Only checking spelling and ignoring structure.",
     "Assuming the reference list matches the citations without checking both ways.",
-    "Skipping the rubric because the essay \"feels\" complete.",
+    'Skipping the rubric because the essay "feels" complete.',
     "Leaving placeholder text in a file submitted at midnight.",
     "Editing on screen in a familiar layout until you stop seeing errors.",
   ],

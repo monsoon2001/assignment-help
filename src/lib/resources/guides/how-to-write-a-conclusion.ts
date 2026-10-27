@@ -45,9 +45,9 @@ const guide: Resource = {
           t: "example",
           label: "Example",
           v: [
-            "Introduction: \"This essay argues that remote work improves junior progression.\"",
-            "Weak conclusion: \"To conclude, this essay has argued that remote work improves junior progression.\"",
-            "Strong conclusion: \"The evidence therefore points in the opposite direction from common assumption: flexibility gains do not translate into progression, because visibility, not hours, drives early promotion.\"",
+            'Introduction: "This essay argues that remote work improves junior progression."',
+            'Weak conclusion: "To conclude, this essay has argued that remote work improves junior progression."',
+            'Strong conclusion: "The evidence therefore points in the opposite direction from common assumption: flexibility gains do not translate into progression, because visibility, not hours, drives early promotion."',
           ],
         },
       ],
@@ -62,9 +62,9 @@ const guide: Resource = {
         {
           t: "ul",
           v: [
-            "Policy or practice: \"Universities adopting this approach should pair it with X, or the effect will be uneven.\"",
-            "Practical consequence: \"For institutions, this means capacity planning must anticipate Y.\"",
-            "Limits of your own argument: \"This does not explain Z, which remains open.\"",
+            'Policy or practice: "Universities adopting this approach should pair it with X, or the effect will be uneven."',
+            'Practical consequence: "For institutions, this means capacity planning must anticipate Y."',
+            'Limits of your own argument: "This does not explain Z, which remains open."',
           ],
         },
       ],
@@ -77,9 +77,9 @@ const guide: Resource = {
           v: [
             "New evidence or sources introduced here.",
             "New counter-arguments you have not developed.",
-            "New topics (\"this essay has also explored...\").",
-            "Generic grand statements, rhetorical questions, and \"in conclusion\" openings.",
-            "Apologies (\"I know this is not perfect, but...\").",
+            'New topics ("this essay has also explored...").',
+            'Generic grand statements, rhetorical questions, and "in conclusion" openings.',
+            'Apologies ("I know this is not perfect, but...").',
           ],
         },
       ],
@@ -99,7 +99,12 @@ const guide: Resource = {
           ],
         },
       ],
-      links: [{ label: "How to write a strong thesis statement", slug: "how-to-write-a-thesis-statement" }],
+      links: [
+        {
+          label: "How to write a strong thesis statement",
+          slug: "how-to-write-a-thesis-statement",
+        },
+      ],
     },
     {
       heading: "Checklist",
@@ -133,7 +138,7 @@ const guide: Resource = {
   mistakes: [
     "Copying the introduction word for word.",
     "Adding a new argument in the last paragraph.",
-    "Opening with \"In conclusion\" — just start the paragraph.",
+    'Opening with "In conclusion" — just start the paragraph.',
     "Ending with a rhetorical question.",
     "Introducing a topic the essay has not covered.",
     "Writing a summary so long it repeats the whole body.",

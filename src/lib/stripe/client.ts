@@ -9,7 +9,7 @@ export function getStripe() {
 
   if (!publishableKey) {
     throw new Error(
-      "Missing NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY. Set it to your Stripe test-mode publishable key in .env.local."
+      "Missing NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY. Set it to your Stripe test-mode publishable key in .env.local.",
     );
   }
 

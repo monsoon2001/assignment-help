@@ -62,9 +62,7 @@ export default function HelperBalancesClient({
             <Wallet size={20} />
           </div>
           <p className="font-medium text-on-surface">No outstanding balances</p>
-          <p className="text-sm text-on-surface-variant mt-1">
-            Every paid order has been settled.
-          </p>
+          <p className="text-sm text-on-surface-variant mt-1">Every paid order has been settled.</p>
         </Card>
       ) : (
         <div className="space-y-4">
@@ -82,39 +80,59 @@ export default function HelperBalancesClient({
           <p className="p-6 text-sm text-on-surface-variant">No payouts recorded yet.</p>
         ) : (
           <div className="overflow-x-auto">
-          <table className="w-full min-w-[560px]">
-            <thead>
-              <tr className="border-b border-outline-variant/30">
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-5 py-3">Helper</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-5 py-3">Sent (CAD)</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-5 py-3">Received</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-5 py-3">Orders</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-5 py-3">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentPayouts.map((p) => (
-                <tr key={p.id} className="border-b border-outline-variant/20 last:border-0">
-                  <td className="px-3 sm:px-5 py-3 text-sm text-on-surface">
-                    {p.helperName}
-                    {p.reference && (
-                      <span className="block text-xs text-on-surface-variant font-mono">{p.reference}</span>
-                    )}
-                  </td>
-                  <td className="px-3 sm:px-5 py-3 text-sm font-semibold text-on-surface">{formatCurrency(p.amountSentCad)}</td>
-                  <td className="px-3 sm:px-5 py-3 text-sm text-on-surface-variant">
-                    {p.amountReceived === null
-                      ? `— · ${p.method}`
-                      : `${p.amountReceived} ${p.receivedCurrency ?? ""} · ${p.method}`}
-                  </td>
-                  <td className="px-3 sm:px-5 py-3 text-sm text-on-surface-variant">{p.orderCount}</td>
-                  <td className="px-3 sm:px-5 py-3 text-sm text-on-surface-variant">
-                    {new Date(p.paidAt).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}
-                  </td>
+            <table className="w-full min-w-[560px]">
+              <thead>
+                <tr className="border-b border-outline-variant/30">
+                  <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-5 py-3">
+                    Helper
+                  </th>
+                  <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-5 py-3">
+                    Sent (CAD)
+                  </th>
+                  <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-5 py-3">
+                    Received
+                  </th>
+                  <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-5 py-3">
+                    Orders
+                  </th>
+                  <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-5 py-3">
+                    Date
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {recentPayouts.map((p) => (
+                  <tr key={p.id} className="border-b border-outline-variant/20 last:border-0">
+                    <td className="px-3 sm:px-5 py-3 text-sm text-on-surface">
+                      {p.helperName}
+                      {p.reference && (
+                        <span className="block text-xs text-on-surface-variant font-mono">
+                          {p.reference}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-3 sm:px-5 py-3 text-sm font-semibold text-on-surface">
+                      {formatCurrency(p.amountSentCad)}
+                    </td>
+                    <td className="px-3 sm:px-5 py-3 text-sm text-on-surface-variant">
+                      {p.amountReceived === null
+                        ? `— · ${p.method}`
+                        : `${p.amountReceived} ${p.receivedCurrency ?? ""} · ${p.method}`}
+                    </td>
+                    <td className="px-3 sm:px-5 py-3 text-sm text-on-surface-variant">
+                      {p.orderCount}
+                    </td>
+                    <td className="px-3 sm:px-5 py-3 text-sm text-on-surface-variant">
+                      {new Date(p.paidAt).toLocaleDateString("en-CA", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </Card>
@@ -132,9 +150,9 @@ function HelperBalanceCard({ balance }: { balance: HelperBalance }) {
       Math.round(
         balance.orders
           .filter((o) => selected.includes(o.orderId))
-          .reduce((sum, o) => sum + o.amountCad, 0) * 100
+          .reduce((sum, o) => sum + o.amountCad, 0) * 100,
       ) / 100,
-    [balance.orders, selected]
+    [balance.orders, selected],
   );
 
   return (
@@ -156,8 +174,13 @@ function HelperBalanceCard({ balance }: { balance: HelperBalance }) {
           </div>
         </div>
         <div className="flex items-center gap-3 shrink-0">
-          <span className="font-display text-lg font-bold text-primary">{formatCurrency(balance.owedCad)}</span>
-          <ChevronDown size={18} className={`text-on-surface-variant transition-transform ${open ? "rotate-180" : ""}`} />
+          <span className="font-display text-lg font-bold text-primary">
+            {formatCurrency(balance.owedCad)}
+          </span>
+          <ChevronDown
+            size={18}
+            className={`text-on-surface-variant transition-transform ${open ? "rotate-180" : ""}`}
+          />
         </div>
       </button>
 
@@ -181,7 +204,7 @@ function HelperBalanceCard({ balance }: { balance: HelperBalance }) {
                       setSelected((prev) =>
                         e.target.checked
                           ? [...prev, o.orderId]
-                          : prev.filter((id) => id !== o.orderId)
+                          : prev.filter((id) => id !== o.orderId),
                       )
                     }
                     className="w-4 h-4 rounded accent-[var(--color-primary)]"
@@ -220,7 +243,13 @@ function HelperBalanceCard({ balance }: { balance: HelperBalance }) {
                 { value: "other", label: "Other" },
               ]}
             />
-            <Input label="Amount received (optional)" name="amountReceived" type="number" step="0.01" min="0" />
+            <Input
+              label="Amount received (optional)"
+              name="amountReceived"
+              type="number"
+              step="0.01"
+              min="0"
+            />
             <Input label="Received currency (optional)" name="receivedCurrency" placeholder="AUD" />
             <Input label="Reference (optional)" name="reference" />
             <Input label="Notes (optional)" name="notes" />

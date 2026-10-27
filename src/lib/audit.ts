@@ -9,7 +9,7 @@ export async function logAdminAction(
   adminId: string,
   action: string,
   targetId?: string | null,
-  details?: Record<string, unknown> | null
+  details?: Record<string, unknown> | null,
 ): Promise<void> {
   if (!adminId) return;
   try {

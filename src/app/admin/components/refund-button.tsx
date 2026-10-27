@@ -17,7 +17,9 @@ export default function RefundButton({ paymentId }: { paymentId: string }) {
         {pending ? "Refunding..." : "Refund"}
       </Button>
       {state.message && (
-        <span className={`text-xs ${state.ok ? "text-success" : "text-error"}`}>{state.message}</span>
+        <span className={`text-xs ${state.ok ? "text-success" : "text-error"}`}>
+          {state.message}
+        </span>
       )}
     </form>
   );

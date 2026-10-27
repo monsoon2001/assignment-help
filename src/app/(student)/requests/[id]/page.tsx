@@ -41,10 +41,7 @@ export default async function StudentRequestDetailPage({
 
   // Once a proposal is accepted the request becomes an order. Show the order
   // workspace for that stage so a single request always opens one page.
-  const { data: proposals } = await supabase
-    .from("proposals")
-    .select("id")
-    .eq("request_id", id);
+  const { data: proposals } = await supabase.from("proposals").select("id").eq("request_id", id);
 
   const proposalIds = (proposals ?? []).map((p) => p.id);
 

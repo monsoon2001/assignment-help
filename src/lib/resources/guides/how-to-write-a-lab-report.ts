@@ -35,7 +35,7 @@ const guide: Resource = {
         },
         {
           t: "p",
-          v: "Reporting the hypothesis honestly matters. Writing \"the hypothesis was disproved\" is a correct and expected scientific outcome. If no hypothesis was set, say so rather than inventing one after the fact.",
+          v: 'Reporting the hypothesis honestly matters. Writing "the hypothesis was disproved" is a correct and expected scientific outcome. If no hypothesis was set, say so rather than inventing one after the fact.',
         },
       ],
     },
@@ -44,7 +44,7 @@ const guide: Resource = {
       blocks: [
         {
           t: "p",
-          v: "Write it so a competent person could repeat the experiment. Write it in the past tense, in third or first person plural, and use the passive voice where you are describing procedure (\"the sample was heated to 60 °C\").",
+          v: 'Write it so a competent person could repeat the experiment. Write it in the past tense, in third or first person plural, and use the passive voice where you are describing procedure ("the sample was heated to 60 °C").',
         },
         {
           t: "ul",
@@ -58,7 +58,7 @@ const guide: Resource = {
         },
         {
           t: "p",
-          v: "Do not narrate the session. \"We walked to the bench and set up the clamp\" is not method; \"the burette was clamped at 150 mm\" is.",
+          v: 'Do not narrate the session. "We walked to the bench and set up the clamp" is not method; "the burette was clamped at 150 mm" is.',
         },
       ],
     },
@@ -105,19 +105,22 @@ const guide: Resource = {
         },
         {
           t: "p",
-          v: "Be specific about error. \"Errors were minimal\" is not analysis. \"The systematic offset of about 2 °C likely reflects the uncalibrated thermocouple, since the ice-point check drifted over the session\" is.",
+          v: 'Be specific about error. "Errors were minimal" is not analysis. "The systematic offset of about 2 °C likely reflects the uncalibrated thermocouple, since the ice-point check drifted over the session" is.',
         },
         {
           t: "example",
           label: "Weak vs strong",
           v: [
-            "Weak: \"The results were as expected and the experiment was successful.\"",
-            "Strong: \"The measured rate constant of 0.042 min⁻¹ sits 11% below the literature value of 0.047 min⁻¹. Given the thermometer's ±0.5 °C uncertainty across a 60 °C span, temperature alone accounts for roughly half that gap; the remainder is consistent with the sample being warmed during transfer.\"",
+            'Weak: "The results were as expected and the experiment was successful."',
+            'Strong: "The measured rate constant of 0.042 min⁻¹ sits 11% below the literature value of 0.047 min⁻¹. Given the thermometer\'s ±0.5 °C uncertainty across a 60 °C span, temperature alone accounts for roughly half that gap; the remainder is consistent with the sample being warmed during transfer."',
           ],
         },
       ],
       links: [
-        { label: "How to interpret statistical results", slug: "how-to-interpret-statistical-results" },
+        {
+          label: "How to interpret statistical results",
+          slug: "how-to-interpret-statistical-results",
+        },
         { label: "How to write a research methodology", slug: "how-to-write-a-research-paper" },
       ],
     },
@@ -155,7 +158,7 @@ const guide: Resource = {
   takeaways: [
     "Results present data; discussion explains it. Mixing them loses marks.",
     "Always report n and a measure of variability with every mean.",
-    "Explain discrepancies quantitatively rather than calling them \"small\".",
+    'Explain discrepancies quantitatively rather than calling them "small".',
     "Include deviations from the standard method — that is honesty, not penalty.",
   ],
   checklist: [
@@ -172,7 +175,7 @@ const guide: Resource = {
   mistakes: [
     "Narrating the practical session in the method.",
     "Reporting means without repeat counts.",
-    "Calling a result \"as expected\" without saying why you expected it.",
+    'Calling a result "as expected" without saying why you expected it.',
     "Quoting a percentage error and offering no explanation.",
     "Interpreting data inside the results section.",
     "Using line graphs for non-continuous categories.",

@@ -4,7 +4,19 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Search, Bell, MessageSquare, GraduationCap, Menu, X, LogOut, User, LayoutDashboard, ChevronDown, Home } from "lucide-react";
+import {
+  Search,
+  Bell,
+  MessageSquare,
+  GraduationCap,
+  Menu,
+  X,
+  LogOut,
+  User,
+  LayoutDashboard,
+  ChevronDown,
+  Home,
+} from "lucide-react";
 import Button from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/client";
@@ -172,9 +184,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
       if (session?.user.id) {
         setUserId(session.user.id);
         const metaAvatar =
-          session.user.user_metadata?.avatar_url ??
-          session.user.user_metadata?.picture ??
-          null;
+          session.user.user_metadata?.avatar_url ?? session.user.user_metadata?.picture ?? null;
         setAvatarUrl((metaAvatar as string) ?? null);
         const { data: profile } = await supabase
           .from("users")
@@ -202,7 +212,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
             .eq("id", session.user.id)
             .then(
               () => undefined,
-              () => undefined
+              () => undefined,
             );
         }
 
@@ -219,10 +229,15 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
           .channel(realtimeTopic("header-notifications"))
           .on(
             "postgres_changes",
-            { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${session.user.id}` },
+            {
+              event: "*",
+              schema: "public",
+              table: "notifications",
+              filter: `user_id=eq.${session.user.id}`,
+            },
             () => {
               void fetchUnread();
-            }
+            },
           )
           .subscribe();
       }
@@ -257,7 +272,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
 
   return (
     <header
-      className={`sticky top-0 z-50 bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant transition-transform duration-300 md:translate-y-0 ${
+      className={`sticky top-0 z-50 bg-surface-container-lowest border-b border-outline-variant transition-transform duration-300 md:translate-y-0 ${
         scrollHidden && !mobileMenuOpen ? "-translate-y-full" : "translate-y-0"
       }`}
     >
@@ -267,8 +282,12 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
             <GraduationCap size={20} />
           </span>
           <div className="leading-tight">
-            <p className="font-display font-bold text-on-surface text-base sm:text-lg leading-none">Acadivo</p>
-            <p className="hidden sm:block text-xs uppercase tracking-widest xl:tracking-widest text-on-surface-variant">Academic Network</p>
+            <p className="font-display font-bold text-on-surface text-base sm:text-lg leading-none">
+              Acadivo
+            </p>
+            <p className="hidden sm:block text-xs uppercase tracking-widest xl:tracking-widest text-on-surface-variant">
+              Academic Network
+            </p>
           </div>
         </Link>
 
@@ -326,13 +345,20 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
 
         <div className="flex items-center gap-2 ml-auto shrink-0">
           {title && (
-            <span className="hidden lg:block text-sm font-medium text-on-surface-variant">{title}</span>
+            <span className="hidden lg:block text-sm font-medium text-on-surface-variant">
+              {title}
+            </span>
           )}
           {userId ? (
             <>
               {pathname !== "/" && role !== "student" && (
                 <Link href="/">
-                  <Button variant="ghost" size="sm" aria-label="Back to homepage" className="hidden xl:inline-flex">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label="Back to homepage"
+                    className="hidden xl:inline-flex"
+                  >
                     <Home size={16} />
                     <span className="hidden 2xl:inline">Home</span>
                   </Button>
@@ -395,7 +421,14 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                 <span className="hidden sm:block max-w-28 sm:max-w-none truncate text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">
                   Hi, {firstName}
                 </span>
-                <Avatar name={userName ?? "User"} src={avatarUrl ?? undefined} role={role} size="md" online className="cursor-pointer" />
+                <Avatar
+                  name={userName ?? "User"}
+                  src={avatarUrl ?? undefined}
+                  role={role}
+                  size="md"
+                  online
+                  className="cursor-pointer"
+                />
               </Link>
               <Button
                 variant="ghost"
@@ -410,12 +443,19 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
           ) : (
             <>
               <Link href="/sign-in">
-                <Button variant="ghost" size="sm" aria-label="Sign in or create account" className="hidden md:inline-flex">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  aria-label="Sign in or create account"
+                  className="hidden md:inline-flex"
+                >
                   <User size={18} />
                 </Button>
               </Link>
               <Link href="/sign-in">
-                <Button variant="primary" size="sm">Sign In</Button>
+                <Button variant="primary" size="sm">
+                  Sign In
+                </Button>
               </Link>
             </>
           )}
@@ -446,7 +486,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
               onClick={closeNow}
               aria-hidden="true"
             />,
-            document.body
+            document.body,
           )}
           <div className="absolute inset-x-0 top-full hidden xl:block">
             <div className="mx-auto max-w-360 px-3 sm:px-6 pt-3">
@@ -505,7 +545,8 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                 <div className="mt-5 flex items-center justify-between gap-4 border-t border-outline-variant/30 pt-4">
                   <p className="text-xs text-on-surface-variant">
                     {activeMenu.label} —{" "}
-                    {activeMenu.groups!.reduce((total, group) => total + group.items.length, 0)} links
+                    {activeMenu.groups!.reduce((total, group) => total + group.items.length, 0)}{" "}
+                    links
                   </p>
                   <Link
                     href={activeMenu.href}
@@ -526,112 +567,115 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
         createPortal(
           <div className="fixed inset-x-0 top-16 bottom-0 z-40 overflow-y-auto xl:hidden bg-surface-container-lowest border-t border-outline-variant">
             <nav className="max-w-360 mx-auto px-4 sm:px-6 py-4 pb-12 flex flex-col gap-3">
-            {menuItems.map((item) => {
-              const isActive = pathname === item.href;
-              const hasGroups = (item.groups?.length ?? 0) > 0;
-              const expanded = openMobileGroup === item.href;
-              return (
-                <div key={item.href} className="border-b border-outline-variant/30 last:border-b-0 pb-2">
-                  <div className="flex items-center justify-between gap-2 min-h-11">
-                    <Link
-                      href={item.href}
-                      className={`relative flex-1 min-w-0 py-2 text-sm font-medium transition-colors inline-flex items-center ${
-                        isActive
-                          ? "text-primary"
-                          : "text-on-surface-variant hover:text-on-surface"
-                      }`}
-                      onClick={closeMobileMenu}
-                    >
-                      {item.label}
-                      {isActive && (
-                        <span className="absolute -bottom-0.5 left-0 right-0 h-0.5 rounded-full bg-primary" />
-                      )}
-                    </Link>
-                    {hasGroups && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setOpenMobileGroup((prev) => (prev === item.href ? null : item.href))
-                        }
-                        aria-expanded={expanded}
-                        aria-label={`${expanded ? "Close" : "Open"} ${item.label} menu`}
-                        className="flex items-center justify-center w-11 h-11 shrink-0 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface cursor-pointer transition-colors"
+              {menuItems.map((item) => {
+                const isActive = pathname === item.href;
+                const hasGroups = (item.groups?.length ?? 0) > 0;
+                const expanded = openMobileGroup === item.href;
+                return (
+                  <div
+                    key={item.href}
+                    className="border-b border-outline-variant/30 last:border-b-0 pb-2"
+                  >
+                    <div className="flex items-center justify-between gap-2 min-h-11">
+                      <Link
+                        href={item.href}
+                        className={`relative flex-1 min-w-0 py-2 text-sm font-medium transition-colors inline-flex items-center ${
+                          isActive
+                            ? "text-primary"
+                            : "text-on-surface-variant hover:text-on-surface"
+                        }`}
+                        onClick={closeMobileMenu}
                       >
-                        <ChevronDown
-                          size={20}
-                          className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
-                        />
-                      </button>
+                        {item.label}
+                        {isActive && (
+                          <span className="absolute -bottom-0.5 left-0 right-0 h-0.5 rounded-full bg-primary" />
+                        )}
+                      </Link>
+                      {hasGroups && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setOpenMobileGroup((prev) => (prev === item.href ? null : item.href))
+                          }
+                          aria-expanded={expanded}
+                          aria-label={`${expanded ? "Close" : "Open"} ${item.label} menu`}
+                          className="flex items-center justify-center w-11 h-11 shrink-0 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface cursor-pointer transition-colors"
+                        >
+                          <ChevronDown
+                            size={20}
+                            className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+                          />
+                        </button>
+                      )}
+                    </div>
+                    {expanded && item.groups && item.groups.length > 0 && (
+                      <div className="mb-1 flex flex-col gap-3 border-l border-outline-variant/30 pl-4">
+                        {item.groups.map((group, groupIndex) => (
+                          <div key={group.title ?? groupIndex} className="min-w-0">
+                            {group.title && (
+                              <p className="py-1 text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
+                                {group.title}
+                              </p>
+                            )}
+                            <div className="flex flex-col">
+                              {group.items.map((child) => (
+                                <Link
+                                  key={`${group.title ?? groupIndex}-${child.href}-${child.label}`}
+                                  href={child.href}
+                                  onClick={closeMobileMenu}
+                                  className="py-1.5 text-sm text-on-surface-variant transition-colors hover:text-primary min-h-11 inline-flex items-center"
+                                >
+                                  {child.label}
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
-                  {expanded && item.groups && item.groups.length > 0 && (
-                    <div className="mb-1 flex flex-col gap-3 border-l border-outline-variant/30 pl-4">
-                      {item.groups.map((group, groupIndex) => (
-                        <div key={group.title ?? groupIndex} className="min-w-0">
-                          {group.title && (
-                            <p className="py-1 text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
-                              {group.title}
-                            </p>
-                          )}
-                          <div className="flex flex-col">
-                            {group.items.map((child) => (
-                              <Link
-                                key={`${group.title ?? groupIndex}-${child.href}-${child.label}`}
-                                href={child.href}
-                                onClick={closeMobileMenu}
-                                className="py-1.5 text-sm text-on-surface-variant transition-colors hover:text-primary min-h-11 inline-flex items-center"
-                              >
-                                {child.label}
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                );
+              })}
 
-            {userId && (
-              <div className="mt-1 border-t border-outline-variant/30 pt-3">
-                <p className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
-                  Account
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { href: dashboardHref, label: "Dashboard", icon: LayoutDashboard },
-                    { href: messagesHref, label: "Messages", icon: MessageSquare },
-                    { href: notificationsHref, label: "Notifications", icon: Bell },
-                    { href: profileHref, label: "Profile", icon: User },
-                  ].map(({ href, label, icon: Icon }) => (
-                    <Link
-                      key={href}
-                      href={href}
-                      onClick={closeMobileMenu}
-                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors min-h-11"
-                    >
-                      <Icon size={17} />
-                      <span className="truncate">{label}</span>
-                    </Link>
-                  ))}
+              {userId && (
+                <div className="mt-1 border-t border-outline-variant/30 pt-3">
+                  <p className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
+                    Account
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { href: dashboardHref, label: "Dashboard", icon: LayoutDashboard },
+                      { href: messagesHref, label: "Messages", icon: MessageSquare },
+                      { href: notificationsHref, label: "Notifications", icon: Bell },
+                      { href: profileHref, label: "Profile", icon: User },
+                    ].map(({ href, label, icon: Icon }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={closeMobileMenu}
+                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors min-h-11"
+                      >
+                        <Icon size={17} />
+                        <span className="truncate">{label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      closeMobileMenu();
+                      setSignOutDialogOpen(true);
+                    }}
+                    className="mt-2 flex w-full items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-error hover:bg-error-container/30 transition-colors min-h-11 cursor-pointer"
+                  >
+                    <LogOut size={17} />
+                    Sign out
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeMobileMenu();
-                    setSignOutDialogOpen(true);
-                  }}
-                  className="mt-2 flex w-full items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-error hover:bg-error-container/30 transition-colors min-h-11 cursor-pointer"
-                >
-                  <LogOut size={17} />
-                  Sign out
-                </button>
-              </div>
-            )}
-          </nav>
+              )}
+            </nav>
           </div>,
-          document.body
+          document.body,
         )}
 
       {signOutDialogOpen &&
@@ -652,7 +696,10 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                   <LogOut size={20} />
                 </span>
                 <div>
-                  <h3 id="sign-out-dialog-title" className="font-display font-bold text-lg text-on-surface">
+                  <h3
+                    id="sign-out-dialog-title"
+                    className="font-display font-bold text-lg text-on-surface"
+                  >
                     Confirm Sign Out
                   </h3>
                   <p className="text-sm text-on-surface-variant mt-1 leading-relaxed">
@@ -661,7 +708,12 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                 </div>
               </div>
               <div className="flex gap-3 mt-6">
-                <Button variant="ghost" size="md" className="flex-1" onClick={() => setSignOutDialogOpen(false)}>
+                <Button
+                  variant="ghost"
+                  size="md"
+                  className="flex-1"
+                  onClick={() => setSignOutDialogOpen(false)}
+                >
                   Cancel
                 </Button>
                 <Button variant="danger" size="md" className="flex-1" onClick={handleSignOut}>
@@ -670,7 +722,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
               </div>
             </div>
           </div>,
-          document.body
+          document.body,
         )}
     </header>
   );

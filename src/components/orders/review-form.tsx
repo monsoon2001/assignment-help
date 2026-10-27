@@ -52,9 +52,7 @@ export default function ReviewForm({
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <p className="text-sm font-medium text-on-surface mb-2">
-          Overall rating for {helperName}
-        </p>
+        <p className="text-sm font-medium text-on-surface mb-2">Overall rating for {helperName}</p>
         <div className="flex items-center gap-1.5">
           {[1, 2, 3, 4, 5].map((n) => (
             <button
@@ -68,9 +66,7 @@ export default function ReviewForm({
               <Star
                 size={32}
                 className={
-                  n <= (hover || rating)
-                    ? "fill-accent text-accent"
-                    : "text-outline-variant"
+                  n <= (hover || rating) ? "fill-accent text-accent" : "text-outline-variant"
                 }
               />
             </button>

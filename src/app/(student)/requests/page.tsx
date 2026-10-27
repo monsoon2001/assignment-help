@@ -20,7 +20,9 @@ export default async function RequestsPage() {
 
   const { data: requests } = await supabase
     .from("requests")
-    .select("id, title, subject, description, deadline, file_urls, status, created_at, sent_at, helper:users!requests_helper_id_fkey(id, name)")
+    .select(
+      "id, title, subject, description, deadline, file_urls, status, created_at, sent_at, helper:users!requests_helper_id_fkey(id, name)",
+    )
     .eq("student_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -48,11 +50,13 @@ export default async function RequestsPage() {
     requestIdsForProposals.length > 0
       ? await supabase
           .from("proposals")
-          .select("id, request_id, helper_id, price, currency, description, revisions_included, expires_at, status, created_at, helper:users(id, name)")
+          .select(
+            "id, request_id, helper_id, price, currency, description, revisions_included, expires_at, status, created_at, helper:users(id, name)",
+          )
           .in("request_id", requestIdsForProposals)
       : { data: null };
 
-  const proposals = (proposalRows ?? []) as unknown as (ProposalRow)[];
+  const proposals = (proposalRows ?? []) as unknown as ProposalRow[];
 
   const acceptedProposalIds = proposals
     .filter((p) => p.status === "accepted")
@@ -86,10 +90,12 @@ export default async function RequestsPage() {
 
   const counts = {
     all: real.length,
-    in_progress: real.filter((r) => ["requested", "proposal_sent", "accepted"].includes(r.status)).length,
+    in_progress: real.filter((r) => ["requested", "proposal_sent", "accepted"].includes(r.status))
+      .length,
     delivered: real.filter((r) => orderStatusByRequest[r.id] === "delivered").length,
     completed: real.filter(
-      (r) => orderStatusByRequest[r.id] === "completed" || ["declined", "cancelled"].includes(r.status)
+      (r) =>
+        orderStatusByRequest[r.id] === "completed" || ["declined", "cancelled"].includes(r.status),
     ).length,
   };
 
@@ -98,7 +104,9 @@ export default async function RequestsPage() {
       <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="font-display font-bold text-2xl text-on-surface">My Requests</h1>
-          <p className="text-sm text-on-surface-variant mt-0.5">Track help requests, deliveries, and revisions</p>
+          <p className="text-sm text-on-surface-variant mt-0.5">
+            Track help requests, deliveries, and revisions
+          </p>
         </div>
         <Link href="/requests/new">
           <Button size="lg" className="justify-between">
@@ -119,9 +127,13 @@ export default async function RequestsPage() {
         <div>
           <h2 className="font-semibold text-sm text-on-surface">Revision policy</h2>
           <p className="text-xs leading-relaxed text-on-surface-variant mt-1">
-            Revisions are <span className="font-semibold text-on-surface">unlimited until you&apos;re fully satisfied</span>{" "}
-            with the delivered work. Helpers are expected to address scope-matching feedback; entirely new
-            requirements may open a new request. Disputes are mediated by our academic integrity team.
+            Revisions are{" "}
+            <span className="font-semibold text-on-surface">
+              unlimited until you&apos;re fully satisfied
+            </span>{" "}
+            with the delivered work. Helpers are expected to address scope-matching feedback;
+            entirely new requirements may open a new request. Disputes are mediated by our academic
+            integrity team.
           </p>
         </div>
       </Card>

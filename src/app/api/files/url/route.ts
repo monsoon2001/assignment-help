@@ -40,12 +40,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const authorized = await canRead(
-    supabase,
-    user.id,
-    bucket,
-    path
-  );
+  const authorized = await canRead(supabase, user.id, bucket, path);
   if (!authorized) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -55,7 +50,7 @@ export async function GET(request: Request) {
     .createSignedUrl(
       path,
       SIGNED_URL_TTL_SECONDS,
-      download ? { download: download === "1" ? true : download } : undefined
+      download ? { download: download === "1" ? true : download } : undefined,
     );
   if (error || !data?.signedUrl) {
     return NextResponse.json({ error: "File unavailable" }, { status: 404 });
@@ -70,7 +65,7 @@ async function canRead(
   supabase: ParticipantClient,
   userId: string,
   bucket: StorageBucket,
-  path: string
+  path: string,
 ): Promise<boolean> {
   // Uploader's own folder: `<uid>/...` (request-files) or `<orderId>/<uid>/...`
   // (order-files, uploader is the second segment).
@@ -89,7 +84,7 @@ async function canRead(
     .not("attachment_url", "is", null);
   if (
     (messages ?? []).some((m) =>
-      pathVariants((m as { attachment_url: string }).attachment_url).has(path)
+      pathVariants((m as { attachment_url: string }).attachment_url).has(path),
     )
   ) {
     return true;
@@ -103,9 +98,7 @@ async function canRead(
       .or(`student_id.eq.${userId},helper_id.eq.${userId}`);
     if (
       (requests ?? []).some((r) =>
-        ((r as { file_urls: string[] }).file_urls ?? []).some((v) =>
-          pathVariants(v).has(path)
-        )
+        ((r as { file_urls: string[] }).file_urls ?? []).some((v) => pathVariants(v).has(path)),
       )
     ) {
       return true;

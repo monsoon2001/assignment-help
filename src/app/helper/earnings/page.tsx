@@ -2,14 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
-import {
-  DollarSign,
-  TrendingUp,
-  Clock,
-  CheckCircle,
-  ArrowUpRight,
-  Receipt,
-} from "lucide-react";
+import { DollarSign, TrendingUp, Clock, CheckCircle, ArrowUpRight, Receipt } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/currency";
 import { ErrorState, PanelEmpty } from "@/components/ui/states";
@@ -54,10 +47,12 @@ export default async function HelperEarnings() {
   // The view is already scoped to the signed-in helper.
   const { data: payouts, error } = await supabase
     .from("helper_payouts")
-    .select("id, amount_sent_cad, amount_received, received_currency, method, reference, order_ids, paid_at, notes")
+    .select(
+      "id, amount_sent_cad, amount_received, received_currency, method, reference, order_ids, paid_at, notes",
+    )
     .order("paid_at", { ascending: false });
 
-  const rows = ((payouts ?? []) as unknown) as PayoutRow[];
+  const rows = (payouts ?? []) as unknown as PayoutRow[];
 
   const { count: completedCount } = await supabase
     .from("orders")
@@ -87,10 +82,30 @@ export default async function HelperEarnings() {
   const maxMonth = chart.reduce((m, [, v]) => Math.max(m, v), 0);
 
   const summaryStats = [
-    { label: "Total Earned", value: fmtTotal, icon: DollarSign, color: "bg-success-tint text-success" },
-    { label: "This Month", value: fmtMonth, icon: TrendingUp, color: "bg-primary-container text-on-primary" },
-    { label: "Completed Orders", value: String(completedCount ?? 0), icon: CheckCircle, color: "bg-secondary-container text-on-secondary-container" },
-    { label: "Payouts", value: String(rows.length), icon: Clock, color: "bg-accent-tint text-on-accent-tint" },
+    {
+      label: "Total Earned",
+      value: fmtTotal,
+      icon: DollarSign,
+      color: "bg-success-tint text-success",
+    },
+    {
+      label: "This Month",
+      value: fmtMonth,
+      icon: TrendingUp,
+      color: "bg-primary-container text-on-primary",
+    },
+    {
+      label: "Completed Orders",
+      value: String(completedCount ?? 0),
+      icon: CheckCircle,
+      color: "bg-secondary-container text-on-secondary-container",
+    },
+    {
+      label: "Payouts",
+      value: String(rows.length),
+      icon: Clock,
+      color: "bg-accent-tint text-on-accent-tint",
+    },
   ];
 
   return (
@@ -99,10 +114,14 @@ export default async function HelperEarnings() {
         <div>
           <h1 className="font-display text-2xl font-bold text-on-surface">Earnings</h1>
           <p className="text-on-surface-variant mt-1">
-            {formatCurrency(totalEarned)} sent to you across {rows.length} payout{rows.length === 1 ? "" : "s"}.
+            {formatCurrency(totalEarned)} sent to you across {rows.length} payout
+            {rows.length === 1 ? "" : "s"}.
           </p>
         </div>
-        <Link href="/helper/orders" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline min-h-11 -my-2">
+        <Link
+          href="/helper/orders"
+          className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline min-h-11 -my-2"
+        >
           View orders <ArrowUpRight size={14} />
         </Link>
       </div>
@@ -122,9 +141,13 @@ export default async function HelperEarnings() {
                   <div className="flex items-start justify-between">
                     <div className="min-w-0">
                       <p className="text-sm text-on-surface-variant">{stat.label}</p>
-                      <p className="text-lg font-bold text-on-surface mt-1 truncate">{stat.value}</p>
+                      <p className="text-lg font-bold text-on-surface mt-1 truncate">
+                        {stat.value}
+                      </p>
                     </div>
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${stat.color}`}>
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${stat.color}`}
+                    >
                       <Icon size={20} />
                     </div>
                   </div>
@@ -194,52 +217,71 @@ export default async function HelperEarnings() {
               />
             ) : (
               <div className="overflow-x-auto">
-              <table className="w-full min-w-[520px]">
-                <thead>
-                  <tr className="border-b border-outline-variant/30">
-                    <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Payout</th>
-                    <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Date</th>
-                    <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Method</th>
-                    <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((p) => {
-                    const orderCount = Array.isArray(p.order_ids) ? p.order_ids.length : 0;
-                    return (
-                      <tr key={p.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
-                        <td className="px-3 sm:px-6 py-4">
-                          <div>
-                            <p className="text-sm font-medium text-on-surface">
-                              {orderCount} order{orderCount === 1 ? "" : "s"} paid out
-                            </p>
-                            <p className="text-xs text-on-surface-variant font-mono">{p.id.slice(0, 8).toUpperCase()}</p>
-                            {p.reference && (
-                              <p className="text-xs text-on-surface-variant mt-1">Ref: {p.reference}</p>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">
-                          {new Date(p.paid_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                        </td>
-                        <td className="px-3 sm:px-6 py-4">
-                          <Badge variant="outline">{methodLabel(p.method)}</Badge>
-                        </td>
-                        <td className="px-3 sm:px-6 py-4 text-right">
-                          <span className="text-sm font-semibold text-success">
-                            +{formatCurrency(Number(p.amount_sent_cad))}
-                          </span>
-                          {p.amount_received !== null && p.received_currency && (
-                            <span className="block text-xs text-on-surface-variant">
-                              received {p.amount_received} {p.received_currency}
+                <table className="w-full min-w-[520px]">
+                  <thead>
+                    <tr className="border-b border-outline-variant/30">
+                      <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                        Payout
+                      </th>
+                      <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                        Date
+                      </th>
+                      <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                        Method
+                      </th>
+                      <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                        Amount
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((p) => {
+                      const orderCount = Array.isArray(p.order_ids) ? p.order_ids.length : 0;
+                      return (
+                        <tr
+                          key={p.id}
+                          className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors"
+                        >
+                          <td className="px-3 sm:px-6 py-4">
+                            <div>
+                              <p className="text-sm font-medium text-on-surface">
+                                {orderCount} order{orderCount === 1 ? "" : "s"} paid out
+                              </p>
+                              <p className="text-xs text-on-surface-variant font-mono">
+                                {p.id.slice(0, 8).toUpperCase()}
+                              </p>
+                              {p.reference && (
+                                <p className="text-xs text-on-surface-variant mt-1">
+                                  Ref: {p.reference}
+                                </p>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">
+                            {new Date(p.paid_at).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </td>
+                          <td className="px-3 sm:px-6 py-4">
+                            <Badge variant="outline">{methodLabel(p.method)}</Badge>
+                          </td>
+                          <td className="px-3 sm:px-6 py-4 text-right">
+                            <span className="text-sm font-semibold text-success">
+                              +{formatCurrency(Number(p.amount_sent_cad))}
                             </span>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                            {p.amount_received !== null && p.received_currency && (
+                              <span className="block text-xs text-on-surface-variant">
+                                received {p.amount_received} {p.received_currency}
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             )}
           </Card>

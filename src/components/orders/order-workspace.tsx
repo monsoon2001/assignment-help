@@ -5,10 +5,24 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  ChevronRight, LayoutGrid, MessageSquare, Package, Check,
-  ShieldCheck, FileText, RotateCcw, Star, Clock,
-  Loader2, CalendarDays, Timer, DollarSign, CheckCircle2, Paperclip,
-  Receipt, ExternalLink,
+  ChevronRight,
+  LayoutGrid,
+  MessageSquare,
+  Package,
+  Check,
+  ShieldCheck,
+  FileText,
+  RotateCcw,
+  Star,
+  Clock,
+  Loader2,
+  CalendarDays,
+  Timer,
+  DollarSign,
+  CheckCircle2,
+  Paperclip,
+  Receipt,
+  ExternalLink,
 } from "lucide-react";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
@@ -23,17 +37,16 @@ import { orderStatusMeta, paymentStatusTone } from "@/lib/status-meta";
 import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 import { markThreadNotificationsRead } from "@/lib/notifications";
 import { notifyActivity } from "@/lib/notify-client";
-import ChatPanel, { type ChatMessageRow, timeLabel, fileNameFromUrl } from "@/components/chat/chat-panel";
+import ChatPanel, {
+  type ChatMessageRow,
+  timeLabel,
+  fileNameFromUrl,
+} from "@/components/chat/chat-panel";
 import SecureFileLink from "@/components/ui/secure-file-link";
 import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
 
 type OrderStatus =
-  | "payment_pending"
-  | "in_progress"
-  | "delivered"
-  | "revision_requested"
-  | "completed"
-  | "disputed";
+  "payment_pending" | "in_progress" | "delivered" | "revision_requested" | "completed" | "disputed";
 
 type OrderData = {
   id: string;
@@ -126,7 +139,9 @@ export default function OrderWorkspace({
   const loadOrder = useCallback(async () => {
     const { data, error } = await supabase.current
       .from("orders")
-      .select("id, status, price, currency, base_amount, base_currency, charge_amount, charge_currency, deadline, created_at, student_id, proposal_id, helper:users!orders_helper_id_fkey(id, name), proposal:proposals(id, request_id, description, revisions_included, request:requests(title, subject))")
+      .select(
+        "id, status, price, currency, base_amount, base_currency, charge_amount, charge_currency, deadline, created_at, student_id, proposal_id, helper:users!orders_helper_id_fkey(id, name), proposal:proposals(id, request_id, description, revisions_included, request:requests(title, subject))",
+      )
       .eq("id", orderId)
       .maybeSingle();
 
@@ -136,13 +151,12 @@ export default function OrderWorkspace({
       return;
     }
 
-    const proposal =
-      (Array.isArray(data.proposal) ? data.proposal[0] : data.proposal) ?? null;
+    const proposal = (Array.isArray(data.proposal) ? data.proposal[0] : data.proposal) ?? null;
     requestIdRef.current = proposal?.request_id ?? null;
 
     const normalized: OrderData = {
       ...(data as Omit<OrderData, "helper" | "proposal">),
-      helper: Array.isArray(data.helper) ? data.helper[0] ?? null : data.helper,
+      helper: Array.isArray(data.helper) ? (data.helper[0] ?? null) : data.helper,
       proposal: proposal
         ? {
             id: proposal.id,
@@ -213,17 +227,22 @@ export default function OrderWorkspace({
         .channel(realtimeTopic(`order:${orderId}`))
         .on(
           "postgres_changes",
-          { event: "INSERT", schema: "public", table: "messages", filter: `order_id=eq.${orderId}` },
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "messages",
+            filter: `order_id=eq.${orderId}`,
+          },
           async () => {
             await loadMessages();
-          }
+          },
         )
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "deliveries", filter: `order_id=eq.${orderId}` },
           async () => {
             await Promise.all([loadDeliveries(), loadOrder()]);
-          }
+          },
         )
         .subscribe();
     }
@@ -280,7 +299,9 @@ export default function OrderWorkspace({
       <Card className="w-full py-16 text-center">
         <p className="text-on-surface-variant">Order not found.</p>
         <Link href={role === "helper" ? "/helper/orders" : "/requests"}>
-          <Button className="mt-4" variant="outline">Back to orders</Button>
+          <Button className="mt-4" variant="outline">
+            Back to orders
+          </Button>
         </Link>
       </Card>
     );
@@ -293,11 +314,11 @@ export default function OrderWorkspace({
   const subject = order.proposal?.request?.subject ?? "General";
   const basePrice = formatCurrency(
     Number(order.base_amount ?? order.price),
-    normalizeCurrency(order.base_currency ?? order.currency)
+    normalizeCurrency(order.base_currency ?? order.currency),
   );
   const chargePrice = formatCurrency(
     Number(order.charge_amount ?? order.price),
-    normalizeCurrency(order.charge_currency ?? order.currency)
+    normalizeCurrency(order.charge_currency ?? order.currency),
   );
   // Students see the local amount they were charged; helpers see the base quote.
   const price = isStudent ? chargePrice : basePrice;
@@ -342,9 +363,7 @@ export default function OrderWorkspace({
     }
   }
 
-  const latestRevisionNotes = [...deliveries]
-    .filter((d) => !!d.revision_note)
-    .reverse();
+  const latestRevisionNotes = [...deliveries].filter((d) => !!d.revision_note).reverse();
 
   async function submitDelivery() {
     if (!deliveryMessage.trim() && deliveryFiles.length === 0) {
@@ -417,10 +436,7 @@ export default function OrderWorkspace({
   }
 
   async function setOrderStatus(status: OrderStatus) {
-    const { error } = await supabase.current
-      .from("orders")
-      .update({ status })
-      .eq("id", orderId);
+    const { error } = await supabase.current.from("orders").update({ status }).eq("id", orderId);
     if (error) {
       setDeliveryError(error.message);
       return;
@@ -458,570 +474,630 @@ export default function OrderWorkspace({
           {isHelper ? "Active Orders" : "My Requests"}
         </Link>
         <ChevronRight size={14} />
-        <span className="text-on-surface font-medium truncate">#{order.id.slice(0, 8).toUpperCase()} · {title}</span>
+        <span className="text-on-surface font-medium truncate">
+          #{order.id.slice(0, 8).toUpperCase()} · {title}
+        </span>
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0 lg:overflow-hidden lg:auto-rows-fr">
         <div className="lg:col-span-7 flex flex-col gap-3 min-h-0 lg:h-full">
           <section className="shrink-0 flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant">
-        <div className="flex items-center gap-4 min-w-0">
-          <div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="font-display font-bold text-xl text-on-surface">{title}</h1>
-              <StatusBadge tone={meta.tone} dot className="shrink-0">{meta.label}</StatusBadge>
+            <div className="flex items-center gap-4 min-w-0">
+              <div>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h1 className="font-display font-bold text-xl text-on-surface">{title}</h1>
+                  <StatusBadge tone={meta.tone} dot className="shrink-0">
+                    {meta.label}
+                  </StatusBadge>
+                </div>
+                <p className="text-xs text-on-surface-variant mt-1">
+                  #{order.id.slice(0, 8).toUpperCase()} · {subject} · {paidLabel}
+                </p>
+                <p className="text-xs text-on-surface-variant mt-1 inline-flex items-center gap-1">
+                  <Timer size={12} />{" "}
+                  {order.deadline
+                    ? `Due ${new Date(order.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+                    : "Deadline flexible"}
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-on-surface-variant mt-1">
-              #{order.id.slice(0, 8).toUpperCase()} · {subject} · {paidLabel}
-            </p>
-            <p className="text-xs text-on-surface-variant mt-1 inline-flex items-center gap-1">
-              <Timer size={12} />{" "}
-              {order.deadline
-                ? `Due ${new Date(order.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
-                : "Deadline flexible"}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          {isStudent && order.status === "completed" && (
-            <Link href={`/orders/${order.id}/review`}>
-              <Button size="sm" variant="outline">
-                <Star size={15} className="mr-1.5" /> Leave a Review
-              </Button>
-            </Link>
-          )}
-          {isHelper && order.status !== "completed" && (
-            <Button size="sm" onClick={() => setActiveTab("delivery")}>
-              Submit Delivery
-            </Button>
-          )}
-          {isStudent && order.status === "delivered" && (
-            <Button size="sm" onClick={() => setActiveTab("delivery")}>
-              Review Delivery
-            </Button>
-          )}
-        </div>
-      </section>
-
-      <div className="shrink-0 flex items-center gap-1 border-b border-outline-variant">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const active = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`inline-flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors cursor-pointer ${
-                tab.id === "chat" ? "lg:hidden " : ""
-              }${
-                active
-                  ? "border-primary-container text-primary"
-                  : "border-transparent text-on-surface-variant hover:text-on-surface"
-              }`}
-            >
-              <Icon size={16} />
-              {tab.label}
-              {tab.id === "chat" && messages.length > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-primary text-white text-xs font-bold">
-                  {messages.length}
-                </span>
+            <div className="flex items-center gap-2 shrink-0">
+              {isStudent && order.status === "completed" && (
+                <Link href={`/orders/${order.id}/review`}>
+                  <Button size="sm" variant="outline">
+                    <Star size={15} className="mr-1.5" /> Leave a Review
+                  </Button>
+                </Link>
               )}
-            </button>
-          );
-        })}
+              {isHelper && order.status !== "completed" && (
+                <Button size="sm" onClick={() => setActiveTab("delivery")}>
+                  Submit Delivery
+                </Button>
+              )}
+              {isStudent && order.status === "delivered" && (
+                <Button size="sm" onClick={() => setActiveTab("delivery")}>
+                  Review Delivery
+                </Button>
+              )}
+            </div>
+          </section>
+
+          <div className="shrink-0 flex items-center gap-1 border-b border-outline-variant">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const active = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`inline-flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors cursor-pointer ${
+                    tab.id === "chat" ? "lg:hidden " : ""
+                  }${
+                    active
+                      ? "border-primary-container text-primary"
+                      : "border-transparent text-on-surface-variant hover:text-on-surface"
+                  }`}
+                >
+                  <Icon size={16} />
+                  {tab.label}
+                  {tab.id === "chat" && messages.length > 0 && (
+                    <span className="ml-1 px-1.5 py-0.5 rounded-full bg-primary text-white text-xs font-bold">
+                      {messages.length}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           <div className="min-h-0 lg:flex-1 lg:overflow-y-auto">
-      {activeTab === "overview" && (
-        <div className="flex flex-col gap-3">
-          <Card className="p-4">
-            <div className="flex items-center justify-between gap-3 mb-4">
-              <div className="min-w-0">
-                <h2 className="font-display font-semibold text-on-surface">Order Progress</h2>
-                <p className="text-xs text-on-surface-variant">Status driven by real order activity.</p>
-              </div>
-              <span className="shrink-0 text-sm font-bold text-on-surface">
-                Step {statusStep + 1} of {timeline.length}
-              </span>
-            </div>
-
-            <ol className="flex items-start">
-              {timeline.map((step, i) => {
-                const done = i < statusStep;
-                const current = i === statusStep;
-                const reached = done || current;
-                const Icon = step.icon;
-                return (
-                  <li key={step.label} className="relative flex-1 min-w-0 flex flex-col items-center">
-                    {i > 0 && (
-                      <span
-                        className={`absolute top-4 right-1/2 h-0.5 w-full ${
-                          reached ? "bg-success" : "bg-surface-container-high"
-                        }`}
-                        aria-hidden="true"
-                      />
-                    )}
-                    <span
-                      className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                        done
-                          ? "bg-success text-white"
-                          : current
-                            ? "bg-primary-container text-on-primary ring-4 ring-primary-container/20"
-                            : "bg-surface-container-high text-on-surface-variant"
-                      }`}
-                    >
-                      <Icon size={15} />
-                    </span>
-                    <span
-                      className={`relative mt-2 px-1 text-[11px] sm:text-xs font-medium text-center leading-tight ${
-                        reached ? "text-on-surface" : "text-on-surface-variant/50"
-                      }`}
-                    >
-                      {step.label}
-                    </span>
-                  </li>
-                );
-              })}
-            </ol>
-          </Card>
-
-          <Card className="p-4">
-              <h2 className="font-display font-semibold text-on-surface mb-2">Agreed Scope</h2>
-              {order.proposal?.description ? (
-                <p className="text-sm text-on-surface-variant leading-relaxed">{order.proposal.description}</p>
-              ) : (
-                <p className="text-sm text-on-surface-variant">No additional scope notes were provided.</p>
-              )}
-              <div className="flex flex-wrap items-center gap-3 mt-3 text-sm">
-                <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
-                  <DollarSign size={14} /> {price} fixed
-                </span>
-                <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
-                  <RotateCcw size={14} /> Unlimited revisions
-                </span>
-                <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
-                  <CalendarDays size={14} />{" "}
-                  {order.deadline
-                    ? new Date(order.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                    : "Flexible"}
-                </span>
-              </div>
-            </Card>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Card className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="font-display font-semibold text-on-surface inline-flex items-center gap-2">
-                  <Receipt size={16} className="text-primary" /> Payment
-                </h2>
-                <StatusBadge tone={payment?.status ? paymentStatusTone(payment.status) : "blueStrong"}>
-                  {payment?.status === "paid" ? "Paid" : "Awaiting Payment"}
-                </StatusBadge>
-              </div>
-              <div className="flex flex-wrap items-center gap-3 text-sm">
-                <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
-                  <DollarSign size={14} /> {price}
-                </span>
-                {payment?.status === "paid" && payment.created_at && (
-                  <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
-                    <CalendarDays size={14} />{" "}
-                    Paid{" "}
-                    {new Date(payment.created_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </span>
-                )}
-              </div>
-              {payment?.status === "paid" && payment.receipt_url ? (
-                <a
-                  href={payment.receipt_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-container px-4 py-3 text-sm font-semibold text-on-primary shadow-sm transition-colors hover:bg-primary-hover"
-                >
-                  <Receipt size={16} /> View payment receipt <ExternalLink size={14} />
-                </a>
-              ) : payment?.status === "paid" ? (
-                <p className="text-xs text-on-surface-variant mt-3 leading-relaxed">
-                  Payment confirmed. Your receipt was sent to your account email.
-                </p>
-              ) : (
-                <p className="text-xs text-on-surface-variant mt-3 leading-relaxed">
-                  {isHelper
-                    ? "The student's payment is collected by Acadivo and shown here once confirmed. Payouts are settled manually by the Acadivo team."
-                    : "Complete payment to start your order."}
-                </p>
-              )}
-            </Card>
-
-            <Card className="p-4">
-              <div className="flex items-center gap-3 mb-2">
-                <Avatar name={logoName} role="helper" size="md" online />
-                <div className="min-w-0 flex-1">
-                  <p className="font-display font-semibold text-on-surface">{helperDisplayName}</p>
-                  <p className="text-xs text-on-surface-variant truncate">Assigned mentor</p>
-                </div>
-                <StatusBadge tone="green" className="shrink-0"><ShieldCheck size={12} /> Verified</StatusBadge>
-              </div>
-              <p className="text-xs text-on-surface-variant flex items-center gap-1.5">
-                <Check size={13} className="text-success shrink-0" />
-                ID-verified peer helper · rated after every completed order
-              </p>
-            </Card>
-            </div>
-        </div>
-      )}
-
-      {activeTab === "chat" && (
-        <div className="h-[calc(100dvh-20rem)] min-h-[280px] lg:hidden">
-          <ChatPanel
-            fill
-            filesBucket="order-files"
-            messages={messages}
-            draft={draft}
-            setDraft={setDraft}
-            files={chatFiles}
-            setFiles={setChatFiles}
-            sending={sendingMsg}
-            error={chatError}
-            onSend={sendMessage}
-            bottomRef={bottomRef}
-            currentUserId={currentUserId}
-            counterpartName={isHelper ? undefined : ACADIVO_HELPER_NAME}
-          />
-        </div>
-      )}
-
-      {activeTab === "delivery" && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
-          <div className="flex flex-col gap-4">
-            {isStudent && payment?.status === "paid" && (
-              <Card className="flex flex-wrap items-center justify-between gap-3 border-success/30 bg-success-tint/30 p-4">
-                <div>
-                  <p className="font-semibold text-on-surface">Payment complete · {chargePrice}</p>
-                  <p className="text-xs text-on-surface-variant">
-                    {payment.created_at
-                      ? `Paid ${new Date(payment.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
-                      : "Your payment is confirmed."}
-                  </p>
-                </div>
-                {payment.receipt_url && (
-                  <a
-                    href={payment.receipt_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary-container px-4 py-2 text-sm font-semibold text-on-primary shadow-sm transition-colors hover:bg-primary-hover"
-                  >
-                    <Receipt size={16} /> View receipt <ExternalLink size={14} />
-                  </a>
-                )}
-                {!payment.receipt_url && (
-                  <p className="text-xs text-on-surface-variant">
-                    Receipt sent to your account email.
-                  </p>
-                )}
-              </Card>
-            )}
-            <Card className="p-5 border-primary-container/20 bg-[linear-gradient(135deg,#eff6ff_0%,#ffffff_65%)]">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3 min-w-0">
-                  <span className="w-11 h-11 rounded-xl bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-sm">
-                    <Package size={20} />
-                  </span>
-                  <div className="min-w-0">
-                    <h2 className="font-display font-semibold text-on-surface">Deliverables</h2>
-                    <p className="text-sm text-on-surface-variant mt-0.5">
-                      {isHelper
-                        ? "Upload completed work. This creates a delivery and marks the order Delivered."
-                        : deliveries.length > 0
-                          ? "Your helper has sent files. Open or download them below."
-                          : "Reviewed files appear here once your helper delivers."}
-                    </p>
-                  </div>
-                </div>
-                <StatusBadge tone={meta.tone} dot className="shrink-0">{meta.label}</StatusBadge>
-              </div>
-
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <div className="rounded-xl border border-outline-variant/70 bg-white/80 px-3 py-2">
-                  <p className="text-[11px] uppercase tracking-wide text-on-surface-variant">Deliveries</p>
-                  <p className="font-display text-lg font-bold text-on-surface">{deliveries.length}</p>
-                </div>
-                <div className="rounded-xl border border-outline-variant/70 bg-white/80 px-3 py-2">
-                  <p className="text-[11px] uppercase tracking-wide text-on-surface-variant">Files</p>
-                  <p className="font-display text-lg font-bold text-on-surface">
-                    {deliveries.reduce((sum, d) => sum + d.file_urls.length, 0)}
-                  </p>
-                </div>
-              </div>
-
-              {isStudent && order.status === "delivered" && (
-                <div className="mt-3 flex items-start gap-2 rounded-xl border border-success/30 bg-success-tint/70 px-3 py-2.5">
-                  <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-success" />
-                  <p className="text-sm text-on-surface">
-                    Review the files below, then approve the work or request changes.
-                  </p>
-                </div>
-              )}
-
-              {isStudent && order.status === "revision_requested" && (
-                <div className="mt-3 flex items-start gap-2 rounded-xl border border-warning/30 bg-warning-container/40 px-3 py-2.5">
-                  <RotateCcw size={16} className="mt-0.5 shrink-0 text-warning" />
-                  <p className="text-sm text-on-surface">
-                    Changes requested. Your helper is updating the delivery.
-                  </p>
-                </div>
-              )}
-
-              {deliveries.length === 0 && (
-                <div className="flex flex-col items-center gap-2 py-8 text-center">
-                  <span className="w-12 h-12 rounded-2xl bg-primary-container/10 flex items-center justify-center">
-                    <Package size={22} className="text-primary" />
-                  </span>
-                  <p className="text-sm font-medium text-on-surface">No deliveries yet</p>
-                  <p className="text-xs text-on-surface-variant">
-                    {isHelper ? "Submit your first deliverable below." : "Your helper hasn't delivered yet."}
-                  </p>
-                </div>
-              )}
-
+            {activeTab === "overview" && (
               <div className="flex flex-col gap-3">
-                {deliveries.map((d) => (
-                  <div
-                    key={d.id}
-                    className={`p-4 rounded-xl border shadow-sm ${
-                      d.revision_note
-                        ? "border-warning/50 bg-warning-container/10"
-                        : "border-outline-variant bg-white"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2 text-xs font-semibold text-on-surface-variant">
-                        <span
-                          className={`w-2 h-2 rounded-full inline-block ${
-                            d.revision_note ? "bg-warning" : "bg-success"
-                          }`}
-                        />
-                        {d.revision_note ? "Changes requested" : "Delivered"} {timeLabel(d.created_at)}
-                      </div>
-                      <span className="text-[11px] text-on-surface-variant">
-                        {d.file_urls.length} {d.file_urls.length === 1 ? "file" : "files"}
-                      </span>
-                    </div>
-                    {d.revision_note ? (
-                      <>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-warning mb-1">
-                          What needs to be corrected
-                        </p>
-                        <p className="text-sm text-on-surface whitespace-pre-line">{d.revision_note}</p>
-                      </>
-                    ) : (
-                      d.message && <p className="text-sm text-on-surface mb-3">{d.message}</p>
-                    )}
-                    {d.file_urls.length > 0 && (
-                      <div className="flex flex-col gap-2">
-                        {d.file_urls.map((url, i) => (
-                          <SecureFileLink
-                            key={i}
-                            stored={url}
-                            bucket="order-files"
-                            showDownload
-                            label={fileNameFromUrl(url)}
-                            className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant bg-surface-container-lowest hover:border-primary-container/50 hover:bg-primary-container/5 transition-colors"
-                          >
-                            <span className="w-9 h-9 rounded-lg bg-primary-container/10 text-primary flex items-center justify-center shrink-0">
-                              <FileText size={16} />
-                            </span>
-                            <span className="min-w-0 flex-1 text-sm font-medium text-on-surface truncate">
-                              {fileNameFromUrl(url)}
-                            </span>
-                          </SecureFileLink>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            {isStudent && order.status === "delivered" && (
-              <Card className="p-5 flex flex-col gap-3 border-success/30 bg-success-tint/30">
-                <div>
-                  <h3 className="font-semibold text-on-surface">How did the delivery look?</h3>
-                  <p className="text-xs text-on-surface-variant mt-1">
-                    Approve to release the order, or ask for corrections first.
-                  </p>
-                </div>
-
-                {revisionOpen ? (
-                  <div className="flex flex-col gap-3">
-                    <div className="flex flex-col gap-1.5">
-                      <Textarea
-                        id="revision-note"
-                        label="What needs to be corrected?"
-                        rows={4}
-                        value={revisionNote}
-                        onChange={(e) => {
-                          setRevisionNote(e.target.value);
-                          setRevisionError(null);
-                        }}
-                        placeholder="e.g. Section 2 still needs the regression output explained in your own words, and the reference list is missing two sources."
-                      />
+                <Card className="p-4">
+                  <div className="flex items-center justify-between gap-3 mb-4">
+                    <div className="min-w-0">
+                      <h2 className="font-display font-semibold text-on-surface">Order Progress</h2>
                       <p className="text-xs text-on-surface-variant">
-                        Your helper sees this note and works through it before delivering again.
+                        Status driven by real order activity.
                       </p>
                     </div>
-                    {revisionError && <p className="text-sm text-error">{revisionError}</p>}
-                    <div className="flex items-center gap-2">
-                      <Button onClick={submitRevisionRequest} disabled={sendingRevision}>
-                        {sendingRevision ? <Loader2 size={15} className="animate-spin" /> : <RotateCcw size={15} />}
-                        Send change request
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        onClick={() => {
-                          setRevisionOpen(false);
-                          setRevisionNote("");
-                          setRevisionError(null);
-                        }}
-                        disabled={sendingRevision}
+                    <span className="shrink-0 text-sm font-bold text-on-surface">
+                      Step {statusStep + 1} of {timeline.length}
+                    </span>
+                  </div>
+
+                  <ol className="flex items-start">
+                    {timeline.map((step, i) => {
+                      const done = i < statusStep;
+                      const current = i === statusStep;
+                      const reached = done || current;
+                      const Icon = step.icon;
+                      return (
+                        <li
+                          key={step.label}
+                          className="relative flex-1 min-w-0 flex flex-col items-center"
+                        >
+                          {i > 0 && (
+                            <span
+                              className={`absolute top-4 right-1/2 h-0.5 w-full ${
+                                reached ? "bg-success" : "bg-surface-container-high"
+                              }`}
+                              aria-hidden="true"
+                            />
+                          )}
+                          <span
+                            className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                              done
+                                ? "bg-success text-white"
+                                : current
+                                  ? "bg-primary-container text-on-primary ring-4 ring-primary-container/20"
+                                  : "bg-surface-container-high text-on-surface-variant"
+                            }`}
+                          >
+                            <Icon size={15} />
+                          </span>
+                          <span
+                            className={`relative mt-2 px-1 text-xs sm:text-xs font-medium text-center leading-tight ${
+                              reached ? "text-on-surface" : "text-on-surface-variant/50"
+                            }`}
+                          >
+                            {step.label}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </Card>
+
+                <Card className="p-4">
+                  <h2 className="font-display font-semibold text-on-surface mb-2">Agreed Scope</h2>
+                  {order.proposal?.description ? (
+                    <p className="text-sm text-on-surface-variant leading-relaxed">
+                      {order.proposal.description}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-on-surface-variant">
+                      No additional scope notes were provided.
+                    </p>
+                  )}
+                  <div className="flex flex-wrap items-center gap-3 mt-3 text-sm">
+                    <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
+                      <DollarSign size={14} /> {price} fixed
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
+                      <RotateCcw size={14} /> Unlimited revisions
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
+                      <CalendarDays size={14} />{" "}
+                      {order.deadline
+                        ? new Date(order.deadline).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          })
+                        : "Flexible"}
+                    </span>
+                  </div>
+                </Card>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Card className="p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h2 className="font-display font-semibold text-on-surface inline-flex items-center gap-2">
+                        <Receipt size={16} className="text-primary" /> Payment
+                      </h2>
+                      <StatusBadge
+                        tone={payment?.status ? paymentStatusTone(payment.status) : "blueStrong"}
                       >
-                        Cancel
-                      </Button>
+                        {payment?.status === "paid" ? "Paid" : "Awaiting Payment"}
+                      </StatusBadge>
                     </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    <Button onClick={() => setOrderStatus("completed")} className="w-full">
-                      <Check size={15} /> Approve &amp; Complete
-                    </Button>
-                    <Button variant="outline" onClick={() => setRevisionOpen(true)}>
-                      <RotateCcw size={15} /> Request a Change
-                    </Button>
-                  </div>
-                )}
-                {deliveryError && <p className="text-sm text-error">{deliveryError}</p>}
-              </Card>
-            )}
-
-            {isStudent && order.status === "revision_requested" && (
-              <Card className="p-5">
-                <div className="flex items-center gap-2">
-                  <RotateCcw size={16} className="text-warning" />
-                  <p className="text-sm font-medium text-on-surface">Revision requested</p>
-                </div>
-                <p className="text-xs text-on-surface-variant mt-1">
-                  Your helper is working through the notes below — you&apos;ll see the revised delivery here.
-                </p>
-                <ul className="mt-3 flex flex-col gap-2">
-                  {latestRevisionNotes.map((d) => (
-                    <li key={d.id} className="text-sm text-on-surface border-l-2 border-warning pl-3">
-                      {d.revision_note}
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            )}
-
-            {isStudent && order.status === "completed" && (
-              <Card className="p-5 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 size={18} className="text-success" />
-                  <div>
-                    <p className="font-semibold text-on-surface">Order completed</p>
-                    <p className="text-xs text-on-surface-variant">Share your experience below.</p>
-                  </div>
-                </div>
-                <Link href={`/orders/${order.id}/review`}>
-                  <Button size="sm"><Star size={14} /> Review</Button>
-                </Link>
-              </Card>
-            )}
-          </div>
-
-          {isHelper && (
-            <Card className="p-5 sticky top-6">
-              {order.status === "revision_requested" && latestRevisionNotes.length > 0 && (
-                <div className="mb-4 rounded-xl border border-warning/50 bg-warning-container/10 p-3">
-                  <p className="text-sm font-semibold text-on-surface flex items-center gap-1.5">
-                    <RotateCcw size={14} className="text-warning" /> Changes requested
-                  </p>
-                  <ul className="mt-2 flex flex-col gap-1.5">
-                    {latestRevisionNotes.map((d) => (
-                      <li key={d.id} className="text-xs text-on-surface leading-relaxed">
-                        &bull; {d.revision_note}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              <h2 className="font-display font-semibold text-on-surface mb-1">Submit Delivery</h2>
-              <p className="text-sm text-on-surface-variant mb-4">
-                Include a summary note and any files for the student.
-              </p>
-
-              <div className="flex flex-col gap-4">
-                <div>
-                  <Textarea
-                    label="Delivery note"
-                    rows={3}
-                    value={deliveryMessage}
-                    onChange={(e) => setDeliveryMessage(e.target.value)}
-                    placeholder="Summarize what you delivered and any notes for the student..."
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-on-surface block mb-1.5">
-                    Files ({deliveryFiles.length} selected)
-                  </label>
-                  <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-outline-variant rounded-xl p-6 cursor-pointer hover:bg-surface-container-low transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary/40 has-[:focus-visible]:border-primary-container">
-                    <Paperclip size={20} className="text-primary" />
-                    <span className="text-sm font-medium text-on-surface">Click to browse</span>
-                    <span className="text-xs text-on-surface-variant">PDF, DOCX, images — up to 25 MB</span>
-                    <input
-                      type="file"
-                      multiple
-                      className="sr-only"
-                      onChange={(e) =>
-                        setDeliveryFiles(Array.from(e.target.files ?? []))
-                      }
-                    />
-                  </label>
-                  {deliveryFiles.length > 0 && (
-                    <div className="flex flex-col gap-2 mt-2">
-                      {deliveryFiles.map((f, i) => (
-                        <span key={i} className="flex items-center gap-2 text-xs text-on-surface-variant">
-                          <FileText size={13} /> {f.name}
+                    <div className="flex flex-wrap items-center gap-3 text-sm">
+                      <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
+                        <DollarSign size={14} /> {price}
+                      </span>
+                      {payment?.status === "paid" && payment.created_at && (
+                        <span className="inline-flex items-center gap-1.5 text-on-surface-variant">
+                          <CalendarDays size={14} /> Paid{" "}
+                          {new Date(payment.created_at).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
                         </span>
+                      )}
+                    </div>
+                    {payment?.status === "paid" && payment.receipt_url ? (
+                      <a
+                        href={payment.receipt_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-container px-4 py-3 text-sm font-semibold text-on-primary shadow-sm transition-colors hover:bg-primary-hover"
+                      >
+                        <Receipt size={16} /> View payment receipt <ExternalLink size={14} />
+                      </a>
+                    ) : payment?.status === "paid" ? (
+                      <p className="text-xs text-on-surface-variant mt-3 leading-relaxed">
+                        Payment confirmed. Your receipt was sent to your account email.
+                      </p>
+                    ) : (
+                      <p className="text-xs text-on-surface-variant mt-3 leading-relaxed">
+                        {isHelper
+                          ? "The student's payment is collected by Acadivo and shown here once confirmed. Payouts are settled manually by the Acadivo team."
+                          : "Complete payment to start your order."}
+                      </p>
+                    )}
+                  </Card>
+
+                  <Card className="p-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <Avatar name={logoName} role="helper" size="md" online />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-display font-semibold text-on-surface">
+                          {helperDisplayName}
+                        </p>
+                        <p className="text-xs text-on-surface-variant truncate">Assigned mentor</p>
+                      </div>
+                      <StatusBadge tone="green" className="shrink-0">
+                        <ShieldCheck size={12} /> Verified
+                      </StatusBadge>
+                    </div>
+                    <p className="text-xs text-on-surface-variant flex items-center gap-1.5">
+                      <Check size={13} className="text-success shrink-0" />
+                      ID-verified peer helper · rated after every completed order
+                    </p>
+                  </Card>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "chat" && (
+              <div className="h-[calc(100dvh-20rem)] min-h-[280px] lg:hidden">
+                <ChatPanel
+                  fill
+                  filesBucket="order-files"
+                  messages={messages}
+                  draft={draft}
+                  setDraft={setDraft}
+                  files={chatFiles}
+                  setFiles={setChatFiles}
+                  sending={sendingMsg}
+                  error={chatError}
+                  onSend={sendMessage}
+                  bottomRef={bottomRef}
+                  currentUserId={currentUserId}
+                  counterpartName={isHelper ? undefined : ACADIVO_HELPER_NAME}
+                />
+              </div>
+            )}
+
+            {activeTab === "delivery" && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+                <div className="flex flex-col gap-4">
+                  {isStudent && payment?.status === "paid" && (
+                    <Card className="flex flex-wrap items-center justify-between gap-3 border-success/30 bg-success-tint/30 p-4">
+                      <div>
+                        <p className="font-semibold text-on-surface">
+                          Payment complete · {chargePrice}
+                        </p>
+                        <p className="text-xs text-on-surface-variant">
+                          {payment.created_at
+                            ? `Paid ${new Date(payment.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+                            : "Your payment is confirmed."}
+                        </p>
+                      </div>
+                      {payment.receipt_url && (
+                        <a
+                          href={payment.receipt_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary-container px-4 py-2 text-sm font-semibold text-on-primary shadow-sm transition-colors hover:bg-primary-hover"
+                        >
+                          <Receipt size={16} /> View receipt <ExternalLink size={14} />
+                        </a>
+                      )}
+                      {!payment.receipt_url && (
+                        <p className="text-xs text-on-surface-variant">
+                          Receipt sent to your account email.
+                        </p>
+                      )}
+                    </Card>
+                  )}
+                  <Card className="p-5 border-primary-tint-line bg-primary-tint/40">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3 min-w-0">
+                        <span className="w-11 h-11 rounded-xl bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-sm">
+                          <Package size={20} />
+                        </span>
+                        <div className="min-w-0">
+                          <h2 className="font-display font-semibold text-on-surface">
+                            Deliverables
+                          </h2>
+                          <p className="text-sm text-on-surface-variant mt-0.5">
+                            {isHelper
+                              ? "Upload completed work. This creates a delivery and marks the order Delivered."
+                              : deliveries.length > 0
+                                ? "Your helper has sent files. Open or download them below."
+                                : "Reviewed files appear here once your helper delivers."}
+                          </p>
+                        </div>
+                      </div>
+                      <StatusBadge tone={meta.tone} dot className="shrink-0">
+                        {meta.label}
+                      </StatusBadge>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-2 gap-2">
+                      <div className="rounded-xl border border-outline-variant/70 bg-white/80 px-3 py-2">
+                        <p className="text-xs uppercase tracking-wide text-on-surface-variant">
+                          Deliveries
+                        </p>
+                        <p className="font-display text-lg font-bold text-on-surface">
+                          {deliveries.length}
+                        </p>
+                      </div>
+                      <div className="rounded-xl border border-outline-variant/70 bg-white/80 px-3 py-2">
+                        <p className="text-xs uppercase tracking-wide text-on-surface-variant">
+                          Files
+                        </p>
+                        <p className="font-display text-lg font-bold text-on-surface">
+                          {deliveries.reduce((sum, d) => sum + d.file_urls.length, 0)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {isStudent && order.status === "delivered" && (
+                      <div className="mt-3 flex items-start gap-2 rounded-xl border border-success/30 bg-success-tint/70 px-3 py-2.5">
+                        <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-success" />
+                        <p className="text-sm text-on-surface">
+                          Review the files below, then approve the work or request changes.
+                        </p>
+                      </div>
+                    )}
+
+                    {isStudent && order.status === "revision_requested" && (
+                      <div className="mt-3 flex items-start gap-2 rounded-xl border border-warning/30 bg-warning-container/40 px-3 py-2.5">
+                        <RotateCcw size={16} className="mt-0.5 shrink-0 text-warning" />
+                        <p className="text-sm text-on-surface">
+                          Changes requested. Your helper is updating the delivery.
+                        </p>
+                      </div>
+                    )}
+
+                    {deliveries.length === 0 && (
+                      <div className="flex flex-col items-center gap-2 py-8 text-center">
+                        <span className="w-12 h-12 rounded-2xl bg-primary-container/10 flex items-center justify-center">
+                          <Package size={22} className="text-primary" />
+                        </span>
+                        <p className="text-sm font-medium text-on-surface">No deliveries yet</p>
+                        <p className="text-xs text-on-surface-variant">
+                          {isHelper
+                            ? "Submit your first deliverable below."
+                            : "Your helper hasn't delivered yet."}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="flex flex-col gap-3">
+                      {deliveries.map((d) => (
+                        <div
+                          key={d.id}
+                          className={`p-4 rounded-xl border shadow-sm ${
+                            d.revision_note
+                              ? "border-warning/50 bg-warning-container/10"
+                              : "border-outline-variant bg-white"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <div className="flex items-center gap-2 text-xs font-semibold text-on-surface-variant">
+                              <span
+                                className={`w-2 h-2 rounded-full inline-block ${
+                                  d.revision_note ? "bg-warning" : "bg-success"
+                                }`}
+                              />
+                              {d.revision_note ? "Changes requested" : "Delivered"}{" "}
+                              {timeLabel(d.created_at)}
+                            </div>
+                            <span className="text-xs text-on-surface-variant">
+                              {d.file_urls.length} {d.file_urls.length === 1 ? "file" : "files"}
+                            </span>
+                          </div>
+                          {d.revision_note ? (
+                            <>
+                              <p className="text-xs font-semibold uppercase tracking-wide text-warning mb-1">
+                                What needs to be corrected
+                              </p>
+                              <p className="text-sm text-on-surface whitespace-pre-line">
+                                {d.revision_note}
+                              </p>
+                            </>
+                          ) : (
+                            d.message && <p className="text-sm text-on-surface mb-3">{d.message}</p>
+                          )}
+                          {d.file_urls.length > 0 && (
+                            <div className="flex flex-col gap-2">
+                              {d.file_urls.map((url, i) => (
+                                <SecureFileLink
+                                  key={i}
+                                  stored={url}
+                                  bucket="order-files"
+                                  showDownload
+                                  label={fileNameFromUrl(url)}
+                                  className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant bg-surface-container-lowest hover:border-primary-container/50 hover:bg-primary-container/5 transition-colors"
+                                >
+                                  <span className="w-9 h-9 rounded-lg bg-primary-container/10 text-primary flex items-center justify-center shrink-0">
+                                    <FileText size={16} />
+                                  </span>
+                                  <span className="min-w-0 flex-1 text-sm font-medium text-on-surface truncate">
+                                    {fileNameFromUrl(url)}
+                                  </span>
+                                </SecureFileLink>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       ))}
                     </div>
+                  </Card>
+
+                  {isStudent && order.status === "delivered" && (
+                    <Card className="p-5 flex flex-col gap-3 border-success/30 bg-success-tint/30">
+                      <div>
+                        <h3 className="font-semibold text-on-surface">
+                          How did the delivery look?
+                        </h3>
+                        <p className="text-xs text-on-surface-variant mt-1">
+                          Approve to release the order, or ask for corrections first.
+                        </p>
+                      </div>
+
+                      {revisionOpen ? (
+                        <div className="flex flex-col gap-3">
+                          <div className="flex flex-col gap-1.5">
+                            <Textarea
+                              id="revision-note"
+                              label="What needs to be corrected?"
+                              rows={4}
+                              value={revisionNote}
+                              onChange={(e) => {
+                                setRevisionNote(e.target.value);
+                                setRevisionError(null);
+                              }}
+                              placeholder="e.g. Section 2 still needs the regression output explained in your own words, and the reference list is missing two sources."
+                            />
+                            <p className="text-xs text-on-surface-variant">
+                              Your helper sees this note and works through it before delivering
+                              again.
+                            </p>
+                          </div>
+                          {revisionError && <p className="text-sm text-error">{revisionError}</p>}
+                          <div className="flex items-center gap-2">
+                            <Button onClick={submitRevisionRequest} disabled={sendingRevision}>
+                              {sendingRevision ? (
+                                <Loader2 size={15} className="animate-spin" />
+                              ) : (
+                                <RotateCcw size={15} />
+                              )}
+                              Send change request
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              onClick={() => {
+                                setRevisionOpen(false);
+                                setRevisionNote("");
+                                setRevisionError(null);
+                              }}
+                              disabled={sendingRevision}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-2">
+                          <Button onClick={() => setOrderStatus("completed")} className="w-full">
+                            <Check size={15} /> Approve &amp; Complete
+                          </Button>
+                          <Button variant="outline" onClick={() => setRevisionOpen(true)}>
+                            <RotateCcw size={15} /> Request a Change
+                          </Button>
+                        </div>
+                      )}
+                      {deliveryError && <p className="text-sm text-error">{deliveryError}</p>}
+                    </Card>
+                  )}
+
+                  {isStudent && order.status === "revision_requested" && (
+                    <Card className="p-5">
+                      <div className="flex items-center gap-2">
+                        <RotateCcw size={16} className="text-warning" />
+                        <p className="text-sm font-medium text-on-surface">Revision requested</p>
+                      </div>
+                      <p className="text-xs text-on-surface-variant mt-1">
+                        Your helper is working through the notes below — you&apos;ll see the revised
+                        delivery here.
+                      </p>
+                      <ul className="mt-3 flex flex-col gap-2">
+                        {latestRevisionNotes.map((d) => (
+                          <li
+                            key={d.id}
+                            className="text-sm text-on-surface border-l-2 border-warning pl-3"
+                          >
+                            {d.revision_note}
+                          </li>
+                        ))}
+                      </ul>
+                    </Card>
+                  )}
+
+                  {isStudent && order.status === "completed" && (
+                    <Card className="p-5 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 size={18} className="text-success" />
+                        <div>
+                          <p className="font-semibold text-on-surface">Order completed</p>
+                          <p className="text-xs text-on-surface-variant">
+                            Share your experience below.
+                          </p>
+                        </div>
+                      </div>
+                      <Link href={`/orders/${order.id}/review`}>
+                        <Button size="sm">
+                          <Star size={14} /> Review
+                        </Button>
+                      </Link>
+                    </Card>
                   )}
                 </div>
 
-                {deliveryError && <p className="text-sm text-error">{deliveryError}</p>}
+                {isHelper && (
+                  <Card className="p-5 sticky top-6">
+                    {order.status === "revision_requested" && latestRevisionNotes.length > 0 && (
+                      <div className="mb-4 rounded-xl border border-warning/50 bg-warning-container/10 p-3">
+                        <p className="text-sm font-semibold text-on-surface flex items-center gap-1.5">
+                          <RotateCcw size={14} className="text-warning" /> Changes requested
+                        </p>
+                        <ul className="mt-2 flex flex-col gap-1.5">
+                          {latestRevisionNotes.map((d) => (
+                            <li key={d.id} className="text-xs text-on-surface leading-relaxed">
+                              &bull; {d.revision_note}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    <h2 className="font-display font-semibold text-on-surface mb-1">
+                      Submit Delivery
+                    </h2>
+                    <p className="text-sm text-on-surface-variant mb-4">
+                      Include a summary note and any files for the student.
+                    </p>
 
-                <Button
-                  disabled={submittingDelivery}
-                  onClick={submitDelivery}
-                  className="w-full justify-center"
-                >
-                  {submittingDelivery ? (
-                    <Loader2 size={16} className="animate-spin" />
-                  ) : (
-                    <Package size={16} />
-                  )}
-                  {submittingDelivery ? "Uploading..." : "Submit Delivery"}
-                </Button>
-                <p className="text-xs text-on-surface-variant text-center">
-                  Submitting sets the order status to Delivered for student review.
-                </p>
+                    <div className="flex flex-col gap-4">
+                      <div>
+                        <Textarea
+                          label="Delivery note"
+                          rows={3}
+                          value={deliveryMessage}
+                          onChange={(e) => setDeliveryMessage(e.target.value)}
+                          placeholder="Summarize what you delivered and any notes for the student..."
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium text-on-surface block mb-1.5">
+                          Files ({deliveryFiles.length} selected)
+                        </label>
+                        <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-outline-variant rounded-xl p-6 cursor-pointer hover:bg-surface-container-low transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary/40 has-[:focus-visible]:border-primary-container">
+                          <Paperclip size={20} className="text-primary" />
+                          <span className="text-sm font-medium text-on-surface">
+                            Click to browse
+                          </span>
+                          <span className="text-xs text-on-surface-variant">
+                            PDF, DOCX, images — up to 25 MB
+                          </span>
+                          <input
+                            type="file"
+                            multiple
+                            className="sr-only"
+                            onChange={(e) => setDeliveryFiles(Array.from(e.target.files ?? []))}
+                          />
+                        </label>
+                        {deliveryFiles.length > 0 && (
+                          <div className="flex flex-col gap-2 mt-2">
+                            {deliveryFiles.map((f, i) => (
+                              <span
+                                key={i}
+                                className="flex items-center gap-2 text-xs text-on-surface-variant"
+                              >
+                                <FileText size={13} /> {f.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {deliveryError && <p className="text-sm text-error">{deliveryError}</p>}
+
+                      <Button
+                        disabled={submittingDelivery}
+                        onClick={submitDelivery}
+                        className="w-full justify-center"
+                      >
+                        {submittingDelivery ? (
+                          <Loader2 size={16} className="animate-spin" />
+                        ) : (
+                          <Package size={16} />
+                        )}
+                        {submittingDelivery ? "Uploading..." : "Submit Delivery"}
+                      </Button>
+                      <p className="text-xs text-on-surface-variant text-center">
+                        Submitting sets the order status to Delivered for student review.
+                      </p>
+                    </div>
+                  </Card>
+                )}
               </div>
-            </Card>
-          )}
-        </div>
-      )}
+            )}
           </div>
         </div>
         <div className="hidden lg:block lg:col-span-5 min-h-0 lg:h-full">

@@ -74,7 +74,9 @@ function BlockView({ block }: { block: ResourceBlock }) {
     case "example":
       return (
         <div className="mb-6 border-l-2 border-primary-container bg-primary-fixed/35 rounded-r-xl p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary mb-3">{block.label}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary mb-3">
+            {block.label}
+          </p>
           <div className="space-y-2.5">
             {block.v.map((para) => (
               <p key={para} className="text-on-surface-variant leading-relaxed">
@@ -111,7 +113,10 @@ function BlockView({ block }: { block: ResourceBlock }) {
               {block.rows.map((row) => (
                 <tr key={row.join("|")} className="border-b border-outline-variant/40">
                   {row.map((cell) => (
-                    <td key={cell} className="px-3 py-3 text-on-surface-variant align-top leading-relaxed">
+                    <td
+                      key={cell}
+                      className="px-3 py-3 text-on-surface-variant align-top leading-relaxed"
+                    >
                       {cell}
                     </td>
                   ))}
@@ -166,7 +171,10 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
 
       <PageHeader
         title={resource.h1}
@@ -202,172 +210,204 @@ export default function ResourceArticle({ resource }: { resource: Resource }) {
       </div>
 
       <div className="band-soft">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="lg:hidden mb-8">
-          <details className="bg-primary-fixed/60 rounded-xl p-4 border border-outline-variant/50">
-            <summary className="font-semibold text-on-surface cursor-pointer text-sm">On this page</summary>
-            <ul className="mt-3 space-y-2">
-              {toc.map((item) => (
-                <li key={item.id}>
-                  <a href={`#${item.id}`} className="text-sm text-on-surface-variant hover:text-primary block">
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </details>
-        </div>
-
-        <div className="grid lg:grid-cols-[1fr_240px] gap-8 lg:gap-12">
-          <article className="min-w-0 break-words bg-white rounded-2xl border border-outline-variant/30 p-6 sm:p-8 shadow-sm">
-            <div className="mb-8">
-              {resource.intro.map((para) => (
-                <p key={para} className="text-lg text-on-surface leading-relaxed mb-4">
-                  {para}
-                </p>
-              ))}
-            </div>
-
-            {resource.sections.map((section, i) => (
-              <section key={contentIds[i]} className="mb-12">
-                <h2
-                  id={contentIds[i]}
-                  className="font-display text-2xl font-bold text-on-surface mb-5 scroll-mt-24"
-                >
-                  {section.heading}
-                </h2>
-                {section.blocks.map((block, i) => (
-                  <BlockView key={i} block={block} />
-                ))}
-                {section.links?.map((link) => {
-                  const target = RESOURCE_BY_SLUG.get(link.slug);
-                  if (!target) return null;
-                  return (
-                    <p key={link.slug} className="mt-4 text-base text-on-surface-variant leading-relaxed">
-                      See also:{" "}
-                      <Link href={resourcePath(target)} className="text-primary hover:underline font-medium">
-                        {link.label}
-                      </Link>
-                    </p>
-                  );
-                })}
-              </section>
-            ))}
-
-            <section id="key-takeaways" className="mb-12 scroll-mt-24">
-              <h2 className="font-display text-2xl font-bold text-on-surface mb-5">Key Takeaways</h2>
-              <ul className="space-y-3">
-                {resource.takeaways.map((item) => (
-                  <li key={item} className="flex gap-3 text-on-surface-variant leading-relaxed">
-                    <MaterialIcon name="check_circle" size={16} className="text-primary shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-
-            <section id="checklist" className="mb-12 scroll-mt-24">
-              <Checklist items={resource.checklist} title="Checklist" />
-            </section>
-
-            <section id="common-mistakes" className="mb-12 scroll-mt-24">
-              <h2 className="font-display text-2xl font-bold text-on-surface mb-5">Common Mistakes to Avoid</h2>
-              <ul className="space-y-3">
-                {resource.mistakes.map((item) => (
-                  <li key={item} className="flex gap-3 text-on-surface-variant leading-relaxed">
-                    <MaterialIcon name="error" size={16} className="text-error shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-
-            {related.length > 0 && (
-              <section id="related-guides" className="mb-12 scroll-mt-24">
-                <h2 className="font-display text-2xl font-bold text-on-surface mb-5">Related Guides</h2>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {related.map((item) => {
-                    const accent = accentForGuideCategory(item.category);
-                    return (
-                      <Link
-                        key={item.slug}
-                        href={resourcePath(item)}
-                        className={`group rounded-xl border border-outline-variant/30 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md ${accent.cardHover}`}
-                      >
-                        <p className={`mb-1 font-semibold transition-colors ${accent.text}`}>
-                          {item.title}
-                        </p>
-                        <p className="text-base leading-relaxed text-on-surface-variant">{item.readingMinutes} min read</p>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
-
-            {resource.subjects.length > 0 && (
-              <section className="mb-12">
-                <h2 className="font-display text-xl font-bold text-on-surface mb-4">Related Subjects</h2>
-                <div className="flex flex-wrap gap-2">
-                  {resource.subjects.map((subject) => (
-                    <Link
-                      key={subject.slug}
-                      href={`/subjects/${subject.slug}`}
-                      className="bg-primary-fixed text-primary rounded-full px-4 py-1.5 text-sm font-medium hover:bg-primary-fixed/70 transition-colors"
-                    >
-                      {subject.label}
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            <div className="bg-white rounded-2xl border border-outline-variant/50 p-6 sm:p-8 mb-12 shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="w-11 h-11 bg-primary-fixed rounded-xl flex items-center justify-center shrink-0">
-                  <BookOpen className="w-5 h-5 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h2 className="font-display text-xl font-bold text-on-surface mb-2">{resource.service.title}</h2>
-                  <p className="text-on-surface-variant mb-5">{resource.service.body}</p>
-                  <Link
-                    href={resource.service.href}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity"
-                  >
-                    {resource.service.cta}
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="text-sm text-on-surface-variant border-t border-outline-variant/40 pt-6">
-              <p>
-                This guide is general academic guidance. Your instructor&apos;s requirements always take priority where
-                they differ from anything written here.
-              </p>
-              <Link href="/resources" className="text-primary hover:underline mt-3 inline-block">
-                Browse all student guides
-              </Link>
-            </div>
-          </article>
-
-          <aside className="hidden lg:block">
-            <div className="sticky top-24">
-              <p className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant mb-4">On this page</p>
-              <ul className="space-y-2 border-l-2 border-outline-variant/50 pl-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="lg:hidden mb-8">
+            <details className="bg-primary-fixed/60 rounded-xl p-4 border border-outline-variant/50">
+              <summary className="font-semibold text-on-surface cursor-pointer text-sm">
+                On this page
+              </summary>
+              <ul className="mt-3 space-y-2">
                 {toc.map((item) => (
                   <li key={item.id}>
-                    <a href={`#${item.id}`} className="text-sm text-on-surface-variant hover:text-primary block leading-snug">
+                    <a
+                      href={`#${item.id}`}
+                      className="text-sm text-on-surface-variant hover:text-primary block"
+                    >
                       {item.label}
                     </a>
                   </li>
                 ))}
               </ul>
-            </div>
-          </aside>
+            </details>
+          </div>
+
+          <div className="grid lg:grid-cols-[1fr_240px] gap-8 lg:gap-12">
+            <article className="min-w-0 break-words bg-white rounded-2xl border border-outline-variant/30 p-6 sm:p-8 shadow-sm">
+              <div className="mb-8">
+                {resource.intro.map((para) => (
+                  <p key={para} className="text-lg text-on-surface leading-relaxed mb-4">
+                    {para}
+                  </p>
+                ))}
+              </div>
+
+              {resource.sections.map((section, i) => (
+                <section key={contentIds[i]} className="mb-12">
+                  <h2
+                    id={contentIds[i]}
+                    className="font-display text-2xl font-bold text-on-surface mb-5 scroll-mt-24"
+                  >
+                    {section.heading}
+                  </h2>
+                  {section.blocks.map((block, i) => (
+                    <BlockView key={i} block={block} />
+                  ))}
+                  {section.links?.map((link) => {
+                    const target = RESOURCE_BY_SLUG.get(link.slug);
+                    if (!target) return null;
+                    return (
+                      <p
+                        key={link.slug}
+                        className="mt-4 text-base text-on-surface-variant leading-relaxed"
+                      >
+                        See also:{" "}
+                        <Link
+                          href={resourcePath(target)}
+                          className="text-primary hover:underline font-medium"
+                        >
+                          {link.label}
+                        </Link>
+                      </p>
+                    );
+                  })}
+                </section>
+              ))}
+
+              <section id="key-takeaways" className="mb-12 scroll-mt-24">
+                <h2 className="font-display text-2xl font-bold text-on-surface mb-5">
+                  Key Takeaways
+                </h2>
+                <ul className="space-y-3">
+                  {resource.takeaways.map((item) => (
+                    <li key={item} className="flex gap-3 text-on-surface-variant leading-relaxed">
+                      <MaterialIcon
+                        name="check_circle"
+                        size={16}
+                        className="text-primary shrink-0"
+                      />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section id="checklist" className="mb-12 scroll-mt-24">
+                <Checklist items={resource.checklist} title="Checklist" />
+              </section>
+
+              <section id="common-mistakes" className="mb-12 scroll-mt-24">
+                <h2 className="font-display text-2xl font-bold text-on-surface mb-5">
+                  Common Mistakes to Avoid
+                </h2>
+                <ul className="space-y-3">
+                  {resource.mistakes.map((item) => (
+                    <li key={item} className="flex gap-3 text-on-surface-variant leading-relaxed">
+                      <MaterialIcon name="error" size={16} className="text-error shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              {related.length > 0 && (
+                <section id="related-guides" className="mb-12 scroll-mt-24">
+                  <h2 className="font-display text-2xl font-bold text-on-surface mb-5">
+                    Related Guides
+                  </h2>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {related.map((item) => {
+                      const accent = accentForGuideCategory(item.category);
+                      return (
+                        <Link
+                          key={item.slug}
+                          href={resourcePath(item)}
+                          className={`group rounded-xl border border-outline-variant/30 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md ${accent.cardHover}`}
+                        >
+                          <p className={`mb-1 font-semibold transition-colors ${accent.text}`}>
+                            {item.title}
+                          </p>
+                          <p className="text-base leading-relaxed text-on-surface-variant">
+                            {item.readingMinutes} min read
+                          </p>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
+
+              {resource.subjects.length > 0 && (
+                <section className="mb-12">
+                  <h2 className="font-display text-xl font-bold text-on-surface mb-4">
+                    Related Subjects
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {resource.subjects.map((subject) => (
+                      <Link
+                        key={subject.slug}
+                        href={`/subjects/${subject.slug}`}
+                        className="bg-primary-fixed text-primary rounded-full px-4 py-1.5 text-sm font-medium hover:bg-primary-fixed/70 transition-colors"
+                      >
+                        {subject.label}
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              <div className="bg-white rounded-2xl border border-outline-variant/50 p-6 sm:p-8 mb-12 shadow-sm">
+                <div className="flex items-start gap-4">
+                  <div className="w-11 h-11 bg-primary-fixed rounded-xl flex items-center justify-center shrink-0">
+                    <BookOpen className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="font-display text-xl font-bold text-on-surface mb-2">
+                      {resource.service.title}
+                    </h2>
+                    <p className="text-on-surface-variant mb-5">{resource.service.body}</p>
+                    <Link
+                      href={resource.service.href}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl font-semibold text-sm hover:opacity-95 transition-opacity"
+                    >
+                      {resource.service.cta}
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-sm text-on-surface-variant border-t border-outline-variant/40 pt-6">
+                <p>
+                  This guide is general academic guidance. Your instructor&apos;s requirements
+                  always take priority where they differ from anything written here.
+                </p>
+                <Link href="/resources" className="text-primary hover:underline mt-3 inline-block">
+                  Browse all student guides
+                </Link>
+              </div>
+            </article>
+
+            <aside className="hidden lg:block">
+              <div className="sticky top-24">
+                <p className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant mb-4">
+                  On this page
+                </p>
+                <ul className="space-y-2 border-l-2 border-outline-variant/50 pl-4">
+                  {toc.map((item) => (
+                    <li key={item.id}>
+                      <a
+                        href={`#${item.id}`}
+                        className="text-sm text-on-surface-variant hover:text-primary block leading-snug"
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </aside>
+          </div>
         </div>
-      </div>
       </div>
     </>
   );

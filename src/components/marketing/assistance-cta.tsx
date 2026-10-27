@@ -58,7 +58,7 @@ export default function AssistanceCta() {
               </div>
             </div>
           </div>,
-          document.body
+          document.body,
         )}
     </>
   );

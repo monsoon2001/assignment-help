@@ -47,10 +47,14 @@ export default async function HelperLayout({ children }: { children: React.React
         .eq("read", false),
     ]);
 
-    if (completedResult.error) throw new Error(`Could not load completed order count: ${completedResult.error.message}`);
-    if (activeResult.error) throw new Error(`Could not load active order count: ${activeResult.error.message}`);
-    if (requestResult.error) throw new Error(`Could not load incoming request count: ${requestResult.error.message}`);
-    if (messageResult.error) throw new Error(`Could not load unread message count: ${messageResult.error.message}`);
+    if (completedResult.error)
+      throw new Error(`Could not load completed order count: ${completedResult.error.message}`);
+    if (activeResult.error)
+      throw new Error(`Could not load active order count: ${activeResult.error.message}`);
+    if (requestResult.error)
+      throw new Error(`Could not load incoming request count: ${requestResult.error.message}`);
+    if (messageResult.error)
+      throw new Error(`Could not load unread message count: ${messageResult.error.message}`);
 
     completedOrders = completedResult.count ?? 0;
     activeOrders = activeResult.count ?? 0;
@@ -79,11 +83,26 @@ export default async function HelperLayout({ children }: { children: React.React
           roleLabel="Helper"
           primary={[
             { href: "/helper/dashboard", label: "Dashboard", icon: "dashboard" },
-            { href: "/helper/requests", label: "Requests", icon: "inbox", badge: incomingRequests || undefined },
-            { href: "/helper/messages", label: "Messages", icon: "messages", badge: unreadMessages || undefined },
+            {
+              href: "/helper/requests",
+              label: "Requests",
+              icon: "inbox",
+              badge: incomingRequests || undefined,
+            },
+            {
+              href: "/helper/messages",
+              label: "Messages",
+              icon: "messages",
+              badge: unreadMessages || undefined,
+            },
           ]}
           more={[
-            { href: "/helper/orders", label: "Orders", icon: "orders", badge: activeOrders || undefined },
+            {
+              href: "/helper/orders",
+              label: "Orders",
+              icon: "orders",
+              badge: activeOrders || undefined,
+            },
             { href: "/helper/earnings", label: "Earnings", icon: "earnings" },
             { href: "/helper/notifications", label: "Notifications", icon: "notifications" },
             { href: "/helper/chat-admin", label: "Chat With Admin", icon: "chat_admin" },

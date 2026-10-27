@@ -2,12 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-import {
-  MessageSquare,
-  Phone,
-  Send,
-  SmilePlus,
-} from "lucide-react";
+import { MessageSquare, Phone, Send, SmilePlus } from "lucide-react";
 import Avatar from "@/components/ui/avatar";
 import Button from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
@@ -26,19 +21,54 @@ import {
 type AdminPeer = { id: string; name: string; avatarUrl?: string | null };
 
 const EMOJIS = [
-  "😀", "😂", "😊", "😍", "😎", "🤔",
-  "😅", "😉", "🤗", "😴", "🤯", "🥳",
-  "🙌", "👍", "👏", "🙏", "💪", "🤝",
-  "✨", "🔥", "🎉", "❤️", "💯", "🚀",
-  "✅", "⭐", "🎯", "📚", "📖", "✏️",
-  "📝", "📅", "⏰", "☕", "🧠", "🎓",
+  "😀",
+  "😂",
+  "😊",
+  "😍",
+  "😎",
+  "🤔",
+  "😅",
+  "😉",
+  "🤗",
+  "😴",
+  "🤯",
+  "🥳",
+  "🙌",
+  "👍",
+  "👏",
+  "🙏",
+  "💪",
+  "🤝",
+  "✨",
+  "🔥",
+  "🎉",
+  "❤️",
+  "💯",
+  "🚀",
+  "✅",
+  "⭐",
+  "🎯",
+  "📚",
+  "📖",
+  "✏️",
+  "📝",
+  "📅",
+  "⏰",
+  "☕",
+  "🧠",
+  "🎓",
 ];
 
 function timeLabel(value: string): string {
   const d = new Date(value);
   const sameDay = new Date().toDateString() === d.toDateString();
   if (sameDay) return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  return d.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  return d.toLocaleString([], {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
@@ -64,7 +94,9 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
     const { data } = await supabase
       .from("admin_messages")
       .select("id, sender_id, recipient_id, body, created_at")
-      .or(`and(sender_id.eq.${meRef.current},recipient_id.eq.${adminId}),and(sender_id.eq.${adminId},recipient_id.eq.${meRef.current})`)
+      .or(
+        `and(sender_id.eq.${meRef.current},recipient_id.eq.${adminId}),and(sender_id.eq.${adminId},recipient_id.eq.${meRef.current})`,
+      )
       .order("created_at", { ascending: true });
     setMessages((data ?? []) as AdminMessage[]);
   }, [adminId]);
@@ -75,7 +107,9 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
     const { data } = await supabase
       .from("call_logs")
       .select("id, caller_id, callee_id, direction, status, started_at, duration_seconds")
-      .or(`and(caller_id.eq.${meRef.current},callee_id.eq.${adminId}),and(caller_id.eq.${adminId},callee_id.eq.${meRef.current})`)
+      .or(
+        `and(caller_id.eq.${meRef.current},callee_id.eq.${adminId}),and(caller_id.eq.${adminId},callee_id.eq.${meRef.current})`,
+      )
       .order("started_at", { ascending: true });
     setLogs((data ?? []) as CallLog[]);
   }, [adminId]);
@@ -115,16 +149,17 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
           const msg = payload.new as AdminMessage;
           const myId = meRef.current;
           if (!myId) return;
-          const involved = (msg.sender_id === myId || msg.recipient_id === myId) &&
+          const involved =
+            (msg.sender_id === myId || msg.recipient_id === myId) &&
             (msg.sender_id === adminId || msg.recipient_id === adminId);
           if (!involved) return;
           setMessages((prev) => (prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]));
-        }
+        },
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "call_logs" },
-        () => void refreshLogs()
+        () => void refreshLogs(),
       )
       .subscribe();
 
@@ -222,7 +257,10 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
         </Button>
       </div>
 
-      <div ref={listRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-3 bg-surface-container-low/40 overscroll-contain pb-6">
+      <div
+        ref={listRef}
+        className="flex-1 overflow-y-auto px-5 py-4 space-y-3 bg-surface-container-low/40 overscroll-contain pb-6"
+      >
         {timeline.length === 0 && (
           <div className="flex flex-col items-center gap-2 py-12 text-center">
             <MessageSquare size={26} className="text-on-surface-variant/50" />
@@ -239,14 +277,16 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
             return (
               <div key={`msg-${m.id}`} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                 <div
-                  className={`max-w-[78%] rounded-2xl px-3.5 py-2 text-[15px] leading-snug ${
+                  className={`max-w-[78%] rounded-2xl px-3.5 py-2 text-sm leading-snug ${
                     mine
                       ? "bg-primary-container text-on-primary rounded-br-md"
                       : "bg-surface-container-high text-on-surface rounded-bl-md"
                   }`}
                 >
                   <p className="whitespace-pre-wrap break-words">{m.body}</p>
-                  <p className={`text-xs mt-1 ${mine ? "text-on-primary/70" : "text-on-surface-variant"}`}>
+                  <p
+                    className={`text-xs mt-1 ${mine ? "text-on-primary/70" : "text-on-surface-variant"}`}
+                  >
                     {timeLabel(m.created_at)}
                   </p>
                 </div>
@@ -258,7 +298,9 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
           const outgoing = l.caller_id === me;
           return (
             <div key={`call-${l.id}`} className="flex justify-center">
-              <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium ${callColor(l.status)}`}>
+              <div
+                className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium ${callColor(l.status)}`}
+              >
                 {callIcon(l.status)}
                 <span>
                   {outgoing ? "Call to Admin" : "Call from Admin"}
@@ -304,7 +346,9 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
               type="button"
               onClick={() => setEmojiOpen((o) => !o)}
               className={`w-9 h-9 shrink-0 flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
-                emojiOpen ? "bg-primary-container text-on-primary" : "text-on-surface-variant hover:bg-surface-container-low"
+                emojiOpen
+                  ? "bg-primary-container text-on-primary"
+                  : "text-on-surface-variant hover:bg-surface-container-low"
               }`}
               aria-label="Add emoji"
             >
@@ -317,7 +361,7 @@ export default function HelperAdminChat({ admin }: { admin: AdminPeer }) {
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Write a message…"
-                className="w-full resize-none outline-none bg-transparent text-[15px] text-on-surface placeholder:text-outline min-h-6 max-h-32"
+                className="w-full resize-none outline-none bg-transparent text-sm text-on-surface placeholder:text-outline min-h-6 max-h-32"
                 style={{ height: "auto" }}
               />
             </div>

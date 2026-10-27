@@ -13,5 +13,5 @@ export const adminClient = createSupabaseClient(
     realtime: {
       transport: WebSocket as unknown as typeof globalThis.WebSocket,
     },
-  }
+  },
 );

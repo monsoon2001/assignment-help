@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  ArrowLeft, ShieldCheck, CreditCard, CalendarDays, BookOpen,
-} from "lucide-react";
+import { ArrowLeft, ShieldCheck, CreditCard, CalendarDays, BookOpen } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { unwrapRow } from "@/lib/embedded";
 import { normalizeCurrency } from "@/lib/currency";
@@ -19,11 +17,7 @@ export const metadata: Metadata = {
   title: "Payment | Acadivo",
 };
 
-export default async function OrderPaymentPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function OrderPaymentPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   const supabase = await createClient();
@@ -37,7 +31,9 @@ export default async function OrderPaymentPage({
 
   const { data: orderRow } = await supabase
     .from("orders")
-    .select("id, price, currency, base_amount, base_currency, charge_amount, charge_currency, status, deadline, proposal:proposals(request:requests(title, country), helper:users(id, name))")
+    .select(
+      "id, price, currency, base_amount, base_currency, charge_amount, charge_currency, status, deadline, proposal:proposals(request:requests(title, country), helper:users(id, name))",
+    )
     .eq("id", id)
     .maybeSingle();
 
@@ -45,7 +41,12 @@ export default async function OrderPaymentPage({
     redirect("/requests");
   }
 
-  const proposal = unwrapRow<{ request: { title: string; country: string | null }[] | { title: string; country: string | null } | null }>(orderRow.proposal);
+  const proposal = unwrapRow<{
+    request:
+      | { title: string; country: string | null }[]
+      | { title: string; country: string | null }
+      | null;
+  }>(orderRow.proposal);
   const request = unwrapRow<{ title: string; country: string | null }>(proposal?.request);
 
   const chargeAmount =
@@ -84,7 +85,9 @@ export default async function OrderPaymentPage({
           <div className="absolute inset-x-0 top-0 h-1 bg-primary" />
 
           <div>
-            <Badge variant="secondary" dot className="shrink-0">Encrypted checkout</Badge>
+            <Badge variant="secondary" dot className="shrink-0">
+              Encrypted checkout
+            </Badge>
             <h1 className="font-display text-lg font-bold text-on-surface mt-3">Review and Pay</h1>
           </div>
 
@@ -98,7 +101,13 @@ export default async function OrderPaymentPage({
             </div>
             <div className="flex items-center gap-2 text-on-surface-variant text-xs">
               <CalendarDays size={13} />
-              Due {order.deadline ? new Date(order.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Flexible"}
+              Due{" "}
+              {order.deadline
+                ? new Date(order.deadline).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })
+                : "Flexible"}
             </div>
           </div>
 
@@ -123,8 +132,9 @@ export default async function OrderPaymentPage({
 
           <p className="text-xs leading-relaxed text-on-surface-variant">
             Payment confirms your order with{" "}
-            <span className="font-semibold text-on-surface">{order.helperName}</span>. Revisions or a
-            refund under our Refund Policy if the delivered work doesn&apos;t match the agreed scope.
+            <span className="font-semibold text-on-surface">{order.helperName}</span>. Revisions or
+            a refund under our Refund Policy if the delivered work doesn&apos;t match the agreed
+            scope.
           </p>
         </Card>
 

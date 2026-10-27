@@ -140,11 +140,7 @@ export function VoiceCallProvider({
       status: string;
     }): Promise<string | null> => {
       try {
-        const { data, error } = await supabase
-          .from("call_logs")
-          .insert(row)
-          .select("id")
-          .single();
+        const { data, error } = await supabase.from("call_logs").insert(row).select("id").single();
         if (error) throw error;
         logIdRef.current = data?.id ?? null;
         return data?.id ?? null;
@@ -153,7 +149,7 @@ export function VoiceCallProvider({
         return null;
       }
     },
-    [supabase]
+    [supabase],
   );
 
   const patchLog = useCallback(
@@ -173,7 +169,7 @@ export function VoiceCallProvider({
         }
       })();
     },
-    [supabase]
+    [supabase],
   );
 
   const clearLog = useCallback(() => {
@@ -228,7 +224,7 @@ export function VoiceCallProvider({
       setPhaseBoth(p);
       autoIdleTimerRef.current = setTimeout(() => setPhaseBoth("idle"), 3000);
     },
-    [setPhaseBoth]
+    [setPhaseBoth],
   );
 
   const handleSignal = useCallback(
@@ -246,13 +242,22 @@ export function VoiceCallProvider({
           }
           callIdRef.current = sig.call;
           pendingOfferRef.current = sig.sdp;
-          peerRef.current = { id: sig.from, name: sig.fromName ?? "Acadivo Support", avatarUrl: sig.fromAvatar ?? null };
+          peerRef.current = {
+            id: sig.from,
+            name: sig.fromName ?? "Acadivo Support",
+            avatarUrl: sig.fromAvatar ?? null,
+          };
           setPeer(peerRef.current);
           setPeerMuted(false);
           setPhaseBoth("incoming");
           noAnswerTimerRef.current = setTimeout(() => {
             if (phaseRef.current === "incoming") {
-              send({ kind: "no-answer", call: callIdRef.current ?? "", to: peerRef.current?.id ?? "", from: meRef.current ?? "" });
+              send({
+                kind: "no-answer",
+                call: callIdRef.current ?? "",
+                to: peerRef.current?.id ?? "",
+                from: meRef.current ?? "",
+              });
               cleanup();
               setPhaseBoth("idle");
             }
@@ -263,7 +268,7 @@ export function VoiceCallProvider({
           if (phaseRef.current !== "outgoing" || callIdRef.current !== sig.call) return;
           try {
             await pcRef.current?.setRemoteDescription(
-              new RTCSessionDescription({ type: "answer", sdp: sig.sdp })
+              new RTCSessionDescription({ type: "answer", sdp: sig.sdp }),
             );
           } catch {
             cleanup();
@@ -330,7 +335,7 @@ export function VoiceCallProvider({
           break;
       }
     },
-    [autoIdle, cleanup, durationSinceAnswer, patchLog, send, setPhaseBoth]
+    [autoIdle, cleanup, durationSinceAnswer, patchLog, send, setPhaseBoth],
   );
 
   useEffect(() => {
@@ -497,7 +502,9 @@ export function VoiceCallProvider({
         status: "failed",
       });
       cleanup();
-      setError(e instanceof Error ? e.message : "Could not start the call (microphone access was denied).");
+      setError(
+        e instanceof Error ? e.message : "Could not start the call (microphone access was denied).",
+      );
       autoIdle("failed");
     }
   }
@@ -643,7 +650,11 @@ export function VoiceCallProvider({
             )}
 
             {minimized && (phase === "incoming" || phase === "outgoing" || phase === "active") && (
-              <DragWindow className="absolute pointer-events-auto cursor-grab active:cursor-grabbing touch-none select-none" pos={windowPos} onPosChange={setWindowPos}>
+              <DragWindow
+                className="absolute pointer-events-auto cursor-grab active:cursor-grabbing touch-none select-none"
+                pos={windowPos}
+                onPosChange={setWindowPos}
+              >
                 <MiniCallBubble
                   name={name}
                   avatarUrl={avatarUrl}
@@ -657,7 +668,11 @@ export function VoiceCallProvider({
             )}
 
             {!minimized && phase === "incoming" && (
-              <DragWindow className="absolute pointer-events-auto cursor-grab active:cursor-grabbing touch-none select-none" pos={windowPos} onPosChange={setWindowPos}>
+              <DragWindow
+                className="absolute pointer-events-auto cursor-grab active:cursor-grabbing touch-none select-none"
+                pos={windowPos}
+                onPosChange={setWindowPos}
+              >
                 <div
                   className="w-full max-w-sm bg-surface-container-lowest rounded-3xl border border-outline-variant shadow-2xl p-6 sm:p-8 text-center animate-[dialog-in_0.2s_ease-out]"
                   role="dialog"
@@ -709,12 +724,22 @@ export function VoiceCallProvider({
             )}
 
             {!minimized && (phase === "outgoing" || phase === "active") && (
-              <DragWindow className="absolute pointer-events-auto cursor-grab active:cursor-grabbing touch-none select-none" pos={windowPos} onPosChange={setWindowPos}>
+              <DragWindow
+                className="absolute pointer-events-auto cursor-grab active:cursor-grabbing touch-none select-none"
+                pos={windowPos}
+                onPosChange={setWindowPos}
+              >
                 <CallPanel
                   name={name}
                   avatarUrl={avatarUrl}
                   subtitle={phase === "active" ? formatTimer(seconds) : "Calling…"}
-                  timer={phase === "active" ? formatTimer(seconds) : <Loader2 size={15} className="animate-spin" />}
+                  timer={
+                    phase === "active" ? (
+                      formatTimer(seconds)
+                    ) : (
+                      <Loader2 size={15} className="animate-spin" />
+                    )
+                  }
                   muted={muted}
                   peerMuted={peerMuted}
                   live={phase === "active"}
@@ -725,27 +750,36 @@ export function VoiceCallProvider({
               </DragWindow>
             )}
 
-            {!minimized && (phase === "declined" || phase === "busy" || phase === "no-answer" || phase === "ended" || phase === "failed") && (
-              <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-auto">
-                <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-xl px-6 py-4 flex items-center gap-3">
-                  <span className="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center shrink-0">
-                    <PhoneOff size={16} className="text-on-surface-variant" />
-                  </span>
-                  <div className="text-left">
-                    <p className="text-sm font-semibold text-on-surface">
-                      {phase === "declined" ? "Call declined"
-                        : phase === "busy" ? "Unavailable right now"
-                          : phase === "no-answer" ? "No answer"
-                            : phase === "failed" ? "Call failed"
-                              : "Call ended"}
-                    </p>
-                    {error && <p className="text-xs text-on-surface-variant max-w-xs">{error}</p>}
+            {!minimized &&
+              (phase === "declined" ||
+                phase === "busy" ||
+                phase === "no-answer" ||
+                phase === "ended" ||
+                phase === "failed") && (
+                <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-auto">
+                  <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-xl px-6 py-4 flex items-center gap-3">
+                    <span className="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center shrink-0">
+                      <PhoneOff size={16} className="text-on-surface-variant" />
+                    </span>
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-on-surface">
+                        {phase === "declined"
+                          ? "Call declined"
+                          : phase === "busy"
+                            ? "Unavailable right now"
+                            : phase === "no-answer"
+                              ? "No answer"
+                              : phase === "failed"
+                                ? "Call failed"
+                                : "Call ended"}
+                      </p>
+                      {error && <p className="text-xs text-on-surface-variant max-w-xs">{error}</p>}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>,
-          document.body
+          document.body,
         )}
     </VoiceCallContext.Provider>
   );
@@ -793,8 +827,14 @@ function DragWindow({
     if (!dragStateRef.current || !winRef.current) return;
     const el = winRef.current;
     onPosChange({
-      x: Math.min(Math.max(8, e.clientX - dragStateRef.current.dx), window.innerWidth - el.offsetWidth - 8),
-      y: Math.min(Math.max(8, e.clientY - dragStateRef.current.dy), window.innerHeight - el.offsetHeight - 8),
+      x: Math.min(
+        Math.max(8, e.clientX - dragStateRef.current.dx),
+        window.innerWidth - el.offsetWidth - 8,
+      ),
+      y: Math.min(
+        Math.max(8, e.clientY - dragStateRef.current.dy),
+        window.innerHeight - el.offsetHeight - 8,
+      ),
     });
   };
 
@@ -953,7 +993,9 @@ function CallPanel({
             onClick={onMute}
             aria-label={muted ? "Unmute" : "Mute"}
             className={`w-14 h-14 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
-              muted ? "bg-warning-container/40 text-warning" : "bg-surface-container-high text-on-surface hover:bg-surface-container-high/70"
+              muted
+                ? "bg-warning-container/40 text-warning"
+                : "bg-surface-container-high text-on-surface hover:bg-surface-container-high/70"
             }`}
           >
             {muted ? <MicOff size={20} /> : <Mic size={20} />}

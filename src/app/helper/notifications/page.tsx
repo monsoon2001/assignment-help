@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import NotificationsView, { type AppNotification } from "@/components/notifications/notifications-view";
+import NotificationsView, {
+  type AppNotification,
+} from "@/components/notifications/notifications-view";
 import { ErrorState } from "@/components/ui/states";
 
 export const dynamic = "force-dynamic";
@@ -35,5 +37,7 @@ export default async function HelperNotificationsPage() {
     );
   }
 
-  return <NotificationsView initial={(data ?? []) as AppNotification[]} emptyHref="/helper/dashboard" />;
+  return (
+    <NotificationsView initial={(data ?? []) as AppNotification[]} emptyHref="/helper/dashboard" />
+  );
 }

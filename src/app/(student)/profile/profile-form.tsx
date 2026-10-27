@@ -43,7 +43,7 @@ export default function StudentProfileForm({
 }) {
   const [state, formAction, pending] = useActionState<StudentProfileResult, FormData>(
     saveStudentProfile,
-    { ok: false, message: "" }
+    { ok: false, message: "" },
   );
 
   const displayName = name || (email ? email.split("@")[0] : "Acadivo Student");
@@ -52,7 +52,9 @@ export default function StudentProfileForm({
     <div className="w-full max-w-6xl mx-auto flex flex-col gap-6">
       <div>
         <h1 className="font-display font-bold text-2xl text-on-surface">Profile</h1>
-        <p className="text-sm text-on-surface-variant mt-0.5">Manage your personal details, academics, and security</p>
+        <p className="text-sm text-on-surface-variant mt-0.5">
+          Manage your personal details, academics, and security
+        </p>
       </div>
 
       <section className="relative overflow-hidden rounded-3xl border border-outline-variant/60 bg-surface-container-lowest">
@@ -66,9 +68,12 @@ export default function StudentProfileForm({
               className="-mt-11 ring-4 ring-surface-container-lowest"
             />
             <div className="min-w-0 pt-1.5">
-              <h2 className="font-display font-bold text-xl text-on-surface truncate">{displayName}</h2>
+              <h2 className="font-display font-bold text-xl text-on-surface truncate">
+                {displayName}
+              </h2>
               <p className="text-sm text-on-surface-variant flex items-center gap-1.5 min-w-0">
-                <Mail size={14} className="shrink-0" /> <span className="truncate">{email || "—"}</span>
+                <Mail size={14} className="shrink-0" />{" "}
+                <span className="truncate">{email || "—"}</span>
               </p>
             </div>
           </div>
@@ -85,7 +90,8 @@ export default function StudentProfileForm({
               </span>
             )}
             <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-container-low px-3 py-1.5 font-medium text-on-surface-variant">
-              <MapPin size={13} className="text-primary" /> {memberSince ? `Member since ${memberSince}` : "Student member"}
+              <MapPin size={13} className="text-primary" />{" "}
+              {memberSince ? `Member since ${memberSince}` : "Student member"}
             </span>
           </div>
         </div>
@@ -94,8 +100,12 @@ export default function StudentProfileForm({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <form action={formAction} className="lg:col-span-2 flex flex-col gap-6">
           <Card className="p-6">
-            <h3 className="font-display font-semibold text-on-surface mb-1">Personal Information</h3>
-            <p className="text-xs text-on-surface-variant mb-5">Used to personalize your workspace and match helpers.</p>
+            <h3 className="font-display font-semibold text-on-surface mb-1">
+              Personal Information
+            </h3>
+            <p className="text-xs text-on-surface-variant mb-5">
+              Used to personalize your workspace and match helpers.
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input name="firstName" label="First Name" defaultValue={firstName} required />
               <Input name="lastName" label="Last Name" defaultValue={lastName} />
@@ -120,14 +130,17 @@ export default function StudentProfileForm({
                   ]}
                 />
                 <p className="text-xs text-on-surface-variant mt-1.5">
-                  Used to charge you in your local currency. You always pay in the currency shown at checkout.
+                  Used to charge you in your local currency. You always pay in the currency shown at
+                  checkout.
                 </p>
               </div>
             </div>
           </Card>
 
           <Card className="p-6">
-            <h3 className="font-display font-semibold text-on-surface mb-1">Academic Information</h3>
+            <h3 className="font-display font-semibold text-on-surface mb-1">
+              Academic Information
+            </h3>
             <p className="text-xs text-on-surface-variant mb-5">
               Helps tailored mentor recommendations.
             </p>
@@ -151,7 +164,9 @@ export default function StudentProfileForm({
           </Card>
 
           {state.message && (
-            <p className={`text-sm rounded-lg px-3 py-2 ${state.ok ? "text-success bg-success-tint" : "text-error bg-error-container/30"}`}>
+            <p
+              className={`text-sm rounded-lg px-3 py-2 ${state.ok ? "text-success bg-success-tint" : "text-error bg-error-container/30"}`}
+            >
               {state.message}
             </p>
           )}
@@ -169,17 +184,25 @@ export default function StudentProfileForm({
             <h3 className="font-display font-semibold text-on-surface mb-4">Security</h3>
             <div className="flex flex-col gap-3">
               <button className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant hover:bg-surface-container-low text-left transition-colors cursor-pointer w-full">
-                <span className="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0"><Mail size={16} /></span>
+                <span className="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
+                  <Mail size={16} />
+                </span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-on-surface">Sign-in method</p>
-                  <p className="text-xs text-on-surface-variant">Google or email verification code</p>
+                  <p className="text-xs text-on-surface-variant">
+                    Google or email verification code
+                  </p>
                 </div>
               </button>
               <button className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant hover:bg-surface-container-low text-left transition-colors cursor-pointer w-full">
-                <span className="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0"><GraduationCap size={16} /></span>
+                <span className="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
+                  <GraduationCap size={16} />
+                </span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-on-surface">Academic information</p>
-                  <p className="text-xs text-on-surface-variant">{institution || "No institution set"} · {levelOfStudy || "No level set"}</p>
+                  <p className="text-xs text-on-surface-variant">
+                    {institution || "No institution set"} · {levelOfStudy || "No level set"}
+                  </p>
                 </div>
               </button>
             </div>

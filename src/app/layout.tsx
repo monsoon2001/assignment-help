@@ -81,8 +81,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${plusJakartaSans.variable} h-full`}>
-      <head>
-      </head>
+      <head></head>
       <body className="min-h-full flex flex-col antialiased">
         <script
           type="application/ld+json"

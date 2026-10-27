@@ -32,7 +32,11 @@ export const metadata: Metadata = {
 
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 export default async function AdminDashboardPage() {
@@ -56,10 +60,27 @@ export default async function AdminDashboardPage() {
   ] = await Promise.all([
     countByRole("student"),
     countByRole("helper"),
-    adminClient.from("requests").select("id", { count: "exact", head: true }).in("status", ["requested", "proposal_sent", "accepted"]).then((r) => r.count ?? 0),
-    adminClient.from("users").select("id", { count: "exact", head: true }).eq("role", "helper").eq("status", "pending").then((r) => r.count ?? 0),
-    adminClient.from("orders").select("id", { count: "exact", head: true }).eq("status", "completed").then((r) => r.count ?? 0),
-    adminClient.from("orders").select("id", { count: "exact", head: true }).eq("status", "in_progress").then((r) => r.count ?? 0),
+    adminClient
+      .from("requests")
+      .select("id", { count: "exact", head: true })
+      .in("status", ["requested", "proposal_sent", "accepted"])
+      .then((r) => r.count ?? 0),
+    adminClient
+      .from("users")
+      .select("id", { count: "exact", head: true })
+      .eq("role", "helper")
+      .eq("status", "pending")
+      .then((r) => r.count ?? 0),
+    adminClient
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "completed")
+      .then((r) => r.count ?? 0),
+    adminClient
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "in_progress")
+      .then((r) => r.count ?? 0),
     adminClient.from("payments").select("amount").eq("status", "paid"),
   ]);
 
@@ -68,7 +89,9 @@ export default async function AdminDashboardPage() {
   const [{ data: recentOrders }, { data: settings }] = await Promise.all([
     adminClient
       .from("orders")
-      .select("id, status, price, currency, deadline, created_at, student:users!orders_student_id_fkey(name, avatar_url), helper:users!orders_helper_id_fkey(name, avatar_url)")
+      .select(
+        "id, status, price, currency, deadline, created_at, student:users!orders_student_id_fkey(name, avatar_url), helper:users!orders_helper_id_fkey(name, avatar_url)",
+      )
       .order("created_at", { ascending: false })
       .limit(8),
     adminClient.from("platform_settings").select("active_helper_id").eq("id", true).maybeSingle(),
@@ -83,7 +106,11 @@ export default async function AdminDashboardPage() {
         .maybeSingle()
     : { data: null };
 
-  const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
 
   const metrics = [
     {
@@ -126,15 +153,28 @@ export default async function AdminDashboardPage() {
       label: "Awaiting Approval",
       value: pendingHelpers.toString(),
       icon: Hourglass,
-      color: pendingHelpers > 0 ? "bg-error-container text-error" : "bg-surface-container-low text-on-surface-variant",
+      color:
+        pendingHelpers > 0
+          ? "bg-error-container text-error"
+          : "bg-surface-container-low text-on-surface-variant",
       href: "/admin/helpers",
     },
   ];
 
   const quickLinks = [
     { href: "/admin/payments", label: "Payments", icon: CreditCard, hint: "Refunds & ledger" },
-    { href: "/admin/helper-balances", label: "Helper Balances", icon: DollarSign, hint: "Manual payouts" },
-    { href: "/admin/chat-monitor", label: "Chat Monitor", icon: ShieldAlert, hint: "Flagged threads" },
+    {
+      href: "/admin/helper-balances",
+      label: "Helper Balances",
+      icon: DollarSign,
+      hint: "Manual payouts",
+    },
+    {
+      href: "/admin/chat-monitor",
+      label: "Chat Monitor",
+      icon: ShieldAlert,
+      hint: "Flagged threads",
+    },
     { href: "/admin/settings", label: "Settings", icon: Settings, hint: "FX & platform" },
   ];
 
@@ -142,7 +182,9 @@ export default async function AdminDashboardPage() {
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="font-display text-2xl sm:text-3xl font-bold text-on-surface">Admin overview</h1>
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-on-surface">
+            Admin overview
+          </h1>
           <p className="text-on-surface-variant mt-1">Platform health at a glance · {today}</p>
         </div>
         <Link
@@ -159,12 +201,16 @@ export default async function AdminDashboardPage() {
           const Icon = metric.icon;
           const inner = (
             <Card className="h-full p-4" hover>
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${metric.color}`}>
+              <div
+                className={`w-10 h-10 rounded-xl flex items-center justify-center ${metric.color}`}
+              >
                 <Icon size={18} />
               </div>
               <p className="text-2xl font-bold text-on-surface mt-3">{metric.value}</p>
               <p className="text-xs text-on-surface-variant mt-0.5">{metric.label}</p>
-              {metric.sub && <p className="text-[11px] text-on-surface-variant mt-1">{metric.sub}</p>}
+              {metric.sub && (
+                <p className="text-xs text-on-surface-variant mt-1">{metric.sub}</p>
+              )}
             </Card>
           );
           return (
@@ -180,7 +226,10 @@ export default async function AdminDashboardPage() {
           <Card>
             <div className="p-5 sm:p-6 border-b border-outline-variant/30 flex items-center justify-between">
               <h2 className="font-display text-lg font-semibold text-on-surface">Recent Orders</h2>
-              <Link href="/admin/orders" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+              <Link
+                href="/admin/orders"
+                className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+              >
                 View all <ArrowRight size={14} />
               </Link>
             </div>
@@ -190,41 +239,80 @@ export default async function AdminDashboardPage() {
                 <table className="w-full min-w-[640px]">
                   <thead>
                     <tr className="border-b border-outline-variant/30">
-                      <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Student</th>
-                      <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Helper</th>
-                      <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Amount</th>
-                      <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Status</th>
-                      <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Deadline</th>
-                      <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">Action</th>
+                      <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                        Student
+                      </th>
+                      <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                        Helper
+                      </th>
+                      <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                        Amount
+                      </th>
+                      <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                        Status
+                      </th>
+                      <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                        Deadline
+                      </th>
+                      <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-6 py-3">
+                        Action
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {recentOrders.map((order) => {
-                      const student = unwrapRow<{ id: string; name: string | null; avatar_url: string | null }>(order.student);
-                      const helper = unwrapRow<{ name: string | null; avatar_url: string | null }>(order.helper);
+                      const student = unwrapRow<{
+                        id: string;
+                        name: string | null;
+                        avatar_url: string | null;
+                      }>(order.student);
+                      const helper = unwrapRow<{ name: string | null; avatar_url: string | null }>(
+                        order.helper,
+                      );
                       return (
-                        <tr key={order.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
+                        <tr
+                          key={order.id}
+                          className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors"
+                        >
                           <td className="px-3 sm:px-6 py-4">
                             <div className="flex items-center gap-2">
-                              <Avatar name={student?.name ?? "Student"} src={student?.avatar_url ?? undefined} size="sm" />
-                              <span className="text-sm text-on-surface">{student?.name ?? "—"}</span>
+                              <Avatar
+                                name={student?.name ?? "Student"}
+                                src={student?.avatar_url ?? undefined}
+                                size="sm"
+                              />
+                              <span className="text-sm text-on-surface">
+                                {student?.name ?? "—"}
+                              </span>
                             </div>
                           </td>
                           <td className="px-3 sm:px-6 py-4">
                             <div className="flex items-center gap-2">
-                              <Avatar name={helper?.name ?? "Helper"} src={helper?.avatar_url ?? undefined} role="helper" size="sm" />
+                              <Avatar
+                                name={helper?.name ?? "Helper"}
+                                src={helper?.avatar_url ?? undefined}
+                                role="helper"
+                                size="sm"
+                              />
                               <span className="text-sm text-on-surface">{helper?.name ?? "—"}</span>
                             </div>
                           </td>
-                          <td className="px-3 sm:px-6 py-4 text-sm font-semibold text-on-surface">{formatCurrency(Number(order.price), normalizeCurrency(order.currency))}</td>
+                          <td className="px-3 sm:px-6 py-4 text-sm font-semibold text-on-surface">
+                            {formatCurrency(Number(order.price), normalizeCurrency(order.currency))}
+                          </td>
                           <td className="px-3 sm:px-6 py-4">
                             <StatusBadge tone={orderStatusTone(order.status)}>
                               {order.status.replaceAll("_", " ")}
                             </StatusBadge>
                           </td>
-                          <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">{formatDate(order.deadline)}</td>
+                          <td className="px-3 sm:px-6 py-4 text-sm text-on-surface-variant">
+                            {formatDate(order.deadline)}
+                          </td>
                           <td className="px-3 sm:px-6 py-4 text-right">
-                            <Link href={`/admin/orders/${order.id}`} className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+                            <Link
+                              href={`/admin/orders/${order.id}`}
+                              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                            >
                               <Eye size={14} /> View
                             </Link>
                           </td>
@@ -257,7 +345,9 @@ export default async function AdminDashboardPage() {
                   <Crown size={20} />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-primary">Active helper</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                    Active helper
+                  </p>
                   <p className="font-display font-semibold text-on-surface truncate">
                     {activeHelper?.name ?? "No helper set"}
                   </p>
@@ -265,11 +355,20 @@ export default async function AdminDashboardPage() {
               </div>
               {activeHelper ? (
                 <div className="mt-3 flex items-center gap-2">
-                  <Avatar name={activeHelper.name ?? "Helper"} src={activeHelper.avatar_url ?? undefined} role="helper" size="sm" />
-                  <span className="text-xs text-on-surface-variant truncate">{activeHelper.email}</span>
+                  <Avatar
+                    name={activeHelper.name ?? "Helper"}
+                    src={activeHelper.avatar_url ?? undefined}
+                    role="helper"
+                    size="sm"
+                  />
+                  <span className="text-xs text-on-surface-variant truncate">
+                    {activeHelper.email}
+                  </span>
                 </div>
               ) : (
-                <p className="text-sm text-on-surface-variant mt-3">Set an active helper so new requests have a destination.</p>
+                <p className="text-sm text-on-surface-variant mt-3">
+                  Set an active helper so new requests have a destination.
+                </p>
               )}
               <p className="text-xs text-on-surface-variant mt-3">
                 All new student requests route to this helper.
@@ -305,7 +404,10 @@ export default async function AdminDashboardPage() {
                       <p className="text-sm font-medium text-on-surface">{link.label}</p>
                       <p className="text-xs text-on-surface-variant truncate">{link.hint}</p>
                     </div>
-                    <ArrowUpRight size={15} className="text-on-surface-variant group-hover:text-primary transition-colors" />
+                    <ArrowUpRight
+                      size={15}
+                      className="text-on-surface-variant group-hover:text-primary transition-colors"
+                    />
                   </Link>
                 );
               })}

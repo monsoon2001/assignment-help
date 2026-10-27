@@ -115,16 +115,17 @@ export default function RequestsList({
 
     const byTab = matches.filter((r) => {
       if (tab === "all") return true;
-      if (tab === "in_progress") return ["requested", "proposal_sent", "accepted"].includes(r.status);
+      if (tab === "in_progress")
+        return ["requested", "proposal_sent", "accepted"].includes(r.status);
       if (tab === "delivered") return orderStatusByRequest[r.id] === "delivered";
       return (
-        orderStatusByRequest[r.id] === "completed" ||
-        ["declined", "cancelled"].includes(r.status)
+        orderStatusByRequest[r.id] === "completed" || ["declined", "cancelled"].includes(r.status)
       );
     });
 
     return byTab.sort((a, b) => {
-      if (sort === "oldest") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      if (sort === "oldest")
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
       if (sort === "due") {
         const aDue = a.deadline ? new Date(a.deadline).getTime() : Number.POSITIVE_INFINITY;
         const bDue = b.deadline ? new Date(b.deadline).getTime() : Number.POSITIVE_INFINITY;
@@ -140,11 +141,13 @@ export default function RequestsList({
   const firstShown = filtered.length === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1;
   const lastShown = Math.min(safePage * PAGE_SIZE, filtered.length);
 
-  const applyFilter = <T,>(setter: (value: T) => void) => (value: T) => {
-    setter(value);
-    setPage(1);
-    setOpenMenu(null);
-  };
+  const applyFilter =
+    <T,>(setter: (value: T) => void) =>
+    (value: T) => {
+      setter(value);
+      setPage(1);
+      setOpenMenu(null);
+    };
 
   return (
     <>
@@ -164,8 +167,10 @@ export default function RequestsList({
             >
               {t.label}
               <span
-                className={`px-1.5 py-0.5 rounded-full text-[11px] font-bold ${
-                  activeTab ? "bg-white/25 text-on-primary" : "bg-surface-container-high text-on-surface"
+                className={`px-1.5 py-0.5 rounded-full text-xs font-bold ${
+                  activeTab
+                    ? "bg-white/25 text-on-primary"
+                    : "bg-surface-container-high text-on-surface"
                 }`}
               >
                 {counts[t.key]}
@@ -341,11 +346,17 @@ export default function RequestsList({
       {pageItems.length > 0 && (
         <section className="flex flex-col gap-3">
           {pageItems.map((r) => {
-            const meta = { label: STATUS_LABEL[r.status] ?? r.status, tone: requestStatusTone(r.status) };
+            const meta = {
+              label: STATUS_LABEL[r.status] ?? r.status,
+              tone: requestStatusTone(r.status),
+            };
             const proposals = proposalsByRequest[r.id] ?? [];
             return (
               <Link key={r.id} href={`/requests/${r.id}`} className="group block">
-                <Card hover className="relative overflow-hidden border border-outline-variant/60 p-4 transition-all group-hover:border-primary-container/50 group-hover:shadow-md sm:p-5">
+                <Card
+                  hover
+                  className="relative overflow-hidden border border-outline-variant/60 p-4 transition-all group-hover:border-primary-container/50 group-hover:shadow-md sm:p-5"
+                >
                   <span className="absolute inset-y-0 left-0 w-1 bg-primary-container opacity-70 transition-opacity group-hover:opacity-100" />
                   <div className="flex items-start gap-3 sm:gap-4">
                     <Avatar name={r.subject || r.title} size="md" className="mt-0.5" />
@@ -359,10 +370,15 @@ export default function RequestsList({
                             {r.subject || "General"} <span aria-hidden>·</span> {refCode(r.id)}
                           </p>
                         </div>
-                        <ChevronRight size={18} className="mt-1 shrink-0 text-on-surface-variant transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+                        <ChevronRight
+                          size={18}
+                          className="mt-1 shrink-0 text-on-surface-variant transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
+                        />
                       </div>
                       <div className="mt-3 flex flex-wrap items-center gap-2">
-                        <StatusBadge tone={meta.tone} dot>{meta.label}</StatusBadge>
+                        <StatusBadge tone={meta.tone} dot>
+                          {meta.label}
+                        </StatusBadge>
                         {proposals.length > 0 && (
                           <Badge variant="outline">
                             {proposals.length} proposal{proposals.length > 1 ? "s" : ""}
@@ -377,7 +393,9 @@ export default function RequestsList({
                         {(r.file_urls?.length ?? 0) > 0 && (
                           <span className="inline-flex min-w-0 items-center gap-1.5">
                             <Paperclip size={13} className="shrink-0 text-primary" />
-                            <span>{r.file_urls!.length} attachment{r.file_urls!.length > 1 ? "s" : ""}</span>
+                            <span>
+                              {r.file_urls!.length} attachment{r.file_urls!.length > 1 ? "s" : ""}
+                            </span>
                           </span>
                         )}
                         <span className="inline-flex min-w-0 items-center gap-1.5">
@@ -400,7 +418,8 @@ export default function RequestsList({
       {requests.length > 0 && (
         <div className="flex items-center justify-between pt-2">
           <p className="text-xs text-on-surface-variant">
-            Showing {firstShown}–{lastShown} of {filtered.length} request{filtered.length !== 1 ? "s" : ""}
+            Showing {firstShown}–{lastShown} of {filtered.length} request
+            {filtered.length !== 1 ? "s" : ""}
           </p>
           <div className="flex items-center gap-1">
             <button

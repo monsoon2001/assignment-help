@@ -36,20 +36,56 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "CS assignment help for Python, Java, SQL, databases, algorithms, ML, and projects. Discuss with a helper, get a personalized proposal, pay only after accepting.",
     intro: `Get expert computer science assignment help across programming, databases, algorithms, and machine learning. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "Python Assignment Help", blurb: "Functions, OOP, data analysis, automation, and scripting explained clearly." },
-      { title: "SQL Assignment Help", blurb: "Queries, joins, normalization, and schema design with hands-on review." },
-      { title: "Java Assignment Help", blurb: "OOP principles, collections, JDBC, and build tooling support." },
-      { title: "Database Assignment Help", blurb: "Relational modelling, transactions, indexing, and ER diagrams." },
-      { title: "Machine Learning Assignment Help", blurb: "Model selection, feature engineering, evaluation, and interpretation." },
-      { title: "Data Structures Assignment Help", blurb: "Trees, graphs, hashing, and complexity analysis worked through step by step." },
-      { title: "Programming Assignment Help", blurb: "Debugging, logic errors, and refactoring with a helper who explains why." },
-      { title: "Computer Science Project Help", blurb: "Project scoping, architecture choices, documentation, and review." },
+      {
+        title: "Python Assignment Help",
+        blurb: "Functions, OOP, data analysis, automation, and scripting explained clearly.",
+      },
+      {
+        title: "SQL Assignment Help",
+        blurb: "Queries, joins, normalization, and schema design with hands-on review.",
+      },
+      {
+        title: "Java Assignment Help",
+        blurb: "OOP principles, collections, JDBC, and build tooling support.",
+      },
+      {
+        title: "Database Assignment Help",
+        blurb: "Relational modelling, transactions, indexing, and ER diagrams.",
+      },
+      {
+        title: "Machine Learning Assignment Help",
+        blurb: "Model selection, feature engineering, evaluation, and interpretation.",
+      },
+      {
+        title: "Data Structures Assignment Help",
+        blurb: "Trees, graphs, hashing, and complexity analysis worked through step by step.",
+      },
+      {
+        title: "Programming Assignment Help",
+        blurb: "Debugging, logic errors, and refactoring with a helper who explains why.",
+      },
+      {
+        title: "Computer Science Project Help",
+        blurb: "Project scoping, architecture choices, documentation, and review.",
+      },
     ],
     faqs: [
-      { q: "Can I get help with Python assignments?", a: "Yes. Get step-by-step Python assignment help covering functions, OOP, data analysis, automation, and more." },
-      { q: "Do you offer Java and SQL assignment help?", a: "Yes. Helpers cover Java, JDBC, SQL queries, normalization, stored procedures, and database design." },
-      { q: "Will I understand the work or just get an answer?", a: "Yes. We focus on explanations and guidance so you learn the concepts instead of only receiving output." },
-      { q: "Do I pay before or after getting a quote?", a: "You receive a personalized proposal with pricing and scope first, and pay only after you accept it." },
+      {
+        q: "Can I get help with Python assignments?",
+        a: "Yes. Get step-by-step Python assignment help covering functions, OOP, data analysis, automation, and more.",
+      },
+      {
+        q: "Do you offer Java and SQL assignment help?",
+        a: "Yes. Helpers cover Java, JDBC, SQL queries, normalization, stored procedures, and database design.",
+      },
+      {
+        q: "Will I understand the work or just get an answer?",
+        a: "Yes. We focus on explanations and guidance so you learn the concepts instead of only receiving output.",
+      },
+      {
+        q: "Do I pay before or after getting a quote?",
+        a: "You receive a personalized proposal with pricing and scope first, and pay only after you accept it.",
+      },
     ],
   },
   {
@@ -66,18 +102,48 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "Statistics assignment help with SPSS, R, data analysis, hypothesis testing, and regression. Send your brief to our verified helper, discuss requirements, get a proposal before paying.",
     intro: `Get expert statistics support for assignments, homework, and analysis projects. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "Statistics Assignment Help", blurb: "Full support for coursework, reports, and statistical analysis projects." },
-      { title: "Statistics Homework Help", blurb: "Work through problems with clear explanations of each step." },
-      { title: "SPSS Assignment Help", blurb: "Data entry, test selection, output interpretation, and APA reporting." },
-      { title: "R Programming Assignment Help", blurb: "Data wrangling, visualization, modelling, and reproducible analysis." },
-      { title: "Data Analysis Assignment Help", blurb: "Cleaning, transforming, and interpreting real datasets responsibly." },
-      { title: "Hypothesis Testing Help", blurb: "Assumptions, test choice, p-values, and reporting results correctly." },
-      { title: "Regression Analysis Help", blurb: "Model specification, diagnostics, residuals, and interpretation." },
+      {
+        title: "Statistics Assignment Help",
+        blurb: "Full support for coursework, reports, and statistical analysis projects.",
+      },
+      {
+        title: "Statistics Homework Help",
+        blurb: "Work through problems with clear explanations of each step.",
+      },
+      {
+        title: "SPSS Assignment Help",
+        blurb: "Data entry, test selection, output interpretation, and APA reporting.",
+      },
+      {
+        title: "R Programming Assignment Help",
+        blurb: "Data wrangling, visualization, modelling, and reproducible analysis.",
+      },
+      {
+        title: "Data Analysis Assignment Help",
+        blurb: "Cleaning, transforming, and interpreting real datasets responsibly.",
+      },
+      {
+        title: "Hypothesis Testing Help",
+        blurb: "Assumptions, test choice, p-values, and reporting results correctly.",
+      },
+      {
+        title: "Regression Analysis Help",
+        blurb: "Model specification, diagnostics, residuals, and interpretation.",
+      },
     ],
     faqs: [
-      { q: "Can you help with SPSS assignments?", a: "Yes. Helpers cover SPSS data entry, statistical tests, output interpretation, and result reporting." },
-      { q: "Do you help with R programming?", a: "Yes. R programming assignment help covers data analysis, visualization, and statistical testing." },
-      { q: "Can I get help with hypothesis testing or regression?", a: "Yes. Helpers explain assumptions, run the appropriate test, and help you interpret results." },
+      {
+        q: "Can you help with SPSS assignments?",
+        a: "Yes. Helpers cover SPSS data entry, statistical tests, output interpretation, and result reporting.",
+      },
+      {
+        q: "Do you help with R programming?",
+        a: "Yes. R programming assignment help covers data analysis, visualization, and statistical testing.",
+      },
+      {
+        q: "Can I get help with hypothesis testing or regression?",
+        a: "Yes. Helpers explain assumptions, run the appropriate test, and help you interpret results.",
+      },
     ],
   },
   {
@@ -94,19 +160,52 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "Mathematics assignment help with step-by-step explanations for algebra, calculus, geometry, and more. Send your brief to our verified helper, discuss your problem, and get a proposal before paying.",
     intro: `Get clear, step-by-step mathematics guidance from verified tutors. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "Algebra Assignment Help", blurb: "Equations, functions, inequalities, and sequences explained clearly." },
-      { title: "Calculus Assignment Help", blurb: "Limits, derivatives, integrals, and series with worked solutions." },
-      { title: "Geometry Assignment Help", blurb: "Proofs, coordinate geometry, and spatial reasoning support." },
-      { title: "Linear Algebra Assignment Help", blurb: "Matrices, vectors, eigenvalues, and transformations." },
-      { title: "Discrete Mathematics Assignment Help", blurb: "Logic, proof techniques, combinatorics, and graph theory." },
-      { title: "Trigonometry Assignment Help", blurb: "Identities, equations, and applications with unit-circle fluency." },
-      { title: "Precalculus Assignment Help", blurb: "Functions, graphs, and preparation for calculus." },
-      { title: "Applied Mathematics Assignment Help", blurb: "Modelling, numerical methods, and real-world problem solving." },
+      {
+        title: "Algebra Assignment Help",
+        blurb: "Equations, functions, inequalities, and sequences explained clearly.",
+      },
+      {
+        title: "Calculus Assignment Help",
+        blurb: "Limits, derivatives, integrals, and series with worked solutions.",
+      },
+      {
+        title: "Geometry Assignment Help",
+        blurb: "Proofs, coordinate geometry, and spatial reasoning support.",
+      },
+      {
+        title: "Linear Algebra Assignment Help",
+        blurb: "Matrices, vectors, eigenvalues, and transformations.",
+      },
+      {
+        title: "Discrete Mathematics Assignment Help",
+        blurb: "Logic, proof techniques, combinatorics, and graph theory.",
+      },
+      {
+        title: "Trigonometry Assignment Help",
+        blurb: "Identities, equations, and applications with unit-circle fluency.",
+      },
+      {
+        title: "Precalculus Assignment Help",
+        blurb: "Functions, graphs, and preparation for calculus.",
+      },
+      {
+        title: "Applied Mathematics Assignment Help",
+        blurb: "Modelling, numerical methods, and real-world problem solving.",
+      },
     ],
     faqs: [
-      { q: "Can you help with calculus?", a: "Yes. Limits, derivatives, integrals, series, and applications are all covered." },
-      { q: "Will I see how each step works?", a: "Yes. Tutors explain the method so you can reproduce it yourself." },
-      { q: "Which levels do you support?", a: "High school, college, undergraduate, and graduate-level problems depending on helper expertise." },
+      {
+        q: "Can you help with calculus?",
+        a: "Yes. Limits, derivatives, integrals, series, and applications are all covered.",
+      },
+      {
+        q: "Will I see how each step works?",
+        a: "Yes. Tutors explain the method so you can reproduce it yourself.",
+      },
+      {
+        q: "Which levels do you support?",
+        a: "High school, college, undergraduate, and graduate-level problems depending on helper expertise.",
+      },
     ],
   },
   {
@@ -123,19 +222,52 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "Business assignment help for marketing, finance, accounting, case studies, and MBA work. Send your brief to our verified helper, discuss your requirements, and get a proposal before paying.",
     intro: `Get expert business guidance for assignments, reports, and case studies. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "Business Assignment Help", blurb: "Structured support for essays, reports, and presentations." },
-      { title: "Marketing Assignment Help", blurb: "Segmentation, positioning, campaigns, and marketing mix analysis." },
-      { title: "Finance Assignment Help", blurb: "Valuation, ratios, capital budgeting, and financial statement analysis." },
-      { title: "Accounting Assignment Help", blurb: "Debits and credits, journals, reconciliations, and cost behaviour." },
-      { title: "Case Study Help", blurb: "Framework-based analysis with structured recommendations." },
-      { title: "MBA Assignment Help", blurb: "Strategy, leadership, operations, and decision analysis." },
-      { title: "Management Assignment Help", blurb: "Organisational behaviour, planning, and control frameworks." },
-      { title: "Human Resource Assignment Help", blurb: "Recruitment, performance, motivation, and labour relations." },
+      {
+        title: "Business Assignment Help",
+        blurb: "Structured support for essays, reports, and presentations.",
+      },
+      {
+        title: "Marketing Assignment Help",
+        blurb: "Segmentation, positioning, campaigns, and marketing mix analysis.",
+      },
+      {
+        title: "Finance Assignment Help",
+        blurb: "Valuation, ratios, capital budgeting, and financial statement analysis.",
+      },
+      {
+        title: "Accounting Assignment Help",
+        blurb: "Debits and credits, journals, reconciliations, and cost behaviour.",
+      },
+      {
+        title: "Case Study Help",
+        blurb: "Framework-based analysis with structured recommendations.",
+      },
+      {
+        title: "MBA Assignment Help",
+        blurb: "Strategy, leadership, operations, and decision analysis.",
+      },
+      {
+        title: "Management Assignment Help",
+        blurb: "Organisational behaviour, planning, and control frameworks.",
+      },
+      {
+        title: "Human Resource Assignment Help",
+        blurb: "Recruitment, performance, motivation, and labour relations.",
+      },
     ],
     faqs: [
-      { q: "Can you help with case studies?", a: "Yes. Helpers help you structure analysis, apply frameworks, and build defensible recommendations." },
-      { q: "Do you cover MBA-level work?", a: "Yes, depending on helper expertise and the scope of your assignment." },
-      { q: "Can you help with finance calculations?", a: "Yes. Valuation, ratios, and capital budgeting can be worked through step by step." },
+      {
+        q: "Can you help with case studies?",
+        a: "Yes. Helpers help you structure analysis, apply frameworks, and build defensible recommendations.",
+      },
+      {
+        q: "Do you cover MBA-level work?",
+        a: "Yes, depending on helper expertise and the scope of your assignment.",
+      },
+      {
+        q: "Can you help with finance calculations?",
+        a: "Yes. Valuation, ratios, and capital budgeting can be worked through step by step.",
+      },
     ],
   },
   {
@@ -152,19 +284,52 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "Essay help, research paper help, and academic editing from verified tutors. Discuss your requirements and receive a personalized proposal before you pay.",
     intro: `Get support that strengthens your writing instead of replacing it. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "Essay Help", blurb: "Structure, arguments, evidence, and clarity with feedback on your own draft." },
-      { title: "Research Paper Help", blurb: "Topic scoping, literature review, methodology, and citation practice." },
-      { title: "Report Writing Help", blurb: "Organising findings into a clear, well-structured report." },
-      { title: "Proofreading Assignment", blurb: "Grammar, punctuation, and consistency checked line by line." },
-      { title: "Academic Editing", blurb: "Structure, flow, and argument strengthened while keeping your voice." },
-      { title: "Case Study Help", blurb: "Analysis frameworks applied consistently and referenced correctly." },
-      { title: "Thesis and Dissertation Help", blurb: "Chapter structure, argument coherence, and long-document planning." },
-      { title: "Citation Help", blurb: "APA, MLA, Harvard, and Chicago applied correctly and consistently." },
+      {
+        title: "Essay Help",
+        blurb: "Structure, arguments, evidence, and clarity with feedback on your own draft.",
+      },
+      {
+        title: "Research Paper Help",
+        blurb: "Topic scoping, literature review, methodology, and citation practice.",
+      },
+      {
+        title: "Report Writing Help",
+        blurb: "Organising findings into a clear, well-structured report.",
+      },
+      {
+        title: "Proofreading Assignment",
+        blurb: "Grammar, punctuation, and consistency checked line by line.",
+      },
+      {
+        title: "Academic Editing",
+        blurb: "Structure, flow, and argument strengthened while keeping your voice.",
+      },
+      {
+        title: "Case Study Help",
+        blurb: "Analysis frameworks applied consistently and referenced correctly.",
+      },
+      {
+        title: "Thesis and Dissertation Help",
+        blurb: "Chapter structure, argument coherence, and long-document planning.",
+      },
+      {
+        title: "Citation Help",
+        blurb: "APA, MLA, Harvard, and Chicago applied correctly and consistently.",
+      },
     ],
     faqs: [
-      { q: "Will someone write my essay for me?", a: "No. Tutors give feedback, explain structure, and help you improve your own writing." },
-      { q: "Can you help with citations and referencing?", a: "Yes. Helpers cover APA, MLA, Harvard, and Chicago formatting and in-text citation practice." },
-      { q: "Do you help with dissertations?", a: "Yes. Helpers can support chapter structure, argument planning, and editing long documents." },
+      {
+        q: "Will someone write my essay for me?",
+        a: "No. Tutors give feedback, explain structure, and help you improve your own writing.",
+      },
+      {
+        q: "Can you help with citations and referencing?",
+        a: "Yes. Helpers cover APA, MLA, Harvard, and Chicago formatting and in-text citation practice.",
+      },
+      {
+        q: "Do you help with dissertations?",
+        a: "Yes. Helpers can support chapter structure, argument planning, and editing long documents.",
+      },
     ],
   },
   {
@@ -181,16 +346,31 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "English literature assignment help for literary analysis, close reading, poetry, and critical essays from verified tutors.",
     intro: `Get guidance on close reading, argument, and literary analysis. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "Literary Analysis Help", blurb: "Building arguments from textual evidence with clear critical logic." },
+      {
+        title: "Literary Analysis Help",
+        blurb: "Building arguments from textual evidence with clear critical logic.",
+      },
       { title: "Poetry Analysis Help", blurb: "Form, meter, rhyme, imagery, and interpretation." },
-      { title: "Prose and Novel Analysis Help", blurb: "Narrative structure, character development, and theme." },
+      {
+        title: "Prose and Novel Analysis Help",
+        blurb: "Narrative structure, character development, and theme.",
+      },
       { title: "Comparative Essay Help", blurb: "Linking two texts through a focused lens." },
       { title: "Close Reading Help", blurb: "Line-by-line interpretation grounded in the text." },
-      { title: "Modernist and Postmodern Literature Help", blurb: "Key movements, techniques, and critical frameworks." },
+      {
+        title: "Modernist and Postmodern Literature Help",
+        blurb: "Key movements, techniques, and critical frameworks.",
+      },
     ],
     faqs: [
-      { q: "Can you help me analyse a text?", a: "Yes. Tutors help you build interpretations from evidence rather than summaries." },
-      { q: "Do you help with comparative essays?", a: "Yes, including selecting a comparison lens and structuring the argument." },
+      {
+        q: "Can you help me analyse a text?",
+        a: "Yes. Tutors help you build interpretations from evidence rather than summaries.",
+      },
+      {
+        q: "Do you help with comparative essays?",
+        a: "Yes, including selecting a comparison lens and structuring the argument.",
+      },
     ],
   },
   {
@@ -207,16 +387,40 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "Biology assignment help for genetics, cell biology, ecology, anatomy, and lab reports from verified tutors.",
     intro: `Get help understanding biological concepts and writing accurate lab reports. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "Genetics Assignment Help", blurb: "Inheritance patterns, gene regulation, and population genetics." },
-      { title: "Cell Biology Assignment Help", blurb: "Organelles, signalling, membranes, and cell cycle." },
-      { title: "Ecology Assignment Help", blurb: "Ecosystem dynamics, population models, and fieldwork analysis." },
-      { title: "Anatomy and Physiology Help", blurb: "Body systems, mechanisms, and clinical correlations." },
-      { title: "Biochemistry Assignment Help", blurb: "Metabolism, enzymes, and molecular interactions." },
-      { title: "Biology Lab Report Help", blurb: "Method, results, figures, and discussion written correctly." },
+      {
+        title: "Genetics Assignment Help",
+        blurb: "Inheritance patterns, gene regulation, and population genetics.",
+      },
+      {
+        title: "Cell Biology Assignment Help",
+        blurb: "Organelles, signalling, membranes, and cell cycle.",
+      },
+      {
+        title: "Ecology Assignment Help",
+        blurb: "Ecosystem dynamics, population models, and fieldwork analysis.",
+      },
+      {
+        title: "Anatomy and Physiology Help",
+        blurb: "Body systems, mechanisms, and clinical correlations.",
+      },
+      {
+        title: "Biochemistry Assignment Help",
+        blurb: "Metabolism, enzymes, and molecular interactions.",
+      },
+      {
+        title: "Biology Lab Report Help",
+        blurb: "Method, results, figures, and discussion written correctly.",
+      },
     ],
     faqs: [
-      { q: "Do you help with lab reports?", a: "Yes, including method, results presentation, and discussion sections." },
-      { q: "Can you explain difficult concepts like genetics?", a: "Yes. Tutors focus on mechanisms so the logic makes sense." },
+      {
+        q: "Do you help with lab reports?",
+        a: "Yes, including method, results presentation, and discussion sections.",
+      },
+      {
+        q: "Can you explain difficult concepts like genetics?",
+        a: "Yes. Tutors focus on mechanisms so the logic makes sense.",
+      },
     ],
   },
   {
@@ -233,16 +437,40 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "Chemistry assignment help for organic mechanisms, physical chemistry calculations, and lab methodology from verified tutors.",
     intro: `Get support with reaction mechanisms, calculations, and laboratory technique. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "Organic Chemistry Assignment Help", blurb: "Reaction mechanisms, functional groups, and synthesis routes." },
-      { title: "Physical Chemistry Help", blurb: "Thermodynamics, kinetics, equilibria, and electrochemistry." },
-      { title: "Stoichiometry Help", blurb: "Calculations, limiting reagents, and concentration problems." },
-      { title: "Spectroscopy Assignment Help", blurb: "Interpreting NMR, IR, and mass spectra to identify structures." },
-      { title: "Chemistry Lab Report Help", blurb: "Accurate procedures, observations, and data interpretation." },
-      { title: "Inorganic Chemistry Help", blurb: "Coordination chemistry, bonding, and periodic trends." },
+      {
+        title: "Organic Chemistry Assignment Help",
+        blurb: "Reaction mechanisms, functional groups, and synthesis routes.",
+      },
+      {
+        title: "Physical Chemistry Help",
+        blurb: "Thermodynamics, kinetics, equilibria, and electrochemistry.",
+      },
+      {
+        title: "Stoichiometry Help",
+        blurb: "Calculations, limiting reagents, and concentration problems.",
+      },
+      {
+        title: "Spectroscopy Assignment Help",
+        blurb: "Interpreting NMR, IR, and mass spectra to identify structures.",
+      },
+      {
+        title: "Chemistry Lab Report Help",
+        blurb: "Accurate procedures, observations, and data interpretation.",
+      },
+      {
+        title: "Inorganic Chemistry Help",
+        blurb: "Coordination chemistry, bonding, and periodic trends.",
+      },
     ],
     faqs: [
-      { q: "Can you help with reaction mechanisms?", a: "Yes. Tutors walk through electron flow and intermediates step by step." },
-      { q: "Do you help with lab reports?", a: "Yes, including procedure, results, and discussion sections." },
+      {
+        q: "Can you help with reaction mechanisms?",
+        a: "Yes. Tutors walk through electron flow and intermediates step by step.",
+      },
+      {
+        q: "Do you help with lab reports?",
+        a: "Yes, including procedure, results, and discussion sections.",
+      },
     ],
   },
   {
@@ -259,16 +487,40 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "Physics assignment help for mechanics, thermodynamics, electromagnetism, and quantum physics with full derivations.",
     intro: `Get physics help with complete derivations, not just final numbers. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "Classical Mechanics Help", blurb: "Newtonian motion, energy, momentum, and rotational dynamics." },
-      { title: "Electromagnetism Assignment Help", blurb: "Fields, potentials, circuits, and Maxwell's equations." },
-      { title: "Thermodynamics Help", blurb: "Laws, cycles, entropy, and statistical interpretation." },
-      { title: "Quantum Physics Help", blurb: "Wavefunctions, operators, uncertainty, and simple models." },
-      { title: "Optics Assignment Help", blurb: "Geometric and wave optics with relevant approximations." },
-      { title: "Fluid Mechanics Help", blurb: "Continuity, Bernoulli, viscosity, and flow analysis." },
+      {
+        title: "Classical Mechanics Help",
+        blurb: "Newtonian motion, energy, momentum, and rotational dynamics.",
+      },
+      {
+        title: "Electromagnetism Assignment Help",
+        blurb: "Fields, potentials, circuits, and Maxwell's equations.",
+      },
+      {
+        title: "Thermodynamics Help",
+        blurb: "Laws, cycles, entropy, and statistical interpretation.",
+      },
+      {
+        title: "Quantum Physics Help",
+        blurb: "Wavefunctions, operators, uncertainty, and simple models.",
+      },
+      {
+        title: "Optics Assignment Help",
+        blurb: "Geometric and wave optics with relevant approximations.",
+      },
+      {
+        title: "Fluid Mechanics Help",
+        blurb: "Continuity, Bernoulli, viscosity, and flow analysis.",
+      },
     ],
     faqs: [
-      { q: "Will you show the full derivation?", a: "Yes. Every problem is worked through with reasoning, not just answers." },
-      { q: "Which physics topics are covered?", a: "Mechanics, E&M, thermodynamics, optics, quantum physics, and fluids." },
+      {
+        q: "Will you show the full derivation?",
+        a: "Yes. Every problem is worked through with reasoning, not just answers.",
+      },
+      {
+        q: "Which physics topics are covered?",
+        a: "Mechanics, E&M, thermodynamics, optics, quantum physics, and fluids.",
+      },
     ],
   },
   {
@@ -285,16 +537,40 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "Engineering assignment help for mechanical, civil, and electrical topics including design projects and technical reports.",
     intro: `Get engineering guidance on analysis, design trade-offs, and technical reporting. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "Mechanical Engineering Help", blurb: "Statics, dynamics, machines, and design fundamentals." },
-      { title: "Electrical Engineering Help", blurb: "Circuits, signals, control systems, and electronics." },
-      { title: "Civil Engineering Help", blurb: "Structures, materials, geotechnics, and transportation." },
-      { title: "Engineering Mathematics Help", blurb: "Applied calculus, linear algebra, and numerical methods." },
-      { title: "Thermodynamics for Engineers Help", blurb: "Systems analysis, cycles, and energy balances." },
-      { title: "Engineering Design Project Help", blurb: "Requirements, trade-offs, prototyping, and documentation." },
+      {
+        title: "Mechanical Engineering Help",
+        blurb: "Statics, dynamics, machines, and design fundamentals.",
+      },
+      {
+        title: "Electrical Engineering Help",
+        blurb: "Circuits, signals, control systems, and electronics.",
+      },
+      {
+        title: "Civil Engineering Help",
+        blurb: "Structures, materials, geotechnics, and transportation.",
+      },
+      {
+        title: "Engineering Mathematics Help",
+        blurb: "Applied calculus, linear algebra, and numerical methods.",
+      },
+      {
+        title: "Thermodynamics for Engineers Help",
+        blurb: "Systems analysis, cycles, and energy balances.",
+      },
+      {
+        title: "Engineering Design Project Help",
+        blurb: "Requirements, trade-offs, prototyping, and documentation.",
+      },
     ],
     faqs: [
-      { q: "Do you help with design projects?", a: "Yes, including requirements analysis, trade-off evaluation, and documentation." },
-      { q: "Can you help with circuit analysis?", a: "Yes, including nodal and mesh methods, AC circuits, and control basics." },
+      {
+        q: "Do you help with design projects?",
+        a: "Yes, including requirements analysis, trade-off evaluation, and documentation.",
+      },
+      {
+        q: "Can you help with circuit analysis?",
+        a: "Yes, including nodal and mesh methods, AC circuits, and control basics.",
+      },
     ],
   },
   {
@@ -311,17 +587,44 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "Psychology assignment help for essays, research, case studies, and APA referencing from verified tutors.",
     intro: `Get structured guidance on psychological concepts, research, and academic writing. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "Psychology Assignment Help", blurb: "Essays, research papers, and concept explanations." },
-      { title: "Cognitive Psychology Help", blurb: "Attention, memory, perception, and experimental findings." },
-      { title: "Developmental Psychology Help", blurb: "Life-span theories and empirical developmental stages." },
-      { title: "Social Psychology Help", blurb: "Conformity, attribution, groups, and social influence." },
-      { title: "Research Methods Help", blurb: "Designs, ethics, statistics, and APA 7 referencing." },
-      { title: "Abnormal Psychology Help", blurb: "Disorders, classification, aetiology, and treatment approaches." },
-      { title: "Case Study Assignment Help", blurb: "Structured clinical or case analysis with evidence." },
+      {
+        title: "Psychology Assignment Help",
+        blurb: "Essays, research papers, and concept explanations.",
+      },
+      {
+        title: "Cognitive Psychology Help",
+        blurb: "Attention, memory, perception, and experimental findings.",
+      },
+      {
+        title: "Developmental Psychology Help",
+        blurb: "Life-span theories and empirical developmental stages.",
+      },
+      {
+        title: "Social Psychology Help",
+        blurb: "Conformity, attribution, groups, and social influence.",
+      },
+      {
+        title: "Research Methods Help",
+        blurb: "Designs, ethics, statistics, and APA 7 referencing.",
+      },
+      {
+        title: "Abnormal Psychology Help",
+        blurb: "Disorders, classification, aetiology, and treatment approaches.",
+      },
+      {
+        title: "Case Study Assignment Help",
+        blurb: "Structured clinical or case analysis with evidence.",
+      },
     ],
     faqs: [
-      { q: "Can you help with APA formatting?", a: "Yes. Helpers cover APA 7 citations, reference lists, and formatting." },
-      { q: "Do you help with research papers?", a: "Yes, from literature review to methodology and structure." },
+      {
+        q: "Can you help with APA formatting?",
+        a: "Yes. Helpers cover APA 7 citations, reference lists, and formatting.",
+      },
+      {
+        q: "Do you help with research papers?",
+        a: "Yes, from literature review to methodology and structure.",
+      },
     ],
   },
   {
@@ -338,16 +641,40 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "Economics assignment help for microeconomics, macroeconomics, econometrics, and policy analysis from verified tutors.",
     intro: `Get help with economic models, data, and policy reasoning. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "Microeconomics Assignment Help", blurb: "Supply and demand, elasticity, and market structures." },
-      { title: "Macroeconomics Assignment Help", blurb: "Growth, unemployment, inflation, and policy trade-offs." },
-      { title: "Econometrics Help", blurb: "Regression, hypothesis testing, and interpreting estimates." },
-      { title: "Economic Data Analysis Help", blurb: "Working with real datasets and reporting results rigorously." },
-      { title: "Public Policy Analysis Help", blurb: "Cost-benefit reasoning and policy evaluation frameworks." },
-      { title: "International Economics Help", blurb: "Trade, exchange rates, and global market mechanisms." },
+      {
+        title: "Microeconomics Assignment Help",
+        blurb: "Supply and demand, elasticity, and market structures.",
+      },
+      {
+        title: "Macroeconomics Assignment Help",
+        blurb: "Growth, unemployment, inflation, and policy trade-offs.",
+      },
+      {
+        title: "Econometrics Help",
+        blurb: "Regression, hypothesis testing, and interpreting estimates.",
+      },
+      {
+        title: "Economic Data Analysis Help",
+        blurb: "Working with real datasets and reporting results rigorously.",
+      },
+      {
+        title: "Public Policy Analysis Help",
+        blurb: "Cost-benefit reasoning and policy evaluation frameworks.",
+      },
+      {
+        title: "International Economics Help",
+        blurb: "Trade, exchange rates, and global market mechanisms.",
+      },
     ],
     faqs: [
-      { q: "Do you help with econometrics?", a: "Yes, including model specification, estimation, and interpretation of results." },
-      { q: "Can you explain economic models?", a: "Yes. Tutors walk through assumptions and intuition behind each model." },
+      {
+        q: "Do you help with econometrics?",
+        a: "Yes, including model specification, estimation, and interpretation of results.",
+      },
+      {
+        q: "Can you explain economic models?",
+        a: "Yes. Tutors walk through assumptions and intuition behind each model.",
+      },
     ],
   },
   {
@@ -364,15 +691,36 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "History assignment help for source analysis, historiography, and essay writing from verified tutors.",
     intro: `Get help building historical arguments from evidence and context. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "World History Assignment Help", blurb: "Cross-period comparison and global context." },
-      { title: "Source Analysis Help", blurb: "Evaluating primary sources for bias, purpose, and reliability." },
-      { title: "Historiography Help", blurb: "Comparing interpretations and building a historiographical argument." },
-      { title: "Essay Structure Help", blurb: "Thesis, evidence selection, and coherent paragraph flow." },
-      { title: "Modern History Help", blurb: "Revolutions, industrialisation, and twentieth-century developments." },
+      {
+        title: "World History Assignment Help",
+        blurb: "Cross-period comparison and global context.",
+      },
+      {
+        title: "Source Analysis Help",
+        blurb: "Evaluating primary sources for bias, purpose, and reliability.",
+      },
+      {
+        title: "Historiography Help",
+        blurb: "Comparing interpretations and building a historiographical argument.",
+      },
+      {
+        title: "Essay Structure Help",
+        blurb: "Thesis, evidence selection, and coherent paragraph flow.",
+      },
+      {
+        title: "Modern History Help",
+        blurb: "Revolutions, industrialisation, and twentieth-century developments.",
+      },
     ],
     faqs: [
-      { q: "Can you help me analyse primary sources?", a: "Yes. Tutors guide you to assess purpose, audience, bias, and reliability." },
-      { q: "Do you help with thesis development?", a: "Yes, including narrowing a topic into a defensible argument." },
+      {
+        q: "Can you help me analyse primary sources?",
+        a: "Yes. Tutors guide you to assess purpose, audience, bias, and reliability.",
+      },
+      {
+        q: "Do you help with thesis development?",
+        a: "Yes, including narrowing a topic into a defensible argument.",
+      },
     ],
   },
   {
@@ -389,16 +737,34 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "Philosophy assignment help for ethics, logic, political philosophy, and argument analysis from verified tutors.",
     intro: `Get help formalising arguments and reasoning through philosophical problems. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "Ethics Assignment Help", blurb: "Normative frameworks, dilemmas, and applied reasoning." },
+      {
+        title: "Ethics Assignment Help",
+        blurb: "Normative frameworks, dilemmas, and applied reasoning.",
+      },
       { title: "Logic Assignment Help", blurb: "Validity, soundness, formalisation, and proofs." },
-      { title: "Political Philosophy Help", blurb: "Justice, authority, liberty, and social contract debates." },
-      { title: "Philosophy of Mind Help", blurb: "Consciousness, qualia, and functionalism debates." },
+      {
+        title: "Political Philosophy Help",
+        blurb: "Justice, authority, liberty, and social contract debates.",
+      },
+      {
+        title: "Philosophy of Mind Help",
+        blurb: "Consciousness, qualia, and functionalism debates.",
+      },
       { title: "Metaphysics Help", blurb: "Identity, causation, possibility, and modality." },
-      { title: "Argument Analysis Help", blurb: "Diagramming arguments and identifying hidden premises." },
+      {
+        title: "Argument Analysis Help",
+        blurb: "Diagramming arguments and identifying hidden premises.",
+      },
     ],
     faqs: [
-      { q: "Can you help with logic assignments?", a: "Yes, including validity, soundness, symbolisation, and proofs." },
-      { q: "Do you help with ethics dilemmas?", a: "Yes. Tutors help you apply frameworks to specific cases rather than giving conclusions." },
+      {
+        q: "Can you help with logic assignments?",
+        a: "Yes, including validity, soundness, symbolisation, and proofs.",
+      },
+      {
+        q: "Do you help with ethics dilemmas?",
+        a: "Yes. Tutors help you apply frameworks to specific cases rather than giving conclusions.",
+      },
     ],
   },
   {
@@ -415,15 +781,30 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "Sociology assignment help for social theory, research methods, and contemporary social issues from verified tutors.",
     intro: `Get help connecting sociological theory to observable social phenomena. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "Social Theory Assignment Help", blurb: "Classical and contemporary theorists explained." },
-      { title: "Research Methods Help", blurb: "Surveys, ethnography, interviews, and validity concerns." },
-      { title: "Social Issues Assignment Help", blurb: "Inequality, urbanisation, and social policy analysis." },
+      {
+        title: "Social Theory Assignment Help",
+        blurb: "Classical and contemporary theorists explained.",
+      },
+      {
+        title: "Research Methods Help",
+        blurb: "Surveys, ethnography, interviews, and validity concerns.",
+      },
+      {
+        title: "Social Issues Assignment Help",
+        blurb: "Inequality, urbanisation, and social policy analysis.",
+      },
       { title: "Culture and Identity Help", blurb: "Culture, identity, media, and socialisation." },
       { title: "Demography Help", blurb: "Population trends, migration, and social change." },
     ],
     faqs: [
-      { q: "Do you help with research methods?", a: "Yes, covering method choice, sampling, and validity limitations." },
-      { q: "Can you explain sociological theory?", a: "Yes, with clear links between theory and concrete examples." },
+      {
+        q: "Do you help with research methods?",
+        a: "Yes, covering method choice, sampling, and validity limitations.",
+      },
+      {
+        q: "Can you explain sociological theory?",
+        a: "Yes, with clear links between theory and concrete examples.",
+      },
     ],
   },
   {
@@ -440,15 +821,33 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "Political science assignment help for political theory, international relations, comparative politics, and public policy.",
     intro: `Get help with political frameworks, evidence, and policy evaluation. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "Political Theory Help", blurb: "Classical and modern theories of authority and legitimacy." },
-      { title: "International Relations Help", blurb: "Realism, liberalism, institutions, and international systems." },
-      { title: "Comparative Politics Help", blurb: "Regime comparison, elections, and political institutions." },
-      { title: "Public Policy Help", blurb: "Policy design, implementation, and evaluation frameworks." },
-      { title: "Political Economy Help", blurb: "Institutions, distribution, and the interaction of politics and markets." },
+      {
+        title: "Political Theory Help",
+        blurb: "Classical and modern theories of authority and legitimacy.",
+      },
+      {
+        title: "International Relations Help",
+        blurb: "Realism, liberalism, institutions, and international systems.",
+      },
+      {
+        title: "Comparative Politics Help",
+        blurb: "Regime comparison, elections, and political institutions.",
+      },
+      {
+        title: "Public Policy Help",
+        blurb: "Policy design, implementation, and evaluation frameworks.",
+      },
+      {
+        title: "Political Economy Help",
+        blurb: "Institutions, distribution, and the interaction of politics and markets.",
+      },
     ],
     faqs: [
       { q: "Do you help with IR essays?", a: "Yes, including framework selection and evidence." },
-      { q: "Can you help with policy analysis?", a: "Yes, using structured evaluation criteria rather than opinion." },
+      {
+        q: "Can you help with policy analysis?",
+        a: "Yes, using structured evaluation criteria rather than opinion.",
+      },
     ],
   },
   {
@@ -465,23 +864,45 @@ export const SUBJECT_CONTENT: SubjectContent[] = [
       "Nursing assignment help for care plans, pharmacology, theory, and clinical practice from verified nursing tutors.",
     intro: `Get support with nursing care plans, pharmacology, and clinical reasoning. ${HOW_IT_WORDS}`,
     subtopics: [
-      { title: "Nursing Care Plan Help", blurb: "Assessment, diagnosis, goals, interventions, and evaluation." },
-      { title: "Pharmacology Assignment Help", blurb: "Drug classes, mechanisms, side effects, and nursing considerations." },
-      { title: "Nursing Theory Help", blurb: "Fawcett, Roy, Orem, and other theoretical frameworks." },
-      { title: "Clinical Reflection Help", blurb: "Structuring reflective practice for clinical submissions." },
-      { title: "Evidence-Based Practice Help", blurb: "Appraising research and applying it to patient care." },
-      { title: "Community Health Help", blurb: "Public health, prevention, and population-level care." },
+      {
+        title: "Nursing Care Plan Help",
+        blurb: "Assessment, diagnosis, goals, interventions, and evaluation.",
+      },
+      {
+        title: "Pharmacology Assignment Help",
+        blurb: "Drug classes, mechanisms, side effects, and nursing considerations.",
+      },
+      {
+        title: "Nursing Theory Help",
+        blurb: "Fawcett, Roy, Orem, and other theoretical frameworks.",
+      },
+      {
+        title: "Clinical Reflection Help",
+        blurb: "Structuring reflective practice for clinical submissions.",
+      },
+      {
+        title: "Evidence-Based Practice Help",
+        blurb: "Appraising research and applying it to patient care.",
+      },
+      {
+        title: "Community Health Help",
+        blurb: "Public health, prevention, and population-level care.",
+      },
     ],
     faqs: [
-      { q: "Can you help write care plans?", a: "Yes, including assessment, diagnosis, outcomes, and rationales." },
-      { q: "Do you help with pharmacology?", a: "Yes, covering drug mechanisms, adverse effects, and nursing responsibilities." },
+      {
+        q: "Can you help write care plans?",
+        a: "Yes, including assessment, diagnosis, outcomes, and rationales.",
+      },
+      {
+        q: "Do you help with pharmacology?",
+        a: "Yes, covering drug mechanisms, adverse effects, and nursing responsibilities.",
+      },
     ],
   },
 ];
 
-export const SUBJECT_CONTENT_BY_SLUG = new Map(
-  SUBJECT_CONTENT.map((s) => [s.slug, s]),
-);
+export const SUBJECT_CONTENT_BY_SLUG = new Map(SUBJECT_CONTENT.map((s) => [s.slug, s]));
 
 export const SUBJECT_GROUPS = SUBJECT_CONTENT.reduce<
   { category: string; icon: string; subjects: SubjectContent[] }[]

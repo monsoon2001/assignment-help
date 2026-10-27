@@ -68,9 +68,9 @@ const guide: Resource = {
           t: "example",
           label: "Weak vs strong",
           v: [
-            "Weak: \"Since the dawn of human civilisation, writing has been essential.\"",
+            'Weak: "Since the dawn of human civilisation, writing has been essential."',
             "Why it fails: no reader needed the statement, and it delays the topic.",
-            "Strong: \"Every university that has moved to online submission has faced the same problem: students submit drafts they have not read.\"",
+            'Strong: "Every university that has moved to online submission has faced the same problem: students submit drafts they have not read."',
             "Why it works: specific, arguable-adjacent, immediately relevant.",
           ],
         },
@@ -82,8 +82,8 @@ const guide: Resource = {
         {
           t: "ul",
           v: [
-            "Dictionary definitions (\"Webster's dictionary defines...\").",
-            "Sweeping claims about society, technology, or \"today's students\".",
+            'Dictionary definitions ("Webster\'s dictionary defines...").',
+            'Sweeping claims about society, technology, or "today\'s students".',
             "Asking the reader to think about a question, then answering nothing until the end.",
             "Quotations used for decoration rather than evidence.",
           ],
@@ -103,10 +103,15 @@ const guide: Resource = {
         },
         {
           t: "p",
-          v: "In a longer piece you can add a roadmap sentence — \"This essay first examines X, then argues Y, and finally considers Z\" — but only if your essay genuinely follows that order.",
+          v: 'In a longer piece you can add a roadmap sentence — "This essay first examines X, then argues Y, and finally considers Z" — but only if your essay genuinely follows that order.',
         },
       ],
-      links: [{ label: "How to write a strong thesis statement", slug: "how-to-write-a-thesis-statement" }],
+      links: [
+        {
+          label: "How to write a strong thesis statement",
+          slug: "how-to-write-a-thesis-statement",
+        },
+      ],
     },
     {
       heading: "Checklist",
@@ -140,7 +145,7 @@ const guide: Resource = {
   ],
   mistakes: [
     "Starting with a definition instead of a point.",
-    "Making claims about \"modern society\" that you cannot support.",
+    'Making claims about "modern society" that you cannot support.',
     "Writing a hook so long it becomes a second introduction.",
     "Delaying the thesis until the second paragraph.",
     "Including a roadmap that does not match the real structure.",

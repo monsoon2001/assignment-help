@@ -47,7 +47,9 @@ export default async function HelperOrders() {
 
   const { data } = await supabase
     .from("orders")
-    .select("id, status, price, currency, deadline, created_at, student:users!orders_student_id_fkey(id, name), proposal:proposals(request:requests(title, subject))")
+    .select(
+      "id, status, price, currency, deadline, created_at, student:users!orders_student_id_fkey(id, name), proposal:proposals(request:requests(title, subject))",
+    )
     .eq("helper_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -60,9 +62,7 @@ export default async function HelperOrders() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold text-on-surface">
-          Active Orders
-        </h1>
+        <h1 className="font-display text-2xl font-bold text-on-surface">Active Orders</h1>
         <p className="text-on-surface-variant mt-1">
           Track progress and manage your ongoing orders.
         </p>
@@ -75,11 +75,13 @@ export default async function HelperOrders() {
           </span>
           <h2 className="font-display font-semibold text-on-surface">No orders yet</h2>
           <p className="text-sm text-on-surface-variant max-w-md">
-            Accepted proposals become paid orders and appear here. Send proposals on incoming requests
-            to land your first one.
+            Accepted proposals become paid orders and appear here. Send proposals on incoming
+            requests to land your first one.
           </p>
           <Link href="/helper/requests" className="mt-1">
-            <Button size="sm" variant="outline">Check incoming requests</Button>
+            <Button size="sm" variant="outline">
+              Check incoming requests
+            </Button>
           </Link>
         </Card>
       )}
@@ -98,13 +100,14 @@ export default async function HelperOrders() {
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h2 className="font-semibold text-on-surface">
-                            {title}
-                          </h2>
-                          <StatusBadge tone={meta.tone} dot>{meta.label}</StatusBadge>
+                          <h2 className="font-semibold text-on-surface">{title}</h2>
+                          <StatusBadge tone={meta.tone} dot>
+                            {meta.label}
+                          </StatusBadge>
                         </div>
                         <p className="text-sm text-on-surface-variant">
-                          #{order.id.slice(0, 8).toUpperCase()} &middot; Student: {order.student?.name || "Student"} &middot; {subject}
+                          #{order.id.slice(0, 8).toUpperCase()} &middot; Student:{" "}
+                          {order.student?.name || "Student"} &middot; {subject}
                         </p>
                       </div>
                       <span className="text-sm font-semibold text-on-surface shrink-0 inline-flex items-center gap-1">
@@ -118,7 +121,10 @@ export default async function HelperOrders() {
                         <Clock size={14} />
                         Deadline:{" "}
                         {order.deadline
-                          ? new Date(order.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                          ? new Date(order.deadline).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                            })
                           : "Flexible"}
                       </span>
                       <span className="text-sm text-on-surface-variant">

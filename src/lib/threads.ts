@@ -2,7 +2,11 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { unwrapRow } from "@/lib/embedded";
 import { orderStatusTone, requestStatusTone, type StatusTone } from "@/lib/status-meta";
 
-export type ThreadCounterpart = { id: string; name: string | null; avatar_url: string | null } | null;
+export type ThreadCounterpart = {
+  id: string;
+  name: string | null;
+  avatar_url: string | null;
+} | null;
 
 export type Thread = {
   key: string;
@@ -42,9 +46,16 @@ type MsgRow = { request_id?: string; order_id?: string; body: string; created_at
 export async function buildThreads(
   client: SupabaseClient,
   userId: string,
-  isHelper: boolean
+  isHelper: boolean,
 ): Promise<Thread[]> {
-  const orderStatuses = ["payment_pending", "in_progress", "delivered", "revision_requested", "disputed", "completed"];
+  const orderStatuses = [
+    "payment_pending",
+    "in_progress",
+    "delivered",
+    "revision_requested",
+    "disputed",
+    "completed",
+  ];
   const requestStatuses = isHelper
     ? ["requested", "proposal_sent"]
     : ["requested", "proposal_sent", "accepted", "declined"];
@@ -54,7 +65,7 @@ export async function buildThreads(
   const reqQuery = client
     .from("requests")
     .select(
-      `id, title, status, created_at, ${counterpart}:users!requests_${counterpart}_id_fkey(id, name, avatar_url)`
+      `id, title, status, created_at, ${counterpart}:users!requests_${counterpart}_id_fkey(id, name, avatar_url)`,
     )
     .eq(`${isHelper ? "helper" : "student"}_id`, userId)
     .in("status", requestStatuses)
@@ -63,7 +74,7 @@ export async function buildThreads(
   const orderQuery = client
     .from("orders")
     .select(
-      `id, status, created_at, ${counterpart}:users!orders_${counterpart}_id_fkey(id, name, avatar_url), proposal:proposals(id, request_id, request:requests(title))`
+      `id, status, created_at, ${counterpart}:users!orders_${counterpart}_id_fkey(id, name, avatar_url), proposal:proposals(id, request_id, request:requests(title))`,
     )
     .eq(`${isHelper ? "helper" : "student"}_id`, userId)
     .in("status", orderStatuses)
@@ -118,7 +129,12 @@ export async function buildThreads(
           .limit(300)
       : { data: null };
 
-  const setLatest = (map: Map<string, { body: string; created_at: string }>, key: string, body: string, created_at: string) => {
+  const setLatest = (
+    map: Map<string, { body: string; created_at: string }>,
+    key: string,
+    body: string,
+    created_at: string,
+  ) => {
     const cur = map.get(key);
     if (!cur || new Date(created_at).getTime() > new Date(cur.created_at).getTime()) {
       map.set(key, { body, created_at });
@@ -160,7 +176,10 @@ export async function buildThreads(
     ...orders.map((o) => {
       const row = o as { id: string; status: string; created_at: string };
       const last = latestByOrder.get(row.id);
-      const meta = { label: ORDER_LABEL[row.status] ?? row.status, tone: orderStatusTone(row.status) };
+      const meta = {
+        label: ORDER_LABEL[row.status] ?? row.status,
+        tone: orderStatusTone(row.status),
+      };
       return {
         key: `order-${row.id}`,
         kind: "order" as const,

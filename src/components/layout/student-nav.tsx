@@ -47,7 +47,11 @@ export default function StudentNav({ items }: { items: StudentNavItem[] }) {
           >
             <Icon size={18} className="shrink-0" />
             <span className="flex-1">{item.label}</span>
-            {item.badge && <Badge variant="primary" className="px-2 py-0.5">{item.badge}</Badge>}
+            {item.badge && (
+              <Badge variant="primary" className="px-2 py-0.5">
+                {item.badge}
+              </Badge>
+            )}
           </Link>
         );
       })}

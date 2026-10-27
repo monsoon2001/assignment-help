@@ -18,7 +18,11 @@ export const metadata: Metadata = {
 
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 export default async function AdminPaymentsPage() {
@@ -26,7 +30,9 @@ export default async function AdminPaymentsPage() {
 
   const { data: payments, error } = await adminClient
     .from("payments")
-    .select("id, amount, currency, status, stripe_payment_intent_id, gross_cad, stripe_fee_cad, net_cad, charge_currency, charge_amount, platform_fee_cad, helper_payout_status, refunded_amount_cad, disputed, created_at, order:orders(id, status, student:users!orders_student_id_fkey(name), helper:users!orders_helper_id_fkey(name))")
+    .select(
+      "id, amount, currency, status, stripe_payment_intent_id, gross_cad, stripe_fee_cad, net_cad, charge_currency, charge_amount, platform_fee_cad, helper_payout_status, refunded_amount_cad, disputed, created_at, order:orders(id, status, student:users!orders_student_id_fkey(name), helper:users!orders_helper_id_fkey(name))",
+    )
     .order("created_at", { ascending: false })
     .limit(200);
 
@@ -49,35 +55,79 @@ export default async function AdminPaymentsPage() {
           <table className="w-full min-w-[900px]">
             <thead>
               <tr className="border-b border-outline-variant/30">
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">Student</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">Helper</th>
-                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">Total</th>
-                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">Stripe fee</th>
-                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">Net</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">Charged</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">Payout</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">Order</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">Date</th>
-                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">Status</th>
-                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">Action</th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">
+                  Student
+                </th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">
+                  Helper
+                </th>
+                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">
+                  Total
+                </th>
+                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">
+                  Stripe fee
+                </th>
+                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">
+                  Net
+                </th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">
+                  Charged
+                </th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">
+                  Payout
+                </th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">
+                  Order
+                </th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">
+                  Date
+                </th>
+                <th className="text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">
+                  Status
+                </th>
+                <th className="text-right text-xs font-semibold text-on-surface-variant uppercase tracking-wider px-3 sm:px-4 py-3">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody>
               {payments.map((payment) => {
-                const order = unwrapRow<{ id: string; status: string; student: unknown; helper: unknown }>(payment.order);
+                const order = unwrapRow<{
+                  id: string;
+                  status: string;
+                  student: unknown;
+                  helper: unknown;
+                }>(payment.order);
                 const orderStudent = unwrapRow<{ name: string | null }>(order?.student);
                 const orderHelper = unwrapRow<{ name: string | null }>(order?.helper);
                 const gross = Number(payment.gross_cad ?? payment.amount ?? 0);
-                const fee = payment.stripe_fee_cad === null || payment.stripe_fee_cad === undefined ? null : Number(payment.stripe_fee_cad);
-                const net = payment.net_cad === null || payment.net_cad === undefined ? null : Number(payment.net_cad);
-                const platformFee = payment.platform_fee_cad === null || payment.platform_fee_cad === undefined ? null : Number(payment.platform_fee_cad);
-                const chargedCurrency = normalizeCurrency(payment.charge_currency ?? payment.currency);
-                const chargedAmount = payment.charge_amount === null || payment.charge_amount === undefined ? null : Number(payment.charge_amount);
+                const fee =
+                  payment.stripe_fee_cad === null || payment.stripe_fee_cad === undefined
+                    ? null
+                    : Number(payment.stripe_fee_cad);
+                const net =
+                  payment.net_cad === null || payment.net_cad === undefined
+                    ? null
+                    : Number(payment.net_cad);
+                const platformFee =
+                  payment.platform_fee_cad === null || payment.platform_fee_cad === undefined
+                    ? null
+                    : Number(payment.platform_fee_cad);
+                const chargedCurrency = normalizeCurrency(
+                  payment.charge_currency ?? payment.currency,
+                );
+                const chargedAmount =
+                  payment.charge_amount === null || payment.charge_amount === undefined
+                    ? null
+                    : Number(payment.charge_amount);
                 const payout = payment.helper_payout_status as string | null;
                 const refunded = Number(payment.refunded_amount_cad ?? 0);
                 const fmt = (v: number | null) => (v === null ? "—" : formatCurrency(v));
                 return (
-                  <tr key={payment.id} className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors">
+                  <tr
+                    key={payment.id}
+                    className="border-b border-outline-variant/20 last:border-0 hover:bg-surface-container-low/50 transition-colors"
+                  >
                     <td className="px-3 sm:px-4 py-4">
                       <div className="flex items-center gap-2">
                         <Avatar name={orderStudent?.name ?? "Student"} size="sm" />
@@ -93,11 +143,17 @@ export default async function AdminPaymentsPage() {
                     <td className="px-3 sm:px-4 py-4 text-right text-sm font-semibold text-on-surface">
                       {formatCurrency(gross)}
                       {refunded > 0 && (
-                        <span className="block text-xs font-normal text-error">-{formatCurrency(refunded)} refunded</span>
+                        <span className="block text-xs font-normal text-error">
+                          -{formatCurrency(refunded)} refunded
+                        </span>
                       )}
                     </td>
-                    <td className="px-3 sm:px-4 py-4 text-right text-sm text-on-surface-variant">{fmt(fee)}</td>
-                    <td className="px-3 sm:px-4 py-4 text-right text-sm text-on-surface-variant">{fmt(net)}</td>
+                    <td className="px-3 sm:px-4 py-4 text-right text-sm text-on-surface-variant">
+                      {fmt(fee)}
+                    </td>
+                    <td className="px-3 sm:px-4 py-4 text-right text-sm text-on-surface-variant">
+                      {fmt(net)}
+                    </td>
                     <td className="px-3 sm:px-4 py-4 text-sm text-on-surface-variant">
                       {chargedAmount === null
                         ? "—"
@@ -120,11 +176,17 @@ export default async function AdminPaymentsPage() {
                       )}
                     </td>
                     <td className="px-3 sm:px-4 py-4">
-                      <StatusBadge tone={orderStatusTone(order?.status)}>{order?.status ?? "—"}</StatusBadge>
+                      <StatusBadge tone={orderStatusTone(order?.status)}>
+                        {order?.status ?? "—"}
+                      </StatusBadge>
                     </td>
-                    <td className="px-3 sm:px-4 py-4 text-sm text-on-surface-variant">{formatDate(payment.created_at)}</td>
+                    <td className="px-3 sm:px-4 py-4 text-sm text-on-surface-variant">
+                      {formatDate(payment.created_at)}
+                    </td>
                     <td className="px-3 sm:px-4 py-4">
-                      <StatusBadge tone={paymentStatusTone(payment.status)}>{payment.status}</StatusBadge>
+                      <StatusBadge tone={paymentStatusTone(payment.status)}>
+                        {payment.status}
+                      </StatusBadge>
                     </td>
                     <td className="px-3 sm:px-4 py-4 text-right">
                       {payment.status === "paid" ? (

@@ -4,14 +4,7 @@
  * state always shows the same text and colour.
  */
 export type StatusTone =
-  | "slate"
-  | "blue"
-  | "blueStrong"
-  | "amber"
-  | "orange"
-  | "indigo"
-  | "green"
-  | "red";
+  "slate" | "blue" | "blueStrong" | "amber" | "orange" | "indigo" | "green" | "red";
 
 export interface StatusMeta {
   label: string;

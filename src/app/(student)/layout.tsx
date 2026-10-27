@@ -39,11 +39,26 @@ export default async function StudentLayout({ children }: { children: React.Reac
     notifCount = notif ?? 0;
   }
 
-  const navItems: { key: "dashboard" | "requests" | "messages" | "notifications" | "profile"; href: string; label: string; badge?: string }[] = [
+  const navItems: {
+    key: "dashboard" | "requests" | "messages" | "notifications" | "profile";
+    href: string;
+    label: string;
+    badge?: string;
+  }[] = [
     { key: "dashboard", href: "/dashboard", label: "Dashboard" },
-    { key: "requests", href: "/requests", label: "My Requests", badge: requestCount > 0 ? String(requestCount) : undefined },
+    {
+      key: "requests",
+      href: "/requests",
+      label: "My Requests",
+      badge: requestCount > 0 ? String(requestCount) : undefined,
+    },
     { key: "messages", href: "/messages", label: "Messages" },
-    { key: "notifications", href: "/notifications", label: "Notifications", badge: notifCount > 0 ? String(notifCount) : undefined },
+    {
+      key: "notifications",
+      href: "/notifications",
+      label: "Notifications",
+      badge: notifCount > 0 ? String(notifCount) : undefined,
+    },
     { key: "profile", href: "/profile", label: "Profile" },
   ];
   return (
@@ -82,19 +97,29 @@ export default async function StudentLayout({ children }: { children: React.Reac
         roleLabel="Student"
         primary={[
           { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
-          { href: "/requests", label: "Requests", icon: "requests", badge: requestCount > 0 ? requestCount : undefined },
+          {
+            href: "/requests",
+            label: "Requests",
+            icon: "requests",
+            badge: requestCount > 0 ? requestCount : undefined,
+          },
           { href: "/messages", label: "Messages", icon: "messages" },
         ]}
         more={[
-          { href: "/notifications", label: "Notifications", icon: "notifications", badge: notifCount > 0 ? notifCount : undefined },
+          {
+            href: "/notifications",
+            label: "Notifications",
+            icon: "notifications",
+            badge: notifCount > 0 ? notifCount : undefined,
+          },
           { href: "/profile", label: "Profile", icon: "profile" },
           { href: "/requests/new", label: "Request Help", icon: "new_request" },
         ]}
       />
 
       <footer className="py-5 text-center text-xs text-on-surface-variant border-t border-outline-variant bg-surface-container-lowest pb-24 md:pb-5">
-        © {new Date().getFullYear()} Acadivo Academic Network. Students worldwide — connect with your academic
-        integrity office for questions.
+        © {new Date().getFullYear()} Acadivo Academic Network. Students worldwide — connect with
+        your academic integrity office for questions.
       </footer>
     </div>
   );

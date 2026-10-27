@@ -17,9 +17,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div className="flex flex-col gap-1.5">
-        {label && (
-          <label className="text-sm font-medium text-ink">{label}</label>
-        )}
+        {label && <label className="text-sm font-medium text-ink">{label}</label>}
         <div className="relative flex items-center">
           {icon && (
             <span className="absolute left-3.5 text-ink-soft pointer-events-none [&>svg]:w-5 [&>svg]:h-5">
@@ -36,7 +34,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {error && <p className="text-xs text-danger">{error}</p>}
       </div>
     );
-  }
+  },
 );
 Input.displayName = "Input";
 export default Input;

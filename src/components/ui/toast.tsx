@@ -47,7 +47,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       setToasts((prev) => [...prev, { id, message, type }]);
       window.setTimeout(() => dismiss(id), 3800);
     },
-    [dismiss]
+    [dismiss],
   );
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       } else {
         toast(
           firstName ? `Welcome back, ${firstName}!` : "Welcome back!",
-          welcome === "back" ? "info" : "success"
+          welcome === "back" ? "info" : "success",
         );
       }
       const clean = new URL(window.location.href);
@@ -84,7 +84,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             role="status"
           >
             {ICONS[t.type]}
-            <p className="text-sm font-medium text-on-surface flex-1 leading-snug pt-0.5">{t.message}</p>
+            <p className="text-sm font-medium text-on-surface flex-1 leading-snug pt-0.5">
+              {t.message}
+            </p>
             <button
               type="button"
               onClick={() => dismiss(t.id)}

@@ -22,7 +22,12 @@ export function timeLabel(value: string): string {
   if (sameDay) {
     return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   }
-  return d.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  return d.toLocaleString([], {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 export function fileNameFromUrl(url: string): string {
@@ -30,12 +35,42 @@ export function fileNameFromUrl(url: string): string {
 }
 
 const EMOJIS = [
-  "😀", "😂", "😊", "😍", "😎", "🤔",
-  "😅", "😉", "🤗", "😴", "🤯", "🥳",
-  "🙌", "👍", "👏", "🙏", "💪", "🤝",
-  "✨", "🔥", "🎉", "❤️", "💯", "🚀",
-  "✅", "⭐", "🎯", "📚", "📖", "✏️",
-  "📝", "📅", "⏰", "☕", "🧠", "🎓",
+  "😀",
+  "😂",
+  "😊",
+  "😍",
+  "😎",
+  "🤔",
+  "😅",
+  "😉",
+  "🤗",
+  "😴",
+  "🤯",
+  "🥳",
+  "🙌",
+  "👍",
+  "👏",
+  "🙏",
+  "💪",
+  "🤝",
+  "✨",
+  "🔥",
+  "🎉",
+  "❤️",
+  "💯",
+  "🚀",
+  "✅",
+  "⭐",
+  "🎯",
+  "📚",
+  "📖",
+  "✏️",
+  "📝",
+  "📅",
+  "⏰",
+  "☕",
+  "🧠",
+  "🎓",
 ];
 
 export default function ChatPanel({
@@ -43,8 +78,18 @@ export default function ChatPanel({
   fill = false,
   compact = false,
   className = "",
-  messages, draft, setDraft, files, setFiles, sending, error, onSend, bottomRef, currentUserId,
-  filesBucket, counterpartName,
+  messages,
+  draft,
+  setDraft,
+  files,
+  setFiles,
+  sending,
+  error,
+  onSend,
+  bottomRef,
+  currentUserId,
+  filesBucket,
+  counterpartName,
 }: {
   title?: string;
   /** When true the panel fills its parent's height instead of using a viewport clamp. */
@@ -138,9 +183,13 @@ export default function ChatPanel({
           : "h-[clamp(300px,calc(100dvh-320px),480px)] sm:h-[clamp(360px,calc(100dvh-300px),560px)] xl:h-[clamp(400px,calc(100dvh-280px),600px)]"
       } ${className}`}
     >
-      <div className={`flex items-center gap-3 ${compact ? "px-3 py-2" : "px-5 py-3"} border-b border-outline-variant bg-surface-container-low/60`}>
+      <div
+        className={`flex items-center gap-3 ${compact ? "px-3 py-2" : "px-5 py-3"} border-b border-outline-variant bg-surface-container-low/60`}
+      >
         <div className="min-w-0 flex-1">
-          <p className={`${compact ? "text-[13px]" : "text-sm"} font-semibold text-on-surface`}>{title}</p>
+          <p className={`${compact ? "text-sm" : "text-sm"} font-semibold text-on-surface`}>
+            {title}
+          </p>
           <p className="text-xs text-success inline-flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-success inline-block" />
             Live · messages sync instantly
@@ -148,7 +197,10 @@ export default function ChatPanel({
         </div>
       </div>
 
-      <div ref={messageListRef} className={`flex-1 overflow-y-auto ${compact ? "px-3 py-3 space-y-3 pb-4" : "px-5 py-4 space-y-4 pb-6"} bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] overscroll-contain`}>
+      <div
+        ref={messageListRef}
+        className={`flex-1 overflow-y-auto ${compact ? "px-3 py-3 space-y-3 pb-4" : "px-5 py-4 space-y-4 pb-6"} bg-surface overscroll-contain`}
+      >
         {messages.length === 0 && (
           <div className={`text-center ${compact ? "pt-10" : "pt-16"}`}>
             <p className="text-sm text-on-surface-variant">No messages yet — say hello!</p>
@@ -160,14 +212,18 @@ export default function ChatPanel({
             <div key={m.id} className={`flex ${isMine ? "justify-end" : "justify-start"} gap-2`}>
               {!isMine && (
                 <Avatar
-                  name={counterpartName || (m.sender && !Array.isArray(m.sender) ? m.sender.name : null) || "U"}
+                  name={
+                    counterpartName ||
+                    (m.sender && !Array.isArray(m.sender) ? m.sender.name : null) ||
+                    "U"
+                  }
                   size="sm"
                   className="mt-1"
                 />
               )}
               <div className={`max-w-[78%] flex flex-col ${isMine ? "items-end" : "items-start"}`}>
                 <div
-                  className={`${compact ? "px-3 py-1.5 rounded-xl text-[14px]" : "px-3.5 py-2 rounded-2xl text-[15px]"} leading-snug text-left ${
+                  className={`${compact ? "px-3 py-1.5 rounded-xl text-sm" : "px-3.5 py-2 rounded-2xl text-sm"} leading-snug text-left ${
                     isMine
                       ? "bg-primary-container text-on-primary rounded-br-sm"
                       : "bg-surface-container border border-outline-variant text-on-surface rounded-bl-sm"
@@ -189,7 +245,9 @@ export default function ChatPanel({
                     </SecureFileLink>
                   )}
                 </div>
-                <div className={`flex items-center gap-1.5 mt-1 text-xs text-on-surface-variant ${isMine ? "justify-end" : "justify-start"}`}>
+                <div
+                  className={`flex items-center gap-1.5 mt-1 text-xs text-on-surface-variant ${isMine ? "justify-end" : "justify-start"}`}
+                >
                   <span>{timeLabel(m.created_at)}</span>
                   {isMine && (
                     <span className="inline-flex items-center">
@@ -204,11 +262,16 @@ export default function ChatPanel({
         <div ref={bottomRef} />
       </div>
 
-      <div className={`border-t border-outline-variant ${compact ? "px-3 py-2.5" : "px-4 py-3"} bg-surface-container-lowest`}>
+      <div
+        className={`border-t border-outline-variant ${compact ? "px-3 py-2.5" : "px-4 py-3"} bg-surface-container-lowest`}
+      >
         {files.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-2">
             {files.map((f, i) => (
-              <span key={i} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-low text-xs text-on-surface-variant">
+              <span
+                key={i}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-low text-xs text-on-surface-variant"
+              >
                 <FileText size={12} />
                 {f.name}
                 <button
@@ -242,44 +305,46 @@ export default function ChatPanel({
             </div>
           )}
           <div className="flex items-end gap-2">
-          <label className="w-10 h-10 shrink-0 self-end flex items-center justify-center rounded-xl text-on-surface-variant hover:bg-surface-container-low cursor-pointer has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary/40">
-            <Paperclip size={17} />
-            <input
-              type="file"
-              className="sr-only"
-              onChange={(e) => {
-                const f = Array.from(e.target.files ?? []);
-                if (f.length) setFiles([...files, f[0]]);
-              }}
-            />
-          </label>
-          <button
-            onClick={() => setEmojiOpen((o) => !o)}
-            className={`w-10 h-10 shrink-0 self-end flex items-center justify-center rounded-xl transition-colors cursor-pointer ${
-              emojiOpen ? "bg-primary-container text-on-primary" : "text-on-surface-variant hover:bg-surface-container-low"
-            }`}
-            aria-label="Add emoji"
-          >
-            <SmilePlus size={17} />
-          </button>
-          <div className="flex-1 min-w-0 rounded-xl border border-outline-variant bg-white focus-within:border-primary-container focus-within:ring-2 focus-within:ring-primary-container/20 transition-all px-3 py-2">
-            <textarea
-              ref={textareaRef}
-              rows={1}
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Write a message…"
-              className="block w-full resize-none outline-none bg-white text-base leading-6 text-on-surface placeholder:text-outline min-h-6 max-h-32 overflow-y-hidden"
-            />
-          </div>
-          <button
-            onClick={onSend}
-            disabled={sending || (!draft.trim() && files.length === 0)}
-            className="w-10 h-10 shrink-0 self-end rounded-xl bg-primary-container text-on-primary flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-          >
-            {sending ? <Loader2 size={17} className="animate-spin" /> : <Send size={17} />}
-          </button>
+            <label className="w-10 h-10 shrink-0 self-end flex items-center justify-center rounded-xl text-on-surface-variant hover:bg-surface-container-low cursor-pointer has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary/40">
+              <Paperclip size={17} />
+              <input
+                type="file"
+                className="sr-only"
+                onChange={(e) => {
+                  const f = Array.from(e.target.files ?? []);
+                  if (f.length) setFiles([...files, f[0]]);
+                }}
+              />
+            </label>
+            <button
+              onClick={() => setEmojiOpen((o) => !o)}
+              className={`w-10 h-10 shrink-0 self-end flex items-center justify-center rounded-xl transition-colors cursor-pointer ${
+                emojiOpen
+                  ? "bg-primary-container text-on-primary"
+                  : "text-on-surface-variant hover:bg-surface-container-low"
+              }`}
+              aria-label="Add emoji"
+            >
+              <SmilePlus size={17} />
+            </button>
+            <div className="flex-1 min-w-0 rounded-xl border border-outline-variant bg-white focus-within:border-primary-container focus-within:ring-2 focus-within:ring-primary-container/20 transition-all px-3 py-2">
+              <textarea
+                ref={textareaRef}
+                rows={1}
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Write a message…"
+                className="block w-full resize-none outline-none bg-white text-base leading-6 text-on-surface placeholder:text-outline min-h-6 max-h-32 overflow-y-hidden"
+              />
+            </div>
+            <button
+              onClick={onSend}
+              disabled={sending || (!draft.trim() && files.length === 0)}
+              className="w-10 h-10 shrink-0 self-end rounded-xl bg-primary-container text-on-primary flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {sending ? <Loader2 size={17} className="animate-spin" /> : <Send size={17} />}
+            </button>
           </div>
         </div>
       </div>

@@ -21,7 +21,7 @@ const guide: Resource = {
       blocks: [
         {
           t: "p",
-          v: "The first read answers \"what am I building\". The second answers the questions that determine whether it is correct:",
+          v: 'The first read answers "what am I building". The second answers the questions that determine whether it is correct:',
         },
         {
           t: "ul",
@@ -85,7 +85,11 @@ const guide: Resource = {
           head: ["Need", "Consider", "Cost"],
           rows: [
             ["Fast lookup by key", "Dictionary / hash map", "O(1) average"],
-            ["Ordered, unique elements", "Set / sorted collection", "O(1) lookup, O(log n) ordered ops"],
+            [
+              "Ordered, unique elements",
+              "Set / sorted collection",
+              "O(1) lookup, O(log n) ordered ops",
+            ],
             ["Repeated access by index, frequent updates", "List / array", "O(1) index"],
             ["Priority ordering", "Heap / priority queue", "O(log n) per operation"],
             ["Prefix range queries", "Prefix sums, Fenwick tree", "O(1) or O(log n) queries"],

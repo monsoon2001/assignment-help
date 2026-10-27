@@ -16,7 +16,7 @@ export interface ProposalForAccept {
  * and currency are ignored.
  */
 export async function acceptProposal(
-  input: ProposalForAccept
+  input: ProposalForAccept,
 ): Promise<{ orderId: string } | { error: string }> {
   try {
     const res = await fetch("/api/orders/accept", {
@@ -28,9 +28,10 @@ export async function acceptProposal(
       }),
     });
 
-    const data = (await res.json().catch(() => null)) as
-      | { orderId?: string; error?: string }
-      | null;
+    const data = (await res.json().catch(() => null)) as {
+      orderId?: string;
+      error?: string;
+    } | null;
 
     if (!res.ok || !data?.orderId) {
       return { error: data?.error ?? "Could not accept this proposal. Please try again." };
@@ -43,7 +44,7 @@ export async function acceptProposal(
 
 export async function declineProposal(
   proposal_id: string,
-  request_id: string
+  request_id: string,
 ): Promise<{ ok: true } | { error: string }> {
   const supabase = createClient();
 
@@ -73,10 +74,7 @@ export async function declineProposal(
     .eq("status", "pending");
 
   if (!countError && (count ?? 0) === 0) {
-    await supabase
-      .from("requests")
-      .update({ status: "requested" })
-      .eq("id", request_id);
+    await supabase.from("requests").update({ status: "requested" }).eq("id", request_id);
   }
 
   notifyActivity("proposal.declined", proposal_id);

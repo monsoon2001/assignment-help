@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     const { data, error } = await supabase
       .from("orders")
       .select(
-        "id, price, currency, base_amount, base_currency, charge_amount, charge_currency, status, proposal_id, student_id, helper_id"
+        "id, price, currency, base_amount, base_currency, charge_amount, charge_currency, status, proposal_id, student_id, helper_id",
       )
       .eq("id", orderId)
       .single();
@@ -74,16 +74,13 @@ export async function POST(request: Request) {
   }
 
   if (order.status !== "payment_pending") {
-    return NextResponse.json(
-      { error: "This order is not awaiting payment." },
-      { status: 409 }
-    );
+    return NextResponse.json({ error: "This order is not awaiting payment." }, { status: 409 });
   }
 
   if (!order.proposal_id || !order.helper_id) {
     return NextResponse.json(
       { error: "This order is missing proposal or helper details." },
-      { status: 409 }
+      { status: 409 },
     );
   }
 
@@ -95,10 +92,7 @@ export async function POST(request: Request) {
     .eq("status", "paid")
     .maybeSingle();
   if (existingPayment) {
-    return NextResponse.json(
-      { error: "This order has already been paid." },
-      { status: 409 }
-    );
+    return NextResponse.json({ error: "This order has already been paid." }, { status: 409 });
   }
 
   // The accepted proposal is the single authority for the amount.
@@ -115,7 +109,9 @@ export async function POST(request: Request) {
   try {
     const { data, error } = await adminClient
       .from("proposals")
-      .select("id, price, status, expires_at, request_id, helper_id, description, request:requests(title)")
+      .select(
+        "id, price, status, expires_at, request_id, helper_id, description, request:requests(title)",
+      )
       .eq("id", order.proposal_id)
       .single();
     if (error) {
@@ -136,7 +132,7 @@ export async function POST(request: Request) {
   ) {
     return NextResponse.json(
       { error: "This proposal is no longer valid for payment." },
-      { status: 409 }
+      { status: 409 },
     );
   }
 
@@ -144,7 +140,7 @@ export async function POST(request: Request) {
   if (proposal.expires_at && new Date(proposal.expires_at).getTime() < Date.now()) {
     return NextResponse.json(
       { error: "This offer has expired. Please ask the helper for a new quote." },
-      { status: 409 }
+      { status: 409 },
     );
   }
 
@@ -165,7 +161,7 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(
       { error: "This offer has changed since you accepted it. Please review and try again." },
-      { status: 409 }
+      { status: 409 },
     );
   }
 
@@ -191,7 +187,7 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(
       { error: `The amount is below the minimum we can charge in ${chargeCurrency}.` },
-      { status: 409 }
+      { status: 409 },
     );
   }
 
@@ -240,7 +236,7 @@ export async function POST(request: Request) {
     console.error("checkout: stripe session creation failed", err);
     return NextResponse.json(
       { error: "Unable to start checkout. Please try again." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

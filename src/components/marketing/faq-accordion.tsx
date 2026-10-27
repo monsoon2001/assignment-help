@@ -27,7 +27,9 @@ export default function FaqAccordion({
       <div
         key={faq.q}
         className={`bg-surface-container-lowest rounded-xl border transition-all duration-300 ${
-          open ? `${accent.cardHover} shadow-sm` : "border-outline-variant/30 bg-white hover:border-outline-variant/60 hover:shadow-sm"
+          open
+            ? `${accent.cardHover} shadow-sm`
+            : "border-outline-variant/30 bg-white hover:border-outline-variant/60 hover:shadow-sm"
         }`}
       >
         <h3>
@@ -58,9 +60,7 @@ export default function FaqAccordion({
           }`}
         >
           <div className="min-h-0 overflow-hidden">
-            <p className="px-5 pb-5 text-base text-on-surface-variant leading-relaxed">
-              {faq.a}
-            </p>
+            <p className="px-5 pb-5 text-base text-on-surface-variant leading-relaxed">{faq.a}</p>
           </div>
         </div>
       </div>
@@ -81,9 +81,5 @@ export default function FaqAccordion({
     );
   }
 
-  return (
-    <div className="grid gap-3 items-start">
-      {items.map((faq, i) => renderItem(faq, i))}
-    </div>
-  );
+  return <div className="grid gap-3 items-start">{items.map((faq, i) => renderItem(faq, i))}</div>;
 }

@@ -5,8 +5,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import {
-  CalendarDays, ChevronRight, Clock, FileText, Loader2, MessageSquare, RotateCcw, Send, ShieldCheck,
-  Timer, UserRound,
+  CalendarDays,
+  ChevronRight,
+  Clock,
+  FileText,
+  Loader2,
+  MessageSquare,
+  RotateCcw,
+  Send,
+  ShieldCheck,
+  Timer,
+  UserRound,
 } from "lucide-react";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
@@ -14,9 +23,7 @@ import StatusBadge from "@/components/ui/status-badge";
 import Avatar from "@/components/ui/avatar";
 import Input from "@/components/ui/input";
 import Textarea from "@/components/ui/textarea";
-import ChatPanel, {
-  type ChatMessageRow, fileNameFromUrl,
-} from "@/components/chat/chat-panel";
+import ChatPanel, { type ChatMessageRow, fileNameFromUrl } from "@/components/chat/chat-panel";
 import SecureFileLink from "@/components/ui/secure-file-link";
 import ProposalCard, { type RequestProposal } from "@/components/requests/proposal-card";
 import { createClient } from "@/lib/supabase/client";
@@ -118,7 +125,9 @@ export default function RequestWorkspace({
   const loadRequest = useCallback(async () => {
     const { data } = await supabase.current
       .from("requests")
-      .select("id, title, subject, description, deadline, status, file_urls, created_at, sent_at, student_id, helper:users!requests_helper_id_fkey(id, name), student:users!requests_student_id_fkey(id, name)")
+      .select(
+        "id, title, subject, description, deadline, status, file_urls, created_at, sent_at, student_id, helper:users!requests_helper_id_fkey(id, name), student:users!requests_student_id_fkey(id, name)",
+      )
       .eq("id", requestId)
       .maybeSingle();
 
@@ -143,7 +152,9 @@ export default function RequestWorkspace({
   const loadProposal = useCallback(async () => {
     const { data } = await supabase.current
       .from("proposals")
-      .select("id, request_id, helper_id, price, currency, description, revisions_included, expires_at, status, created_at, helper:users(id, name)")
+      .select(
+        "id, request_id, helper_id, price, currency, description, revisions_included, expires_at, status, created_at, helper:users(id, name)",
+      )
       .eq("request_id", requestId)
       .maybeSingle();
 
@@ -190,17 +201,22 @@ export default function RequestWorkspace({
         .channel(realtimeTopic(`request:${requestId}`))
         .on(
           "postgres_changes",
-          { event: "INSERT", schema: "public", table: "messages", filter: `request_id=eq.${requestId}` },
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "messages",
+            filter: `request_id=eq.${requestId}`,
+          },
           async () => {
             await loadMessages();
-          }
+          },
         )
         .on(
           "postgres_changes",
           { event: "UPDATE", schema: "public", table: "requests", filter: `id=eq.${requestId}` },
           async () => {
             await loadRequest();
-          }
+          },
         )
         .subscribe();
     }
@@ -257,20 +273,23 @@ export default function RequestWorkspace({
       <Card className="w-full py-16 text-center">
         <p className="text-on-surface-variant">Request not found.</p>
         <Link href={mode === "helper" ? "/helper/requests" : "/requests"}>
-          <Button className="mt-4" variant="outline">Back to requests</Button>
+          <Button className="mt-4" variant="outline">
+            Back to requests
+          </Button>
         </Link>
       </Card>
     );
   }
 
   const isHelper = mode === "helper";
-  const meta = { label: STATUS_LABEL[request.status] ?? request.status, tone: requestStatusTone(request.status) };
+  const meta = {
+    label: STATUS_LABEL[request.status] ?? request.status,
+    tone: requestStatusTone(request.status),
+  };
   const otherParty = isHelper ? request.student : request.helper;
   // Students only ever see the branded helper identity — never the real
   // name/photo. Helpers still see the actual student they're working with.
-  const otherPartyName = isHelper
-    ? otherParty?.name || "Student"
-    : ACADIVO_HELPER_NAME;
+  const otherPartyName = isHelper ? otherParty?.name || "Student" : ACADIVO_HELPER_NAME;
   const overdue =
     !isHelper && request.status === "requested" && isPastResponseWindow(request.sent_at);
 
@@ -336,9 +355,7 @@ export default function RequestWorkspace({
       <div className="flex items-center gap-3">
         <Avatar name={otherPartyName} role={isHelper ? "student" : "helper"} size="md" online />
         <div className="min-w-0 flex-1">
-          <p className="font-display font-semibold text-sm text-on-surface">
-            {otherPartyName}
-          </p>
+          <p className="font-display font-semibold text-sm text-on-surface">{otherPartyName}</p>
           <p className="text-xs text-on-surface-variant truncate">
             {isHelper ? "Student who requested help" : "Expert assigned to your request"}
           </p>
@@ -346,7 +363,12 @@ export default function RequestWorkspace({
         {request.sent_at && !isHelper && (
           <span className="text-xs text-on-surface-variant shrink-0 inline-flex items-center gap-1">
             <Clock size={12} />
-            {new Date(request.sent_at).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+            {new Date(request.sent_at).toLocaleString([], {
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+            })}
           </span>
         )}
       </div>
@@ -392,12 +414,20 @@ export default function RequestWorkspace({
             <div className="flex items-center gap-4 min-w-0">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2.5 flex-wrap">
-                  <h1 className="min-w-0 max-w-full break-words [overflow-wrap:anywhere] font-display font-bold text-lg text-on-surface line-clamp-2">{title}</h1>
-                  <StatusBadge tone={meta.tone} dot className="shrink-0">{meta.label}</StatusBadge>
+                  <h1 className="min-w-0 max-w-full break-words [overflow-wrap:anywhere] font-display font-bold text-lg text-on-surface line-clamp-2">
+                    {title}
+                  </h1>
+                  <StatusBadge tone={meta.tone} dot className="shrink-0">
+                    {meta.label}
+                  </StatusBadge>
                 </div>
                 <p className="text-xs text-on-surface-variant mt-0.5 flex items-center gap-1.5 flex-wrap">
-                  <span className="min-w-0 break-words [overflow-wrap:anywhere]">#{request.id.slice(0, 8).toUpperCase()} · {request.subject || "General"}</span>
-                  <span className="text-outline-variant" aria-hidden>·</span>
+                  <span className="min-w-0 break-words [overflow-wrap:anywhere]">
+                    #{request.id.slice(0, 8).toUpperCase()} · {request.subject || "General"}
+                  </span>
+                  <span className="text-outline-variant" aria-hidden>
+                    ·
+                  </span>
                   <span className="inline-flex items-center gap-1 whitespace-nowrap">
                     <Timer size={12} />{" "}
                     {request.deadline
@@ -409,7 +439,9 @@ export default function RequestWorkspace({
             </div>
             <div className="flex items-center gap-2 shrink-0">
               {isHelper && request.status === "proposal_sent" && (
-                <StatusBadge tone="blue"><ShieldCheck size={12} /> Proposal Sent</StatusBadge>
+                <StatusBadge tone="blue">
+                  <ShieldCheck size={12} /> Proposal Sent
+                </StatusBadge>
               )}
             </div>
           </section>
@@ -421,10 +453,12 @@ export default function RequestWorkspace({
                   <Clock size={16} />
                 </span>
                 <div>
-                  <p className="font-semibold text-on-surface text-sm">This helper hasn&apos;t responded yet</p>
+                  <p className="font-semibold text-on-surface text-sm">
+                    This helper hasn&apos;t responded yet
+                  </p>
                   <p className="text-xs text-on-surface-variant mt-0.5">
-                    It&apos;s been more than 2 hours since your request was sent. You can keep chatting in the
-                    request thread or contact support if you need help.
+                    It&apos;s been more than 2 hours since your request was sent. You can keep
+                    chatting in the request thread or contact support if you need help.
                   </p>
                 </div>
               </div>
@@ -458,19 +492,30 @@ export default function RequestWorkspace({
           </div>
 
           <div className="min-h-0 lg:flex-1 lg:overflow-y-auto">
-            <div className={`${view === "details" ? "flex" : "hidden lg:flex"} flex-col gap-1.5 lg:h-full`}>
+            <div
+              className={`${view === "details" ? "flex" : "hidden lg:flex"} flex-col gap-1.5 lg:h-full`}
+            >
               <Card className="p-2.5">
-                <h2 className="font-display font-semibold text-on-surface text-xs uppercase tracking-wide mb-1">Request details</h2>
+                <h2 className="font-display font-semibold text-on-surface text-xs uppercase tracking-wide mb-1">
+                  Request details
+                </h2>
                 {request.description ? (
-                  <p className="break-words [overflow-wrap:anywhere] text-xs text-on-surface-variant leading-snug whitespace-pre-line">{request.description}</p>
+                  <p className="break-words [overflow-wrap:anywhere] text-xs text-on-surface-variant leading-snug whitespace-pre-line">
+                    {request.description}
+                  </p>
                 ) : (
-                  <p className="text-xs text-on-surface-variant">No additional details were provided.</p>
+                  <p className="text-xs text-on-surface-variant">
+                    No additional details were provided.
+                  </p>
                 )}
                 <div className="flex flex-wrap items-center gap-2.5 mt-1.5 text-xs">
                   <span className="inline-flex items-center gap-1 text-on-surface-variant">
                     <CalendarDays size={12} />{" "}
                     {request.deadline
-                      ? new Date(request.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                      ? new Date(request.deadline).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })
                       : "Flexible"}
                   </span>
                   <span className="inline-flex items-center gap-1 text-on-surface-variant">
@@ -502,7 +547,9 @@ export default function RequestWorkspace({
 
               {isHelper && !proposal && (
                 <Card className="p-3.5">
-                  <h2 className="font-display font-semibold text-on-surface text-sm mb-1">Send a proposal</h2>
+                  <h2 className="font-display font-semibold text-on-surface text-sm mb-1">
+                    Send a proposal
+                  </h2>
                   <p className="text-xs text-on-surface-variant mb-3">
                     Price this request in the chat — the student reviews and accepts from here.
                   </p>
@@ -542,7 +589,8 @@ export default function RequestWorkspace({
                   <div className="mt-3 flex items-start gap-2 p-2.5 rounded-lg bg-surface-container-low border border-outline-variant">
                     <RotateCcw size={14} className="text-primary shrink-0 mt-0.5" />
                     <p className="text-xs leading-relaxed text-on-surface-variant">
-                      Unlimited revisions until the student is satisfied with the delivered work — no extra cost.
+                      Unlimited revisions until the student is satisfied with the delivered work —
+                      no extra cost.
                     </p>
                   </div>
                   <div className="mt-3">
@@ -560,7 +608,11 @@ export default function RequestWorkspace({
                     onClick={handleSendBid}
                     className="w-full justify-center mt-3"
                   >
-                    {sendingBid ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                    {sendingBid ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      <Send size={16} />
+                    )}
                     {sendingBid ? "Sending..." : "Send Proposal"}
                   </Button>
                 </Card>

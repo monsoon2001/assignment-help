@@ -61,7 +61,11 @@ export async function updateUser(_prev: ActionResult, formData: FormData): Promi
   if (error) return { ok: false, message: error.message };
 
   await logAdminAction(adminId, "user_update", userId, {
-    from: { name: before?.name ?? null, role: before?.role ?? null, status: before?.status ?? null },
+    from: {
+      name: before?.name ?? null,
+      role: before?.role ?? null,
+      status: before?.status ?? null,
+    },
     to: { name: name || null, role, status },
   });
 
@@ -110,7 +114,10 @@ export async function setActiveHelper(formData: FormData): Promise<void> {
   revalidatePath("/admin/helpers");
 }
 
-export async function requestRefund(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+export async function requestRefund(
+  _prev: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
   const adminId = await requireAdmin();
   const paymentId = clean(formData.get("paymentId"));
   if (!paymentId) return { ok: false, message: "Missing payment." };
@@ -130,7 +137,7 @@ export async function requestRefund(_prev: ActionResult, formData: FormData): Pr
     await stripe.refunds.create(
       { payment_intent: payment.stripe_payment_intent_id },
       // Idempotency: a retried request or replayed form submit can't double-refund.
-      { idempotencyKey: `refund-${paymentId}` }
+      { idempotencyKey: `refund-${paymentId}` },
     );
   } catch (err) {
     return { ok: false, message: err instanceof Error ? err.message : "Stripe refund failed." };

@@ -81,8 +81,12 @@ export default function ResourceBrowser() {
 
       {results.length === 0 ? (
         <div className="text-center py-16 bg-surface-container-lowest rounded-2xl border border-outline-variant/30">
-          <p className="font-display text-lg font-bold text-on-surface mb-2">No guides match that search</p>
-          <p className="text-on-surface-variant mb-6">Try a different keyword, or clear the filters.</p>
+          <p className="font-display text-lg font-bold text-on-surface mb-2">
+            No guides match that search
+          </p>
+          <p className="text-on-surface-variant mb-6">
+            Try a different keyword, or clear the filters.
+          </p>
           <Button
             type="button"
             onClick={() => {
@@ -105,20 +109,28 @@ export default function ResourceBrowser() {
                 className={`group flex min-h-64 flex-col rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${accent.cardHover}`}
               >
                 {category && (
-                  <span className={`mb-4 self-start rounded-full px-3 py-1 text-xs font-semibold ${accent.tile} ${accent.text}`}>
+                  <span
+                    className={`mb-4 self-start rounded-full px-3 py-1 text-xs font-semibold ${accent.tile} ${accent.text}`}
+                  >
                     {category.name}
                   </span>
                 )}
-                <h3 className={`mb-2 font-display font-bold leading-snug transition-colors ${accent.text}`}>
+                <h3
+                  className={`mb-2 font-display font-bold leading-snug transition-colors ${accent.text}`}
+                >
                   {guide.title}
                 </h3>
-                <p className="mb-4 flex-1 text-base leading-relaxed text-on-surface-variant line-clamp-3">{guide.description}</p>
+                <p className="mb-4 flex-1 text-base leading-relaxed text-on-surface-variant line-clamp-3">
+                  {guide.description}
+                </p>
                 <div className="mt-auto flex items-center justify-between">
                   <span className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant">
                     <Clock className="w-3.5 h-3.5" />
                     {guide.readingMinutes} min read
                   </span>
-                  <span className={`inline-flex items-center gap-1 text-sm font-semibold ${accent.text}`}>
+                  <span
+                    className={`inline-flex items-center gap-1 text-sm font-semibold ${accent.text}`}
+                  >
                     Read Guide <ArrowRight size={14} className="inline-block -mt-0.5" />
                   </span>
                 </div>

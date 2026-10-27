@@ -14,7 +14,7 @@ import { CHARGE_CURRENCIES, currencyDecimals, DEFAULT_CURRENCY } from "@/lib/cur
 const FOREIGN_CURRENCIES = CHARGE_CURRENCIES.filter((c) => c !== "CAD");
 
 const RATES_URL = `https://api.frankfurter.dev/v1/latest?base=CAD&symbols=${FOREIGN_CURRENCIES.join(
-  ","
+  ",",
 )}`;
 
 const DAY_SECONDS = 60 * 60 * 24;
@@ -73,11 +73,7 @@ export function roundMoney(amount: number, currency: string): number {
  * Convert an amount between currencies using the CAD-based rate. Returns null
  * when a rate is unavailable so callers can fall back to charging CAD.
  */
-export async function convert(
-  amount: number,
-  from: string,
-  to: string
-): Promise<number | null> {
+export async function convert(amount: number, from: string, to: string): Promise<number | null> {
   const rate = await rateBetween(from, to);
   if (rate === null) return null;
   return amount * rate;

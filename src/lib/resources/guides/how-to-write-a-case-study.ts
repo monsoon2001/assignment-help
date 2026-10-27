@@ -25,7 +25,7 @@ const guide: Resource = {
         },
         {
           t: "p",
-          v: "Be clear which one you are doing. \"Illustrate a process\" and \"test a theory\" call for different structures and different evidence.",
+          v: 'Be clear which one you are doing. "Illustrate a process" and "test a theory" call for different structures and different evidence.',
         },
       ],
     },
@@ -116,13 +116,15 @@ const guide: Resource = {
         {
           t: "example",
           label: "Description",
-          v: ["\"In March the team introduced a new triage system. By June waiting times had fallen from 14 to 9 minutes.\""],
+          v: [
+            '"In March the team introduced a new triage system. By June waiting times had fallen from 14 to 9 minutes."',
+          ],
         },
         {
           t: "example",
           label: "Analysis",
           v: [
-            "\"Waiting times fell by 36% after triage was introduced, but the change did not come from the triage rules themselves. Staff interviews indicate the improvement largely reflects a backlog cleared in the first month; post-June data shows times plateauing at 9 minutes. The system changed who was prioritised, not how quickly anyone was seen — which is why satisfaction rose while throughput gains stalled.\"",
+            '"Waiting times fell by 36% after triage was introduced, but the change did not come from the triage rules themselves. Staff interviews indicate the improvement largely reflects a backlog cleared in the first month; post-June data shows times plateauing at 9 minutes. The system changed who was prioritised, not how quickly anyone was seen — which is why satisfaction rose while throughput gains stalled."',
           ],
         },
         {

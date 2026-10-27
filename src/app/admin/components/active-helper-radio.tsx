@@ -30,9 +30,7 @@ export default function ActiveHelperRadio({
         />
         <span
           className={
-            active
-              ? "text-sm font-semibold text-primary"
-              : "text-sm text-on-surface-variant"
+            active ? "text-sm font-semibold text-primary" : "text-sm text-on-surface-variant"
           }
         >
           {active ? "Main helper" : "Make main"}

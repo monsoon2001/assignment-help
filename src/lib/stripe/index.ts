@@ -3,7 +3,7 @@ import Stripe from "stripe";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error(
-    "Missing STRIPE_SECRET_KEY. Set it to your Stripe test-mode secret key in .env.local."
+    "Missing STRIPE_SECRET_KEY. Set it to your Stripe test-mode secret key in .env.local.",
   );
 }
 

@@ -13,10 +13,7 @@ function clean(value: FormDataEntryValue | null): string {
   return String(value ?? "").trim();
 }
 
-export async function recordPayout(
-  _prev: PayoutResult,
-  formData: FormData
-): Promise<PayoutResult> {
+export async function recordPayout(_prev: PayoutResult, formData: FormData): Promise<PayoutResult> {
   const adminId = await requireAdmin();
 
   const helperId = clean(formData.get("helperId"));

@@ -16,11 +16,7 @@ export async function requireAdmin(): Promise<string> {
     redirect("/sign-in");
   }
 
-  const { data } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
+  const { data } = await supabase.from("users").select("role").eq("id", user.id).maybeSingle();
 
   if (data?.role !== "admin") {
     redirect("/dashboard");

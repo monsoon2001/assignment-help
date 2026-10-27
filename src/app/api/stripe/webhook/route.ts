@@ -43,11 +43,7 @@ export async function POST(request: Request) {
   try {
     // Signature is verified against the RAW body.
     const payload = await request.text();
-    event = stripe.webhooks.constructEvent(
-      payload,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
+    event = stripe.webhooks.constructEvent(payload, signature, process.env.STRIPE_WEBHOOK_SECRET!);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Invalid signature";
     return NextResponse.json({ error: message }, { status: 400 });
@@ -74,10 +70,7 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error("webhook: handler failure", err);
     // Release the event so Stripe's retry can process it again.
-    await adminClient
-      .from("processed_stripe_events")
-      .delete()
-      .eq("event_id", event.id);
+    await adminClient.from("processed_stripe_events").delete().eq("event_id", event.id);
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 
@@ -129,11 +122,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     balanceTransactionId = info.balanceTransactionId;
   }
 
-  const chargeCurrency = normalizeCurrency(
-    orderRow?.charge_currency ?? session.currency ?? "cad"
-  );
+  const chargeCurrency = normalizeCurrency(orderRow?.charge_currency ?? session.currency ?? "cad");
   const chargeAmount = round2(
-    Number(orderRow?.charge_amount ?? (Number(session.amount_total ?? 0) / 100))
+    Number(orderRow?.charge_amount ?? Number(session.amount_total ?? 0) / 100),
   );
 
   // Convert the real charge to the internal CAD ledger.
@@ -146,7 +137,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       ? chargeAmount
       : chargeToCadRate === null
         ? 0
-        : chargeAmount * chargeToCadRate
+        : chargeAmount * chargeToCadRate,
   );
 
   // What the platform pays the helper's base quote would be in CAD; the
@@ -182,11 +173,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       stripe_payment_intent_id: intentId,
       stripe_balance_transaction_id: balanceTransactionId,
       receipt_url: receiptUrl,
-      customer_email:
-        typeof session.customer_email === "string" ? session.customer_email : null,
+      customer_email: typeof session.customer_email === "string" ? session.customer_email : null,
       status: "paid",
     },
-    { onConflict: "stripe_payment_intent_id", ignoreDuplicates: true }
+    { onConflict: "stripe_payment_intent_id", ignoreDuplicates: true },
   );
 
   if (paymentError) {
@@ -228,7 +218,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       emailLinkLabel: "Open the order",
       audience: ["student", "helper", "admin"],
       inAppRoles: ["admin"],
-    }))
+    })),
   );
 }
 
@@ -379,7 +369,7 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
         emailLinkLabel: "View the order",
         audience: ["student", "helper", "admin"],
         inAppRoles: ["student", "helper", "admin"],
-      }))
+      })),
     );
   }
 }
@@ -410,10 +400,7 @@ async function handleDisputeCreated(dispute: Stripe.Dispute) {
   }
 
   if (payment.order_id) {
-    await adminClient
-      .from("orders")
-      .update({ status: "disputed" })
-      .eq("id", payment.order_id);
+    await adminClient.from("orders").update({ status: "disputed" }).eq("id", payment.order_id);
 
     after(() =>
       notifyOrderActivity(payment.order_id!, () => ({
@@ -426,7 +413,7 @@ async function handleDisputeCreated(dispute: Stripe.Dispute) {
         emailLinkLabel: "View the order",
         audience: ["student", "helper", "admin"],
         inAppRoles: ["student", "helper", "admin"],
-      }))
+      })),
     );
   }
 }

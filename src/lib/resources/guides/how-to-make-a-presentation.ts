@@ -21,7 +21,7 @@ const guide: Resource = {
       blocks: [
         {
           t: "p",
-          v: "Before opening any software, write one sentence: \"When they leave, my audience will understand that ___\". If you cannot write that sentence, you are not ready to design slides.",
+          v: 'Before opening any software, write one sentence: "When they leave, my audience will understand that ___". If you cannot write that sentence, you are not ready to design slides.',
         },
         {
           t: "ol",
@@ -63,7 +63,7 @@ const guide: Resource = {
         {
           t: "ul",
           v: [
-            "Put a full sentence as your slide title. \"Results\" tells the audience nothing; \"Falling wait times followed triage\" does.",
+            'Put a full sentence as your slide title. "Results" tells the audience nothing; "Falling wait times followed triage" does.',
             "Six lines of text maximum. If a slide is dense, split it or move the detail to a handout.",
             "Use one visual that carries the point — a chart, diagram, or image. Not decoration.",
             "Charts need units, axis labels, and a takeaway caption.",
@@ -86,7 +86,7 @@ const guide: Resource = {
           v: [
             "Talk to the audience, not the screen. If you must read, read the slide — do not read your notes.",
             "Slow down. Most presenters speak roughly 30% faster under nerves.",
-            "Signpost: \"I'll cover three things...\" gives the audience a map.",
+            'Signpost: "I\'ll cover three things..." gives the audience a map.',
             "Pause after a key statement instead of rushing past it.",
             "Handle nerves physically: slow exhale, feet on the floor, arrive early.",
             "Rehearse aloud and time it. Rehearsing silently is much less accurate.",

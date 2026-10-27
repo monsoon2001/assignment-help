@@ -22,22 +22,37 @@ export const metadata: Metadata = {
 
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
-export default async function AdminRequestDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function AdminRequestDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   await requireAdmin();
   const { id } = await params;
 
   const { data: request } = await adminClient
     .from("requests")
-    .select("id, title, description, subject, deadline, status, file_urls, created_at, student:users!requests_student_id_fkey(id, name, email, avatar_url), proposals:proposals(id, price, currency, description, revisions_included, status, created_at, helper:users(id, name, avatar_url))")
+    .select(
+      "id, title, description, subject, deadline, status, file_urls, created_at, student:users!requests_student_id_fkey(id, name, email, avatar_url), proposals:proposals(id, price, currency, description, revisions_included, status, created_at, helper:users(id, name, avatar_url))",
+    )
     .eq("id", id)
     .maybeSingle();
 
   if (!request) notFound();
 
-  const student = unwrapRow<{ id: string; name: string | null; email: string | null; avatar_url: string | null }>(request.student);
+  const student = unwrapRow<{
+    id: string;
+    name: string | null;
+    email: string | null;
+    avatar_url: string | null;
+  }>(request.student);
   const proposals = (request.proposals as unknown as ProposalRow[]) ?? [];
 
   const attachedFiles = (request.file_urls as string[] | undefined) ?? [];
@@ -46,7 +61,7 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
       stored,
       label: fileNameFromStoredUrl(stored),
       url: await createSignedFileUrl(stored, "request-files"),
-    }))
+    })),
   );
 
   type ProposalRow = {
@@ -63,15 +78,26 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <div>
-        <Link href="/admin/requests" className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline mb-3">
+        <Link
+          href="/admin/requests"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline mb-3"
+        >
           <ArrowLeft size={14} /> Back to requests
         </Link>
         <h1 className="font-display text-2xl font-bold text-on-surface">{request.title}</h1>
         <div className="flex flex-wrap items-center gap-2 mt-2">
           <Badge variant="outline">{request.subject ?? "General"}</Badge>
-          <StatusBadge tone={requestStatusTone(request.status)}>{request.status.replaceAll("_", " ")}</StatusBadge>
-          <span className="text-sm text-on-surface-variant">Posted {formatDate(request.created_at)}</span>
-          {request.deadline && <span className="text-sm text-on-surface-variant">· Deadline {formatDate(request.deadline)}</span>}
+          <StatusBadge tone={requestStatusTone(request.status)}>
+            {request.status.replaceAll("_", " ")}
+          </StatusBadge>
+          <span className="text-sm text-on-surface-variant">
+            Posted {formatDate(request.created_at)}
+          </span>
+          {request.deadline && (
+            <span className="text-sm text-on-surface-variant">
+              · Deadline {formatDate(request.deadline)}
+            </span>
+          )}
         </div>
       </div>
 
@@ -89,7 +115,12 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
                 {signedAttachments.map((a) => (
                   <li key={a.stored}>
                     {a.url ? (
-                      <a href={a.url} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline break-all">
+                      <a
+                        href={a.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm text-primary hover:underline break-all"
+                      >
                         {a.label}
                       </a>
                     ) : (
@@ -105,7 +136,11 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
         <Card className="p-6 h-fit">
           <h2 className="font-display text-lg font-semibold text-on-surface mb-4">Student</h2>
           <div className="flex items-center gap-3">
-            <Avatar name={student?.name ?? "Student"} src={student?.avatar_url ?? undefined} size="md" />
+            <Avatar
+              name={student?.name ?? "Student"}
+              src={student?.avatar_url ?? undefined}
+              size="md"
+            />
             <div>
               <p className="text-sm font-medium text-on-surface">{student?.name ?? "Unnamed"}</p>
               <p className="text-xs text-on-surface-variant">{student?.email}</p>
@@ -125,25 +160,45 @@ export default async function AdminRequestDetailPage({ params }: { params: Promi
           <div className="divide-y divide-outline-variant/20">
             {proposals.map((raw) => {
               const { helper: helperRaw, ...proposal } = raw;
-              const helper = unwrapRow<{ name: string | null; avatar_url: string | null }>(helperRaw);
+              const helper = unwrapRow<{ name: string | null; avatar_url: string | null }>(
+                helperRaw,
+              );
               return (
-              <div key={proposal.id} className="p-6 flex flex-col sm:flex-row sm:items-start gap-4">
-                  <Avatar name={helper?.name ?? "Helper"} src={helper?.avatar_url ?? undefined} role="helper" size="md" />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-on-surface">{helper?.name ?? "Helper"}</p>
-                    <StatusBadge tone={proposalStatusTone(proposal.status)}>{proposal.status}</StatusBadge>
+                <div
+                  key={proposal.id}
+                  className="p-6 flex flex-col sm:flex-row sm:items-start gap-4"
+                >
+                  <Avatar
+                    name={helper?.name ?? "Helper"}
+                    src={helper?.avatar_url ?? undefined}
+                    role="helper"
+                    size="md"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-semibold text-on-surface">
+                        {helper?.name ?? "Helper"}
+                      </p>
+                      <StatusBadge tone={proposalStatusTone(proposal.status)}>
+                        {proposal.status}
+                      </StatusBadge>
+                    </div>
+                    <p className="text-sm text-on-surface-variant mt-1">
+                      {proposal.description || "No description."}
+                    </p>
+                    <p className="text-xs text-on-surface-variant mt-2">
+                      Unlimited revisions until the student is satisfied
+                    </p>
                   </div>
-                  <p className="text-sm text-on-surface-variant mt-1">{proposal.description || "No description."}</p>
-                  <p className="text-xs text-on-surface-variant mt-2">
-                    Unlimited revisions until the student is satisfied
-                  </p>
+                  <div className="text-right shrink-0">
+                    <p className="text-lg font-bold text-on-surface">
+                      {formatCurrency(Number(proposal.price), normalizeCurrency(proposal.currency))}
+                    </p>
+                    <p className="text-xs text-on-surface-variant">
+                      {formatDate(proposal.created_at)}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="text-lg font-bold text-on-surface">{formatCurrency(Number(proposal.price), normalizeCurrency(proposal.currency))}</p>
-                  <p className="text-xs text-on-surface-variant">{formatDate(proposal.created_at)}</p>
-                </div>
-              </div>
               );
             })}
           </div>

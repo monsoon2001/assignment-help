@@ -216,7 +216,9 @@ function hashKey(key: string) {
 }
 
 function accentAt(index: number) {
-  return ACCENTS[ACCENT_KEYS[((index % ACCENT_KEYS.length) + ACCENT_KEYS.length) % ACCENT_KEYS.length]];
+  return ACCENTS[
+    ACCENT_KEYS[((index % ACCENT_KEYS.length) + ACCENT_KEYS.length) % ACCENT_KEYS.length]
+  ];
 }
 
 export function accentForIndex(index: number) {
@@ -224,10 +226,16 @@ export function accentForIndex(index: number) {
 }
 
 // Distinct hues so the four "how it works" steps never blend together.
-const STEP_ACCENT_KEYS = ["indigo", "orange", "green", "purple"] as const satisfies readonly AccentKey[];
+const STEP_ACCENT_KEYS = [
+  "indigo",
+  "orange",
+  "green",
+  "purple",
+] as const satisfies readonly AccentKey[];
 
 export function accentForStep(index: number): AccentStyle {
-  const safe = ((index % STEP_ACCENT_KEYS.length) + STEP_ACCENT_KEYS.length) % STEP_ACCENT_KEYS.length;
+  const safe =
+    ((index % STEP_ACCENT_KEYS.length) + STEP_ACCENT_KEYS.length) % STEP_ACCENT_KEYS.length;
   return ACCENTS[STEP_ACCENT_KEYS[safe]];
 }
 

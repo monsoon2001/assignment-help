@@ -46,13 +46,13 @@ async function loadUsers(ids: (string | null | undefined)[]): Promise<Map<string
   if (unique.length === 0) return new Map();
   const { data } = await adminClient.from("users").select("id, email, name").in("id", unique);
   return new Map(
-    (data ?? []).map((u) => [u.id, { id: u.id, email: u.email, name: u.name } as Party])
+    (data ?? []).map((u) => [u.id, { id: u.id, email: u.email, name: u.name } as Party]),
   );
 }
 
 async function loadAdmins(): Promise<Party[]> {
   const { data } = await adminClient.from("users").select("id, email, name").eq("role", "admin");
-  return (data ?? []).map((u) => ({ id: u.id, email: u.email, name: u.name } as Party));
+  return (data ?? []).map((u) => ({ id: u.id, email: u.email, name: u.name }) as Party);
 }
 
 function greeting(party: Party): string {
@@ -62,7 +62,7 @@ function greeting(party: Party): string {
 
 async function notifyParties(
   parties: { party: Party; role: PartyRole }[],
-  notice: ActivityNotice
+  notice: ActivityNotice,
 ): Promise<void> {
   const inAppRoles = new Set(notice.inAppRoles ?? []);
   const audience = new Set(notice.audience);
@@ -70,10 +70,7 @@ async function notifyParties(
   const tasks = parties.map(async ({ party, role }) => {
     if (!audience.has(role)) return;
 
-    if (
-      inAppRoles.has(role) &&
-      party.id !== notice.actorId
-    ) {
+    if (inAppRoles.has(role) && party.id !== notice.actorId) {
       const { error } = await adminClient.from("notifications").insert({
         user_id: party.id,
         type: notice.type,
@@ -98,7 +95,7 @@ async function notifyParties(
 }
 
 async function loadRequestParties(
-  requestId: string
+  requestId: string,
 ): Promise<{ student: Party | null; helper: Party | null; title: string } | null> {
   const { data } = await adminClient
     .from("requests")
@@ -109,13 +106,13 @@ async function loadRequestParties(
   const users = await loadUsers([data.student_id, data.helper_id]);
   return {
     title: data.title,
-    student: data.student_id ? users.get(data.student_id) ?? null : null,
-    helper: data.helper_id ? users.get(data.helper_id) ?? null : null,
+    student: data.student_id ? (users.get(data.student_id) ?? null) : null,
+    helper: data.helper_id ? (users.get(data.helper_id) ?? null) : null,
   };
 }
 
 async function loadOrderParties(
-  orderId: string
+  orderId: string,
 ): Promise<{ student: Party | null; helper: Party | null; title: string } | null> {
   const { data } = await adminClient
     .from("orders")
@@ -127,15 +124,15 @@ async function loadOrderParties(
   const request = Array.isArray(data.request) ? data.request[0] : data.request;
   return {
     title: (request as { title?: string } | null)?.title ?? "your order",
-    student: data.student_id ? users.get(data.student_id) ?? null : null,
-    helper: data.helper_id ? users.get(data.helper_id) ?? null : null,
+    student: data.student_id ? (users.get(data.student_id) ?? null) : null,
+    helper: data.helper_id ? (users.get(data.helper_id) ?? null) : null,
   };
 }
 
 /** Notify the student + helper + all admins about a request-level activity. */
 export async function notifyRequestActivity(
   requestId: string,
-  build: (ctx: { title: string }) => ActivityNotice
+  build: (ctx: { title: string }) => ActivityNotice,
 ): Promise<void> {
   try {
     const ctx = await loadRequestParties(requestId);
@@ -155,7 +152,7 @@ export async function notifyRequestActivity(
 /** Notify the student + helper + all admins about an order-level activity. */
 export async function notifyOrderActivity(
   orderId: string,
-  build: (ctx: { title: string }) => ActivityNotice
+  build: (ctx: { title: string }) => ActivityNotice,
 ): Promise<void> {
   try {
     const ctx = await loadOrderParties(orderId);

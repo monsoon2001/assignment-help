@@ -38,7 +38,7 @@ export default function AdminMessages({ helpers }: { helpers: HelperLite[] }) {
   const [me, setMe] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const meRef = useRef<string | null>(null);
-const selectedIdRef = useRef<string | null>(null);
+  const selectedIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     meRef.current = me;
@@ -83,25 +83,23 @@ const selectedIdRef = useRef<string | null>(null);
           if (msg.sender_id !== userId) {
             setUnread((u) => ({ ...u, [msg.sender_id]: (u[msg.sender_id] ?? 0) + 1 }));
           }
-        }
+        },
       )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "call_logs" },
-        () => {
-          const openId = selectedIdRef.current;
-          const userId = meRef.current;
-          if (!openId || !userId) return;
-          void (async () => {
-            const { data } = await supabase
-              .from("call_logs")
-              .select("id, caller_id, callee_id, direction, status, started_at, duration_seconds")
-              .or(`and(caller_id.eq.${userId},callee_id.eq.${openId}),and(caller_id.eq.${openId},callee_id.eq.${userId})`)
-              .order("started_at", { ascending: true });
-            setLogs((data ?? []) as CallLog[]);
-          })();
-        }
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "call_logs" }, () => {
+        const openId = selectedIdRef.current;
+        const userId = meRef.current;
+        if (!openId || !userId) return;
+        void (async () => {
+          const { data } = await supabase
+            .from("call_logs")
+            .select("id, caller_id, callee_id, direction, status, started_at, duration_seconds")
+            .or(
+              `and(caller_id.eq.${userId},callee_id.eq.${openId}),and(caller_id.eq.${openId},callee_id.eq.${userId})`,
+            )
+            .order("started_at", { ascending: true });
+          setLogs((data ?? []) as CallLog[]);
+        })();
+      })
       .subscribe();
 
     return () => {
@@ -109,36 +107,45 @@ const selectedIdRef = useRef<string | null>(null);
     };
   }, []);
 
-  const openThread = useCallback(async (helperId: string) => {
-    forceScrollRef.current = true;
-    setSelectedId(helperId);
-    setUnread((u) => ({ ...u, [helperId]: 0 }));
-    if (!supabaseRef.current || !me) return;
-    const { data } = await supabaseRef.current
-      .from("admin_messages")
-      .select("id, sender_id, recipient_id, body, created_at")
-      .or(`sender_id.eq.${me},sender_id.eq.${helperId}`)
-      .or(`recipient_id.eq.${me},recipient_id.eq.${helperId}`)
-      .order("created_at", { ascending: true });
-    // Combined filter would be ideal; fall back to fetching both directions.
-    const { data: otherSide } = await supabaseRef.current
-      .from("admin_messages")
-      .select("id, sender_id, recipient_id, body, created_at")
-      .or(`sender_id.eq.${helperId},recipient_id.eq.${helperId}`)
-      .order("created_at", { ascending: true });
-    setMessages(
-      (data ?? [])
-        .concat(otherSide ?? [])
-        .filter((m: AdminMessage) => (m.sender_id === me || m.recipient_id === me) && (m.sender_id === helperId || m.recipient_id === helperId))
-        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-    );
-    const { data: logRows } = await supabaseRef.current
-      .from("call_logs")
-      .select("id, caller_id, callee_id, direction, status, started_at, duration_seconds")
-      .or(`and(caller_id.eq.${me},callee_id.eq.${helperId}),and(caller_id.eq.${helperId},callee_id.eq.${me})`)
-      .order("started_at", { ascending: true });
-    setLogs((logRows ?? []) as CallLog[]);
-  }, [me]);
+  const openThread = useCallback(
+    async (helperId: string) => {
+      forceScrollRef.current = true;
+      setSelectedId(helperId);
+      setUnread((u) => ({ ...u, [helperId]: 0 }));
+      if (!supabaseRef.current || !me) return;
+      const { data } = await supabaseRef.current
+        .from("admin_messages")
+        .select("id, sender_id, recipient_id, body, created_at")
+        .or(`sender_id.eq.${me},sender_id.eq.${helperId}`)
+        .or(`recipient_id.eq.${me},recipient_id.eq.${helperId}`)
+        .order("created_at", { ascending: true });
+      // Combined filter would be ideal; fall back to fetching both directions.
+      const { data: otherSide } = await supabaseRef.current
+        .from("admin_messages")
+        .select("id, sender_id, recipient_id, body, created_at")
+        .or(`sender_id.eq.${helperId},recipient_id.eq.${helperId}`)
+        .order("created_at", { ascending: true });
+      setMessages(
+        (data ?? [])
+          .concat(otherSide ?? [])
+          .filter(
+            (m: AdminMessage) =>
+              (m.sender_id === me || m.recipient_id === me) &&
+              (m.sender_id === helperId || m.recipient_id === helperId),
+          )
+          .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
+      );
+      const { data: logRows } = await supabaseRef.current
+        .from("call_logs")
+        .select("id, caller_id, callee_id, direction, status, started_at, duration_seconds")
+        .or(
+          `and(caller_id.eq.${me},callee_id.eq.${helperId}),and(caller_id.eq.${helperId},callee_id.eq.${me})`,
+        )
+        .order("started_at", { ascending: true });
+      setLogs((logRows ?? []) as CallLog[]);
+    },
+    [me],
+  );
 
   useEffect(() => {
     const el = cardScrollRef.current;
@@ -164,7 +171,7 @@ const selectedIdRef = useRef<string | null>(null);
     setSending(false);
   }
 
-  const selected = !selectedId ? null : helpers.find((h) => h.id === selectedId) ?? null;
+  const selected = !selectedId ? null : (helpers.find((h) => h.id === selectedId) ?? null);
   const { startCall, phase } = useVoiceCall();
   const callBusy = phase !== "idle";
 
@@ -196,12 +203,21 @@ const selectedIdRef = useRef<string | null>(null);
               key={helper.id}
               onClick={() => openThread(helper.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 text-left cursor-pointer transition-colors ${
-                selectedId === helper.id ? "bg-primary-container/20" : "hover:bg-surface-container-low"
+                selectedId === helper.id
+                  ? "bg-primary-container/20"
+                  : "hover:bg-surface-container-low"
               }`}
             >
-              <Avatar name={helper.name ?? "Helper"} src={helper.avatar_url ?? undefined} role="helper" size="sm" />
+              <Avatar
+                name={helper.name ?? "Helper"}
+                src={helper.avatar_url ?? undefined}
+                role="helper"
+                size="sm"
+              />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-on-surface truncate">{helper.name ?? "Helper"}</p>
+                <p className="text-sm font-medium text-on-surface truncate">
+                  {helper.name ?? "Helper"}
+                </p>
                 <p className="text-xs text-on-surface-variant truncate">{helper.email}</p>
               </div>
               {unread[helper.id] ? <Badge variant="primary">{unread[helper.id]}</Badge> : null}
@@ -214,7 +230,12 @@ const selectedIdRef = useRef<string | null>(null);
         {selected ? (
           <>
             <div className="p-4 border-b border-outline-variant/30 flex items-center gap-3 shrink-0">
-              <Avatar name={selected.name ?? "Helper"} src={selected.avatar_url ?? undefined} role="helper" size="md" />
+              <Avatar
+                name={selected.name ?? "Helper"}
+                src={selected.avatar_url ?? undefined}
+                role="helper"
+                size="md"
+              />
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-on-surface">{selected.name ?? "Helper"}</p>
                 <p className="text-xs text-on-surface-variant truncate">{selected.email}</p>
@@ -224,7 +245,11 @@ const selectedIdRef = useRef<string | null>(null);
                 size="sm"
                 disabled={callBusy}
                 onClick={() =>
-                  startCall({ id: selected.id, name: selected.name ?? "Helper", avatarUrl: selected.avatar_url })
+                  startCall({
+                    id: selected.id,
+                    name: selected.name ?? "Helper",
+                    avatarUrl: selected.avatar_url,
+                  })
                 }
                 aria-label={`Call ${selected.name ?? "Helper"}`}
               >
@@ -233,7 +258,10 @@ const selectedIdRef = useRef<string | null>(null);
               </Button>
             </div>
 
-            <div ref={cardScrollRef} className="flex-1 min-h-0 overflow-y-auto p-5 space-y-3 bg-surface-container-low/40 overscroll-contain">
+            <div
+              ref={cardScrollRef}
+              className="flex-1 min-h-0 overflow-y-auto p-5 space-y-3 bg-surface-container-low/40 overscroll-contain"
+            >
               {timeline.length === 0 && (
                 <p className="text-center text-sm text-on-surface-variant py-10">
                   No messages yet. Say hi!
@@ -245,7 +273,9 @@ const selectedIdRef = useRef<string | null>(null);
                   const outgoing = l.caller_id === me;
                   return (
                     <div key={`call-${l.id}`} className="flex justify-center">
-                      <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium ${callColor(l.status)}`}>
+                      <div
+                        className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium ${callColor(l.status)}`}
+                      >
                         {callIcon(l.status)}
                         <span>
                           {outgoing ? "Call to Helper" : "Call from Helper"}
@@ -272,7 +302,9 @@ const selectedIdRef = useRef<string | null>(null);
                       }`}
                     >
                       <p>{m.body}</p>
-                      <p className={`text-xs mt-1 ${mine ? "text-on-primary/70" : "text-on-surface-variant"}`}>
+                      <p
+                        className={`text-xs mt-1 ${mine ? "text-on-primary/70" : "text-on-surface-variant"}`}
+                      >
                         {formatTime(m.created_at)}
                       </p>
                     </div>
@@ -282,7 +314,10 @@ const selectedIdRef = useRef<string | null>(null);
               <div ref={bottomRef} />
             </div>
 
-            <form onSubmit={sendMessage} className="p-4 border-t border-outline-variant/30 flex items-center gap-3 shrink-0">
+            <form
+              onSubmit={sendMessage}
+              className="p-4 border-t border-outline-variant/30 flex items-center gap-3 shrink-0"
+            >
               <Input
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}

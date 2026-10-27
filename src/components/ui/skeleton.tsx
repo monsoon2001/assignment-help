@@ -30,7 +30,11 @@ export function SkeletonCircle({ className = "" }: SkeletonProps) {
 /** Generic page placeholder: title block, paragraph, then a panel. */
 export function PageSkeleton() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" aria-busy="true" aria-live="polite">
+    <div
+      className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
+      aria-busy="true"
+      aria-live="polite"
+    >
       <span className="sr-only">Loading…</span>
       <Skeleton className="h-9 w-64" />
       <SkeletonText lines={2} className="mt-5 max-w-2xl" />
@@ -97,7 +101,10 @@ export function AdminSkeleton() {
       </div>
       <div className="mt-6 rounded-2xl border border-outline-variant p-5">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="flex items-center gap-4 border-b border-outline-variant/40 py-4 last:border-0">
+          <div
+            key={i}
+            className="flex items-center gap-4 border-b border-outline-variant/40 py-4 last:border-0"
+          >
             <SkeletonCircle className="w-10 h-10" />
             <div className="flex-1 space-y-2">
               <Skeleton className="h-3.5 w-48" />

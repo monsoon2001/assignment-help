@@ -63,9 +63,7 @@ export default function HelperRequestsView({
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold text-on-surface">
-          Incoming Requests
-        </h1>
+        <h1 className="font-display text-2xl font-bold text-on-surface">Incoming Requests</h1>
         <p className="text-on-surface-variant mt-1">
           These requests were sent directly to you. Respond in the chat to lock in the work.
         </p>
@@ -100,11 +98,13 @@ export default function HelperRequestsView({
           </span>
           <h2 className="font-display font-semibold text-on-surface">No requests here right now</h2>
           <p className="text-sm text-on-surface-variant max-w-md">
-            Students reach out directly, so a request appears here once a student sends their brief. Keep your
-            profile up to date so students know what you cover.
+            Students reach out directly, so a request appears here once a student sends their brief.
+            Keep your profile up to date so students know what you cover.
           </p>
           <Link href="/helper/profile" className="mt-1">
-            <Button size="sm" variant="outline">Complete your profile</Button>
+            <Button size="sm" variant="outline">
+              Complete your profile
+            </Button>
           </Link>
         </Card>
       )}
@@ -121,15 +121,14 @@ export default function HelperRequestsView({
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <h2 className="font-semibold text-on-surface">
-                            {req.title}
-                          </h2>
+                          <h2 className="font-semibold text-on-surface">{req.title}</h2>
                           <StatusBadge tone={alreadyProposed ? "blue" : "slate"} dot>
                             {alreadyProposed ? "Proposal Sent" : "New Request"}
                           </StatusBadge>
                         </div>
                         <p className="text-sm text-on-surface-variant">
-                          Sent by {req.student?.name || "Student"} &middot; {timeAgo(req.created_at)}
+                          Sent by {req.student?.name || "Student"} &middot;{" "}
+                          {timeAgo(req.created_at)}
                         </p>
                       </div>
                     </div>

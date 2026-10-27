@@ -5,9 +5,5 @@ import { createClient } from "@/lib/supabase/client";
 export function markThreadNotificationsRead(link: string) {
   if (!link) return;
   const supabase = createClient();
-  void supabase
-    .from("notifications")
-    .update({ read: true })
-    .eq("link", link)
-    .eq("read", false);
+  void supabase.from("notifications").update({ read: true }).eq("link", link).eq("read", false);
 }
