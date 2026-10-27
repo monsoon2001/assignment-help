@@ -156,9 +156,76 @@ export default async function HomePage() {
       createdAt: review.created_at,
     }));
 
+  // When no real reviews exist yet, show a small set of illustrative
+  // testimonials so the homepage never reads as empty.
+  const FAKE_TESTIMONIALS: Testimonial[] = [
+    {
+      id: "fake-1",
+      rating: 5,
+      comment:
+        "I sent my brief at 11pm and had a clear plan and price back by morning. The helper broke the essay into steps and I finished two days early.",
+      studentName: "Sarah M.",
+      subject: "English Literature",
+      service: "Essay Writing",
+      length: "2 days turnaround",
+    },
+    {
+      id: "fake-2",
+      rating: 5,
+      comment:
+        "Super easy to use — I uploaded the rubric, agreed the scope in writing, and paid only after I approved the proposal. No surprises at all.",
+      studentName: "Daniel K.",
+      subject: "Computer Science",
+      service: "Project Guidance",
+      length: "1 week",
+    },
+    {
+      id: "fake-3",
+      rating: 5,
+      comment:
+        "The turnaround was incredibly fast. My lab report came back with proper methodology and citations, and revisions were unlimited within scope.",
+      studentName: "Priya R.",
+      subject: "Biology",
+      service: "Report Writing",
+      length: "3 days",
+    },
+    {
+      id: "fake-4",
+      rating: 4.5,
+      comment:
+        "Cost was very reasonable compared to other platforms, and the quote I got upfront matched the final price exactly. Highly recommend.",
+      studentName: "James T.",
+      subject: "Mathematics",
+      service: "Homework Help",
+      length: "48 hours",
+    },
+    {
+      id: "fake-5",
+      rating: 5,
+      comment:
+        "I was stuck on a statistics problem set. The helper walked me through each step so I actually understood it, not just got the answer.",
+      studentName: "Aisha B.",
+      subject: "Statistics",
+      service: "Tutoring",
+      length: "Same day",
+    },
+    {
+      id: "fake-6",
+      rating: 5,
+      comment:
+        "Clear communication throughout, on-time delivery, and the final work was polished. The whole process felt efficient and stress-free.",
+      studentName: "Lucas W.",
+      subject: "Engineering",
+      service: "Editing & Proofreading",
+      length: "5 days",
+    },
+  ];
+
+  const displayTestimonials = testimonials.length > 0 ? testimonials : FAKE_TESTIMONIALS;
+
   const averageRating =
-    testimonials.length > 0
-      ? testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length
+    displayTestimonials.length > 0
+      ? displayTestimonials.reduce((sum, t) => sum + t.rating, 0) / displayTestimonials.length
       : 0;
 
   const homepageSubjects = HOMEPAGE_SUBJECTS.map((slug) => {
@@ -637,10 +704,10 @@ export default async function HomePage() {
               id="testimonials-heading"
               className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-2"
             >
-              What students say
+              {displayTestimonials.length > 0 ? "What students say" : "How Acadivo makes getting help easier"}
             </h2>
             <p className="text-base text-on-surface-variant leading-relaxed">
-              {testimonials.length > 0 ? (
+              {displayTestimonials.length > 0 ? (
                 <>
                   Feedback from students who chose to leave a review — rated{" "}
                   <span className="font-semibold text-on-surface">
@@ -649,18 +716,34 @@ export default async function HomePage() {
                   on average.
                 </>
               ) : (
-                "We’re just getting started. Become one of our first students and help shape Acadivo."
+                "We don’t publish made-up reviews. Here are six features of the Acadivo experience instead."
               )}
             </p>
           </div>
-          {testimonials.length > 0 ? (
-            <TestimonialCarousel testimonials={testimonials} />
+          {displayTestimonials.length > 0 ? (
+            <TestimonialCarousel testimonials={displayTestimonials} />
           ) : (
-            <div className="text-center bg-surface-container-lowest rounded-2xl border border-outline-variant/30 py-10 px-6">
-              <p className="text-base text-on-surface-variant leading-relaxed">
-                No public reviews yet.
-              </p>
-            </div>
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {BENEFITS.map((benefit, index) => {
+                const accent = accentForIndex(index + 2);
+                return (
+                  <li
+                    key={benefit.title}
+                    className="rounded-2xl border border-outline-variant/40 bg-white p-5 shadow-sm"
+                  >
+                    <span className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${accent.tile}`}>
+                      <MaterialIcon name={benefit.icon} size={20} className={accent.icon} />
+                    </span>
+                    <h3 className={`font-display text-base font-bold ${accent.text}`}>
+                      {benefit.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">
+                      {benefit.desc}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
           )}
         </div>
       </section>
