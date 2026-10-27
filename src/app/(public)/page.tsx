@@ -471,7 +471,7 @@ export default async function HomePage() {
       </section>
 
       {/* Core Academic Services */}
-      <section className="py-12 sm:py-16 bg-section">
+      <section className="py-12 sm:py-16 bg-section border-t border-outline-variant/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8 sm:mb-10">
             <div className="max-w-2xl">
@@ -524,8 +524,8 @@ export default async function HomePage() {
                       {service.detail}
                     </p>
                   )}
-                  <ul className="mt-4 space-y-1.5 border-t border-outline-variant/30 pt-4">
-                    {service.items.map((item) => (
+                   <ul className="hidden sm:block mt-4 space-y-1.5 border-t border-outline-variant/30 pt-4">
+                     {service.items.map((item) => (
                       <li
                         key={item}
                         className="flex items-center gap-2 text-sm text-on-surface-variant"
@@ -689,7 +689,7 @@ export default async function HomePage() {
       </section>
 
       {/* Subjects We Cover */}
-      <section className="py-12 sm:py-16 bg-section" aria-labelledby="subjects-heading">
+      <section className="py-12 sm:py-16 bg-section border-t border-outline-variant/40" aria-labelledby="subjects-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
             <div className="max-w-2xl">
@@ -744,7 +744,7 @@ export default async function HomePage() {
       </section>
 
       {/* Free Study Guides */}
-      <section className="py-12 sm:py-16 bg-white" aria-labelledby="guides-heading">
+      <section className="py-12 sm:py-16 bg-white border-t border-outline-variant/40" aria-labelledby="guides-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
             <div className="max-w-2xl">
@@ -768,7 +768,7 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {homepageGuides.map((guide) => {
               return (
                 <Link
@@ -813,7 +813,7 @@ export default async function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-12 sm:py-16 bg-section" aria-labelledby="testimonials-heading">
+      <section className="py-12 sm:py-16 bg-section border-t border-outline-variant/40" aria-labelledby="testimonials-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl mx-auto text-center mb-8">
             <h2
