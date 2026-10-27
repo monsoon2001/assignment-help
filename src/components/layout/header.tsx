@@ -278,7 +278,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
     >
       <div className="max-w-360 mx-auto px-3 sm:px-6 h-16 flex items-center gap-3 sm:gap-6">
         <Link href="/" className="flex items-center gap-2 shrink-0 min-h-11 min-w-11">
-          <span className="w-9 h-9 rounded-xl bg-primary-container text-on-primary flex items-center justify-center">
+          <span className="w-9 h-9 rounded-xl bg-brand text-on-brand flex items-center justify-center">
             <GraduationCap size={20} />
           </span>
           <div className="leading-tight">

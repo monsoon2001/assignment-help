@@ -87,7 +87,7 @@ export default function SignUpPage() {
     <div className="m-auto w-full max-w-md">
       <div className="animate-rise-in rounded-3xl border border-line bg-surface p-5 shadow-xl shadow-primary/5 sm:p-7">
         <div className="mb-5 flex flex-col items-center text-center">
-          <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-fixed text-primary">
+          <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-tint text-brand">
             <GraduationCap size={24} />
           </span>
           <h1 className="font-display text-2xl font-bold text-on-surface">Create your account</h1>
@@ -201,6 +201,7 @@ export default function SignUpPage() {
 
             <Button
               type="submit"
+              variant="brand"
               size="lg"
               className="w-full justify-between"
               disabled={!accepted || loading}

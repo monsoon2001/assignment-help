@@ -2,7 +2,7 @@ import { forwardRef } from "react";
 import Link from "next/link";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger" | "brand";
   size?: "sm" | "md" | "lg";
   href?: string;
 }
@@ -17,6 +17,7 @@ const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
       outline: "border border-line bg-surface text-ink hover:bg-primary-tint",
       ghost: "text-ink-soft hover:bg-canvas hover:text-ink",
       danger: "bg-danger text-white hover:bg-danger-hover",
+      brand: "bg-brand text-white hover:bg-brand-hover active:bg-brand-dark shadow-sm",
     };
     const sizes: Record<string, string> = {
       sm: "px-3 py-1.5 min-h-11 min-w-11 text-sm gap-1.5",

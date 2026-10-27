@@ -13,6 +13,13 @@
   --color-primary-tint: #eff6ff;
   --color-primary-tint-line: #bfdbfe;
 
+  /* Brand — deeper navy used for logo and auth surfaces. */
+  --color-brand: #1e3a8a;
+  --color-brand-hover: #1e40af;
+  --color-brand-dark: #172554;
+  --color-brand-tint: #dbeafe;
+  --color-on-brand: #ffffff;
+
   --color-accent: #f59e0b;
   --color-accent-tint: #fef3c7;
   --color-on-accent-tint: #78350f;

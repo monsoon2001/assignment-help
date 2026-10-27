@@ -97,7 +97,7 @@ function SignInForm() {
     <div className="m-auto w-full max-w-md">
       <div className="animate-rise-in rounded-3xl border border-line bg-surface p-5 shadow-xl shadow-primary/5 sm:p-7">
         <div className="mb-5 flex flex-col items-center text-center">
-          <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-fixed text-primary">
+          <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-tint text-brand">
             <GraduationCap size={24} />
           </span>
           <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary-fixed px-3 py-1 text-xs font-semibold text-on-primary-fixed-variant">
@@ -149,7 +149,7 @@ function SignInForm() {
             </p>
           )}
 
-          <Button type="submit" size="lg" className="w-full justify-between" disabled={loading}>
+          <Button type="submit" variant="brand" size="lg" className="w-full justify-between" disabled={loading}>
             {loading ? "Signing in..." : "Sign In"}
             <ArrowRight size={18} />
           </Button>
