@@ -26,6 +26,7 @@ import {
   UserRound,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import useScrollVisibility from "@/components/layout/use-scroll-visibility";
 
 const ICONS: Record<string, LucideIcon> = {
   dashboard: LayoutDashboard,
@@ -72,6 +73,7 @@ export default function RoleBottomNav({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const scrollHidden = useScrollVisibility();
 
   const isActive = (href: string) =>
     pathname === href ||
@@ -82,7 +84,9 @@ export default function RoleBottomNav({
   return (
     <>
       <nav
-        className={`${navVisibility} fixed bottom-0 inset-x-0 z-50 border-t border-outline-variant bg-surface-container-lowest/95 backdrop-blur px-1 pb-[env(safe-area-inset-bottom)]`}
+        className={`${navVisibility} fixed bottom-0 inset-x-0 z-50 border-t border-outline-variant bg-surface-container-lowest/95 backdrop-blur px-1 pb-[env(safe-area-inset-bottom)] transition-transform duration-300 md:translate-y-0 ${
+          scrollHidden && !open ? "translate-y-full" : "translate-y-0"
+        }`}
         aria-label={`${roleLabel} navigation`}
       >
         <div className="flex items-stretch justify-around">

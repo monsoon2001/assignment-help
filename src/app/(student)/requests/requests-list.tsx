@@ -344,40 +344,51 @@ export default function RequestsList({
             const meta = { label: STATUS_LABEL[r.status] ?? r.status, tone: requestStatusTone(r.status) };
             const proposals = proposalsByRequest[r.id] ?? [];
             return (
-              <Link key={r.id} href={`/requests/${r.id}`} className="block">
-                <Card hover className="p-5">
-                  <div className="flex items-center gap-4">
-                    <Avatar name={r.subject || r.title} size="md" />
+              <Link key={r.id} href={`/requests/${r.id}`} className="group block">
+                <Card hover className="relative overflow-hidden border border-outline-variant/60 p-4 transition-all group-hover:border-primary-container/50 group-hover:shadow-md sm:p-5">
+                  <span className="absolute inset-y-0 left-0 w-1 bg-primary-container opacity-70 transition-opacity group-hover:opacity-100" />
+                  <div className="flex items-start gap-3 sm:gap-4">
+                    <Avatar name={r.subject || r.title} size="md" className="mt-0.5" />
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <h3 className="font-display font-semibold text-on-surface truncate">{r.title}</h3>
-                        <StatusBadge tone={meta.tone} dot>
-                          {meta.label}
-                        </StatusBadge>
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="line-clamp-2 break-words [overflow-wrap:anywhere] font-display font-semibold leading-snug text-on-surface">
+                            {r.title}
+                          </h3>
+                          <p className="mt-1 break-words text-xs text-on-surface-variant">
+                            {r.subject || "General"} <span aria-hidden>·</span> {refCode(r.id)}
+                          </p>
+                        </div>
+                        <ChevronRight size={18} className="mt-1 shrink-0 text-on-surface-variant transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+                      </div>
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <StatusBadge tone={meta.tone} dot>{meta.label}</StatusBadge>
                         {proposals.length > 0 && (
                           <Badge variant="outline">
                             {proposals.length} proposal{proposals.length > 1 ? "s" : ""}
                           </Badge>
                         )}
                       </div>
-                      <p className="text-xs text-on-surface-variant mt-1 truncate">
-                        {refCode(r.id)} · {r.subject || "General"} · Requested {formatDate(r.created_at)}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-on-surface-variant">
-                        <span className="inline-flex items-center gap-1">
-                          <CalendarDays size={11} /> Due {formatDate(r.deadline)}
+                      <div className="mt-3 grid grid-cols-1 gap-2 border-t border-outline-variant/40 pt-3 text-xs text-on-surface-variant sm:grid-cols-2">
+                        <span className="inline-flex min-w-0 items-center gap-1.5">
+                          <CalendarDays size={13} className="shrink-0 text-primary" />
+                          <span className="truncate">Due {formatDate(r.deadline)}</span>
                         </span>
                         {(r.file_urls?.length ?? 0) > 0 && (
-                          <span className="inline-flex items-center gap-1">
-                            <Paperclip size={11} /> {r.file_urls!.length} attachment{r.file_urls!.length > 1 ? "s" : ""}
+                          <span className="inline-flex min-w-0 items-center gap-1.5">
+                            <Paperclip size={13} className="shrink-0 text-primary" />
+                            <span>{r.file_urls!.length} attachment{r.file_urls!.length > 1 ? "s" : ""}</span>
                           </span>
                         )}
-                        <span className="inline-flex items-center gap-1">
-                          <Users size={11} /> {r.helper?.name ?? "No helper yet"}
+                        <span className="inline-flex min-w-0 items-center gap-1.5">
+                          <Users size={13} className="shrink-0 text-primary" />
+                          <span className="truncate">{r.helper?.name ?? "No helper yet"}</span>
+                        </span>
+                        <span className="text-on-surface-variant/80">
+                          Requested {formatDate(r.created_at)}
                         </span>
                       </div>
                     </div>
-                    <ChevronRight size={18} className="shrink-0 text-on-surface-variant" />
                   </div>
                 </Card>
               </Link>

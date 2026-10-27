@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { ArrowRight, CalendarDays, Clock, ChevronUp, ChevronDown, FileText, Loader2, Trash2, Upload, X } from "lucide-react";
 import { SUBJECTS, SERVICE_TYPES, ACADEMIC_LEVELS, OTHER_OPTION } from "@/lib/constants";
 import Input from "@/components/ui/input";
@@ -68,6 +69,8 @@ interface TaskRequestFormProps {
   submitLabel: string;
   note?: string;
   submitting?: boolean;
+  termsAccepted: boolean;
+  setTermsAccepted: (accepted: boolean) => void;
 }
 
 /**
@@ -150,6 +153,8 @@ export default function TaskRequestForm({
   submitLabel,
   note,
   submitting = false,
+  termsAccepted,
+  setTermsAccepted,
 }: TaskRequestFormProps) {
   const today = new Date().toISOString().slice(0, 10);
   const [filesOpen, setFilesOpen] = useState(false);
@@ -362,6 +367,22 @@ export default function TaskRequestForm({
         />
       </div>
 
+      <label className="flex cursor-pointer items-start gap-2.5 text-xs leading-relaxed text-on-surface-variant">
+        <input
+          type="checkbox"
+          className="mt-0.5 h-4 w-4 shrink-0 rounded border-outline-variant accent-primary"
+          checked={termsAccepted}
+          onChange={(e) => setTermsAccepted(e.target.checked)}
+        />
+        <span>
+          I have read and agree to Acadivo&apos;s{" "}
+          <Link href="/terms" className="font-semibold text-primary hover:underline" target="_blank">
+            Terms of Service
+          </Link>
+          .
+        </span>
+      </label>
+
       {error && (
         <p className="text-sm text-error bg-error-container/40 border border-error/30 rounded-lg px-3 py-2">
           {error}
@@ -370,7 +391,7 @@ export default function TaskRequestForm({
 
       <Button
         type="submit"
-        disabled={submitting}
+        disabled={submitting || !termsAccepted}
         className="w-full h-11"
       >
         {submitting ? <Loader2 size={16} className="animate-spin" /> : submitLabel}

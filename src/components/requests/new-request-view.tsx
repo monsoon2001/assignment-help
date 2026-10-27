@@ -101,6 +101,7 @@ export default function NewRequestView({
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const set = useCallback(<K extends TaskRequestField>(
     key: K,
@@ -161,6 +162,11 @@ export default function NewRequestView({
     e.preventDefault();
     if (submitting) return;
     setError("");
+
+    if (!termsAccepted) {
+      setError("Please accept the Terms of Service before sending your request.");
+      return;
+    }
 
     if (values.helpType === OTHER_OPTION && !values.customHelpType.trim()) {
       setError("Please select the type of help you need.");
@@ -275,6 +281,8 @@ export default function NewRequestView({
               error={error}
               onSubmit={handleSubmit}
               submitting={submitting}
+              termsAccepted={termsAccepted}
+              setTermsAccepted={setTermsAccepted}
               submitLabel="Send Task Request"
               note="Your request goes straight to our verified academic helper. No charge until you accept a proposal."
             />

@@ -270,7 +270,7 @@ export default function ChatPanel({
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Write a message…"
-              className="block w-full resize-none outline-none bg-white text-[14px] leading-6 text-on-surface placeholder:text-outline min-h-6 max-h-32 overflow-y-hidden"
+              className="block w-full resize-none outline-none bg-white text-base leading-6 text-on-surface placeholder:text-outline min-h-6 max-h-32 overflow-y-hidden"
             />
           </div>
           <button

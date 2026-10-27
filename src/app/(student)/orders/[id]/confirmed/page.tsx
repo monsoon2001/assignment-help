@@ -157,7 +157,7 @@ export default async function OrderConfirmedPage({
               href={receiptUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-1 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-container px-4 py-3 text-sm font-semibold text-on-primary shadow-sm transition-colors hover:bg-primary-hover"
+              className="mt-1 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-success/40 bg-white px-4 py-3 text-sm font-semibold text-success shadow-sm transition-colors hover:bg-success-tint/30"
             >
               <MailCheck size={16} /> View your payment receipt <ExternalLink size={14} />
             </a>

@@ -82,7 +82,7 @@ export default async function DashboardPage() {
       .limit(50),
     supabase
       .from("orders")
-      .select("id")
+      .select("id, proposal:proposals(request_id)")
       .eq("student_id", user.id)
       .eq("status", "completed"),
     supabase
@@ -98,6 +98,12 @@ export default async function DashboardPage() {
     ...r,
     helper: unwrapRow<{ id: string; name: string | null }>(r.helper),
   }));
+  const completedRequestIds = new Set(
+    (completedOrders ?? []).flatMap((order) => {
+      const proposal = unwrapRow<{ request_id: string | null }>(order.proposal);
+      return proposal?.request_id ? [proposal.request_id] : [];
+    })
+  );
 
   const activeIds = requests
     .filter((r) => ["proposal_sent", "accepted"].includes(r.status))
@@ -143,29 +149,8 @@ export default async function DashboardPage() {
   const actionCards: ActionCardItem[] = [];
   const seenKeys = new Set<string>();
 
-  // Proposals for requests that are still open (proposal_sent or just have pending proposal)
-  for (const req of requests) {
-    if (req.status === "cancelled" || req.status === "declined") continue;
-    const reqProposals = proposals.filter((p) => p.request_id === req.id && p.status === "pending");
-    for (const p of reqProposals) {
-      const key = `proposal:${p.id}:${req.id}`;
-      if (seenKeys.has(key)) continue;
-      seenKeys.add(key);
-      actionCards.push({
-        id: p.id,
-        key,
-        href: `/requests/${req.id}`,
-        title: "New proposal",
-        body: `Helper sent a proposal for "${req.title}". Review and respond.`,
-        createdAt: p.created_at,
-        tone: "bg-secondary-container text-on-secondary-container",
-        icon: FileText,
-        dot: true,
-      });
-    }
-  }
-
-  // Orders that need action from student
+  // Load all orders first so proposal cards can be suppressed once a proposal
+  // has already become an order.
   const orderListRes = await supabase
     .from("orders")
     .select("id, status, updated_at, created_at, proposal:proposals(id, request_id, request:requests(id,title))")
@@ -186,6 +171,32 @@ export default async function DashboardPage() {
       proposalId: prop?.id ?? null,
     };
   });
+
+  const requestIdsWithOrders = new Set(
+    orders.flatMap((order) => (order.requestId ? [order.requestId] : []))
+  );
+
+  // Only proposals that are still awaiting the student's decision are actionable.
+  for (const req of requests) {
+    if (req.status !== "proposal_sent" || requestIdsWithOrders.has(req.id)) continue;
+    const reqProposals = proposals.filter((p) => p.request_id === req.id && p.status === "pending");
+    for (const p of reqProposals) {
+      const key = `proposal:${p.id}:${req.id}`;
+      if (seenKeys.has(key)) continue;
+      seenKeys.add(key);
+      actionCards.push({
+        id: p.id,
+        key,
+        href: `/requests/${req.id}`,
+        title: "New proposal",
+        body: `Helper sent a proposal for "${req.title}". Review and respond.`,
+        createdAt: p.created_at,
+        tone: "bg-secondary-container text-on-secondary-container",
+        icon: FileText,
+        dot: true,
+      });
+    }
+  }
 
   for (const o of orders) {
     if (!o.requestId) continue;
@@ -258,6 +269,11 @@ export default async function DashboardPage() {
     const requestIdForCard =
       requestId ?? orders.find((o) => o.id === orderId)?.requestId ?? null;
     if (!requestIdForCard) continue;
+    if (completedRequestIds.has(requestIdForCard)) continue;
+    const linkedOrder = orders.find((o) => o.requestId === requestIdForCard);
+    if (linkedOrder && ["completed", "cancelled", "declined", "disputed"].includes(linkedOrder.status)) {
+      continue;
+    }
     const key = `notif:${n.id}`;
     if (seenKeys.has(key)) continue;
     seenKeys.add(key);

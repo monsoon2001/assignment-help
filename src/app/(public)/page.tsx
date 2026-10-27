@@ -123,8 +123,7 @@ export default async function HomePage() {
     .from("helper_reviews")
     .select("id, rating, comment, created_at, student_name, student_avatar_url")
     .not("comment", "is", null)
-    .order("created_at", { ascending: false })
-    .limit(100);
+    .order("created_at", { ascending: false });
 
   if (reviewsError) {
     console.error("Could not load public homepage reviews:", reviewsError.message);
@@ -142,12 +141,12 @@ export default async function HomePage() {
     .filter((review) => {
       const comment = review.comment?.trim() ?? "";
       if (comment.length < 40 || review.rating < 1 || review.rating > 5) return false;
+      if (review.student_name?.trim().toLowerCase() === "mansha parajuli") return false;
       const key = `${(review.student_name ?? "").trim().toLowerCase()}|${comment.toLowerCase()}`;
       if (seenReviews.has(key)) return false;
       seenReviews.add(key);
       return true;
     })
-    .slice(0, 6)
     .map((review) => ({
       id: review.id,
       rating: review.rating,

@@ -12,9 +12,22 @@ export async function uploadOrderFile(
   if (!user) {
     throw new Error("You must be signed in.");
   }
+  if (file.size === 0) {
+    throw new Error(`${file.name} is empty. Choose a file that contains content.`);
+  }
+
+  let content: ArrayBuffer;
+  try {
+    content = await file.arrayBuffer();
+  } catch (error) {
+    const reason = error instanceof Error ? ` ${error.message}` : "";
+    throw new Error(`We couldn't read ${file.name}.${reason}`);
+  }
 
   const path = `${orderId}/${user.id}/${crypto.randomUUID()}-${file.name}`;
-  const { error } = await supabase.storage.from("order-files").upload(path, file);
+  const { error } = await supabase.storage.from("order-files").upload(path, content, {
+    contentType: file.type || "application/octet-stream",
+  });
   if (error) {
     throw new Error(error.message);
   }

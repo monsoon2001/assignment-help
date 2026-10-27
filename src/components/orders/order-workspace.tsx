@@ -119,7 +119,9 @@ export default function OrderWorkspace({
     markThreadNotificationsRead(`/orders/${orderId}?tab=delivery`);
     markThreadNotificationsRead(`/helper/orders/${orderId}`);
     markThreadNotificationsRead(pathname);
-  }, [pathname, orderId]);
+    const requestId = order?.proposal?.request_id;
+    if (requestId) markThreadNotificationsRead(`/requests/${requestId}`);
+  }, [pathname, orderId, order?.proposal?.request_id]);
 
   const loadOrder = useCallback(async () => {
     const { data, error } = await supabase.current

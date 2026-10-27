@@ -376,25 +376,27 @@ export default function RequestWorkspace({
 
   return (
     <div className="w-full max-w-7xl mx-auto flex flex-col gap-3 h-full min-h-0">
-      <nav className="flex items-center gap-1.5 text-sm text-on-surface-variant shrink-0">
+      <nav className="flex min-w-0 items-center gap-1.5 text-sm text-on-surface-variant shrink-0">
         <Link href={isHelper ? "/helper/requests" : "/requests"} className="hover:text-on-surface">
           {isHelper ? "Incoming Requests" : "My Requests"}
         </Link>
-        <ChevronRight size={14} />
-        <span className="text-on-surface font-medium truncate">#{request.id.slice(0, 8).toUpperCase()} · {title}</span>
+        <ChevronRight size={14} className="shrink-0" />
+        <span className="min-w-0 flex-1 text-on-surface font-medium truncate" title={title}>
+          #{request.id.slice(0, 8).toUpperCase()} · {title}
+        </span>
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0 lg:overflow-hidden lg:auto-rows-fr">
         <div className="lg:col-span-7 flex flex-col gap-1.5 min-h-0 lg:h-full">
           <section className="flex flex-col lg:flex-row lg:items-center justify-between gap-1.5 lg:gap-4 p-2.5 rounded-2xl bg-surface-container-lowest border border-outline-variant shrink-0">
             <div className="flex items-center gap-4 min-w-0">
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2.5 flex-wrap">
-                  <h1 className="font-display font-bold text-lg text-on-surface truncate">{title}</h1>
+                  <h1 className="min-w-0 max-w-full break-words [overflow-wrap:anywhere] font-display font-bold text-lg text-on-surface line-clamp-2">{title}</h1>
                   <StatusBadge tone={meta.tone} dot className="shrink-0">{meta.label}</StatusBadge>
                 </div>
                 <p className="text-xs text-on-surface-variant mt-0.5 flex items-center gap-1.5 flex-wrap">
-                  <span className="whitespace-nowrap">#{request.id.slice(0, 8).toUpperCase()} · {request.subject || "General"}</span>
+                  <span className="min-w-0 break-words [overflow-wrap:anywhere]">#{request.id.slice(0, 8).toUpperCase()} · {request.subject || "General"}</span>
                   <span className="text-outline-variant" aria-hidden>·</span>
                   <span className="inline-flex items-center gap-1 whitespace-nowrap">
                     <Timer size={12} />{" "}
@@ -460,7 +462,7 @@ export default function RequestWorkspace({
               <Card className="p-2.5">
                 <h2 className="font-display font-semibold text-on-surface text-xs uppercase tracking-wide mb-1">Request details</h2>
                 {request.description ? (
-                  <p className="text-xs text-on-surface-variant leading-snug whitespace-pre-line">{request.description}</p>
+                  <p className="break-words [overflow-wrap:anywhere] text-xs text-on-surface-variant leading-snug whitespace-pre-line">{request.description}</p>
                 ) : (
                   <p className="text-xs text-on-surface-variant">No additional details were provided.</p>
                 )}

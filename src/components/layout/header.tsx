@@ -10,6 +10,7 @@ import Avatar from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/client";
 import { realtimeTopic } from "@/lib/supabase/realtime";
 import type { UserRole } from "@/lib/auth";
+import useScrollVisibility from "@/components/layout/use-scroll-visibility";
 
 export interface MenuChild {
   label: string;
@@ -53,6 +54,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
   const router = useRouter();
+  const scrollHidden = useScrollVisibility();
 
   const openNow = useCallback((href: string) => {
     if (closeTimer.current) {
@@ -254,7 +256,11 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
     : "User";
 
   return (
-    <header className="sticky top-0 z-50 bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant">
+    <header
+      className={`sticky top-0 z-50 bg-surface-container-lowest/90 backdrop-blur border-b border-outline-variant transition-transform duration-300 md:translate-y-0 ${
+        scrollHidden && !mobileMenuOpen ? "-translate-y-full" : "translate-y-0"
+      }`}
+    >
       <div className="max-w-360 mx-auto px-3 sm:px-6 h-16 flex items-center gap-3 sm:gap-6">
         <Link href="/" className="flex items-center gap-2 shrink-0 min-h-11 min-w-11">
           <span className="w-9 h-9 rounded-xl bg-primary-container text-on-primary flex items-center justify-center">
@@ -363,11 +369,20 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                   <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary-container ring-2 ring-surface-container-lowest" />
                 </Button>
               </Link>
+              {role !== null && role !== "admin" && pathname !== "/" && (
+                <Link
+                  href="/"
+                  aria-label="Home"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface md:hidden"
+                >
+                  <Home size={22} />
+                </Link>
+              )}
               {role === "student" && pathname.startsWith("/dashboard") && (
                 <Link
                   href="/"
                   aria-label="Home"
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface"
+                  className="hidden h-11 w-11 items-center justify-center rounded-xl text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface md:inline-flex"
                 >
                   <Home size={22} />
                 </Link>

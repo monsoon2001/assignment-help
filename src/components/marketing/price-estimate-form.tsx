@@ -31,6 +31,7 @@ export default function PriceEstimateForm() {
   const [values, setValues] = useState<TaskRequestFormValues>(BLANK);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const restoredRef = useRef(false);
 
   const set = useCallback(<K extends TaskRequestField>(
@@ -71,6 +72,11 @@ export default function PriceEstimateForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!termsAccepted) {
+      setError("Please accept the Terms of Service before continuing.");
+      return;
+    }
 
     const subjectRaw = composeSelection(
       values.subject,
@@ -135,6 +141,8 @@ export default function PriceEstimateForm() {
       set={set}
       error={error}
       onSubmit={handleSubmit}
+      termsAccepted={termsAccepted}
+      setTermsAccepted={setTermsAccepted}
       submitLabel="Get My Estimate"
       note="Free estimate — no commitment required"
       submitting={submitting}

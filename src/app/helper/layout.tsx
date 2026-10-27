@@ -78,7 +78,6 @@ export default async function HelperLayout({ children }: { children: React.React
         <RoleBottomNav
           roleLabel="Helper"
           primary={[
-            { href: "/", label: "Home", icon: "home" },
             { href: "/helper/dashboard", label: "Dashboard", icon: "dashboard" },
             { href: "/helper/requests", label: "Requests", icon: "inbox", badge: incomingRequests || undefined },
             { href: "/helper/messages", label: "Messages", icon: "messages", badge: unreadMessages || undefined },
