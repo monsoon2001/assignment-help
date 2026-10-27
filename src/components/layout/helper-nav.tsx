@@ -14,14 +14,23 @@ import {
   Headset,
 } from "lucide-react";
 import Button from "@/components/ui/button";
+import Badge from "@/components/ui/badge";
 import { useVoiceCall } from "@/components/call/voice-call";
 
-const links = [
+type HelperBadgeKey = "incomingRequests" | "activeOrders" | "unreadMessages";
+
+const links: Array<{
+  key: string;
+  href: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  badge?: HelperBadgeKey;
+}> = [
   { key: "dashboard", href: "/helper/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { key: "requests", href: "/helper/requests", label: "Incoming Requests", icon: Inbox },
-  { key: "orders", href: "/helper/orders", label: "Active Orders", icon: Briefcase },
+  { key: "requests", href: "/helper/requests", label: "Incoming Requests", icon: Inbox, badge: "incomingRequests" },
+  { key: "orders", href: "/helper/orders", label: "Active Orders", icon: Briefcase, badge: "activeOrders" },
   { key: "earnings", href: "/helper/earnings", label: "Earnings", icon: DollarSign },
-  { key: "messages", href: "/helper/messages", label: "Messages", icon: MessageSquare },
+  { key: "messages", href: "/helper/messages", label: "Messages", icon: MessageSquare, badge: "unreadMessages" },
   { key: "chat-admin", href: "/helper/chat-admin", label: "Chat With Admin", icon: MessagesSquare },
   { key: "profile", href: "/helper/profile", label: "Edit Profile", icon: SquarePen },
 ];
@@ -29,18 +38,24 @@ const links = [
 export default function HelperNav({
   completedOrders,
   activeOrders,
+  incomingRequests,
+  unreadMessages,
 }: {
   completedOrders: number;
   activeOrders: number;
+  incomingRequests: number;
+  unreadMessages: number;
 }) {
   const segments = useSelectedLayoutSegments();
   const current = segments[0];
+  const badges = { activeOrders, incomingRequests, unreadMessages };
 
   return (
     <aside className="w-64 shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 p-4 hidden md:flex flex-col gap-1 md:h-[calc(100vh-4rem)] lg:h-full">
       {links.map((link) => {
         const Icon = link.icon;
         const active = current === link.key;
+        const badgeCount = link.badge ? badges[link.badge] : 0;
         return (
           <Link
             key={link.href}
@@ -53,7 +68,12 @@ export default function HelperNav({
             }`}
           >
             <Icon size={18} />
-            {link.label}
+            <span className="flex-1">{link.label}</span>
+            {badgeCount > 0 && (
+              <Badge variant="primary" className="px-2 py-0.5">
+                {badgeCount}
+              </Badge>
+            )}
           </Link>
         );
       })}

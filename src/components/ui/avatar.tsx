@@ -14,7 +14,7 @@ interface AvatarProps {
   className?: string;
 }
 
-export default function Avatar({ src, alt, name, role, size = "md", online, className = "" }: AvatarProps) {
+export default function Avatar({ src, alt, name, size = "md", online, className = "" }: AvatarProps) {
   const sizes = { sm: "w-8 h-8", md: "w-10 h-10", lg: "w-14 h-14" };
   const dims = { sm: 32, md: 40, lg: 56 };
   const parts = (name ?? "").trim().split(/\s+/).filter(Boolean);
@@ -23,10 +23,7 @@ export default function Avatar({ src, alt, name, role, size = "md", online, clas
       ? "?"
       : (parts.length === 1 ? parts[0][0] : parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   const [error, setError] = useState(false);
-  // Google accounts use their own profile photo. Non-Google helpers get a stable
-  // assistant portrait (assigned by name). The branded "Acadivo Helper" identity
-  // and students/admins without a Google photo fall back to initials.
-  const resolvedSrc = avatarFor(name, src, role);
+  const resolvedSrc = avatarFor(src);
 
   return (
     <div className={`relative shrink-0 ${className}`}>

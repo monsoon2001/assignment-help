@@ -95,19 +95,19 @@ export function currencyFlag(code?: string | null): string {
   return currencyMeta(code).flag;
 }
 
-/** Format an amount in its own currency, e.g. "$150.00" / "¥15,000". */
+/** Format an amount in its own currency, rounded to a whole major unit. */
 export function formatCurrency(amount: number, currency: string = DEFAULT_CURRENCY): string {
   const meta = currencyMeta(currency);
-  const safe = Number.isFinite(amount) ? amount : 0;
+  const safe = Number.isFinite(amount) ? Math.round(amount) : 0;
   try {
     return new Intl.NumberFormat("en-CA", {
       style: "currency",
       currency: meta.code,
-      minimumFractionDigits: meta.decimals,
-      maximumFractionDigits: meta.decimals,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(safe);
   } catch {
-    return `${meta.symbol}${safe.toFixed(meta.decimals)}`;
+    return `${meta.symbol}${safe}`;
   }
 }
 
@@ -326,8 +326,9 @@ export function computeLocalCharge(
   surchargePercent: number
 ): number | null {
   const converted = convertViaCad(baseAmount, baseCurrency, localCurrency, rates);
-  if (converted === null) return null;
+  if (converted === null || !Number.isFinite(converted) || converted <= 0) return null;
   const pct = Number.isFinite(surchargePercent) ? surchargePercent : 0;
   const withFee = converted * (1 + pct / 100);
-  return roundMoney(withFee, localCurrency);
+  // Prices are shown and charged as whole major units, never with decimals.
+  return Math.max(1, Math.round(withFee));
 }

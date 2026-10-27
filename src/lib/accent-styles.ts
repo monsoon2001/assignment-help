@@ -223,6 +223,14 @@ export function accentForIndex(index: number) {
   return accentAt(index);
 }
 
+// Distinct hues so the four "how it works" steps never blend together.
+const STEP_ACCENT_KEYS = ["indigo", "orange", "green", "purple"] as const satisfies readonly AccentKey[];
+
+export function accentForStep(index: number): AccentStyle {
+  const safe = ((index % STEP_ACCENT_KEYS.length) + STEP_ACCENT_KEYS.length) % STEP_ACCENT_KEYS.length;
+  return ACCENTS[STEP_ACCENT_KEYS[safe]];
+}
+
 export function accentForSubject(slug: string): AccentStyle {
   const key = SUBJECT_ACCENT_KEYS[slug];
   return key ? ACCENTS[key] : accentAt(hashKey(slug));

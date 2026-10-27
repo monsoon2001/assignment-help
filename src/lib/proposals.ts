@@ -23,12 +23,17 @@ export async function submitProposal(
     return { error: "You must be signed in to send a proposal." };
   }
 
+  const price = Math.round(input.price);
+  if (!Number.isFinite(input.price) || !Number.isSafeInteger(price) || price <= 0) {
+    return { error: "Enter a valid whole-number proposal price." };
+  }
+
   const { data, error } = await supabase
     .from("proposals")
     .insert({
       request_id: input.request_id,
       helper_id: user.id,
-      price: input.price,
+      price,
       currency: normalizeCurrency(input.currency),
       description: input.description ?? null,
       revisions_included: input.revisions_included ?? 0,

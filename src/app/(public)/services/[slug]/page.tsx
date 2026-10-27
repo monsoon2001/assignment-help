@@ -11,7 +11,7 @@ import { STEPS } from "@/lib/home-content";
 import { ALL_RESOURCES, resourcePath } from "@/lib/resources";
 import { CtaBand, PageHeader } from "@/components/marketing/page-shell";
 import { SITE_URL, jsonLdScript } from "@/lib/seo";
-import { accentForService, DARK_LINK } from "@/lib/accent-styles";
+import { accentForService, accentForStep, DARK_LINK } from "@/lib/accent-styles";
 
 export const dynamicParams = false;
 
@@ -132,22 +132,25 @@ export default async function ServiceDetailPage({
               How a {service.name.toLowerCase()} request works
             </h2>
             <ol className="grid sm:grid-cols-2 gap-4">
-              {STEPS.map((step) => (
+              {STEPS.map((step, i) => {
+                const accent = accentForStep(i);
+                return (
                 <li
                   key={step.num}
-                  className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5"
+                  className={`rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-5 ${accent.cardHover}`}
                 >
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary font-display text-sm font-bold text-on-primary">
+                    <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-display text-sm font-bold ${accent.tile} ${accent.text}`}>
                       {step.num}
                     </span>
-                    <h3 className="font-display text-lg font-bold leading-snug text-on-surface">
+                    <h3 className={`font-display text-lg font-bold leading-snug ${accent.text}`}>
                       {step.title}
                     </h3>
                   </div>
                   <p className="text-on-surface-variant leading-relaxed">{step.desc}</p>
                 </li>
-              ))}
+                );
+              })}
             </ol>
           </section>
 

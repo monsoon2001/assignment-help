@@ -79,8 +79,20 @@ export default function ChatPanel({
   };
 
   const messageListRef = useRef<HTMLDivElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const emojiRef = useRef<HTMLDivElement | null>(null);
+
+  // Grow the composer with the message instead of letting long or multi-line
+  // drafts scroll inside a single-line box. The CSS max-height caps it, after
+  // which the textarea scrolls on its own.
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 128)}px`;
+    el.style.overflowY = el.scrollHeight > 128 ? "auto" : "hidden";
+  }, [draft]);
 
   // Keep the newest message in view: jump to the bottom on mount and whenever
   // the conversation changes. A second rAF pass handles late layout (fonts,
@@ -136,7 +148,7 @@ export default function ChatPanel({
         </div>
       </div>
 
-      <div ref={messageListRef} className={`flex-1 overflow-y-auto ${compact ? "px-3 py-3 space-y-3 pb-4" : "px-5 py-4 space-y-4 pb-6"} bg-surface-container-low/40 overscroll-contain`}>
+      <div ref={messageListRef} className={`flex-1 overflow-y-auto ${compact ? "px-3 py-3 space-y-3 pb-4" : "px-5 py-4 space-y-4 pb-6"} bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] overscroll-contain`}>
         {messages.length === 0 && (
           <div className={`text-center ${compact ? "pt-10" : "pt-16"}`}>
             <p className="text-sm text-on-surface-variant">No messages yet — say hello!</p>
@@ -153,15 +165,15 @@ export default function ChatPanel({
                   className="mt-1"
                 />
               )}
-              <div className={`max-w-[78%] ${isMine ? "items-end text-right" : "items-start"}`}>
+              <div className={`max-w-[78%] flex flex-col ${isMine ? "items-end" : "items-start"}`}>
                 <div
-                  className={`${compact ? "px-3 py-1.5 rounded-xl text-[14px]" : "px-3.5 py-2 rounded-2xl text-[15px]"} leading-snug ${
+                  className={`${compact ? "px-3 py-1.5 rounded-xl text-[14px]" : "px-3.5 py-2 rounded-2xl text-[15px]"} leading-snug text-left ${
                     isMine
                       ? "bg-primary-container text-on-primary rounded-br-sm"
                       : "bg-surface-container border border-outline-variant text-on-surface rounded-bl-sm"
                   }`}
                 >
-                  {m.body && <p>{m.body}</p>}
+                  {m.body && <p className="whitespace-pre-wrap break-words">{m.body}</p>}
                   {m.attachment_url && (
                     <SecureFileLink
                       stored={m.attachment_url}
@@ -177,8 +189,8 @@ export default function ChatPanel({
                     </SecureFileLink>
                   )}
                 </div>
-                <div className="flex items-center gap-1.5 mt-1 text-xs text-on-surface-variant justify-end">
-                  <span className="w-full flex justify-end">{timeLabel(m.created_at)}</span>
+                <div className={`flex items-center gap-1.5 mt-1 text-xs text-on-surface-variant ${isMine ? "justify-end" : "justify-start"}`}>
+                  <span>{timeLabel(m.created_at)}</span>
                   {isMine && (
                     <span className="inline-flex items-center">
                       <Send size={12} className="text-primary opacity-0" />
@@ -210,7 +222,7 @@ export default function ChatPanel({
           </div>
         )}
         {error && <p className="text-xs text-error mb-2">{error}</p>}
-        <div className="relative">
+        <div className="relative rounded-xl bg-white">
           {emojiOpen && (
             <div
               ref={emojiRef}
@@ -230,7 +242,7 @@ export default function ChatPanel({
             </div>
           )}
           <div className="flex items-end gap-2">
-          <label className="w-9 h-9 shrink-0 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-low cursor-pointer has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary/40">
+          <label className="w-10 h-10 shrink-0 self-end flex items-center justify-center rounded-xl text-on-surface-variant hover:bg-surface-container-low cursor-pointer has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary/40">
             <Paperclip size={17} />
             <input
               type="file"
@@ -243,28 +255,28 @@ export default function ChatPanel({
           </label>
           <button
             onClick={() => setEmojiOpen((o) => !o)}
-            className={`w-9 h-9 shrink-0 flex items-center justify-center rounded-lg transition-colors cursor-pointer ${
+            className={`w-10 h-10 shrink-0 self-end flex items-center justify-center rounded-xl transition-colors cursor-pointer ${
               emojiOpen ? "bg-primary-container text-on-primary" : "text-on-surface-variant hover:bg-surface-container-low"
             }`}
             aria-label="Add emoji"
           >
             <SmilePlus size={17} />
           </button>
-          <div className="flex-1 rounded-xl border border-outline-variant bg-surface-container-lowest focus-within:border-primary-container focus-within:ring-2 focus-within:ring-primary-container/20 transition-all px-3 py-2">
+          <div className="flex-1 min-w-0 rounded-xl border border-outline-variant bg-white focus-within:border-primary-container focus-within:ring-2 focus-within:ring-primary-container/20 transition-all px-3 py-2">
             <textarea
+              ref={textareaRef}
               rows={1}
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Write a message…"
-              className="w-full resize-none outline-none bg-transparent text-[14px] text-on-surface placeholder:text-outline min-h-6 max-h-32"
-              style={{ height: "auto" }}
+              className="block w-full resize-none outline-none bg-white text-[14px] leading-6 text-on-surface placeholder:text-outline min-h-6 max-h-32 overflow-y-hidden"
             />
           </div>
           <button
             onClick={onSend}
             disabled={sending || (!draft.trim() && files.length === 0)}
-            className="w-10 h-10 shrink-0 rounded-xl bg-primary-container text-on-primary flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="w-10 h-10 shrink-0 self-end rounded-xl bg-primary-container text-on-primary flex items-center justify-center hover:bg-primary-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             {sending ? <Loader2 size={17} className="animate-spin" /> : <Send size={17} />}
           </button>

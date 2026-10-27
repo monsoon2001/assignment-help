@@ -324,7 +324,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
           )}
           {userId ? (
             <>
-              {pathname !== "/" && (
+              {pathname !== "/" && role !== "student" && (
                 <Link href="/">
                   <Button variant="ghost" size="sm" aria-label="Back to homepage" className="hidden xl:inline-flex">
                     <Home size={16} />
@@ -363,6 +363,15 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                   <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary-container ring-2 ring-surface-container-lowest" />
                 </Button>
               </Link>
+              {role === "student" && pathname.startsWith("/dashboard") && (
+                <Link
+                  href="/"
+                  aria-label="Home"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface"
+                >
+                  <Home size={22} />
+                </Link>
+              )}
               <Link
                 href={profileHref}
                 aria-label="Your profile"

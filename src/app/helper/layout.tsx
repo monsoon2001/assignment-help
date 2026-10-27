@@ -20,15 +20,42 @@ export default async function HelperLayout({ children }: { children: React.React
 
   let completedOrders = 0;
   let activeOrders = 0;
+  let incomingRequests = 0;
+  let unreadMessages = 0;
   if (user) {
-    const { data: orderRows } = await supabase
-      .from("orders")
-      .select("status")
-      .eq("helper_id", user.id);
-    for (const order of orderRows ?? []) {
-      if (order.status === "completed") completedOrders += 1;
-      else activeOrders += 1;
-    }
+    const [completedResult, activeResult, requestResult, messageResult] = await Promise.all([
+      supabase
+        .from("orders")
+        .select("id", { count: "exact", head: true })
+        .eq("helper_id", user.id)
+        .eq("status", "completed"),
+      supabase
+        .from("orders")
+        .select("id", { count: "exact", head: true })
+        .eq("helper_id", user.id)
+        .neq("status", "completed"),
+      supabase
+        .from("requests")
+        .select("id", { count: "exact", head: true })
+        .eq("helper_id", user.id)
+        .eq("status", "requested"),
+      supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("type", "message")
+        .eq("read", false),
+    ]);
+
+    if (completedResult.error) throw new Error(`Could not load completed order count: ${completedResult.error.message}`);
+    if (activeResult.error) throw new Error(`Could not load active order count: ${activeResult.error.message}`);
+    if (requestResult.error) throw new Error(`Could not load incoming request count: ${requestResult.error.message}`);
+    if (messageResult.error) throw new Error(`Could not load unread message count: ${messageResult.error.message}`);
+
+    completedOrders = completedResult.count ?? 0;
+    activeOrders = activeResult.count ?? 0;
+    incomingRequests = requestResult.count ?? 0;
+    unreadMessages = messageResult.count ?? 0;
   }
 
   return (
@@ -37,7 +64,12 @@ export default async function HelperLayout({ children }: { children: React.React
         <Header />
         <WarningsBannerClient />
         <div className="flex flex-1 w-full max-w-360 mx-auto lg:min-h-0">
-          <HelperNav completedOrders={completedOrders} activeOrders={activeOrders} />
+          <HelperNav
+            completedOrders={completedOrders}
+            activeOrders={activeOrders}
+            incomingRequests={incomingRequests}
+            unreadMessages={unreadMessages}
+          />
           <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:p-8 pb-24 md:pb-10 lg:pb-0 lg:min-h-0 lg:overflow-y-auto">
             {children}
           </main>
@@ -48,11 +80,11 @@ export default async function HelperLayout({ children }: { children: React.React
           primary={[
             { href: "/", label: "Home", icon: "home" },
             { href: "/helper/dashboard", label: "Dashboard", icon: "dashboard" },
-            { href: "/helper/requests", label: "Requests", icon: "inbox" },
-            { href: "/helper/messages", label: "Messages", icon: "messages" },
+            { href: "/helper/requests", label: "Requests", icon: "inbox", badge: incomingRequests || undefined },
+            { href: "/helper/messages", label: "Messages", icon: "messages", badge: unreadMessages || undefined },
           ]}
           more={[
-            { href: "/helper/orders", label: "Orders", icon: "orders" },
+            { href: "/helper/orders", label: "Orders", icon: "orders", badge: activeOrders || undefined },
             { href: "/helper/earnings", label: "Earnings", icon: "earnings" },
             { href: "/helper/notifications", label: "Notifications", icon: "notifications" },
             { href: "/helper/chat-admin", label: "Chat With Admin", icon: "chat_admin" },

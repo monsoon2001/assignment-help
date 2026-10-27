@@ -22,6 +22,7 @@ import { createClient } from "@/lib/supabase/server";
 import { unwrapRow } from "@/lib/embedded";
 import { requestStatusTone } from "@/lib/status-meta";
 import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
+import DashboardRefresh from "@/components/dashboard/dashboard-refresh";
 
 export const dynamic = "force-dynamic";
 
@@ -70,7 +71,7 @@ export default async function DashboardPage() {
     redirect("/sign-in");
   }
 
-  const [{ data: reqRows }, { data: completedOrders }] = await Promise.all([
+  const [{ data: reqRows }, { data: completedOrders }, { data: notifRows }] = await Promise.all([
     supabase
       .from("requests")
       .select(
@@ -84,6 +85,13 @@ export default async function DashboardPage() {
       .select("id")
       .eq("student_id", user.id)
       .eq("status", "completed"),
+    supabase
+      .from("notifications")
+      .select("id, type, message, link, created_at")
+      .eq("user_id", user.id)
+      .eq("read", false)
+      .order("created_at", { ascending: false })
+      .limit(30),
   ]);
 
   const requests = (reqRows ?? []).map((r) => ({
@@ -138,7 +146,7 @@ export default async function DashboardPage() {
   // Proposals for requests that are still open (proposal_sent or just have pending proposal)
   for (const req of requests) {
     if (req.status === "cancelled" || req.status === "declined") continue;
-    const reqProposals = proposals.filter((p) => p.request_id === req.id && p.status !== "declined");
+    const reqProposals = proposals.filter((p) => p.request_id === req.id && p.status === "pending");
     for (const p of reqProposals) {
       const key = `proposal:${p.id}:${req.id}`;
       if (seenKeys.has(key)) continue;
@@ -205,7 +213,7 @@ export default async function DashboardPage() {
         actionCards.push({
           id: o.id,
           key,
-          href: `/requests/${o.requestId}`,
+          href: `/requests/${o.requestId}?tab=delivery`,
           title: "Work delivered",
           body: `Work delivered for "${o.requestTitle}". Review and approve or request revision.`,
           createdAt: o.updated_at,
@@ -222,7 +230,7 @@ export default async function DashboardPage() {
         actionCards.push({
           id: o.id,
           key,
-          href: `/requests/${o.requestId}`,
+          href: `/requests/${o.requestId}?tab=delivery`,
           title: "Revision in progress",
           body: `Revision requested for "${o.requestTitle}". Helper is working on it.`,
           createdAt: o.updated_at,
@@ -234,69 +242,36 @@ export default async function DashboardPage() {
     }
   }
 
-  // Recent messages from helpers (request messages + order messages) that need attention
-  const { data: reqMsgRows } = await supabase
-    .from("messages")
-    .select("id, request_id, sender_id, created_at, content")
-    .in(
-      "request_id",
-      requests.map((r) => r.id)
-    )
-    .order("created_at", { ascending: false })
-    .limit(15);
-  for (const m of (reqMsgRows ?? []) as Array<{ id: string; request_id: string | null; sender_id: string; created_at: string }>) {
-    if (!m.request_id) continue;
-    const req = requests.find((r) => r.id === m.request_id);
-    if (!req) continue;
-    if (m.sender_id === user.id) continue;
-    if (req.helper_id && m.sender_id === req.helper_id) {
-      const key = `msg:req:${m.id}`;
-      if (!seenKeys.has(key)) {
-        seenKeys.add(key);
-        actionCards.push({
-          id: m.id,
-          key,
-          href: `/requests/${req.id}`,
-          title: "New message",
-          body: `Helper replied on "${req.title}".`,
-          createdAt: m.created_at,
-          tone: "bg-primary-container text-on-primary",
-          icon: MessageSquare,
-          dot: true,
-        });
-      }
-    }
-  }
-
-  const orderIdsForMsgs = orders.map((o) => o.id);
-  if (orderIdsForMsgs.length > 0) {
-    const { data: ordMsgRows } = await supabase
-      .from("messages")
-      .select("id, order_id, sender_id, created_at")
-      .in("order_id", orderIdsForMsgs)
-      .order("created_at", { ascending: false })
-      .limit(15);
-    for (const m of (ordMsgRows ?? []) as Array<{ id: string; order_id: string | null; sender_id: string; created_at: string }>) {
-      if (!m.order_id) continue;
-      const o = orders.find((x) => x.id === m.order_id);
-      if (!o || !o.requestId) continue;
-      if (m.sender_id === user.id) continue;
-      const key = `msg:ord:${m.id}`;
-      if (!seenKeys.has(key)) {
-        seenKeys.add(key);
-        actionCards.push({
-          id: m.id,
-          key,
-          href: `/requests/${o.requestId}`,
-          title: "New message",
-          body: `Helper replied on "${o.requestTitle}".`,
-          createdAt: m.created_at,
-          tone: "bg-primary-container text-on-primary",
-          icon: MessageSquare,
-          dot: true,
-        });
-      }
-    }
+  // New messages come from unread notification rows, not the message history.
+  // That way opening the thread marks the notification read and the dashboard
+  // card disappears instead of lingering for every old message.
+  for (const n of (notifRows ?? []) as Array<{
+    id: string;
+    type: string;
+    message: string;
+    link: string | null;
+    created_at: string;
+  }>) {
+    if (n.type !== "message") continue;
+    const requestId = n.link?.match(/^\/requests\/([^/?]+)/)?.[1];
+    const orderId = n.link?.match(/^\/orders\/([^/?]+)/)?.[1];
+    const requestIdForCard =
+      requestId ?? orders.find((o) => o.id === orderId)?.requestId ?? null;
+    if (!requestIdForCard) continue;
+    const key = `notif:${n.id}`;
+    if (seenKeys.has(key)) continue;
+    seenKeys.add(key);
+    actionCards.push({
+      id: n.id,
+      key,
+      href: `/requests/${requestIdForCard}`,
+      title: "New message",
+      body: n.message,
+      createdAt: n.created_at,
+      tone: "bg-primary-container text-on-primary",
+      icon: MessageSquare,
+      dot: true,
+    });
   }
 
   // Remove delivered/completed/declined/cancelled context from action cards by cross-checking - keep only actionable
@@ -328,6 +303,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="w-full max-w-7xl mx-auto flex flex-col gap-8">
+      <DashboardRefresh userId={user.id} />
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
           <h1 className="font-display font-bold text-2xl sm:text-3xl text-on-surface">Hi, {firstName}</h1>

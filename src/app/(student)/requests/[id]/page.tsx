@@ -13,10 +13,12 @@ export const metadata: Metadata = {
 
 export default async function StudentRequestDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }) {
-  const { id } = await params;
+  const [{ id }, query] = await Promise.all([params, searchParams]);
 
   const supabase = await createClient();
   const {
@@ -53,7 +55,13 @@ export default async function StudentRequestDetailPage({
   const orderId = (orders?.[0] as { id: string } | undefined)?.id ?? null;
 
   if (orderId) {
-    return <OrderWorkspace orderId={orderId} />;
+    return (
+      <OrderWorkspace
+        key={`${orderId}:${query.tab === "delivery" ? "delivery" : "overview"}`}
+        orderId={orderId}
+        initialTab={query.tab === "delivery" ? "delivery" : "overview"}
+      />
+    );
   }
 
   const { data: profile } = await supabase

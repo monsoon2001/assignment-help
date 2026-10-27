@@ -115,7 +115,13 @@ export default function NotificationsView({
   function handleOpen(n: AppNotification) {
     if (!n.read) void markRead(n.id);
     if (n.link) {
-      router.push(n.link);
+      // Delivery notifications should land on the delivered files, not the
+      // order overview. Older notification rows predate the deep link.
+      let href = n.link;
+      if (n.type === "delivery" && href.startsWith("/orders/") && !href.includes("tab=")) {
+        href += href.includes("?") ? "&tab=delivery" : "?tab=delivery";
+      }
+      router.push(href);
       router.refresh();
     }
   }

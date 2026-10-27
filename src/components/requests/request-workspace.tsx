@@ -291,11 +291,17 @@ export default function RequestWorkspace({
   }
 
   async function handleSendBid() {
-    const parsedPrice = Number(bidPrice);
-    if (!bidPrice || Number.isNaN(parsedPrice) || parsedPrice <= 0) {
+    const rawPrice = Number(bidPrice);
+    if (!bidPrice || !Number.isFinite(rawPrice) || rawPrice <= 0) {
       setBidError("Enter a valid price for this request.");
       return;
     }
+    const parsedPrice = Math.round(rawPrice);
+    if (!Number.isSafeInteger(parsedPrice) || parsedPrice <= 0) {
+      setBidError("The price must round to at least one whole unit.");
+      return;
+    }
+    setBidPrice(String(parsedPrice));
     setSendingBid(true);
     setBidError(null);
     const result = await submitProposal({
@@ -498,25 +504,30 @@ export default function RequestWorkspace({
                   <p className="text-xs text-on-surface-variant mb-3">
                     Price this request in the chat — the student reviews and accepts from here.
                   </p>
-                  <div className="flex flex-col gap-3 sm:flex-row">
-                    <div className="flex-1">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+                    <div className="w-full sm:w-32 sm:shrink-0">
                       <Input
-                        label="Your price"
+                        label="Price (whole units)"
                         type="number"
-                        min="0.01"
-                        step="0.01"
-                        placeholder="25.00"
+                        inputMode="numeric"
+                        min="1"
+                        step="1"
+                        placeholder="Enter amount"
                         value={bidPrice}
                         onChange={(e) => setBidPrice(e.target.value)}
+                        onBlur={() => {
+                          const raw = Number(bidPrice);
+                          if (Number.isFinite(raw) && raw > 0) setBidPrice(String(Math.round(raw)));
+                        }}
                       />
                     </div>
-                    <div className="flex flex-col gap-1.5 sm:w-44">
+                    <div className="flex flex-1 min-w-0 flex-col gap-1.5">
                       <label className="text-sm font-medium text-on-surface">Currency</label>
                       <select
                         aria-label="Currency"
                         value={bidCurrency}
                         onChange={(e) => setBidCurrency(e.target.value)}
-                        className="h-11 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20"
+                        className="h-11 w-full min-w-0 truncate rounded-lg border border-outline-variant bg-surface-container-lowest px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20"
                       >
                         {CHARGE_CURRENCIES.map((code) => (
                           <option key={code} value={code}>

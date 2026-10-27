@@ -19,11 +19,11 @@ import {
   TEAM_NOTE,
 } from "@/lib/home-content";
 import FaqAccordion from "@/components/marketing/faq-accordion";
-import { CURATED_TESTIMONIALS, THIN_REVIEW_MIN_LENGTH } from "@/lib/home-testimonials";
 import {
   accentForFeaturedGuide,
   accentForGuideCategory,
   accentForIndex,
+  accentForStep,
   accentForSubject,
   DARK_LINK,
 } from "@/lib/accent-styles";
@@ -117,49 +117,45 @@ const HOMEPAGE_SUBJECTS = [
   "academic-writing",
 ] as const;
 
-type RawReview = {
-  id: string;
-  rating: number;
-  comment: string | null;
-  student_name: string | null;
-  student_avatar_url: string | null;
-  created_at?: string | null;
-};
-
 export default async function HomePage() {
   const supabase = await createClient();
-  const reviewsResult = await supabase
+  const { data: reviewRows, error: reviewsError } = await supabase
     .from("helper_reviews")
     .select("id, rating, comment, created_at, student_name, student_avatar_url")
     .not("comment", "is", null)
     .order("created_at", { ascending: false })
-    .limit(8);
+    .limit(100);
+
+  if (reviewsError) {
+    console.error("Could not load public homepage reviews:", reviewsError.message);
+  }
 
   const seenReviews = new Set<string>();
-  const realTestimonials: Testimonial[] = ((reviewsResult.data ?? []) as unknown as RawReview[])
-    .filter((r) => (r.comment ?? "").trim().length > 0)
-    .filter((r) => {
-      // The same short review can be left twice; show each comment once.
-      const key = `${(r.student_name ?? "").toLowerCase()}|${r.comment!.trim().toLowerCase()}`;
+  const testimonials: Testimonial[] = ((reviewRows ?? []) as unknown as Array<{
+    id: string;
+    rating: number;
+    comment: string | null;
+    student_name: string | null;
+    student_avatar_url: string | null;
+    created_at: string | null;
+  }>)
+    .filter((review) => {
+      const comment = review.comment?.trim() ?? "";
+      if (comment.length < 40 || review.rating < 1 || review.rating > 5) return false;
+      const key = `${(review.student_name ?? "").trim().toLowerCase()}|${comment.toLowerCase()}`;
       if (seenReviews.has(key)) return false;
       seenReviews.add(key);
       return true;
     })
-    .map((r) => ({
-      id: r.id,
-      rating: r.rating,
-      comment: (r.comment ?? "").trim(),
-      studentName: r.student_name,
-      studentAvatarUrl: r.student_avatar_url,
-      createdAt: (r as { created_at?: string | null }).created_at ?? null,
+    .slice(0, 6)
+    .map((review) => ({
+      id: review.id,
+      rating: review.rating,
+      comment: review.comment!.trim(),
+      studentName: review.student_name,
+      studentAvatarUrl: review.student_avatar_url,
+      createdAt: review.created_at,
     }));
-
-  // A one-line "Excellent work!" tells a visitor nothing, so short reviews are
-  // left out and the section is filled with the curated accounts instead.
-  const testimonials: Testimonial[] = [
-    ...realTestimonials.filter((t) => t.comment.length >= THIN_REVIEW_MIN_LENGTH),
-    ...CURATED_TESTIMONIALS,
-  ].slice(0, 6);
 
   const averageRating =
     testimonials.length > 0
@@ -312,7 +308,7 @@ export default async function HomePage() {
             {/* Right Column - Price Estimate Form */}
             <div
               id="estimate"
-              className="hidden lg:block scroll-mt-24 bg-surface-container-lowest rounded-2xl shadow-xl shadow-primary-container/15 ring-1 ring-outline-variant/50 border border-outline-variant/50 p-6 sm:p-8 home-enter home-enter-delay"
+              className="hidden lg:block scroll-mt-24 bg-surface-container-lowest rounded-2xl shadow-2xl shadow-primary/10 ring-1 ring-outline-variant/70 border-2 border-outline-variant/70 p-6 sm:p-8 home-enter home-enter-delay"
             >
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-10 h-10 bg-primary-fixed rounded-xl flex items-center justify-center shrink-0">
@@ -403,7 +399,7 @@ export default async function HomePage() {
 
           <ol className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-5">
             {STEPS.map((step, i) => {
-              const accent = accentForIndex(i);
+              const accent = accentForStep(i);
               return (
               <li key={step.num} className="relative group">
                 {i < STEPS.length - 1 && (
@@ -647,11 +643,11 @@ export default async function HomePage() {
             <p className="text-base text-on-surface-variant leading-relaxed">
               {testimonials.length > 0 ? (
                 <>
-                  Feedback from students who used Acadivo — rated{" "}
+                  Feedback from students who chose to leave a review — rated{" "}
                   <span className="font-semibold text-on-surface">
                     {averageRating.toFixed(1)} / 5
                   </span>{" "}
-                  on average, and every helper is a verified peer mentor.
+                  on average.
                 </>
               ) : (
                 "We’re just getting started. Become one of our first students and help shape Acadivo."
@@ -663,7 +659,7 @@ export default async function HomePage() {
           ) : (
             <div className="text-center bg-surface-container-lowest rounded-2xl border border-outline-variant/30 py-10 px-6">
               <p className="text-base text-on-surface-variant leading-relaxed">
-                No testimonials yet — join us to be the first, and we&apos;ll feature your review here.
+                No public reviews yet.
               </p>
             </div>
           )}

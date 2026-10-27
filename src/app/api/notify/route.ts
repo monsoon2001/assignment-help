@@ -139,7 +139,7 @@ export async function POST(request: Request) {
           return {
             type: "delivery",
             message: "A helper delivered work for your order.",
-            link: `/orders/${id}`,
+            link: `/orders/${id}?tab=delivery`,
             emailSubject: "Work delivered — review it now",
             emailBody:
               "A helper delivered work for your order. Review it and either accept the delivery or request a revision.",

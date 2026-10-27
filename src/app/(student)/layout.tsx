@@ -81,7 +81,6 @@ export default async function StudentLayout({ children }: { children: React.Reac
       <RoleBottomNav
         roleLabel="Student"
         primary={[
-          { href: "/", label: "Home", icon: "home" },
           { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
           { href: "/requests", label: "Requests", icon: "requests", badge: requestCount > 0 ? requestCount : undefined },
           { href: "/messages", label: "Messages", icon: "messages" },

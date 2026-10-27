@@ -74,7 +74,15 @@ type PaymentRow = {
   created_at: string | null;
 };
 
-export default function OrderWorkspace({ orderId }: { orderId: string }) {
+type WorkspaceTab = "overview" | "chat" | "delivery";
+
+export default function OrderWorkspace({
+  orderId,
+  initialTab = "overview",
+}: {
+  orderId: string;
+  initialTab?: WorkspaceTab;
+}) {
   const supabase = useRef(createClient());
 
   const [order, setOrder] = useState<OrderData | null>(null);
@@ -83,7 +91,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<"overview" | "chat" | "delivery">("overview");
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>(initialTab);
   const [messages, setMessages] = useState<ChatMessageRow[]>([]);
   const [deliveries, setDeliveries] = useState<DeliveryRow[]>([]);
   const [payment, setPayment] = useState<PaymentRow | null>(null);
@@ -108,6 +116,7 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
 
   useEffect(() => {
     markThreadNotificationsRead(`/orders/${orderId}`);
+    markThreadNotificationsRead(`/orders/${orderId}?tab=delivery`);
     markThreadNotificationsRead(`/helper/orders/${orderId}`);
     markThreadNotificationsRead(pathname);
   }, [pathname, orderId]);
@@ -627,10 +636,14 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                   href={payment.receipt_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-container px-4 py-3 text-sm font-semibold text-on-primary shadow-sm transition-colors hover:bg-primary-hover"
                 >
-                  View payment receipt <ExternalLink size={12} />
+                  <Receipt size={16} /> View payment receipt <ExternalLink size={14} />
                 </a>
+              ) : payment?.status === "paid" ? (
+                <p className="text-xs text-on-surface-variant mt-3 leading-relaxed">
+                  Payment confirmed. Your receipt was sent to your account email.
+                </p>
               ) : (
                 <p className="text-xs text-on-surface-variant mt-3 leading-relaxed">
                   {isHelper
@@ -681,13 +694,83 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
       {activeTab === "delivery" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
           <div className="flex flex-col gap-4">
-            <Card className="p-5">
-              <h2 className="font-display font-semibold text-on-surface mb-1">Deliverables</h2>
-              <p className="text-sm text-on-surface-variant mb-4">
-                {isHelper
-                  ? "Upload completed work. This creates a delivery and marks the order Delivered."
-                  : "Reviewed files appear here once your helper delivers."}
-              </p>
+            {isStudent && payment?.status === "paid" && (
+              <Card className="flex flex-wrap items-center justify-between gap-3 border-success/30 bg-success-tint/30 p-4">
+                <div>
+                  <p className="font-semibold text-on-surface">Payment complete · {chargePrice}</p>
+                  <p className="text-xs text-on-surface-variant">
+                    {payment.created_at
+                      ? `Paid ${new Date(payment.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+                      : "Your payment is confirmed."}
+                  </p>
+                </div>
+                {payment.receipt_url && (
+                  <a
+                    href={payment.receipt_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary-container px-4 py-2 text-sm font-semibold text-on-primary shadow-sm transition-colors hover:bg-primary-hover"
+                  >
+                    <Receipt size={16} /> View receipt <ExternalLink size={14} />
+                  </a>
+                )}
+                {!payment.receipt_url && (
+                  <p className="text-xs text-on-surface-variant">
+                    Receipt sent to your account email.
+                  </p>
+                )}
+              </Card>
+            )}
+            <Card className="p-5 border-primary-container/20 bg-[linear-gradient(135deg,#eff6ff_0%,#ffffff_65%)]">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3 min-w-0">
+                  <span className="w-11 h-11 rounded-xl bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-sm">
+                    <Package size={20} />
+                  </span>
+                  <div className="min-w-0">
+                    <h2 className="font-display font-semibold text-on-surface">Deliverables</h2>
+                    <p className="text-sm text-on-surface-variant mt-0.5">
+                      {isHelper
+                        ? "Upload completed work. This creates a delivery and marks the order Delivered."
+                        : deliveries.length > 0
+                          ? "Your helper has sent files. Open or download them below."
+                          : "Reviewed files appear here once your helper delivers."}
+                    </p>
+                  </div>
+                </div>
+                <StatusBadge tone={meta.tone} dot className="shrink-0">{meta.label}</StatusBadge>
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="rounded-xl border border-outline-variant/70 bg-white/80 px-3 py-2">
+                  <p className="text-[11px] uppercase tracking-wide text-on-surface-variant">Deliveries</p>
+                  <p className="font-display text-lg font-bold text-on-surface">{deliveries.length}</p>
+                </div>
+                <div className="rounded-xl border border-outline-variant/70 bg-white/80 px-3 py-2">
+                  <p className="text-[11px] uppercase tracking-wide text-on-surface-variant">Files</p>
+                  <p className="font-display text-lg font-bold text-on-surface">
+                    {deliveries.reduce((sum, d) => sum + d.file_urls.length, 0)}
+                  </p>
+                </div>
+              </div>
+
+              {isStudent && order.status === "delivered" && (
+                <div className="mt-3 flex items-start gap-2 rounded-xl border border-success/30 bg-success-tint/70 px-3 py-2.5">
+                  <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-success" />
+                  <p className="text-sm text-on-surface">
+                    Review the files below, then approve the work or request changes.
+                  </p>
+                </div>
+              )}
+
+              {isStudent && order.status === "revision_requested" && (
+                <div className="mt-3 flex items-start gap-2 rounded-xl border border-warning/30 bg-warning-container/40 px-3 py-2.5">
+                  <RotateCcw size={16} className="mt-0.5 shrink-0 text-warning" />
+                  <p className="text-sm text-on-surface">
+                    Changes requested. Your helper is updating the delivery.
+                  </p>
+                </div>
+              )}
 
               {deliveries.length === 0 && (
                 <div className="flex flex-col items-center gap-2 py-8 text-center">
@@ -705,17 +788,24 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                 {deliveries.map((d) => (
                   <div
                     key={d.id}
-                    className={`p-4 rounded-xl border ${
-                      d.revision_note ? "border-warning/50 bg-warning-container/10" : "border-outline-variant"
+                    className={`p-4 rounded-xl border shadow-sm ${
+                      d.revision_note
+                        ? "border-warning/50 bg-warning-container/10"
+                        : "border-outline-variant bg-white"
                     }`}
                   >
-                    <div className="flex items-center gap-2 text-xs text-on-surface-variant mb-2">
-                      <span
-                        className={`w-2 h-2 rounded-full inline-block ${
-                          d.revision_note ? "bg-warning" : "bg-success"
-                        }`}
-                      />
-                      {d.revision_note ? "Changes requested" : "Delivered"} {timeLabel(d.created_at)}
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-on-surface-variant">
+                        <span
+                          className={`w-2 h-2 rounded-full inline-block ${
+                            d.revision_note ? "bg-warning" : "bg-success"
+                          }`}
+                        />
+                        {d.revision_note ? "Changes requested" : "Delivered"} {timeLabel(d.created_at)}
+                      </div>
+                      <span className="text-[11px] text-on-surface-variant">
+                        {d.file_urls.length} {d.file_urls.length === 1 ? "file" : "files"}
+                      </span>
                     </div>
                     {d.revision_note ? (
                       <>
@@ -736,9 +826,9 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                             bucket="order-files"
                             showDownload
                             label={fileNameFromUrl(url)}
-                            className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant hover:bg-surface-container-low transition-colors"
+                            className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant bg-surface-container-lowest hover:border-primary-container/50 hover:bg-primary-container/5 transition-colors"
                           >
-                            <span className="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
+                            <span className="w-9 h-9 rounded-lg bg-primary-container/10 text-primary flex items-center justify-center shrink-0">
                               <FileText size={16} />
                             </span>
                             <span className="min-w-0 flex-1 text-sm font-medium text-on-surface truncate">
@@ -754,8 +844,13 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
             </Card>
 
             {isStudent && order.status === "delivered" && (
-              <Card className="p-5 flex flex-col gap-3">
-                <h3 className="font-semibold text-on-surface">How did the delivery look?</h3>
+              <Card className="p-5 flex flex-col gap-3 border-success/30 bg-success-tint/30">
+                <div>
+                  <h3 className="font-semibold text-on-surface">How did the delivery look?</h3>
+                  <p className="text-xs text-on-surface-variant mt-1">
+                    Approve to release the order, or ask for corrections first.
+                  </p>
+                </div>
 
                 {revisionOpen ? (
                   <div className="flex flex-col gap-3">
@@ -796,11 +891,11 @@ export default function OrderWorkspace({ orderId }: { orderId: string }) {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2">
+                    <Button onClick={() => setOrderStatus("completed")} className="w-full">
+                      <Check size={15} /> Approve &amp; Complete
+                    </Button>
                     <Button variant="outline" onClick={() => setRevisionOpen(true)}>
                       <RotateCcw size={15} /> Request a Change
-                    </Button>
-                    <Button onClick={() => setOrderStatus("completed")} className="w-full">
-                      <Check size={15} /> Accept &amp; Complete
                     </Button>
                   </div>
                 )}

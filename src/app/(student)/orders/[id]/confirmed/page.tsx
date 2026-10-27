@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import {
-  CheckCircle2, Verified, CalendarCheck, MailCheck, MessageSquare, ShieldCheck, Timer,
+  CheckCircle2, Verified, CalendarCheck, MailCheck, MessageSquare, ShieldCheck, Timer, ExternalLink,
 } from "lucide-react";
 import { stripe } from "@/lib/stripe";
 import { unwrapRow } from "@/lib/embedded";
@@ -157,9 +157,9 @@ export default async function OrderConfirmedPage({
               href={receiptUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-primary inline-flex items-center gap-1.5 font-semibold hover:underline"
+              className="mt-1 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-container px-4 py-3 text-sm font-semibold text-on-primary shadow-sm transition-colors hover:bg-primary-hover"
             >
-              <MailCheck size={13} /> View your payment receipt
+              <MailCheck size={16} /> View your payment receipt <ExternalLink size={14} />
             </a>
           ) : (
             <p className="text-xs text-on-surface-variant inline-flex items-center gap-1.5">
