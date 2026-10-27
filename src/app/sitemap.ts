@@ -15,6 +15,8 @@ const STATIC_ROUTES = [
   "/services",
   "/subjects",
   "/terms",
+  "/tools",
+  "/tools/word-counter",
 ];
 
 // One page per service, generated from the same data as /services and the

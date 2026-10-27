@@ -36,8 +36,12 @@ const organizationSchema = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   applicationName: SITE_NAME,
-  title: "Assignment Help Online | Find a Qualified Assignment Helper | Acadivo",
+  title: {
+    default: "Assignment Help Online | Find a Qualified Assignment Helper | Acadivo",
+    template: "%s",
+  },
   description: SITE_DESCRIPTION,
+  alternates: { canonical: "./" },
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
@@ -56,7 +60,7 @@ export const metadata: Metadata = {
     images: ["/opengraph-image"],
   },
   robots: {
-    index: true,
+    index: process.env.VERCEL_ENV === "production",
     follow: true,
     googleBot: {
       index: true,

@@ -87,6 +87,22 @@ const nextConfig: NextConfig = {
       })),
     ];
   },
+  async redirects() {
+    const canonical = "https://acadivo.com";
+    const hosts = [
+      "www.acadivo.com",
+      "acadivo.vercel.app",
+      "*.vercel.app",
+    ];
+    return hosts.flatMap((host) => [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: host }],
+        destination: `${canonical}/:path*`,
+        permanent: true,
+      },
+    ]);
+  },
 };
 
 export default nextConfig;
