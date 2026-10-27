@@ -67,21 +67,17 @@ export default function ResourcesPage() {
                           className={accent.icon}
                         />
                       </span>
-                      <span className={`text-xs font-semibold ${accent.text}`}>
+                      <span className="text-xs font-semibold text-on-surface-variant">
                         {CATEGORY_BY_SLUG.get(guide.category)?.name}
                       </span>
                     </div>
-                    <h3
-                      className={`mb-2 font-display font-bold leading-snug transition-colors ${accent.text}`}
-                    >
+                    <h3 className="mb-2 font-display font-bold leading-snug text-on-surface">
                       {guide.title}
                     </h3>
                     <p className="mb-4 flex-1 text-base leading-relaxed text-on-surface-variant line-clamp-3">
                       {guide.ogDescription}
                     </p>
-                    <span
-                      className={`inline-flex items-center gap-1.5 text-sm font-semibold ${accent.text}`}
-                    >
+                    <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
                       Read guide{" "}
                       <ArrowRight
                         size={15}
@@ -120,17 +116,13 @@ export default function ResourcesPage() {
                     >
                       <MaterialIcon name={category.icon} size={24} className={accent.icon} />
                     </div>
-                    <h3
-                      className={`mb-1.5 font-display font-bold transition-colors ${accent.text}`}
-                    >
+                    <h3 className="mb-1.5 font-display font-bold text-on-surface">
                       {category.name}
                     </h3>
                     <p className="mb-4 flex-1 text-base leading-relaxed text-on-surface-variant">
                       {category.description}
                     </p>
-                    <p
-                      className={`inline-flex items-center gap-1.5 text-sm font-semibold ${accent.text}`}
-                    >
+                    <p className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
                       {count} guides{" "}
                       <ArrowRight
                         size={15}
