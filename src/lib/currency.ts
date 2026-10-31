@@ -1,10 +1,9 @@
 // Multi-currency support.
 //
-// Helpers may quote a price in any currency below. The platform then charges
-// the student in *their* local currency (resolved from their saved sign-in
-// location), converts to CAD for its own ledger, and absorbs any processing or
-// foreign-exchange cost. Students never see a fee, a commission or a CAD
-// equivalent — only the single local total they pay.
+// Helpers may quote a price in any currency below. The platform charges the
+// student in their local currency and includes a processing/FX buffer in the
+// total. Proposal screens disclose the helper's quote and estimate the included
+// costs before the student accepts.
 //
 // Fees baked into that total:
 //   * Students in Canada pay a flat 3.9% Stripe processing fee.
@@ -257,14 +256,14 @@ export function isCanada(country?: string | null): boolean {
 }
 
 /**
- * Stripe processing fee absorbed by the platform for Canadian students. There is
- * no currency-conversion fee because the platform settles in CAD.
+ * Processing-cost buffer included in the local total for Canadian students.
  */
 export const CA_PROCESSING_FEE_PERCENT = 3.9;
 
 /**
- * Processing + currency-conversion buffer for students outside Canada. Used as a
- * fallback when the admin setting is missing or non-positive.
+ * Processing + currency-conversion buffer included in the local total for
+ * students outside Canada. Used as a fallback when the admin setting is missing
+ * or non-positive.
  */
 export const INTERNATIONAL_FEE_PERCENT = 5.9;
 
@@ -314,7 +313,7 @@ export function convertViaCad(
 /**
  * The amount a student pays in their local currency: the helper's quoted base
  * converted at the daily rate, plus the platform's processing/conversion fee.
- * The fee is never itemised — only the final local total is shown.
+ * Proposal UIs show the helper quote and estimated included costs separately.
  *
  * `surchargePercent` must already reflect the student's location: 3.9% for
  * Canada, 5.9% (or the configured international buffer) otherwise.

@@ -13,8 +13,8 @@ import {
 
 /**
  * The international processing/FX buffer applied to students outside Canada.
- * Read from the admin-only settings table with the service role; it is never
- * itemised and is only used to derive the single local total.
+ * Read from the admin-only settings table with the service role and used to
+ * preview and lock the student's local total.
  */
 export async function getFxSurchargePercent(): Promise<number> {
   const { data } = await adminClient
@@ -50,9 +50,8 @@ export interface ChargeContext {
 }
 
 /**
- * The client-safe inputs a student UI needs to preview a local charge: their
- * local currency, the daily CAD-based rates and the hidden buffer. Used by the
- * proposal card so the quote matches what will be locked at acceptance.
+ * The client-safe inputs the proposal UI needs to preview a student's local
+ * total, including the estimated processing/FX costs, before acceptance.
  */
 export async function getChargeContext(country: string | null): Promise<ChargeContext> {
   const [rates, surchargePercent] = await Promise.all([

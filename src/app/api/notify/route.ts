@@ -17,6 +17,7 @@ export const dynamic = "force-dynamic";
 type NotifyEvent =
   | "request.created"
   | "proposal.created"
+  | "proposal.revised"
   | "proposal.declined"
   | "order.delivered"
   | "order.revision_requested"
@@ -66,7 +67,8 @@ export async function POST(request: Request) {
       }));
       break;
     }
-    case "proposal.created": {
+    case "proposal.created":
+    case "proposal.revised": {
       const { data } = await adminClient
         .from("proposals")
         .select("helper_id, request_id")
@@ -78,13 +80,22 @@ export async function POST(request: Request) {
       }
       await notifyRequestActivity(data.request_id, ({ title }) => ({
         type: "proposal",
-        message: `A helper sent a proposal for "${title}".`,
+        message:
+          event === "proposal.revised"
+            ? `A helper revised the quote for "${title}".`
+            : `A helper sent a proposal for "${title}".`,
         link: `/requests`,
-        emailSubject: "A helper sent you a proposal",
-        emailBody: `A helper has responded to your request "${title}" with a proposal. Review it and accept to move forward.`,
+        emailSubject:
+          event === "proposal.revised"
+            ? "A helper revised your quote"
+            : "A helper sent you a proposal",
+        emailBody:
+          event === "proposal.revised"
+            ? `A helper revised the quote for your request "${title}". Review the updated amount and details.`
+            : `A helper has responded to your request "${title}" with a proposal. Review it and accept to move forward.`,
         emailLinkLabel: "Review the proposal",
         audience: ["student", "helper", "admin"],
-        inAppRoles: ["admin"],
+        inAppRoles: event === "proposal.revised" ? ["student", "admin"] : ["admin"],
         actorId: user.id,
       }));
       break;

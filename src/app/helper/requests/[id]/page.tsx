@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import RequestWorkspace from "@/components/requests/request-workspace";
 import OrderWorkspace from "@/components/orders/order-workspace";
 import { createClient } from "@/lib/supabase/server";
+import { getChargeContext } from "@/lib/charge.server";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ export default async function HelperRequestDetailPage({
 
   const { data: request } = await supabase
     .from("requests")
-    .select("id, helper_id")
+    .select("id, helper_id, student_id")
     .eq("id", id)
     .maybeSingle();
 
@@ -52,5 +53,20 @@ export default async function HelperRequestDetailPage({
     return <OrderWorkspace orderId={orderId} />;
   }
 
-  return <RequestWorkspace requestId={id} mode="helper" />;
+  const { data: student } = await supabase
+    .from("users")
+    .select("country")
+    .eq("id", request.student_id)
+    .maybeSingle();
+  const chargeContext = await getChargeContext(student?.country ?? null);
+
+  return (
+    <RequestWorkspace
+      requestId={id}
+      mode="helper"
+      localCurrency={chargeContext.localCurrency}
+      rates={chargeContext.rates}
+      surchargePercent={chargeContext.surchargePercent}
+    />
+  );
 }

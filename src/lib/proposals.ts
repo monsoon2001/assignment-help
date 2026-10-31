@@ -13,7 +13,7 @@ export interface NewProposalInput {
 
 export async function submitProposal(
   input: NewProposalInput,
-): Promise<{ id: string } | { error: string }> {
+): Promise<{ id: string; revised: boolean } | { error: string }> {
   const supabase = createClient();
 
   const {
@@ -28,67 +28,20 @@ export async function submitProposal(
     return { error: "Enter a valid whole-number proposal price." };
   }
 
-  // If a previous proposal was declined, allow resubmitting by updating it.
-  const { data: existing } = await supabase
-    .from("proposals")
-    .select("id, status")
-    .eq("request_id", input.request_id)
-    .eq("helper_id", user.id)
-    .maybeSingle();
+  const { data, error } = await supabase.rpc("submit_or_revise_proposal", {
+    p_request_id: input.request_id,
+    p_price: price,
+    p_currency: normalizeCurrency(input.currency),
+    p_description: input.description ?? null,
+    p_revisions_included: input.revisions_included ?? 0,
+  });
+  if (error) return { error: error.message };
 
-  let resultId: string;
-  if (existing && existing.status === "declined") {
-    const { data, error } = await supabase
-      .from("proposals")
-      .update({
-        price,
-        currency: normalizeCurrency(input.currency),
-        description: input.description ?? null,
-        revisions_included: input.revisions_included ?? 0,
-        expires_at: input.expires_at ?? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        status: "pending",
-      })
-      .eq("id", existing.id)
-      .select("id")
-      .single();
-    if (error) return { error: error.message };
-    resultId = data.id;
-  } else if (existing) {
-    return { error: "You already sent a proposal for this request." };
-  } else {
-    const { data, error } = await supabase
-      .from("proposals")
-      .insert({
-        request_id: input.request_id,
-        helper_id: user.id,
-        price,
-        currency: normalizeCurrency(input.currency),
-        description: input.description ?? null,
-        revisions_included: input.revisions_included ?? 0,
-        expires_at: input.expires_at ?? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        status: "pending",
-      })
-      .select("id")
-      .single();
-
-    if (error) {
-      if (error.code === "23505") {
-        return { error: "You already sent a proposal for this request." };
-      }
-      return { error: error.message };
-    }
-    resultId = data.id;
+  const result = data as { id?: unknown; revised?: unknown } | null;
+  if (typeof result?.id !== "string" || typeof result.revised !== "boolean") {
+    return { error: "The proposal was saved, but its result could not be confirmed." };
   }
 
-  const { error: updateError } = await supabase
-    .from("requests")
-    .update({ status: "proposal_sent" })
-    .eq("id", input.request_id);
-
-  if (updateError) {
-    return { error: updateError.message };
-  }
-
-  notifyActivity("proposal.created", resultId);
-  return { id: resultId };
+  notifyActivity(result.revised ? "proposal.revised" : "proposal.created", result.id);
+  return { id: result.id, revised: result.revised };
 }

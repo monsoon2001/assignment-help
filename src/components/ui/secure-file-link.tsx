@@ -134,26 +134,33 @@ export default function SecureFileLink({
   }
 
   return (
-    <span className={className}>
-      <button
-        type="button"
-        onClick={open}
-        title={title}
-        aria-disabled={state.error}
-        className="flex items-center gap-3 flex-1 min-w-0 text-left cursor-pointer"
-      >
-        {children}
-      </button>
-      <button
-        type="button"
-        onClick={download}
-        disabled={downloading}
-        title={`Download ${displayName}`}
-        aria-label={`Download ${displayName}`}
-        className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-md text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors disabled:opacity-50 cursor-pointer"
-      >
-        <Download size={15} />
-      </button>
-    </span>
+    <>
+      <span className={className}>
+        <button
+          type="button"
+          onClick={open}
+          title={title}
+          aria-disabled={state.error}
+          className="flex items-center gap-3 flex-1 min-w-0 text-left cursor-pointer"
+        >
+          {children}
+        </button>
+        <button
+          type="button"
+          onClick={download}
+          disabled={downloading}
+          title={`Download ${displayName}`}
+          aria-label={`Download ${displayName}`}
+          className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-md text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors disabled:opacity-50 cursor-pointer"
+        >
+          <Download size={15} />
+        </button>
+      </span>
+      {state.error && (
+        <span role="alert" className="text-xs text-error">
+          This file could not be opened. Please try again or contact support.
+        </span>
+      )}
+    </>
   );
 }

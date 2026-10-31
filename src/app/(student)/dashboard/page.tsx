@@ -24,6 +24,8 @@ import { requestStatusTone } from "@/lib/status-meta";
 import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 import DashboardRefresh from "@/components/dashboard/dashboard-refresh";
 import DismissActionCardButton from "@/components/dashboard/dismiss-action-card-button";
+import SecureFileLink from "@/components/ui/secure-file-link";
+import { fileNameFromStoredUrl } from "@/lib/signed-files";
 
 export const dynamic = "force-dynamic";
 
@@ -60,6 +62,7 @@ type ActionCardItem = {
   tone: string;
   icon: LucideIcon;
   dot?: boolean;
+  deliveryFiles?: string[];
 };
 
 export default async function DashboardPage() {
@@ -152,7 +155,7 @@ export default async function DashboardPage() {
   const orderListRes = await supabase
     .from("orders")
     .select(
-      "id, status, updated_at, created_at, proposal:proposals(id, request_id, request:requests(id,title))",
+      "id, status, updated_at, created_at, proposal:proposals(id, request_id, request:requests(id,title)), deliveries(id, file_urls)",
     )
     .eq("student_id", user.id)
     .order("updated_at", { ascending: false })
@@ -171,6 +174,7 @@ export default async function DashboardPage() {
       requestId: req?.id ?? null,
       requestTitle: req?.title ?? "your request",
       proposalId: prop?.id ?? null,
+      deliveryFiles: (o.deliveries ?? []).flatMap((delivery) => delivery.file_urls ?? []),
     };
   });
 
@@ -233,6 +237,7 @@ export default async function DashboardPage() {
           tone: "bg-success-tint text-success",
           icon: Package,
           dot: true,
+          deliveryFiles: o.deliveryFiles,
         });
       }
     }
@@ -371,6 +376,15 @@ export default async function DashboardPage() {
         })}
       </section>
 
+      {orderListRes.error && (
+        <div role="alert">
+          <Card className="border-error/40 bg-error-container/10 p-4 text-sm text-error">
+            We couldn&apos;t load your current orders or delivery files. Refresh the dashboard to
+            try again.
+          </Card>
+        </div>
+      )}
+
       {actionable.length > 0 && (
         <section className="flex flex-col gap-3">
           <div className="flex items-center justify-between gap-4">
@@ -382,8 +396,8 @@ export default async function DashboardPage() {
               return (
                 <div key={card.key} className="relative">
                   <DismissActionCardButton cardKey={card.key} />
-                  <Link href={card.href}>
-                    <Card className="action-card p-5 transition-shadow hover:shadow-lg" hover>
+                  <Card className="action-card p-5 transition-shadow hover:shadow-lg" hover>
+                    <Link href={card.href} className="block">
                       <div className="flex items-start gap-3">
                         <span
                           className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${card.tone}`}
@@ -408,8 +422,27 @@ export default async function DashboardPage() {
                           </div>
                         </div>
                       </div>
-                    </Card>
-                  </Link>
+                    </Link>
+                    {card.deliveryFiles && card.deliveryFiles.length > 0 && (
+                      <div className="mt-3 flex flex-col gap-2">
+                        {card.deliveryFiles.map((file, index) => (
+                          <SecureFileLink
+                            key={`${file}-${index}`}
+                            stored={file}
+                            bucket="order-files"
+                            showDownload
+                            label={fileNameFromStoredUrl(file)}
+                            className="flex items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest p-2 text-sm text-on-surface hover:bg-surface-container-low"
+                          >
+                            <FileText size={15} className="shrink-0 text-primary" />
+                            <span className="min-w-0 flex-1 truncate">
+                              {fileNameFromStoredUrl(file)}
+                            </span>
+                          </SecureFileLink>
+                        ))}
+                      </div>
+                    )}
+                  </Card>
                 </div>
               );
             })}

@@ -125,6 +125,7 @@ export default function OrderWorkspace({
   const [deliveryFiles, setDeliveryFiles] = useState<File[]>([]);
   const [submittingDelivery, setSubmittingDelivery] = useState(false);
   const [deliveryError, setDeliveryError] = useState<string | null>(null);
+  const [deliveryLoadError, setDeliveryLoadError] = useState<string | null>(null);
   const [revisionOpen, setRevisionOpen] = useState(false);
   const [revisionNote, setRevisionNote] = useState("");
   const [sendingRevision, setSendingRevision] = useState(false);
@@ -218,11 +219,16 @@ export default function OrderWorkspace({
   }, [orderId]);
 
   const loadDeliveries = useCallback(async () => {
-    const { data } = await supabase.current
+    const { data, error } = await supabase.current
       .from("deliveries")
       .select("id, message, file_urls, revision_note, created_at")
       .eq("order_id", orderId)
       .order("created_at", { ascending: true });
+    if (error) {
+      setDeliveryLoadError(`Could not load delivery files: ${error.message}`);
+      return;
+    }
+    setDeliveryLoadError(null);
     setDeliveries((data ?? []) as DeliveryRow[]);
   }, [orderId]);
 
@@ -590,6 +596,8 @@ export default function OrderWorkspace({
                       orderId={order.id}
                       orderStatus={order.status}
                       orderPaid={false}
+                      lockedAmount={Number(order.charge_amount ?? order.price)}
+                      lockedCurrency={normalizeCurrency(order.charge_currency ?? order.currency)}
                       localCurrency={normalizeCurrency(order.charge_currency ?? order.currency)}
                     />
                   )}
@@ -751,7 +759,7 @@ export default function OrderWorkspace({
             )}
 
             {activeTab === "chat" && (
-              <div className="h-[calc(100dvh-20rem)] min-h-[280px] lg:hidden">
+              <div className="h-[calc(100dvh-20rem)] min-h-[280px] overflow-hidden lg:hidden">
                 <ChatPanel
                   fill
                   filesBucket="order-files"
@@ -803,6 +811,11 @@ export default function OrderWorkspace({
                     </Card>
                   )}
                   <Card className="p-5 border-primary-tint-line bg-primary-tint/40">
+                    {deliveryLoadError && (
+                      <p role="alert" className="mb-3 text-sm text-error">
+                        {deliveryLoadError}
+                      </p>
+                    )}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3 min-w-0">
                         <span className="w-11 h-11 rounded-xl bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-sm">

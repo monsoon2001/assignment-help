@@ -102,64 +102,57 @@ export async function POST(request: Request) {
     );
   }
 
-  // Insert with the service role: the financial columns are computed here from
-  // the proposal and the student's local currency, never from client input, so
-  // the client-facing orders INSERT policy is intentionally removed (see the
-  // harden_order_insert migration).
-  const now = new Date().toISOString();
-  const { data: order, error: insertError } = await adminClient
-    .from("orders")
-    .insert({
-      proposal_id: proposal.id,
-      student_id: user.id,
-      helper_id: proposal.helper_id,
-      status: "payment_pending",
-      price: baseAmount,
-      currency: baseCurrency,
-      base_currency: baseCurrency,
-      base_amount: baseAmount,
-      charge_currency: charge.currency,
-      charge_amount: charge.amount,
-      charge_locked_at: now,
-      deadline: req.deadline ?? null,
-    })
-    .select("id")
-    .single();
+  // The RPC rechecks the proposal price and creates the order while holding
+  // request/proposal row locks. A quote revised in parallel cannot be accepted
+  // at a stale amount.
+  const { data: acceptedOrderId, error: acceptError } = await adminClient.rpc(
+    "accept_proposal_with_charge",
+    {
+      p_proposal_id: proposal.id,
+      p_student_id: user.id,
+      p_expected_price: baseAmount,
+      p_expected_currency: baseCurrency,
+      p_charge_currency: charge.currency,
+      p_charge_amount: charge.amount,
+    },
+  );
 
-  if (insertError) {
-    if (insertError.code === "23505") {
+  if (acceptError) {
+    if (acceptError.code === "23505") {
+      const { data: existingOrder } = await adminClient
+        .from("orders")
+        .select("id, student_id")
+        .eq("proposal_id", proposal.id)
+        .maybeSingle();
+      if (existingOrder?.student_id === user.id) {
+        return NextResponse.json({ orderId: existingOrder.id });
+      }
       return NextResponse.json(
         { error: "This proposal has already been accepted." },
         { status: 409 },
       );
     }
-    console.error("accept: order insert failed", insertError);
-    return NextResponse.json({ error: insertError.message }, { status: 500 });
+    if (acceptError.code === "P0001") {
+      return NextResponse.json({ error: acceptError.message }, { status: 409 });
+    }
+    console.error("accept: proposal acceptance failed", acceptError);
+    return NextResponse.json(
+      { error: "Could not accept this proposal. Please try again." },
+      { status: 500 },
+    );
   }
-
-  const { error: requestError } = await supabase
-    .from("requests")
-    .update({ status: "accepted" })
-    .eq("id", req.id);
-  if (requestError) {
-    return NextResponse.json({ error: requestError.message }, { status: 500 });
-  }
-
-  const { error: proposalUpdateError } = await supabase
-    .from("proposals")
-    .update({ status: "accepted" })
-    .eq("id", proposal.id);
-  if (proposalUpdateError) {
-    return NextResponse.json({ error: proposalUpdateError.message }, { status: 500 });
+  if (typeof acceptedOrderId !== "string") {
+    console.error("accept: proposal acceptance returned no order id");
+    return NextResponse.json({ error: "Could not confirm the accepted order." }, { status: 500 });
   }
 
   // Run after the response so the email fan-out never slows the student's
   // redirect to the payment screen.
   after(() =>
-    notifyOrderActivity(order.id, () => ({
+    notifyOrderActivity(acceptedOrderId, () => ({
       type: "payment",
       message: "A proposal was accepted — an order is ready for payment.",
-      link: `/orders/${order.id}`,
+      link: `/orders/${acceptedOrderId}`,
       emailSubject: "Proposal accepted — payment is next",
       emailBody:
         "A proposal for this request was just accepted and an order has been created. The student now needs to complete payment for the work to begin.",
@@ -170,5 +163,5 @@ export async function POST(request: Request) {
     })),
   );
 
-  return NextResponse.json({ orderId: order.id });
+  return NextResponse.json({ orderId: acceptedOrderId });
 }

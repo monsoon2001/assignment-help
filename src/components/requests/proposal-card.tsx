@@ -8,9 +8,11 @@ import Avatar from "@/components/ui/avatar";
 import { acceptProposal, declineProposal } from "@/lib/orders";
 import {
   computeLocalCharge,
+  convertViaCad,
   normalizeCurrency,
   formatCurrency,
   DEFAULT_CURRENCY,
+  roundMoney,
 } from "@/lib/currency";
 import { proposalStatusMeta } from "@/lib/status-meta";
 import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
@@ -48,6 +50,8 @@ export default function ProposalCard({
   orderId,
   orderStatus,
   orderPaid = false,
+  lockedAmount,
+  lockedCurrency,
   localCurrency = DEFAULT_CURRENCY,
   rates = null,
   surchargePercent = 0,
@@ -60,6 +64,8 @@ export default function ProposalCard({
   orderId?: string | null;
   orderStatus?: string | null;
   orderPaid?: boolean;
+  lockedAmount?: number;
+  lockedCurrency?: string;
   localCurrency?: string;
   rates?: Record<string, number> | null;
   surchargePercent?: number;
@@ -76,26 +82,36 @@ export default function ProposalCard({
   // Show the student what they will actually be charged, in their local
   // currency. Falls back to the helper's quoted amount when no local rate is
   // available. No CAD equivalent is shown.
-  const localAmount = computeLocalCharge(
-    basePrice,
-    currency,
-    localCurrency,
-    rates,
-    surchargePercent,
-  );
+  const awaitingPayment =
+    proposal.status === "accepted" && !!orderId && orderStatus === "payment_pending" && !orderPaid;
+  const lockedAmountIsValid =
+    typeof lockedAmount === "number" && Number.isFinite(lockedAmount) && lockedAmount > 0;
+  const chargeCurrency = awaitingPayment
+    ? normalizeCurrency(lockedCurrency ?? localCurrency)
+    : localCurrency;
+  const localAmount =
+    awaitingPayment && lockedAmountIsValid
+      ? lockedAmount
+      : computeLocalCharge(basePrice, currency, chargeCurrency, rates, surchargePercent);
   const localResolved =
     localAmount !== null && localAmount > 0
-      ? { currency: localCurrency, amount: localAmount }
+      ? { currency: chargeCurrency, amount: localAmount }
       : null;
 
   const displayAmount = localResolved ? localResolved.amount : basePrice;
   const displayCurrency = localResolved ? localResolved.currency : currency;
   const price = formatCurrency(displayAmount, displayCurrency);
+  const convertedBasePrice = localResolved
+    ? convertViaCad(basePrice, currency, displayCurrency, rates)
+    : null;
+  const includedCosts =
+    convertedBasePrice !== null
+      ? Math.max(0, displayAmount - roundMoney(convertedBasePrice, displayCurrency))
+      : null;
 
   const statusMeta = proposalStatusMeta(proposal.status);
-  const awaitingPayment =
-    proposal.status === "accepted" && !!orderId && orderStatus === "payment_pending" && !orderPaid;
   const canDecide = proposal.status === "pending" || awaitingPayment;
+  const amountLabel = awaitingPayment ? "Locked total" : "Estimated total";
 
   async function handleAccept() {
     setBusy("accept");
@@ -151,7 +167,7 @@ export default function ProposalCard({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-lg bg-surface-container-low p-2">
           <div className="flex flex-col justify-center">
             <span className="text-xs text-secondary uppercase font-semibold tracking-wider">
-              {localResolved ? "You Pay" : "Total Fixed Price"}
+              {localResolved ? amountLabel : "Helper quote"}
             </span>
             <div className="flex items-baseline gap-1.5 mt-0.5">
               <span className="font-display text-xl font-bold text-primary tracking-tight">
@@ -159,6 +175,18 @@ export default function ProposalCard({
               </span>
               <span className="text-xs text-on-surface-variant font-medium">{displayCurrency}</span>
             </div>
+            {localResolved && (
+              <div className="mt-1 text-xs text-on-surface-variant">
+                <p>Helper quote: {formatCurrency(basePrice, currency)}</p>
+                {includedCosts !== null && includedCosts > 0 && (
+                  <p>
+                    Includes about {formatCurrency(includedCosts, displayCurrency)} for payment
+                    processing and currency conversion.
+                  </p>
+                )}
+                {!awaitingPayment && <p>The final total is locked when you accept.</p>}
+              </div>
+            )}
           </div>
           <div className="flex flex-col justify-center sm:pl-3">
             <span className="text-xs text-secondary uppercase font-semibold tracking-wider">
