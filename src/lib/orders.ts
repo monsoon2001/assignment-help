@@ -1,4 +1,3 @@
-import { createClient } from "@/lib/supabase/client";
 import { notifyActivity } from "@/lib/notify-client";
 
 export interface ProposalForAccept {
@@ -46,35 +45,22 @@ export async function declineProposal(
   proposal_id: string,
   request_id: string,
 ): Promise<{ ok: true } | { error: string }> {
-  const supabase = createClient();
-
-  const { data: proposal } = await supabase
-    .from("proposals")
-    .select("id, status")
-    .eq("id", proposal_id)
-    .maybeSingle();
-
-  if (!proposal || proposal.status !== "pending") {
-    return { error: "This proposal has already been resolved." };
-  }
-
-  const { error } = await supabase
-    .from("proposals")
-    .update({ status: "declined" })
-    .eq("id", proposal_id);
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  const { count, error: countError } = await supabase
-    .from("proposals")
-    .select("id", { count: "exact", head: true })
-    .eq("request_id", request_id)
-    .eq("status", "pending");
-
-  if (!countError && (count ?? 0) === 0) {
-    await supabase.from("requests").update({ status: "requested" }).eq("id", request_id);
+  try {
+    const response = await fetch("/api/proposals/decline", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ proposal_id, request_id }),
+    });
+    const data = (await response.json().catch(() => null)) as {
+      ok?: boolean;
+      error?: string;
+    } | null;
+    if (!response.ok || data?.ok !== true) {
+      return { error: data?.error ?? "Could not decline this proposal. Please try again." };
+    }
+  } catch (error) {
+    console.error("proposal decline request failed", error);
+    return { error: "Could not decline this proposal. Please try again." };
   }
 
   notifyActivity("proposal.declined", proposal_id);

@@ -72,7 +72,7 @@ export default async function DashboardPage() {
     redirect("/sign-in");
   }
 
-  const [{ data: reqRows }, { data: completedOrders }, { data: notifRows }] = await Promise.all([
+  const [{ data: reqRows }, { data: completedOrders }] = await Promise.all([
     supabase
       .from("requests")
       .select(
@@ -86,13 +86,6 @@ export default async function DashboardPage() {
       .select("id, proposal:proposals(request_id)")
       .eq("student_id", user.id)
       .eq("status", "completed"),
-    supabase
-      .from("notifications")
-      .select("id, type, message, link, created_at")
-      .eq("user_id", user.id)
-      .eq("read", false)
-      .order("created_at", { ascending: false })
-      .limit(30),
   ]);
 
   const requests = (reqRows ?? []).map((r) => ({
@@ -269,7 +262,13 @@ export default async function DashboardPage() {
   const actionable = actionCards
     .filter((card) => {
       // Don't show message-related cards
-      if (card.key.startsWith("notif:") || card.title === "New message") return false;
+      if (
+        card.key.startsWith("notif:") ||
+        /\bmessages?\b/i.test(card.key) ||
+        /\bmessages?\b/i.test(card.title) ||
+        /\bmessages?\b/i.test(card.body)
+      )
+        return false;
       // Remove if it's about a completed order
       if (card.key.startsWith("order:")) {
         const oId = card.id;

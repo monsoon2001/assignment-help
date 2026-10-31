@@ -88,6 +88,8 @@ export default function RequestWorkspace({
   const [messages, setMessages] = useState<ChatMessageRow[]>([]);
   const [proposal, setProposal] = useState<RequestProposal | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [orderStatus, setOrderStatus] = useState<string | null>(null);
+  const [orderPaid, setOrderPaid] = useState(false);
 
   const [draft, setDraft] = useState("");
   const [chatFiles, setChatFiles] = useState<File[]>([]);
@@ -162,6 +164,8 @@ export default function RequestWorkspace({
     if (!row) {
       setProposal(null);
       setOrderId(null);
+      setOrderStatus(null);
+      setOrderPaid(false);
       return;
     }
     const normalized: RequestProposal = {
@@ -173,12 +177,27 @@ export default function RequestWorkspace({
     if (normalized.status === "accepted") {
       const { data: order } = await supabase.current
         .from("orders")
-        .select("id")
+        .select("id, status")
         .eq("proposal_id", normalized.id)
         .maybeSingle();
-      setOrderId(order && !Array.isArray(order) ? order.id : null);
+      const currentOrder = order && !Array.isArray(order) ? order : null;
+      setOrderId(currentOrder?.id ?? null);
+      setOrderStatus(currentOrder?.status ?? null);
+      if (currentOrder?.id) {
+        const { data: payment } = await supabase.current
+          .from("payments")
+          .select("id")
+          .eq("order_id", currentOrder.id)
+          .eq("status", "paid")
+          .maybeSingle();
+        setOrderPaid(!!payment);
+      } else {
+        setOrderPaid(false);
+      }
     } else {
       setOrderId(null);
+      setOrderStatus(null);
+      setOrderPaid(false);
     }
   }, [requestId]);
 
@@ -554,7 +573,7 @@ export default function RequestWorkspace({
                     Price this request in the chat — the student reviews and accepts from here.
                   </p>
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
-                    <div className="w-full sm:w-48 sm:shrink-0">
+                    <div className="w-full sm:w-64 sm:shrink-0">
                       <Input
                         label="Price (whole units)"
                         type="number"
@@ -562,6 +581,7 @@ export default function RequestWorkspace({
                         min="1"
                         step="1"
                         placeholder="Enter amount"
+                        className="placeholder:text-on-surface-variant"
                         value={bidPrice}
                         onChange={(e) => setBidPrice(e.target.value)}
                         onBlur={() => {
@@ -624,78 +644,93 @@ export default function RequestWorkspace({
                   requestTitle={title}
                   requestDeadline={request.deadline}
                   orderId={orderId}
+                  orderStatus={orderStatus}
+                  orderPaid={orderPaid}
                   localCurrency={localCurrency}
                   rates={rates}
                   surchargePercent={surchargePercent}
                   className="lg:flex-1"
+                  onDeclined={() => {
+                    setProposal((current) =>
+                      current ? { ...current, status: "declined" } : current,
+                    );
+                    setOrderId(null);
+                    setOrderStatus(null);
+                    setOrderPaid(false);
+                  }}
                 />
               )}
 
-              {isHelper && proposal && proposal.status === "declined" && request.status !== "accepted" && (
-                <Card className="p-3.5">
-                  <h2 className="font-display font-semibold text-on-surface text-sm mb-1">
-                    Send revised quote
-                  </h2>
-                  <p className="text-xs text-on-surface-variant mb-3">
-                    The student declined your previous proposal. You can send a revised quote.
-                  </p>
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
-                    <div className="w-full sm:w-48 sm:shrink-0">
-                      <Input
-                        label="Price (whole units)"
-                        type="number"
-                        inputMode="numeric"
-                        min="1"
-                        step="1"
-                        placeholder="Enter amount"
-                        value={bidPrice}
-                        onChange={(e) => setBidPrice(e.target.value)}
-                        onBlur={() => {
-                          const raw = Number(bidPrice);
-                          if (Number.isFinite(raw) && raw > 0) setBidPrice(String(Math.round(raw)));
-                        }}
+              {isHelper &&
+                proposal &&
+                proposal.status === "declined" &&
+                request.status !== "accepted" && (
+                  <Card className="p-3.5">
+                    <h2 className="font-display font-semibold text-on-surface text-sm mb-1">
+                      Send revised quote
+                    </h2>
+                    <p className="text-xs text-on-surface-variant mb-3">
+                      The student declined your previous proposal. You can send a revised quote.
+                    </p>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+                      <div className="w-full sm:w-64 sm:shrink-0">
+                        <Input
+                          label="Price (whole units)"
+                          type="number"
+                          inputMode="numeric"
+                          min="1"
+                          step="1"
+                          placeholder="Enter amount"
+                          className="placeholder:text-on-surface-variant"
+                          value={bidPrice}
+                          onChange={(e) => setBidPrice(e.target.value)}
+                          onBlur={() => {
+                            const raw = Number(bidPrice);
+                            if (Number.isFinite(raw) && raw > 0)
+                              setBidPrice(String(Math.round(raw)));
+                          }}
+                        />
+                      </div>
+                      <div className="flex flex-1 min-w-0 flex-col gap-1.5">
+                        <label className="text-sm font-medium text-on-surface">Currency</label>
+                        <select
+                          aria-label="Currency"
+                          value={bidCurrency}
+                          onChange={(e) => setBidCurrency(e.target.value)}
+                          className="h-11 w-full min-w-0 truncate rounded-lg border border-outline-variant bg-surface-container-lowest px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20"
+                        >
+                          {CHARGE_CURRENCIES.map((code) => (
+                            <option key={code} value={code}>
+                              {currencyFlag(code)} {code} · {currencyName(code)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <Textarea
+                        label="Proposal message"
+                        rows={3}
+                        placeholder="Describe your revised offer..."
+                        value={bidDescription}
+                        onChange={(e) => setBidDescription(e.target.value)}
                       />
                     </div>
-                    <div className="flex flex-1 min-w-0 flex-col gap-1.5">
-                      <label className="text-sm font-medium text-on-surface">Currency</label>
-                      <select
-                        aria-label="Currency"
-                        value={bidCurrency}
-                        onChange={(e) => setBidCurrency(e.target.value)}
-                        className="h-11 w-full min-w-0 truncate rounded-lg border border-outline-variant bg-surface-container-lowest px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20"
-                      >
-                        {CHARGE_CURRENCIES.map((code) => (
-                          <option key={code} value={code}>
-                            {currencyFlag(code)} {code} · {currencyName(code)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                  <div className="mt-3">
-                    <Textarea
-                      label="Proposal message"
-                      rows={3}
-                      placeholder="Describe your revised offer..."
-                      value={bidDescription}
-                      onChange={(e) => setBidDescription(e.target.value)}
-                    />
-                  </div>
-                  {bidError && <p className="text-sm text-error mt-2">{bidError}</p>}
-                  <Button
-                    disabled={sendingBid}
-                    onClick={handleSendBid}
-                    className="w-full justify-center mt-3"
-                  >
-                    {sendingBid ? (
-                      <Loader2 size={16} className="animate-spin" />
-                    ) : (
-                      <Send size={16} />
-                    )}
-                    {sendingBid ? "Sending..." : "Send Revised Quote"}
-                  </Button>
-                </Card>
-              )}
+                    {bidError && <p className="text-sm text-error mt-2">{bidError}</p>}
+                    <Button
+                      disabled={sendingBid}
+                      onClick={handleSendBid}
+                      className="w-full justify-center mt-3"
+                    >
+                      {sendingBid ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <Send size={16} />
+                      )}
+                      {sendingBid ? "Sending..." : "Send Revised Quote"}
+                    </Button>
+                  </Card>
+                )}
 
               {isHelper && proposal && (
                 <p className="text-xs text-on-surface-variant inline-flex items-center gap-1">

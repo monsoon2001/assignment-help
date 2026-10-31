@@ -46,19 +46,25 @@ export default function ProposalCard({
   proposal,
   requestDeadline,
   orderId,
+  orderStatus,
+  orderPaid = false,
   localCurrency = DEFAULT_CURRENCY,
   rates = null,
   surchargePercent = 0,
   className = "",
+  onDeclined,
 }: {
   proposal: RequestProposal;
   requestTitle?: string | null;
   requestDeadline?: string | null;
   orderId?: string | null;
+  orderStatus?: string | null;
+  orderPaid?: boolean;
   localCurrency?: string;
   rates?: Record<string, number> | null;
   surchargePercent?: number;
   className?: string;
+  onDeclined?: () => void;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState<"accept" | "decline" | null>(null);
@@ -87,10 +93,17 @@ export default function ProposalCard({
   const price = formatCurrency(displayAmount, displayCurrency);
 
   const statusMeta = proposalStatusMeta(proposal.status);
+  const awaitingPayment =
+    proposal.status === "accepted" && !!orderId && orderStatus === "payment_pending" && !orderPaid;
+  const canDecide = proposal.status === "pending" || awaitingPayment;
 
   async function handleAccept() {
     setBusy("accept");
     setError(null);
+    if (awaitingPayment && orderId) {
+      router.push(`/orders/${orderId}/payment`);
+      return;
+    }
     const result = await acceptProposal({
       proposal_id: proposal.id,
       helper_id: proposal.helper_id,
@@ -116,6 +129,7 @@ export default function ProposalCard({
       setError(result.error);
       return;
     }
+    onDeclined?.();
     router.refresh();
   }
 
@@ -186,7 +200,7 @@ export default function ProposalCard({
       </div>
 
       <div className="mt-auto border-t border-outline-variant px-3 pt-2.5 pb-2">
-        {proposal.status === "pending" ? (
+        {canDecide ? (
           <div className="flex flex-col gap-2">
             {error && <p className="text-sm text-error">{error}</p>}
             <div className="flex flex-col-reverse sm:flex-row items-center gap-2">
@@ -211,7 +225,13 @@ export default function ProposalCard({
                 ) : (
                   <DollarSign size={15} />
                 )}
-                {busy === "accept" ? "Accepting..." : "Accept & Continue to Checkout"}
+                {busy === "accept"
+                  ? awaitingPayment
+                    ? "Opening Checkout..."
+                    : "Accepting..."
+                  : awaitingPayment
+                    ? "Continue to Checkout"
+                    : "Accept & Continue to Checkout"}
               </Button>
             </div>
           </div>

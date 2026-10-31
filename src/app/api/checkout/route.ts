@@ -231,6 +231,22 @@ export async function POST(request: Request) {
       cancel_url: `${origin}/orders/${order.id}/payment`,
     });
 
+    const { error: trackingError } = await adminClient
+      .from("order_checkout_sessions")
+      .insert({ session_id: session.id, order_id: order.id });
+    if (trackingError) {
+      console.error("checkout: failed to track checkout session", trackingError);
+      try {
+        await stripe.checkout.sessions.expire(session.id);
+      } catch (expireError) {
+        console.error("checkout: failed to expire untracked checkout session", expireError);
+      }
+      return NextResponse.json(
+        { error: "Unable to start checkout. Please try again." },
+        { status: 500 },
+      );
+    }
+
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (err) {
     console.error("checkout: stripe session creation failed", err);
