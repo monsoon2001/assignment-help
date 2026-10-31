@@ -28,26 +28,56 @@ export async function submitProposal(
     return { error: "Enter a valid whole-number proposal price." };
   }
 
-  const { data, error } = await supabase
+  // If a previous proposal was declined, allow resubmitting by updating it.
+  const { data: existing } = await supabase
     .from("proposals")
-    .insert({
-      request_id: input.request_id,
-      helper_id: user.id,
-      price,
-      currency: normalizeCurrency(input.currency),
-      description: input.description ?? null,
-      revisions_included: input.revisions_included ?? 0,
-      expires_at: input.expires_at ?? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      status: "pending",
-    })
-    .select("id")
-    .single();
+    .select("id, status")
+    .eq("request_id", input.request_id)
+    .eq("helper_id", user.id)
+    .maybeSingle();
 
-  if (error) {
-    if (error.code === "23505") {
-      return { error: "You already sent a proposal for this request." };
+  let resultId: string;
+  if (existing && existing.status === "declined") {
+    const { data, error } = await supabase
+      .from("proposals")
+      .update({
+        price,
+        currency: normalizeCurrency(input.currency),
+        description: input.description ?? null,
+        revisions_included: input.revisions_included ?? 0,
+        expires_at: input.expires_at ?? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        status: "pending",
+      })
+      .eq("id", existing.id)
+      .select("id")
+      .single();
+    if (error) return { error: error.message };
+    resultId = data.id;
+  } else if (existing) {
+    return { error: "You already sent a proposal for this request." };
+  } else {
+    const { data, error } = await supabase
+      .from("proposals")
+      .insert({
+        request_id: input.request_id,
+        helper_id: user.id,
+        price,
+        currency: normalizeCurrency(input.currency),
+        description: input.description ?? null,
+        revisions_included: input.revisions_included ?? 0,
+        expires_at: input.expires_at ?? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        status: "pending",
+      })
+      .select("id")
+      .single();
+
+    if (error) {
+      if (error.code === "23505") {
+        return { error: "You already sent a proposal for this request." };
+      }
+      return { error: error.message };
     }
-    return { error: error.message };
+    resultId = data.id;
   }
 
   const { error: updateError } = await supabase
@@ -59,6 +89,6 @@ export async function submitProposal(
     return { error: updateError.message };
   }
 
-  notifyActivity("proposal.created", data.id);
-  return { id: data.id };
+  notifyActivity("proposal.created", resultId);
+  return { id: resultId };
 }

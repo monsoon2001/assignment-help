@@ -554,7 +554,7 @@ export default function RequestWorkspace({
                     Price this request in the chat — the student reviews and accepts from here.
                   </p>
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
-                    <div className="w-full sm:w-32 sm:shrink-0">
+                    <div className="w-full sm:w-48 sm:shrink-0">
                       <Input
                         label="Price (whole units)"
                         type="number"
@@ -629,6 +629,72 @@ export default function RequestWorkspace({
                   surchargePercent={surchargePercent}
                   className="lg:flex-1"
                 />
+              )}
+
+              {isHelper && proposal && proposal.status === "declined" && request.status !== "accepted" && (
+                <Card className="p-3.5">
+                  <h2 className="font-display font-semibold text-on-surface text-sm mb-1">
+                    Send revised quote
+                  </h2>
+                  <p className="text-xs text-on-surface-variant mb-3">
+                    The student declined your previous proposal. You can send a revised quote.
+                  </p>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+                    <div className="w-full sm:w-48 sm:shrink-0">
+                      <Input
+                        label="Price (whole units)"
+                        type="number"
+                        inputMode="numeric"
+                        min="1"
+                        step="1"
+                        placeholder="Enter amount"
+                        value={bidPrice}
+                        onChange={(e) => setBidPrice(e.target.value)}
+                        onBlur={() => {
+                          const raw = Number(bidPrice);
+                          if (Number.isFinite(raw) && raw > 0) setBidPrice(String(Math.round(raw)));
+                        }}
+                      />
+                    </div>
+                    <div className="flex flex-1 min-w-0 flex-col gap-1.5">
+                      <label className="text-sm font-medium text-on-surface">Currency</label>
+                      <select
+                        aria-label="Currency"
+                        value={bidCurrency}
+                        onChange={(e) => setBidCurrency(e.target.value)}
+                        className="h-11 w-full min-w-0 truncate rounded-lg border border-outline-variant bg-surface-container-lowest px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20"
+                      >
+                        {CHARGE_CURRENCIES.map((code) => (
+                          <option key={code} value={code}>
+                            {currencyFlag(code)} {code} · {currencyName(code)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="mt-3">
+                    <Textarea
+                      label="Proposal message"
+                      rows={3}
+                      placeholder="Describe your revised offer..."
+                      value={bidDescription}
+                      onChange={(e) => setBidDescription(e.target.value)}
+                    />
+                  </div>
+                  {bidError && <p className="text-sm text-error mt-2">{bidError}</p>}
+                  <Button
+                    disabled={sendingBid}
+                    onClick={handleSendBid}
+                    className="w-full justify-center mt-3"
+                  >
+                    {sendingBid ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      <Send size={16} />
+                    )}
+                    {sendingBid ? "Sending..." : "Send Revised Quote"}
+                  </Button>
+                </Card>
               )}
 
               {isHelper && proposal && (

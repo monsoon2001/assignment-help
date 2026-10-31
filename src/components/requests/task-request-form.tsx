@@ -138,9 +138,17 @@ function PickerField({
           onChange={(e) => onChange(e.target.value)}
           className={PICKER_CLASS}
         />
+        <label htmlFor={`field-${kind}`} className="absolute inset-0 cursor-pointer" aria-hidden />
         <button
           type="button"
-          onClick={openPicker}
+          onClick={(e) => {
+            e.preventDefault();
+            openPicker();
+          }}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            openPicker();
+          }}
           aria-label={`Open ${label.toLowerCase()} picker`}
           className="absolute right-3 flex items-center text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
         >

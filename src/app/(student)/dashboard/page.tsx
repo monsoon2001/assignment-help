@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   ChevronRight,
   Inbox,
+  X,
   type LucideIcon,
 } from "lucide-react";
 import Button from "@/components/ui/button";
@@ -261,48 +262,14 @@ export default async function DashboardPage() {
     }
   }
 
-  // New messages come from unread notification rows, not the message history.
-  // That way opening the thread marks the notification read and the dashboard
-  // card disappears instead of lingering for every old message.
-  for (const n of (notifRows ?? []) as Array<{
-    id: string;
-    type: string;
-    message: string;
-    link: string | null;
-    created_at: string;
-  }>) {
-    if (n.type !== "message") continue;
-    const requestId = n.link?.match(/^\/requests\/([^/?]+)/)?.[1];
-    const orderId = n.link?.match(/^\/orders\/([^/?]+)/)?.[1];
-    const requestIdForCard = requestId ?? orders.find((o) => o.id === orderId)?.requestId ?? null;
-    if (!requestIdForCard) continue;
-    if (completedRequestIds.has(requestIdForCard)) continue;
-    const linkedOrder = orders.find((o) => o.requestId === requestIdForCard);
-    if (
-      linkedOrder &&
-      ["completed", "cancelled", "declined", "disputed"].includes(linkedOrder.status)
-    ) {
-      continue;
-    }
-    const key = `notif:${n.id}`;
-    if (seenKeys.has(key)) continue;
-    seenKeys.add(key);
-    actionCards.push({
-      id: n.id,
-      key,
-      href: `/requests/${requestIdForCard}`,
-      title: "New message",
-      body: n.message,
-      createdAt: n.created_at,
-      tone: "bg-primary-container text-on-primary",
-      icon: MessageSquare,
-      dot: true,
-    });
-  }
+  // Don't show action required cards for new messages - only major tasks
+  // (payment, review delivery, revisions, etc.) as requested.
 
   // Remove delivered/completed/declined/cancelled context from action cards by cross-checking - keep only actionable
   const actionable = actionCards
     .filter((card) => {
+      // Don't show message-related cards
+      if (card.key.startsWith("notif:") || card.title === "New message") return false;
       // Remove if it's about a completed order
       if (card.key.startsWith("order:")) {
         const oId = card.id;
@@ -414,34 +381,54 @@ export default async function DashboardPage() {
             {actionable.map((card) => {
               const Icon = card.icon;
               return (
-                <Link key={card.key} href={card.href}>
-                  <Card className="action-card p-5 transition-shadow hover:shadow-lg" hover>
-                    <div className="flex items-start gap-3">
-                      <span
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${card.tone}`}
-                      >
-                        <Icon size={18} />
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="font-semibold text-on-surface truncate">{card.title}</p>
-                          {card.dot && <span className="w-2 h-2 rounded-full bg-primary" />}
-                        </div>
-                        <p className="text-sm text-on-surface-variant line-clamp-2 mt-1">
-                          {card.body}
-                        </p>
-                        <div className="flex items-center justify-between mt-3">
-                          <p className="text-xs text-on-surface-variant">
-                            {timeAgo(card.createdAt)}
+                <div key={card.key} className="relative">
+                  <button
+                    type="button"
+                    aria-label="Remove card"
+                    className="absolute top-2 right-2 z-10 p-1 rounded-full hover:bg-surface-container-high transition-colors"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (typeof window !== "undefined") {
+                        const hidden = JSON.parse(localStorage.getItem("hiddenActionCards") || "[]");
+                        if (!hidden.includes(card.key)) {
+                          localStorage.setItem("hiddenActionCards", JSON.stringify([...hidden, card.key]));
+                        }
+                        window.location.reload();
+                      }
+                    }}
+                  >
+                    <X size={14} className="text-on-surface-variant" />
+                  </button>
+                  <Link href={card.href}>
+                    <Card className="action-card p-5 transition-shadow hover:shadow-lg" hover>
+                      <div className="flex items-start gap-3">
+                        <span
+                          className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${card.tone}`}
+                        >
+                          <Icon size={18} />
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold text-on-surface truncate">{card.title}</p>
+                            {card.dot && <span className="w-2 h-2 rounded-full bg-primary" />}
+                          </div>
+                          <p className="text-sm text-on-surface-variant line-clamp-2 mt-1">
+                            {card.body}
                           </p>
-                          <span className="text-sm font-medium text-primary inline-flex items-center gap-1">
-                            Act now <ChevronRight size={14} />
-                          </span>
+                          <div className="flex items-center justify-between mt-3">
+                            <p className="text-xs text-on-surface-variant">
+                              {timeAgo(card.createdAt)}
+                            </p>
+                            <span className="text-sm font-medium text-primary inline-flex items-center gap-1">
+                              Act now <ChevronRight size={14} />
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Card>
-                </Link>
+                    </Card>
+                  </Link>
+                </div>
               );
             })}
           </div>

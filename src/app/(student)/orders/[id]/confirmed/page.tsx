@@ -143,11 +143,16 @@ export default async function OrderConfirmedPage({
           </p>
           <p className="font-display font-semibold text-on-surface mt-0.5">{title}</p>
         </div>
-        <div className="px-6 py-5 grid grid-cols-2 sm:grid-cols-3 gap-5">
+        <div className="px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
             <p className="text-xs text-on-surface-variant uppercase tracking-wide">Amount</p>
             <p className="font-display text-lg font-bold text-primary mt-0.5">{price}</p>
             <p className="text-xs text-on-surface-variant">Paid via Card</p>
+          </div>
+          <div>
+            <p className="text-xs text-on-surface-variant uppercase tracking-wide">Paid by</p>
+            <p className="text-sm font-semibold text-on-surface mt-0.5">{user.user_metadata?.name || user.email}</p>
+            <p className="text-xs text-on-surface-variant">Platform: Acadivo</p>
           </div>
           <div>
             <p className="text-xs text-on-surface-variant uppercase tracking-wide">Milestone</p>
@@ -168,8 +173,18 @@ export default async function OrderConfirmedPage({
         </div>
         <div className="px-6 py-4 border-t border-outline-variant bg-surface-container-low/40 flex flex-col gap-1.5">
           <p className="text-xs text-on-surface-variant inline-flex items-center gap-1.5">
-            <CalendarCheck size={13} /> Guaranteed delivery per agreed deadline &middot; work may
-            begin immediately
+            <CalendarCheck size={13} /> Payment confirmed at{" "}
+            {paymentRow?.created_at
+              ? new Date(paymentRow.created_at).toLocaleString(undefined, {
+                  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "just now"}{" "}
+            &middot; Guaranteed delivery per agreed deadline
           </p>
           {receiptUrl ? (
             <a
