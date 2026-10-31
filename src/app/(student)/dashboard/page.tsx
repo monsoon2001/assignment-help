@@ -13,7 +13,6 @@ import {
   AlertTriangle,
   ChevronRight,
   Inbox,
-  X,
   type LucideIcon,
 } from "lucide-react";
 import Button from "@/components/ui/button";
@@ -24,6 +23,7 @@ import { unwrapRow } from "@/lib/embedded";
 import { requestStatusTone } from "@/lib/status-meta";
 import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 import DashboardRefresh from "@/components/dashboard/dashboard-refresh";
+import DismissActionCardButton from "@/components/dashboard/dismiss-action-card-button";
 
 export const dynamic = "force-dynamic";
 
@@ -381,24 +381,7 @@ export default async function DashboardPage() {
               const Icon = card.icon;
               return (
                 <div key={card.key} className="relative">
-                  <button
-                    type="button"
-                    aria-label="Remove card"
-                    className="absolute top-2 right-2 z-10 p-1 rounded-full hover:bg-surface-container-high transition-colors"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (typeof window !== "undefined") {
-                        const hidden = JSON.parse(localStorage.getItem("hiddenActionCards") || "[]");
-                        if (!hidden.includes(card.key)) {
-                          localStorage.setItem("hiddenActionCards", JSON.stringify([...hidden, card.key]));
-                        }
-                        window.location.reload();
-                      }
-                    }}
-                  >
-                    <X size={14} className="text-on-surface-variant" />
-                  </button>
+                  <DismissActionCardButton cardKey={card.key} />
                   <Link href={card.href}>
                     <Card className="action-card p-5 transition-shadow hover:shadow-lg" hover>
                       <div className="flex items-start gap-3">
