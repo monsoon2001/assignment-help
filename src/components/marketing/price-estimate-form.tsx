@@ -5,12 +5,21 @@ import { useRouter, useSearchParams } from "next/navigation";
 import TaskRequestForm, {
   LAST_DUE_TIME,
   normalizePages,
+  WORDS_PER_PAGE,
   type TaskRequestField,
   type TaskRequestFormValues,
 } from "@/components/requests/task-request-form";
 import { createClient } from "@/lib/supabase/client";
-import { savePendingDraft, saveDraftFiles, loadPendingDraft } from "@/lib/requests";
+import {
+  savePendingDraft,
+  saveDraftFiles,
+  loadPendingDraft,
+  submitRequest,
+  clearPendingDraft,
+  clearDraftFiles,
+} from "@/lib/requests";
 import { OTHER_OPTION, composeSelection } from "@/lib/constants";
+import { countryNameFor, defaultCurrencyForCountry, DEFAULT_COUNTRY } from "@/lib/currency";
 
 const BLANK: TaskRequestFormValues = {
   subject: "",
@@ -107,29 +116,74 @@ export default function PriceEstimateForm() {
       return;
     }
 
-    savePendingDraft({
-      service: helpTypeRaw,
-      subject: subjectRaw,
-      level: values.level,
-      deadline: values.deadline,
-      dueTime: values.dueTime || undefined,
-      wordCount: values.pages,
-      details: values.details,
-    });
     setSubmitting(true);
-    await saveDraftFiles(values.files);
+    try {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-    const supabase = createClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    // The draft (fields + files) is already saved, so anonymous visitors resume
-    // straight on the request page once they have an account.
-    if (!session) {
-      router.push("/sign-in?next=/requests/new");
-      return;
+      if (!session) {
+        savePendingDraft({
+          service: helpTypeRaw,
+          subject: subjectRaw,
+          level: values.level,
+          deadline: values.deadline,
+          dueTime: values.dueTime || undefined,
+          wordCount: values.pages,
+          details: values.details,
+        });
+        await saveDraftFiles(values.files);
+        router.push("/sign-in?next=/requests/new");
+        return;
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from("users")
+        .select("country")
+        .eq("id", session.user.id)
+        .maybeSingle();
+      if (profileError) {
+        console.error("homepage request submission: profile country lookup failed", profileError);
+        setError("We couldn't verify your billing country. Please try again.");
+        return;
+      }
+      const country = countryNameFor(profile?.country) ?? DEFAULT_COUNTRY;
+      const description = [
+        values.details,
+        `Academic level: ${values.level}`,
+        values.pages
+          ? `Expected length: ${values.pages} page${Number(values.pages) === 1 ? "" : "s"} (approx ${Number(values.pages) * WORDS_PER_PAGE} words)`
+          : "",
+        `Country: ${country} (bills in ${defaultCurrencyForCountry(country)})`,
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+      const result = await submitRequest({
+        title: `${helpTypeRaw} — ${subjectRaw}`,
+        description,
+        subject: subjectRaw,
+        country,
+        deadline: values.deadline
+          ? new Date(`${values.deadline}T${values.dueTime || LAST_DUE_TIME}:00`).toISOString()
+          : null,
+        files: values.files,
+      });
+
+      if ("error" in result) {
+        setError(result.error);
+        return;
+      }
+
+      clearPendingDraft();
+      await clearDraftFiles();
+      router.push(`/requests/sent?id=${result.id}`);
+    } catch (submitError) {
+      console.error("homepage request submission failed", submitError);
+      setError("We couldn't send your request. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
-    router.push("/requests/new");
   };
 
   return (
