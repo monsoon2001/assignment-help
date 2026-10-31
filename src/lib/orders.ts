@@ -63,6 +63,6 @@ export async function declineProposal(
     return { error: "Could not decline this proposal. Please try again." };
   }
 
-  notifyActivity("proposal.declined", proposal_id);
+  notifyActivity("proposal.revision_requested", request_id);
   return { ok: true };
 }

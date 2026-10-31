@@ -19,6 +19,7 @@ type NotifyEvent =
   | "proposal.created"
   | "proposal.revised"
   | "proposal.declined"
+  | "proposal.revision_requested"
   | "order.delivered"
   | "order.revision_requested"
   | "order.completed";
@@ -119,6 +120,29 @@ export async function POST(request: Request) {
         emailSubject: "A proposal was declined",
         emailBody: `Your proposal for "${title}" was declined by the student. Keep an eye out for other requests.`,
         emailLinkLabel: "Browse requests",
+        audience: ["student", "helper", "admin"],
+        inAppRoles: ["helper", "admin"],
+        actorId: user.id,
+      }));
+      break;
+    }
+    case "proposal.revision_requested": {
+      const { data } = await adminClient
+        .from("requests")
+        .select("id, student_id, title")
+        .eq("id", id)
+        .maybeSingle();
+      if (!data) return NextResponse.json({ error: "Not found" }, { status: 404 });
+      if (data.student_id !== user.id) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      await notifyRequestActivity(id, ({ title }) => ({
+        type: "proposal",
+        message: `The student requested a new price for "${title}".`,
+        link: `/helper/requests/${id}`,
+        emailSubject: "A student requested a revised price",
+        emailBody: `The student requested a new price for "${title}". Open the request and send a fresh quote.`,
+        emailLinkLabel: "Revise the quote",
         audience: ["student", "helper", "admin"],
         inAppRoles: ["helper", "admin"],
         actorId: user.id,

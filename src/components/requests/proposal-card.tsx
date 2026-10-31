@@ -54,7 +54,7 @@ export default function ProposalCard({
   rates = null,
   surchargePercent = 0,
   className = "",
-  onDeclined,
+  onRevisionRequested,
 }: {
   proposal: RequestProposal;
   requestTitle?: string | null;
@@ -68,7 +68,7 @@ export default function ProposalCard({
   rates?: Record<string, number> | null;
   surchargePercent?: number;
   className?: string;
-  onDeclined?: () => void;
+  onRevisionRequested?: () => void;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState<"accept" | "revise" | "delete" | null>(null);
@@ -132,7 +132,7 @@ export default function ProposalCard({
       setError(result.error);
       return;
     }
-    onDeclined?.();
+    onRevisionRequested?.();
     router.refresh();
   }
 

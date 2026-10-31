@@ -38,7 +38,6 @@ import {
   currencyName,
   DEFAULT_CURRENCY,
   formatCurrency,
-  normalizeCurrency,
   roundMoney,
 } from "@/lib/currency";
 import { markThreadNotificationsRead } from "@/lib/notifications";
@@ -113,7 +112,6 @@ export default function RequestWorkspace({
   const [sendingBid, setSendingBid] = useState(false);
   const [bidError, setBidError] = useState<string | null>(null);
   const [bidNotice, setBidNotice] = useState<string | null>(null);
-  const [editingQuote, setEditingQuote] = useState(false);
 
   const [view, setView] = useState<"chat" | "details">("chat");
 
@@ -365,11 +363,11 @@ export default function RequestWorkspace({
     setSendingBid(false);
     if ("error" in result) {
       if (
+        result.error.includes("A quote has already been sent.") ||
         result.error.includes("This proposal is locked and can no longer be edited.") ||
         result.error.includes("This proposal is locked because an order already exists.")
       ) {
         await Promise.all([loadProposal(), loadRequest()]);
-        setEditingQuote(false);
         setBidNotice(
           "This proposal has already been accepted or resolved. The latest status is shown.",
         );
@@ -381,20 +379,8 @@ export default function RequestWorkspace({
     setBidPrice("");
     setBidDescription("");
     setBidRevisions("1");
-    setEditingQuote(false);
     await loadProposal();
     await loadRequest();
-  }
-
-  function startEditingQuote() {
-    if (!proposal) return;
-    setBidPrice(String(proposal.price));
-    setBidCurrency(normalizeCurrency(proposal.currency));
-    setBidDescription(proposal.description ?? "");
-    setBidRevisions(String(proposal.revisions_included));
-    setBidError(null);
-    setBidNotice(null);
-    setEditingQuote(true);
   }
 
   const title = request.title || "Untitled Request";
@@ -620,24 +606,16 @@ export default function RequestWorkspace({
               )}
 
               {isHelper &&
-                (!proposal ||
-                  proposal.status === "declined" ||
-                  (proposal.status === "pending" && editingQuote)) &&
+                (!proposal || proposal.status === "declined") &&
                 request.status !== "accepted" && (
                   <Card className="p-3.5">
                     <h2 className="font-display font-semibold text-on-surface text-sm mb-1">
-                      {!proposal
-                        ? "Send a proposal"
-                        : proposal.status === "declined"
-                          ? "Send revised quote"
-                          : "Edit proposal"}
+                      {!proposal ? "Send a proposal" : "Send revised quote"}
                     </h2>
                     <p className="text-xs text-on-surface-variant mb-3">
                       {proposal?.status === "declined"
-                        ? "The student declined your previous proposal. Update the amount or details and send a new quote."
-                        : proposal
-                          ? "The student has not accepted this quote yet. You can revise it until they accept."
-                          : "Set your price and explain what's included. The student will see an estimated total with processing and currency costs before accepting."}
+                        ? "The student requested a new price. Enter a fresh quote; the previous quote has been removed."
+                        : "Set your price and explain what's included. The student will see an estimated total with processing and currency costs before accepting."}
                     </p>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
                       <div className="w-full sm:w-64 sm:shrink-0">
@@ -733,16 +711,6 @@ export default function RequestWorkspace({
                           ? "Send Revised Quote"
                           : "Send Proposal"}
                     </Button>
-                    {proposal?.status === "pending" && (
-                      <Button
-                        variant="ghost"
-                        disabled={sendingBid}
-                        onClick={() => setEditingQuote(false)}
-                        className="w-full justify-center mt-2"
-                      >
-                        Cancel editing
-                      </Button>
-                    )}
                   </Card>
                 )}
 
@@ -758,10 +726,8 @@ export default function RequestWorkspace({
                   rates={rates}
                   surchargePercent={surchargePercent}
                   className="lg:flex-1"
-                  onDeclined={() => {
-                    setProposal((current) =>
-                      current ? { ...current, status: "declined" } : current,
-                    );
+                  onRevisionRequested={() => {
+                    setProposal(null);
                     setOrderId(null);
                     setOrderStatus(null);
                     setOrderPaid(false);
@@ -769,15 +735,13 @@ export default function RequestWorkspace({
                 />
               )}
 
-              {isHelper && proposal?.status === "pending" && !editingQuote && (
-                <div className="flex flex-wrap items-center justify-between gap-2">
+              {isHelper && proposal?.status === "pending" && (
+                <div className="flex flex-wrap items-center gap-2">
                   <p className="text-xs text-on-surface-variant inline-flex items-center gap-1">
                     <ShieldCheck size={12} className="text-primary" />
-                    Your proposal is with the student. You&apos;ll be notified when they respond.
+                    Your quote is with the student and can no longer be edited. You&apos;ll be
+                    notified when they respond.
                   </p>
-                  <Button size="sm" variant="outline" onClick={startEditingQuote}>
-                    Edit quote
-                  </Button>
                 </div>
               )}
 

@@ -3,6 +3,7 @@ export type NotifyEvent =
   | "proposal.created"
   | "proposal.revised"
   | "proposal.declined"
+  | "proposal.revision_requested"
   | "order.delivered"
   | "order.revision_requested"
   | "order.completed";

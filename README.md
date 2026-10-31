@@ -57,12 +57,11 @@ EMAIL_FROM="Acadivo <notifications@your-verified-domain.com>"
   can never be forged from the browser. **Apply this migration.**
 - A Content-Security-Policy is set in `next.config.ts`.
 - Redirect targets are sanitised with `safeNextPath()` (`src/lib/auth.ts`).
-- Proposal revisions after a student declines a quote use
-  `public.submit_or_revise_proposal`. If a database already ran an older version of that function,
-  apply the follow-up migration:
+- A student revision request removes the old quote, and the helper submits a fresh, non-editable
+  proposal. Apply the proposal-reset migration to the database:
 
   ```bash
-  psql "$DIRECT_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261031000004_reapply_proposal_revision_support.sql
+  psql "$DIRECT_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261031000005_reset_proposals_for_revision.sql
   ```
 
 ## Payments (multi-currency local charge, platform-collected)
