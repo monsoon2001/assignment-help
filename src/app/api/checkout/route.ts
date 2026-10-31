@@ -51,12 +51,13 @@ export async function POST(request: Request) {
     proposal_id: string | null;
     student_id: string;
     helper_id: string | null;
+    created_at: string;
   };
   try {
     const { data, error } = await supabase
       .from("orders")
       .select(
-        "id, price, currency, base_amount, base_currency, charge_amount, charge_currency, status, proposal_id, student_id, helper_id",
+        "id, price, currency, base_amount, base_currency, charge_amount, charge_currency, status, proposal_id, student_id, helper_id, created_at",
       )
       .eq("id", orderId)
       .single();
@@ -201,9 +202,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 
+  const paymentDeadline = Math.floor(new Date(order.created_at).getTime() / 1000) + 24 * 60 * 60;
+  const earliestAllowedExpiry = Math.floor(Date.now() / 1000) + 30 * 60;
+  if (!Number.isFinite(paymentDeadline) || paymentDeadline < earliestAllowedExpiry) {
+    return NextResponse.json(
+      { error: "The payment window has expired. Please ask the helper for a new proposal." },
+      { status: 409 },
+    );
+  }
+
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
+      expires_at: paymentDeadline,
       payment_method_types: ["card"],
       customer_email: user.email ?? undefined,
       client_reference_id: order.id,
@@ -235,7 +246,22 @@ export async function POST(request: Request) {
       .from("order_checkout_sessions")
       .insert({ session_id: session.id, order_id: order.id });
     if (trackingError) {
-      console.warn("checkout: unable to track session; checkout can still proceed", trackingError);
+      console.error(
+        "checkout: session tracking failed; expiring the untracked session",
+        trackingError,
+      );
+      try {
+        await stripe.checkout.sessions.expire(session.id);
+      } catch (expireError) {
+        console.error("checkout: unable to expire the untracked session", {
+          sessionId: session.id,
+          error: expireError,
+        });
+      }
+      return NextResponse.json(
+        { error: "Unable to securely track checkout. Please try again." },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({ sessionId: session.id, url: session.url });

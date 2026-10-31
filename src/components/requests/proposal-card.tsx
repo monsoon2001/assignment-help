@@ -8,11 +8,9 @@ import Avatar from "@/components/ui/avatar";
 import { acceptProposal, declineProposal } from "@/lib/orders";
 import {
   computeLocalCharge,
-  convertViaCad,
   normalizeCurrency,
   formatCurrency,
   DEFAULT_CURRENCY,
-  roundMoney,
 } from "@/lib/currency";
 import { proposalStatusMeta } from "@/lib/status-meta";
 import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
@@ -73,15 +71,15 @@ export default function ProposalCard({
   onDeclined?: () => void;
 }) {
   const router = useRouter();
-  const [busy, setBusy] = useState<"accept" | "decline" | null>(null);
+  const [busy, setBusy] = useState<"accept" | "revise" | "delete" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showDeclineActions, setShowDeclineActions] = useState(false);
 
   const currency = normalizeCurrency(proposal.currency);
   const basePrice = Number(proposal.price);
 
-  // Show the student what they will actually be charged, in their local
-  // currency. Falls back to the helper's quoted amount when no local rate is
-  // available. No CAD equivalent is shown.
+  // Show only the student's final local total. Never substitute the helper's
+  // base quote when a conversion rate is unavailable.
   const awaitingPayment =
     proposal.status === "accepted" && !!orderId && orderStatus === "payment_pending" && !orderPaid;
   const lockedAmountIsValid =
@@ -98,20 +96,9 @@ export default function ProposalCard({
       ? { currency: chargeCurrency, amount: localAmount }
       : null;
 
-  const displayAmount = localResolved ? localResolved.amount : basePrice;
-  const displayCurrency = localResolved ? localResolved.currency : currency;
-  const price = formatCurrency(displayAmount, displayCurrency);
-  const convertedBasePrice = localResolved
-    ? convertViaCad(basePrice, currency, displayCurrency, rates)
-    : null;
-  const includedCosts =
-    convertedBasePrice !== null
-      ? Math.max(0, displayAmount - roundMoney(convertedBasePrice, displayCurrency))
-      : null;
-
   const statusMeta = proposalStatusMeta(proposal.status);
   const canDecide = proposal.status === "pending" || awaitingPayment;
-  const amountLabel = awaitingPayment ? "Locked total" : "Estimated total";
+  const amountLabel = "Total";
 
   async function handleAccept() {
     setBusy("accept");
@@ -136,8 +123,8 @@ export default function ProposalCard({
     router.push(`/orders/${result.orderId}/payment`);
   }
 
-  async function handleDecline() {
-    setBusy("decline");
+  async function handleRequestRevision() {
+    setBusy("revise");
     setError(null);
     const result = await declineProposal(proposal.id, proposal.request_id);
     setBusy(null);
@@ -147,6 +134,42 @@ export default function ProposalCard({
     }
     onDeclined?.();
     router.refresh();
+  }
+
+  async function handleDeleteRequest() {
+    if (
+      !window.confirm(
+        "Permanently delete this request, its proposals, chats, and attached files? This cannot be undone.",
+      )
+    ) {
+      return;
+    }
+
+    setBusy("delete");
+    setError(null);
+    try {
+      const response = await fetch("/api/requests/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ request_id: proposal.request_id }),
+      });
+      const result = (await response.json()) as { error?: string; warning?: string };
+      setBusy(null);
+      if (!response.ok) {
+        setError(result.error ?? "Unable to delete this request.");
+        return;
+      }
+
+      if (result.warning) {
+        window.alert(result.warning);
+      }
+      router.push("/requests");
+      router.refresh();
+    } catch (deleteError) {
+      console.error("request delete: request could not be deleted", deleteError);
+      setBusy(null);
+      setError("Unable to delete this request. Please try again.");
+    }
   }
 
   return (
@@ -167,25 +190,22 @@ export default function ProposalCard({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-lg bg-surface-container-low p-2">
           <div className="flex flex-col justify-center">
             <span className="text-xs text-secondary uppercase font-semibold tracking-wider">
-              {localResolved ? amountLabel : "Helper quote"}
+              {amountLabel}
             </span>
             <div className="flex items-baseline gap-1.5 mt-0.5">
               <span className="font-display text-xl font-bold text-primary tracking-tight">
-                {price}
+                {localResolved ? formatCurrency(localResolved.amount, localResolved.currency) : "—"}
               </span>
-              <span className="text-xs text-on-surface-variant font-medium">{displayCurrency}</span>
+              {localResolved && (
+                <span className="text-xs text-on-surface-variant font-medium">
+                  {localResolved.currency}
+                </span>
+              )}
             </div>
-            {localResolved && (
-              <div className="mt-1 text-xs text-on-surface-variant">
-                <p>Helper quote: {formatCurrency(basePrice, currency)}</p>
-                {includedCosts !== null && includedCosts > 0 && (
-                  <p>
-                    Includes about {formatCurrency(includedCosts, displayCurrency)} for payment
-                    processing and currency conversion.
-                  </p>
-                )}
-                {!awaitingPayment && <p>The final total is locked when you accept.</p>}
-              </div>
+            {!localResolved && (
+              <p className="mt-1 text-xs text-error">
+                Final price is temporarily unavailable. Please try again later.
+              </p>
             )}
           </div>
           <div className="flex flex-col justify-center sm:pl-3">
@@ -231,37 +251,76 @@ export default function ProposalCard({
         {canDecide ? (
           <div className="flex flex-col gap-2">
             {error && <p className="text-sm text-error">{error}</p>}
-            <div className="flex flex-col-reverse sm:flex-row items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full sm:w-auto text-error hover:bg-error-container/20"
-                disabled={busy !== null}
-                onClick={handleDecline}
-              >
-                {busy === "decline" ? <Loader2 size={15} className="animate-spin" /> : null}
-                Decline Proposal
-              </Button>
-              <Button
-                size="sm"
-                className="w-full sm:w-auto"
-                disabled={busy !== null}
-                onClick={handleAccept}
-              >
-                {busy === "accept" ? (
-                  <Loader2 size={15} className="animate-spin" />
-                ) : (
-                  <DollarSign size={15} />
-                )}
-                {busy === "accept"
-                  ? awaitingPayment
-                    ? "Opening Checkout..."
-                    : "Accepting..."
-                  : awaitingPayment
-                    ? "Continue to Checkout"
-                    : "Accept & Continue to Checkout"}
-              </Button>
-            </div>
+            {showDeclineActions ? (
+              <div className="flex flex-col gap-2">
+                <p className="text-sm text-on-surface-variant">
+                  Ask the helper to revise the price, or permanently delete this request.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-center"
+                  disabled={busy !== null}
+                  onClick={handleRequestRevision}
+                >
+                  {busy === "revise" ? <Loader2 size={15} className="animate-spin" /> : null}
+                  Ask for a revised price
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-center text-error hover:bg-error-container/20"
+                  disabled={busy !== null}
+                  onClick={handleDeleteRequest}
+                >
+                  {busy === "delete" ? <Loader2 size={15} className="animate-spin" /> : null}
+                  Delete request
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-center"
+                  disabled={busy !== null}
+                  onClick={() => setShowDeclineActions(false)}
+                >
+                  Keep proposal
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col-reverse sm:flex-row items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full sm:w-auto text-error hover:bg-error-container/20"
+                  disabled={busy !== null}
+                  onClick={() => {
+                    setError(null);
+                    setShowDeclineActions(true);
+                  }}
+                >
+                  Decline Proposal
+                </Button>
+                <Button
+                  size="sm"
+                  className="w-full sm:w-auto"
+                  disabled={busy !== null || !localResolved}
+                  onClick={handleAccept}
+                >
+                  {busy === "accept" ? (
+                    <Loader2 size={15} className="animate-spin" />
+                  ) : (
+                    <DollarSign size={15} />
+                  )}
+                  {busy === "accept"
+                    ? awaitingPayment
+                      ? "Opening Checkout..."
+                      : "Accepting..."
+                    : awaitingPayment
+                      ? "Continue to Checkout"
+                      : "Accept & Continue to Checkout"}
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           <p className="text-sm font-medium text-on-surface-variant">

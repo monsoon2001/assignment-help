@@ -112,6 +112,7 @@ export default function RequestWorkspace({
   const [bidRevisions, setBidRevisions] = useState("1");
   const [sendingBid, setSendingBid] = useState(false);
   const [bidError, setBidError] = useState<string | null>(null);
+  const [bidNotice, setBidNotice] = useState<string | null>(null);
   const [editingQuote, setEditingQuote] = useState(false);
 
   const [view, setView] = useState<"chat" | "details">("chat");
@@ -353,6 +354,7 @@ export default function RequestWorkspace({
     setBidPrice(String(parsedPrice));
     setSendingBid(true);
     setBidError(null);
+    setBidNotice(null);
     const result = await submitProposal({
       request_id: requestId,
       price: parsedPrice,
@@ -362,6 +364,17 @@ export default function RequestWorkspace({
     });
     setSendingBid(false);
     if ("error" in result) {
+      if (
+        result.error.includes("This proposal is locked and can no longer be edited.") ||
+        result.error.includes("This proposal is locked because an order already exists.")
+      ) {
+        await Promise.all([loadProposal(), loadRequest()]);
+        setEditingQuote(false);
+        setBidNotice(
+          "This proposal has already been accepted or resolved. The latest status is shown.",
+        );
+        return;
+      }
       setBidError(result.error);
       return;
     }
@@ -380,6 +393,7 @@ export default function RequestWorkspace({
     setBidDescription(proposal.description ?? "");
     setBidRevisions(String(proposal.revisions_included));
     setBidError(null);
+    setBidNotice(null);
     setEditingQuote(true);
   }
 
@@ -595,6 +609,15 @@ export default function RequestWorkspace({
                   </div>
                 )}
               </Card>
+
+              {isHelper && bidNotice && (
+                <p
+                  role="status"
+                  className="rounded-lg border border-outline-variant bg-surface-container-low p-3 text-sm text-on-surface-variant"
+                >
+                  {bidNotice}
+                </p>
+              )}
 
               {isHelper &&
                 (!proposal ||

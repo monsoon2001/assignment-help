@@ -70,19 +70,19 @@ local currency**, derived from their saved sign-up location (`users.country`):
 
 - The **base** amount/currency (what the helper quoted) is stored on the order as
   `base_amount` / `base_currency`, alongside `charge_amount` / `charge_currency` / `charge_locked_at`.
-- The student is charged the helper's base quote converted to local currency plus processing costs:
+- The student is charged the base amount converted to local currency plus processing costs:
   **3.9% for Canada** and the configured international processing/FX buffer (**5.9% by default**).
-  Before acceptance, both the helper and student see the helper's quote, an estimated student total,
-  and the approximate included costs. The exact local total is recalculated and locked when accepted.
+  Helpers can preview the expected student total while preparing a quote. Students see only the final
+  total, which is recalculated and locked when accepted.
 - Rates come from the Frankfurter API (`base=CAD`), cached 24h server-side. If a required rate is
   unavailable, acceptance asks the student to retry rather than charging an unexpected currency.
 - The rate and amount are **locked at acceptance**; the platform absorbs later drift.
 
 - The amount charged is taken from the **locked charge stored in the database**, never from the client,
   so tampering with the page cannot change the Stripe amount.
-- Students see the **helper's quote and estimated included processing/conversion costs** before
-  accepting. This estimate is not a platform commission or helper-share disclosure; the exact total
-  is locked at acceptance. Helpers and admins see CAD equivalents and the full ledger breakdown.
+- Students see only the **final local total** before accepting; processing and conversion costs are
+  included without a separate breakdown. The exact total is locked at acceptance. Helpers and admins
+  see CAD equivalents and the full ledger breakdown.
 - A **private ledger** on `payments` records the charge (`charge_currency`, `charge_amount`,
   `charge_to_cad_rate`), the CAD settlement (`gross_cad`, `stripe_fee_cad`, `net_cad`), the hidden
   buffer (`platform_fee_cad = gross_cad − base CAD value`) and `helper_payout_status`, `disputed`,
@@ -97,6 +97,9 @@ local currency**, derived from their saved sign-up location (`users.country`):
   signature on the raw body, and is **idempotent** (`processed_stripe_events`). Refunds convert the
   refunded presentment amount back to CAD via the locked `charge_to_cad_rate`; disputes set the payout
   to `on_hold`.
+- Unpaid accepted requests are hard-deleted with their linked records and request-chat files after
+  the 24-hour payment window. The daily Vercel cron rechecks Stripe and payment state before deletion;
+  its daily cadence can delay cleanup beyond the 24-hour deadline.
 
 Apply the multi-currency migration (also drops the old `helper_payments` view / `helper_compensation`
 table and creates the `helper_payouts` view):
@@ -129,6 +132,7 @@ node scripts/test-payment-model.mjs  # multi-currency local-charge + manual-payo
    - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
    - `STRIPE_SECRET_KEY`
    - `STRIPE_WEBHOOK_SECRET`
+   - `CRON_SECRET` (a random string of at least 16 characters, used to authenticate the daily unpaid-request cleanup)
 3. Apply any not-yet-applied migrations to the production database before deploying.
 4. Configure a Stripe webhook in the Stripe dashboard pointing to `https://<your-domain>/api/stripe/webhook` with the `checkout.session.completed`, `charge.refunded` and `charge.dispute.created` events, and set `STRIPE_WEBHOOK_SECRET` to that endpoint&apos;s signing secret.
 5. While in test mode, keep test-mode Stripe keys. To go live, swap all Stripe keys and the webhook secret for live-mode values (settings page / admin panel reference them via env).

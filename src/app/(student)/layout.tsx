@@ -104,14 +104,14 @@ export default async function StudentLayout({ children }: { children: React.Reac
             badge: requestCount > 0 ? requestCount : undefined,
           },
           { href: "/messages", label: "Messages", icon: "messages" },
-        ]}
-        more={[
           {
             href: "/notifications",
             label: "Notifications",
             icon: "notifications",
             badge: notifCount > 0 ? notifCount : undefined,
           },
+        ]}
+        more={[
           { href: "/profile", label: "Profile", icon: "profile" },
           { href: "/requests/new", label: "Request Help", icon: "new_request" },
         ]}
