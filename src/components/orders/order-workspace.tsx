@@ -43,6 +43,7 @@ import ChatPanel, {
   fileNameFromUrl,
 } from "@/components/chat/chat-panel";
 import SecureFileLink from "@/components/ui/secure-file-link";
+import ProposalCard from "@/components/requests/proposal-card";
 import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
 
 type OrderStatus =
@@ -65,8 +66,14 @@ type OrderData = {
   proposal: {
     id: string | null;
     request_id: string | null;
+    helper_id: string | null;
+    price: number | null;
+    currency: string | null;
     description: string | null;
     revisions_included: number | null;
+    expires_at: string | null;
+    status: string | null;
+    created_at: string | null;
     request: { title: string | null; subject: string | null } | null;
   } | null;
 };
@@ -140,7 +147,7 @@ export default function OrderWorkspace({
     const { data, error } = await supabase.current
       .from("orders")
       .select(
-        "id, status, price, currency, base_amount, base_currency, charge_amount, charge_currency, deadline, created_at, student_id, proposal_id, helper:users!orders_helper_id_fkey(id, name), proposal:proposals(id, request_id, description, revisions_included, request:requests(title, subject))",
+        "id, status, price, currency, base_amount, base_currency, charge_amount, charge_currency, deadline, created_at, student_id, proposal_id, helper:users!orders_helper_id_fkey(id, name), proposal:proposals(id, request_id, helper_id, price, currency, description, revisions_included, expires_at, status, created_at, request:requests(title, subject))",
       )
       .eq("id", orderId)
       .maybeSingle();
@@ -161,8 +168,14 @@ export default function OrderWorkspace({
         ? {
             id: proposal.id,
             request_id: proposal.request_id,
+            helper_id: proposal.helper_id,
+            price: proposal.price,
+            currency: proposal.currency,
             description: proposal.description,
             revisions_included: proposal.revisions_included,
+            expires_at: proposal.expires_at,
+            status: proposal.status,
+            created_at: proposal.created_at,
             request: Array.isArray(proposal.request)
               ? (proposal.request[0] ?? null)
               : (proposal.request ?? null),
@@ -553,6 +566,33 @@ export default function OrderWorkspace({
           <div className="min-h-0 lg:flex-1 lg:overflow-y-auto">
             {activeTab === "overview" && (
               <div className="flex flex-col gap-3">
+                {isStudent &&
+                  order.status === "payment_pending" &&
+                  payment?.status !== "paid" &&
+                  order.proposal?.id &&
+                  order.proposal.request_id &&
+                  order.proposal.helper_id && (
+                    <ProposalCard
+                      proposal={{
+                        id: order.proposal.id,
+                        request_id: order.proposal.request_id,
+                        helper_id: order.proposal.helper_id,
+                        price: Number(order.proposal.price ?? order.price),
+                        currency: order.proposal.currency ?? order.currency,
+                        description: order.proposal.description,
+                        revisions_included: order.proposal.revisions_included ?? 0,
+                        expires_at: order.proposal.expires_at,
+                        status: order.proposal.status ?? "accepted",
+                        created_at: order.proposal.created_at ?? order.created_at,
+                        helper: order.helper,
+                      }}
+                      requestDeadline={order.deadline}
+                      orderId={order.id}
+                      orderStatus={order.status}
+                      orderPaid={false}
+                      localCurrency={normalizeCurrency(order.charge_currency ?? order.currency)}
+                    />
+                  )}
                 <Card className="p-4">
                   <div className="flex items-center justify-between gap-3 mb-4">
                     <div className="min-w-0">

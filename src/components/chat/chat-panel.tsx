@@ -199,7 +199,7 @@ export default function ChatPanel({
 
       <div
         ref={messageListRef}
-        className={`flex-1 overflow-y-auto ${compact ? "px-3 py-3 space-y-3 pb-4" : "px-5 py-4 space-y-4 pb-6"} bg-surface overscroll-contain`}
+        className={`min-h-0 flex-1 overflow-y-auto ${compact ? "px-3 py-3 space-y-3 pb-4" : "px-5 py-4 space-y-4 pb-6"} bg-surface overscroll-contain`}
       >
         {messages.length === 0 && (
           <div className={`text-center ${compact ? "pt-10" : "pt-16"}`}>

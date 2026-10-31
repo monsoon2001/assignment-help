@@ -10,6 +10,7 @@ import Badge from "@/components/ui/badge";
 import Avatar from "@/components/ui/avatar";
 import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 import CheckoutPanel from "@/components/orders/checkout-panel";
+import ProposalCard, { type RequestProposal } from "@/components/requests/proposal-card";
 
 export const dynamic = "force-dynamic";
 
@@ -32,7 +33,7 @@ export default async function OrderPaymentPage({ params }: { params: Promise<{ i
   const { data: orderRow } = await supabase
     .from("orders")
     .select(
-      "id, price, currency, base_amount, base_currency, charge_amount, charge_currency, status, deadline, proposal:proposals(request:requests(title, country), helper:users(id, name))",
+      "id, price, currency, base_amount, base_currency, charge_amount, charge_currency, status, deadline, proposal:proposals(id, request_id, helper_id, price, currency, description, revisions_included, expires_at, status, created_at, request:requests(title, country), helper:users(id, name))",
     )
     .eq("id", id)
     .maybeSingle();
@@ -41,13 +42,16 @@ export default async function OrderPaymentPage({ params }: { params: Promise<{ i
     redirect("/requests");
   }
 
-  const proposal = unwrapRow<{
-    request:
-      | { title: string; country: string | null }[]
-      | { title: string; country: string | null }
-      | null;
-  }>(orderRow.proposal);
+  const proposal = unwrapRow<
+    RequestProposal & {
+      request:
+        | { title: string; country: string | null }[]
+        | { title: string; country: string | null }
+        | null;
+    }
+  >(orderRow.proposal);
   const request = unwrapRow<{ title: string; country: string | null }>(proposal?.request);
+  const helper = unwrapRow<RequestProposal["helper"]>(proposal?.helper);
 
   const chargeAmount =
     orderRow.charge_amount !== null && Number.isFinite(Number(orderRow.charge_amount))
@@ -138,7 +142,19 @@ export default async function OrderPaymentPage({ params }: { params: Promise<{ i
           </p>
         </Card>
 
-        <CheckoutPanel orderId={order.id} amount={order.price} currency={order.currency} />
+        <div className="flex flex-col gap-4">
+          {proposal && (
+            <ProposalCard
+              proposal={{ ...proposal, helper }}
+              requestDeadline={order.deadline}
+              orderId={order.id}
+              orderStatus={order.status}
+              orderPaid={false}
+              localCurrency={order.currency}
+            />
+          )}
+          <CheckoutPanel orderId={order.id} amount={order.price} currency={order.currency} />
+        </div>
       </div>
     </div>
   );

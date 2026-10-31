@@ -79,10 +79,11 @@ export async function POST(request: Request) {
     );
   }
 
+  let unpaidOrderId: string | null = null;
   if (proposal.status === "accepted") {
     const { data: order, error: orderError } = await adminClient
       .from("orders")
-      .select("id, status")
+      .select("id, status, created_at")
       .eq("proposal_id", proposal.id)
       .maybeSingle();
     if (orderError) {
@@ -98,6 +99,7 @@ export async function POST(request: Request) {
         { status: 409 },
       );
     }
+    unpaidOrderId = order.id;
 
     const { data: paidPayment, error: paymentError } = await adminClient
       .from("payments")
@@ -120,15 +122,52 @@ export async function POST(request: Request) {
       .from("order_checkout_sessions")
       .select("session_id")
       .eq("order_id", order.id);
+
+    let sessionIds = (sessions ?? []).map(({ session_id }) => session_id);
     if (sessionsError) {
-      console.error("proposal decline: checkout session lookup failed", sessionsError);
-      return NextResponse.json(
-        { error: "Unable to safely cancel checkout. Please try again." },
-        { status: 500 },
+      console.warn(
+        "proposal decline: session tracking unavailable; searching Stripe sessions",
+        sessionsError,
       );
+      sessionIds = [];
+      let startingAfter: string | undefined;
+      const created = Math.floor(new Date(order.created_at).getTime() / 1000);
+      if (!Number.isFinite(created)) {
+        return NextResponse.json(
+          { error: "Unable to safely cancel checkout. Please contact support." },
+          { status: 500 },
+        );
+      }
+
+      try {
+        let hasMore = true;
+        while (hasMore) {
+          const batch = await stripe.checkout.sessions.list({
+            created: { gte: created },
+            limit: 100,
+            ...(startingAfter ? { starting_after: startingAfter } : {}),
+          });
+          sessionIds.push(
+            ...batch.data
+              .filter((session) => session.metadata?.order_id === order.id)
+              .map((session) => session.id),
+          );
+          hasMore = batch.has_more;
+          startingAfter = batch.data.at(-1)?.id;
+          if (hasMore && !startingAfter) {
+            throw new Error("Stripe returned an incomplete checkout session page.");
+          }
+        }
+      } catch (error) {
+        console.error("proposal decline: Stripe session search failed", error);
+        return NextResponse.json(
+          { error: "Unable to safely cancel checkout. Please try again." },
+          { status: 503 },
+        );
+      }
     }
 
-    for (const { session_id: sessionId } of sessions ?? []) {
+    for (const sessionId of sessionIds) {
       try {
         const session = await stripe.checkout.sessions.retrieve(sessionId);
         if (session.status === "complete") {
@@ -153,16 +192,139 @@ export async function POST(request: Request) {
     }
   }
 
-  const { error: declineError } = await supabase.rpc("decline_unpaid_proposal", {
-    p_proposal_id: proposal.id,
-    p_request_id: proposal.request_id,
-  });
-  if (declineError) {
-    console.error("proposal decline: database operation failed", declineError);
-    return NextResponse.json(
-      { error: "This proposal could not be declined. Refresh and try again." },
-      { status: 409 },
-    );
+  if (proposal.status === "pending") {
+    const { data: declinedProposal, error: declineError } = await supabase
+      .from("proposals")
+      .update({ status: "declined" })
+      .eq("id", proposal.id)
+      .eq("status", "pending")
+      .select("id")
+      .maybeSingle();
+    if (declineError) {
+      console.error("proposal decline: database operation failed", declineError);
+      return NextResponse.json(
+        { error: "This proposal could not be declined. Refresh and try again." },
+        { status: 409 },
+      );
+    }
+    if (!declinedProposal) {
+      return NextResponse.json(
+        { error: "This proposal has already been resolved. Refresh and try again." },
+        { status: 409 },
+      );
+    }
+
+    const { count, error: countError } = await supabase
+      .from("proposals")
+      .select("id", { count: "exact", head: true })
+      .eq("request_id", proposal.request_id)
+      .eq("status", "pending");
+    if (countError) {
+      console.error("proposal decline: pending proposal lookup failed", countError);
+      return NextResponse.json(
+        { error: "Proposal declined, but the request status could not be updated." },
+        { status: 500 },
+      );
+    }
+    if (count === 0) {
+      const { error: requestUpdateError } = await supabase
+        .from("requests")
+        .update({ status: "requested" })
+        .eq("id", proposal.request_id)
+        .eq("status", "proposal_sent");
+      if (requestUpdateError) {
+        console.error("proposal decline: request status update failed", requestUpdateError);
+        return NextResponse.json(
+          { error: "Proposal declined, but the request status could not be updated." },
+          { status: 500 },
+        );
+      }
+    }
+  } else {
+    const { error: declineError } = await supabase.rpc("decline_unpaid_proposal", {
+      p_proposal_id: proposal.id,
+      p_request_id: proposal.request_id,
+    });
+    if (declineError) {
+      if (declineError.code !== "PGRST202" || !unpaidOrderId) {
+        console.error("proposal decline: database operation failed", declineError);
+        return NextResponse.json(
+          {
+            error:
+              "This unpaid accepted proposal could not be declined. Apply the latest database migration and try again.",
+          },
+          { status: 409 },
+        );
+      }
+
+      console.warn("proposal decline: database function unavailable; using guarded fallback");
+      const { data: declinedProposal, error: updateError } = await adminClient
+        .from("proposals")
+        .update({ status: "declined" })
+        .eq("id", proposal.id)
+        .eq("status", "accepted")
+        .select("id")
+        .maybeSingle();
+      if (updateError || !declinedProposal) {
+        console.error("proposal decline: fallback proposal update failed", updateError);
+        return NextResponse.json(
+          { error: "This proposal could not be declined. Refresh and try again." },
+          { status: 409 },
+        );
+      }
+
+      const { data: deletedOrder, error: deleteError } = await adminClient
+        .from("orders")
+        .delete()
+        .eq("id", unpaidOrderId)
+        .eq("status", "payment_pending")
+        .select("id")
+        .maybeSingle();
+      if (deleteError || !deletedOrder) {
+        console.error("proposal decline: fallback order cancellation failed", deleteError);
+        const { error: restoreError } = await adminClient
+          .from("proposals")
+          .update({ status: "accepted" })
+          .eq("id", proposal.id)
+          .eq("status", "declined");
+        if (restoreError) {
+          console.error("proposal decline: fallback proposal restore failed", restoreError);
+        }
+        return NextResponse.json(
+          { error: "This unpaid order could not be cancelled. Refresh and try again." },
+          { status: 409 },
+        );
+      }
+
+      const { count, error: countError } = await adminClient
+        .from("proposals")
+        .select("id", { count: "exact", head: true })
+        .eq("request_id", proposal.request_id)
+        .eq("status", "pending");
+      if (countError) {
+        console.error("proposal decline: fallback pending proposal lookup failed", countError);
+        return NextResponse.json(
+          { error: "Proposal declined, but the request status could not be updated." },
+          { status: 500 },
+        );
+      }
+
+      const { error: requestUpdateError } = await adminClient
+        .from("requests")
+        .update({ status: count ? "proposal_sent" : "requested" })
+        .eq("id", proposal.request_id)
+        .eq("status", "accepted");
+      if (requestUpdateError) {
+        console.error(
+          "proposal decline: fallback request status update failed",
+          requestUpdateError,
+        );
+        return NextResponse.json(
+          { error: "Proposal declined, but the request status could not be updated." },
+          { status: 500 },
+        );
+      }
+    }
   }
 
   return NextResponse.json({ ok: true });

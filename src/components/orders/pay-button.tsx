@@ -20,18 +20,24 @@ export default function PayButton({
   async function handlePay() {
     setLoading(true);
     setError(null);
-    const res = await fetch("/api/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ orderId }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setError(data.error ?? "Could not start checkout.");
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId }),
+      });
+      const data = (await res.json().catch(() => null)) as { url?: string; error?: string } | null;
+      if (!res.ok || !data?.url) {
+        setError(data?.error ?? "Could not start checkout. Please try again.");
+        setLoading(false);
+        return;
+      }
+      window.location.assign(data.url);
+    } catch (error) {
+      console.error("checkout: request failed", error);
+      setError("Could not connect to checkout. Check your connection and try again.");
       setLoading(false);
-      return;
     }
-    window.location.href = data.url;
   }
 
   return (
