@@ -189,7 +189,7 @@ export default function ProposalCard({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-lg bg-surface-container-low p-2">
           <div className="flex flex-col justify-center">
-            <span className="text-xs text-secondary uppercase font-semibold tracking-wider">
+            <span className="text-xs text-on-surface-variant uppercase font-semibold tracking-wider">
               {amountLabel}
             </span>
             <div className="flex items-baseline gap-1.5 mt-0.5">
@@ -209,7 +209,7 @@ export default function ProposalCard({
             )}
           </div>
           <div className="flex flex-col justify-center sm:pl-3">
-            <span className="text-xs text-secondary uppercase font-semibold tracking-wider">
+            <span className="text-xs text-on-surface-variant uppercase font-semibold tracking-wider">
               Offer Details
             </span>
             <div className="flex items-center gap-1.5 mt-1">

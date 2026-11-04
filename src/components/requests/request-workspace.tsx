@@ -546,6 +546,26 @@ export default function RequestWorkspace({
             <div
               className={`${view === "details" ? "flex" : "hidden lg:flex"} flex-col gap-1.5 lg:min-h-full`}
             >
+              {!isHelper && proposal && (
+                <ProposalCard
+                  proposal={proposal}
+                  requestTitle={title}
+                  requestDeadline={request.deadline}
+                  orderId={orderId}
+                  orderStatus={orderStatus}
+                  orderPaid={orderPaid}
+                  localCurrency={localCurrency}
+                  rates={rates}
+                  surchargePercent={surchargePercent}
+                  onRevisionRequested={() => {
+                    setProposal(null);
+                    setOrderId(null);
+                    setOrderStatus(null);
+                    setOrderPaid(false);
+                  }}
+                />
+              )}
+
               <Card className="p-2.5">
                 <h2 className="font-display font-semibold text-on-surface text-xs uppercase tracking-wide mb-1">
                   Request details
@@ -713,27 +733,6 @@ export default function RequestWorkspace({
                     </Button>
                   </Card>
                 )}
-
-              {!isHelper && proposal && (
-                <ProposalCard
-                  proposal={proposal}
-                  requestTitle={title}
-                  requestDeadline={request.deadline}
-                  orderId={orderId}
-                  orderStatus={orderStatus}
-                  orderPaid={orderPaid}
-                  localCurrency={localCurrency}
-                  rates={rates}
-                  surchargePercent={surchargePercent}
-                  className="lg:flex-1"
-                  onRevisionRequested={() => {
-                    setProposal(null);
-                    setOrderId(null);
-                    setOrderStatus(null);
-                    setOrderPaid(false);
-                  }}
-                />
-              )}
 
               {isHelper && proposal?.status === "pending" && (
                 <div className="flex flex-wrap items-center gap-2">
