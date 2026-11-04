@@ -544,7 +544,7 @@ export default function RequestWorkspace({
 
           <div className="min-h-0 lg:flex-1 lg:overflow-y-auto">
             <div
-              className={`${view === "details" ? "flex" : "hidden lg:flex"} flex-col gap-1.5 lg:h-full`}
+              className={`${view === "details" ? "flex" : "hidden lg:flex"} flex-col gap-1.5 lg:min-h-full`}
             >
               <Card className="p-2.5">
                 <h2 className="font-display font-semibold text-on-surface text-xs uppercase tracking-wide mb-1">
