@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { unwrapRow } from "@/lib/embedded";
 import { adminClient } from "@/lib/supabase/admin";
@@ -211,6 +212,120 @@ export async function POST(request: Request) {
     );
   }
 
+  // Reuse an existing open Checkout Session when the student clicks Pay more
+  // than once. Reusing the same session keeps this order's tracking row (and
+  // Stripe's session) singular; stale attempts are expired instead of left open.
+  let trackedSessionIds: string[];
+  try {
+    trackedSessionIds = await listTrackedCheckoutSessions(order.id);
+  } catch (err) {
+    console.error("checkout: unable to read tracked checkout sessions", {
+      orderId: order.id,
+      error: err,
+    });
+    return NextResponse.json(
+      {
+        error:
+          "We couldn't secure your checkout session, so no payment was taken. Please try again in a moment.",
+      },
+      { status: 503 },
+    );
+  }
+
+  const sessionsToExpire: string[] = [];
+  let reusableSession: Stripe.Checkout.Session | null = null;
+
+  for (const sessionId of trackedSessionIds) {
+    let existing: Stripe.Checkout.Session;
+    try {
+      existing = await stripe.checkout.sessions.retrieve(sessionId);
+    } catch (err) {
+      if (isMissingStripeResource(err)) {
+        await deleteTrackedCheckoutSession(sessionId);
+        continue;
+      }
+      console.error("checkout: unable to inspect a previous checkout session", {
+        orderId: order.id,
+        sessionId,
+        error: err,
+      });
+      return NextResponse.json(
+        {
+          error:
+            "We couldn't safely reset your previous checkout attempt, so no payment was taken. Please try again in a moment.",
+        },
+        { status: 503 },
+      );
+    }
+
+    if (
+      existing.mode === "payment" &&
+      existing.payment_status === "paid" &&
+      existing.client_reference_id === order.id
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "This order has already been paid. We're confirming your payment — refresh in a moment.",
+        },
+        { status: 409 },
+      );
+    }
+
+    const matchesCurrentCharge =
+      existing.metadata?.order_id === order.id &&
+      existing.client_reference_id === order.id &&
+      existing.amount_total === unitAmount &&
+      existing.currency?.toLowerCase() === chargeCurrency.toLowerCase();
+    const hasEnoughTimeLeft =
+      typeof existing.expires_at === "number" &&
+      existing.expires_at * 1000 > Date.now() + 5 * 60 * 1000;
+
+    if (
+      existing.status === "open" &&
+      existing.payment_status === "unpaid" &&
+      matchesCurrentCharge &&
+      hasEnoughTimeLeft &&
+      existing.url
+    ) {
+      if (!reusableSession) {
+        reusableSession = existing;
+        continue;
+      }
+    }
+
+    if (existing.status === "open") {
+      sessionsToExpire.push(existing.id);
+    } else {
+      // Expired or completed-but-unpaid sessions cannot be reused.
+      await deleteTrackedCheckoutSession(existing.id);
+    }
+  }
+
+  for (const sessionId of sessionsToExpire) {
+    try {
+      await stripe.checkout.sessions.expire(sessionId);
+    } catch (err) {
+      console.error("checkout: unable to expire a previous checkout session", {
+        orderId: order.id,
+        sessionId,
+        error: err,
+      });
+      return NextResponse.json(
+        {
+          error:
+            "We couldn't safely reset your previous checkout attempt, so no payment was taken. Please try again in a moment.",
+        },
+        { status: 503 },
+      );
+    }
+    await deleteTrackedCheckoutSession(sessionId);
+  }
+
+  if (reusableSession?.url) {
+    return NextResponse.json({ sessionId: reusableSession.id, url: reusableSession.url });
+  }
+
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -246,30 +361,62 @@ export async function POST(request: Request) {
       .from("order_checkout_sessions")
       .insert({ session_id: session.id, order_id: order.id });
     if (trackingError) {
-      console.error(
-        "checkout: session tracking failed; expiring the untracked session",
-        trackingError,
-      );
+      console.error("checkout: session tracking failed; expiring the untracked session", {
+        orderId: order.id,
+        sessionId: session.id,
+        error: trackingError,
+      });
       try {
         await stripe.checkout.sessions.expire(session.id);
       } catch (expireError) {
         console.error("checkout: unable to expire the untracked session", {
+          orderId: order.id,
           sessionId: session.id,
           error: expireError,
         });
       }
       return NextResponse.json(
-        { error: "Unable to securely track checkout. Please try again." },
-        { status: 500 },
+        {
+          error:
+            "We couldn't finish securing your checkout session, so no payment was taken. Please try again in a moment.",
+        },
+        { status: 503 },
       );
     }
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (err) {
-    console.error("checkout: stripe session creation failed", err);
+    console.error("checkout: stripe session creation failed", { orderId: order.id, error: err });
     return NextResponse.json(
-      { error: "Unable to start checkout. Please try again." },
-      { status: 500 },
+      { error: "We couldn't start checkout, so no payment was taken. Please try again." },
+      { status: 503 },
     );
   }
+}
+
+async function listTrackedCheckoutSessions(orderId: string): Promise<string[]> {
+  const { data, error } = await adminClient
+    .from("order_checkout_sessions")
+    .select("session_id")
+    .eq("order_id", orderId);
+  if (error) throw error;
+  return (data ?? []).map((row) => row.session_id as string);
+}
+
+async function deleteTrackedCheckoutSession(sessionId: string): Promise<void> {
+  const { error } = await adminClient
+    .from("order_checkout_sessions")
+    .delete()
+    .eq("session_id", sessionId);
+  if (error) {
+    console.error("checkout: unable to delete a stale tracking row", { sessionId, error });
+  }
+}
+
+function isMissingStripeResource(err: unknown): boolean {
+  return (
+    typeof err === "object" &&
+    err !== null &&
+    (err as { code?: string }).code === "resource_missing"
+  );
 }

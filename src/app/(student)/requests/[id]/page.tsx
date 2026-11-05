@@ -39,24 +39,35 @@ export default async function StudentRequestDetailPage({
     redirect("/requests");
   }
 
-  // Once a proposal is accepted the request becomes an order. Show the order
-  // workspace for that stage so a single request always opens one page.
+  // Once a proposal is accepted the request becomes an order. Until the Stripe
+  // webhook records a paid payment, keep the request workspace (details,
+  // proposal, chat) and do not expose the order's delivery area.
   const { data: proposals } = await supabase.from("proposals").select("id").eq("request_id", id);
 
   const proposalIds = (proposals ?? []).map((p) => p.id);
 
   const { data: orders } = proposalIds.length
-    ? await supabase.from("orders").select("id").in("proposal_id", proposalIds).limit(1)
+    ? await supabase
+        .from("orders")
+        .select("id, payments(status)")
+        .in("proposal_id", proposalIds)
+        .limit(1)
     : { data: null };
 
-  const orderId = (orders?.[0] as { id: string } | undefined)?.id ?? null;
+  const orderRow = (orders?.[0] ?? null) as {
+    id: string;
+    payments: { status: string }[] | { status: string } | null;
+  } | null;
+  const payments = Array.isArray(orderRow?.payments) ? orderRow?.payments : [orderRow?.payments];
+  const paid = !!orderRow && (payments ?? []).some((payment) => payment?.status === "paid");
 
-  if (orderId) {
+  if (orderRow && paid) {
+    const initialTab = query.tab === "delivery" ? "delivery" : "overview";
     return (
       <OrderWorkspace
-        key={`${orderId}:${query.tab === "delivery" ? "delivery" : "overview"}`}
-        orderId={orderId}
-        initialTab={query.tab === "delivery" ? "delivery" : "overview"}
+        key={`${orderRow.id}:${initialTab}`}
+        orderId={orderRow.id}
+        initialTab={initialTab}
       />
     );
   }

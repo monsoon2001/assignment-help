@@ -23,7 +23,7 @@ export default async function StudentOrderPage({
 
   const { data: order } = await supabase
     .from("orders")
-    .select("id, student_id, proposal:proposals(request_id)")
+    .select("id, student_id, status, payments(status), proposal:proposals(request_id)")
     .eq("id", id)
     .maybeSingle();
 
@@ -33,9 +33,13 @@ export default async function StudentOrderPage({
 
   const proposal = Array.isArray(order.proposal) ? (order.proposal[0] ?? null) : order.proposal;
   const requestId = (proposal as { request_id: string | null } | null)?.request_id;
+  const payments = Array.isArray(order.payments) ? order.payments : [order.payments];
+  const paid = (payments as ({ status: string } | null)[]).some(
+    (payment) => payment?.status === "paid",
+  );
 
-  // Orders are now shown inside the single request workspace. Delivery
-  // notifications carry ?tab=delivery so the student lands on the files.
-  const suffix = query.tab === "delivery" ? "?tab=delivery" : "";
+  // Delivery is server-gated: an unpaid order is still in the request/proposal
+  // stage, so strip the delivery tab and send the student back there.
+  const suffix = paid && query.tab === "delivery" ? "?tab=delivery" : "";
   redirect(requestId ? `/requests/${requestId}${suffix}` : "/requests");
 }
