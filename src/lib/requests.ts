@@ -1,4 +1,5 @@
 import { createClient as createBrowserClient } from "@/lib/supabase/client";
+import { safeFileName } from "@/lib/file-name";
 import { notifyActivity } from "@/lib/notify-client";
 
 const DRAFT_KEY = "acadivo:pending-request";
@@ -31,6 +32,11 @@ export interface NewRequestInput {
   deadline?: string | null;
   country?: string;
   files?: File[];
+  /**
+   * Client-generated key that makes retries safe. A double click or a retried
+   * submission reuses the existing request instead of creating a duplicate.
+   */
+  idempotencyKey?: string;
 }
 
 export type PendingRequestDraft = {
@@ -134,6 +140,21 @@ export async function submitRequest(
     return { error: "You must be signed in to submit a request." };
   }
 
+  const idempotencyKey = input.idempotencyKey?.trim() || null;
+
+  // If this exact submission already landed (double click, lost response,
+  // retry), return the existing request instead of uploading and inserting
+  // everything again.
+  if (idempotencyKey) {
+    const { data: existing } = await supabase
+      .from("requests")
+      .select("id")
+      .eq("student_id", user.id)
+      .eq("idempotency_key", idempotencyKey)
+      .maybeSingle();
+    if (existing?.id) return { id: existing.id };
+  }
+
   const helperId = await getActiveHelperId();
 
   const fileUrls: string[] = [];
@@ -150,7 +171,7 @@ export async function submitRequest(
       return { error: `We couldn't read ${file.name}.${reason}` };
     }
 
-    const path = `${user.id}/${crypto.randomUUID()}-${file.name}`;
+    const path = `${user.id}/${crypto.randomUUID()}-${safeFileName(file.name)}`;
     const { error: uploadError } = await supabase.storage
       .from("request-files")
       .upload(path, content, {
@@ -176,11 +197,23 @@ export async function submitRequest(
       deadline: input.deadline ?? null,
       file_urls: fileUrls,
       status: "requested",
+      idempotency_key: idempotencyKey,
     })
     .select("id")
     .single();
 
   if (error) {
+    // A concurrent double submit hit the unique (student_id, idempotency_key)
+    // index. The other call won; return its request.
+    if (error.code === "23505" && idempotencyKey) {
+      const { data: existing } = await supabase
+        .from("requests")
+        .select("id")
+        .eq("student_id", user.id)
+        .eq("idempotency_key", idempotencyKey)
+        .maybeSingle();
+      if (existing?.id) return { id: existing.id };
+    }
     return { error: error.message };
   }
   notifyActivity("request.created", data.id);

@@ -57,7 +57,7 @@ export default function DebugPythonPage() {
         ]}
       />
       <div className="band-soft">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <div className="page-container-prose py-12 sm:py-16">
           <p className="text-lg text-on-surface-variant leading-relaxed mb-10">
             Debugging isn&apos;t guesswork — it&apos;s a repeatable process. Start from the error
             Python already gave you, narrow it down to the smallest failing piece, then fix one

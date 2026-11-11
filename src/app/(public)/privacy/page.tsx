@@ -76,7 +76,7 @@ export default function PrivacyPage() {
       />
 
       <section className="band-soft">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <div className="page-container-prose py-12 sm:py-16">
           <div className="space-y-6">
             {sections.map((section) => (
               <div

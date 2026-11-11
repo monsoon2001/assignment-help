@@ -22,7 +22,7 @@ export default function ToolsIndexPage() {
         crumbs={[{ label: "Home", href: "/" }, { label: "Tools" }]}
       />
       <div className="band-soft">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <div className="page-container py-12 sm:py-16">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {TOOLS.map((tool) => (
               <Link

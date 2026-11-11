@@ -30,7 +30,7 @@ export default function WordCounterPage() {
         crumbs={[{ label: "Home", href: "/" }, { label: "Tools", href: "/tools" }, { label: "Word Counter" }]}
       />
       <div className="band-soft">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <div className="page-container-prose py-12 sm:py-16">
           <WordCounter />
           <div className="mt-10 prose prose-sm max-w-none text-on-surface-variant">
             <h2 className="font-display text-xl font-bold text-on-surface">How to use</h2>

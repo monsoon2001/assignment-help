@@ -67,14 +67,14 @@ export default async function HelperLayout({ children }: { children: React.React
       <div className="min-h-dvh flex flex-col bg-background lg:h-dvh lg:overflow-hidden">
         <Header />
         <WarningsBannerClient />
-        <div className="flex flex-1 w-full max-w-360 mx-auto lg:min-h-0">
+        <div className="flex flex-1 w-full page-container lg:min-h-0">
           <HelperNav
             completedOrders={completedOrders}
             activeOrders={activeOrders}
             incomingRequests={incomingRequests}
             unreadMessages={unreadMessages}
           />
-          <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:p-8 pb-24 md:pb-10 lg:pb-0 lg:min-h-0 lg:overflow-y-auto">
+          <main className="flex-1 min-w-0 py-6 md:pl-8 pb-24 md:pb-10 lg:pb-0 lg:min-h-0 lg:overflow-y-auto">
             {children}
           </main>
         </div>

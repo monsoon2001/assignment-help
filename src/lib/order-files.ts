@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { safeFileName } from "@/lib/file-name";
 
 export async function uploadOrderFile(orderId: string, file: File): Promise<string> {
   const supabase = createClient();
@@ -21,7 +22,7 @@ export async function uploadOrderFile(orderId: string, file: File): Promise<stri
     throw new Error(`We couldn't read ${file.name}.${reason}`);
   }
 
-  const path = `${orderId}/${user.id}/${crypto.randomUUID()}-${file.name}`;
+  const path = `${orderId}/${user.id}/${crypto.randomUUID()}-${safeFileName(file.name)}`;
   const { error } = await supabase.storage.from("order-files").upload(path, content, {
     contentType: file.type || "application/octet-stream",
   });

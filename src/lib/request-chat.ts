@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
+import { safeFileName } from "@/lib/file-name";
 import type { ChatMessageRow } from "@/components/chat/chat-panel";
 
 export async function fetchRequestMessages(requestId: string): Promise<ChatMessageRow[] | null> {
@@ -27,7 +28,7 @@ export async function sendRequestMessage(
 
   let attachmentUrl: string | null = null;
   if (file) {
-    const path = `${user.id}/${crypto.randomUUID()}-${file.name}`;
+    const path = `${user.id}/${crypto.randomUUID()}-${safeFileName(file.name)}`;
     const { error: uploadError } = await supabase.storage.from("request-files").upload(path, file);
     if (uploadError) {
       return { error: uploadError.message };

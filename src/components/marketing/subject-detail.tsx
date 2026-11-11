@@ -54,7 +54,7 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
       />
 
       <div className="bg-white border-b border-outline-variant/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-7">
+        <div className="page-container pb-7">
           <div className="flex flex-col sm:flex-row gap-3 text-sm text-on-surface-variant mb-6">
             {["Verified subject helper", "Discuss before you pay", "Personalized proposal"].map(
               (item) => (
@@ -88,7 +88,7 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
       </div>
 
       <section className="py-12 sm:py-16 bg-white band-hero">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="page-container">
           <div className="mb-8 flex items-center justify-center gap-3">
             <span
               className={`flex h-10 w-10 items-center justify-center rounded-xl ${accent.tile}`}
@@ -119,7 +119,7 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
       </section>
 
       <section className="py-12 sm:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="page-container">
           <div className="text-center mb-10">
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-on-surface mb-4">
               How Acadivo Works
@@ -155,7 +155,7 @@ export default function SubjectDetail({ subject }: { subject: SubjectContent }) 
       </section>
 
       <section className="py-12 sm:py-16 band-soft">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="page-container-reading">
           <h2 className="font-display text-2xl font-bold text-on-surface mb-8 text-center">
             {subject.name} Assignment Help FAQs
           </h2>

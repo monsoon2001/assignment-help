@@ -43,7 +43,8 @@ import ChatPanel, {
   fileNameFromUrl,
 } from "@/components/chat/chat-panel";
 import SecureFileLink from "@/components/ui/secure-file-link";
-import ProposalCard from "@/components/requests/proposal-card";
+import ProposalCard, { type RequestProposal } from "@/components/requests/proposal-card";
+import ProposalActivity from "@/components/requests/proposal-activity";
 import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
 
 type OrderStatus =
@@ -115,6 +116,7 @@ export default function OrderWorkspace({
   const [messages, setMessages] = useState<ChatMessageRow[]>([]);
   const [deliveries, setDeliveries] = useState<DeliveryRow[]>([]);
   const [payment, setPayment] = useState<PaymentRow | null>(null);
+  const [proposalHistory, setProposalHistory] = useState<RequestProposal[]>([]);
 
   const [draft, setDraft] = useState("");
   const [chatFiles, setChatFiles] = useState<File[]>([]);
@@ -161,6 +163,19 @@ export default function OrderWorkspace({
 
     const proposal = (Array.isArray(data.proposal) ? data.proposal[0] : data.proposal) ?? null;
     requestIdRef.current = proposal?.request_id ?? null;
+
+    if (proposal?.request_id) {
+      const { data: history } = await supabase.current
+        .from("proposals")
+        .select(
+          "id, request_id, helper_id, price, currency, description, revisions_included, expires_at, status, created_at, student_note, target_price, decline_reason, revision_requested_at, replaced_by, revision_of, helper:users(id, name)",
+        )
+        .eq("request_id", proposal.request_id)
+        .order("created_at", { ascending: true });
+      setProposalHistory((history ?? []) as unknown as RequestProposal[]);
+    } else {
+      setProposalHistory([]);
+    }
 
     const normalized: OrderData = {
       ...(data as Omit<OrderData, "helper" | "proposal">),
@@ -601,6 +616,9 @@ export default function OrderWorkspace({
                       localCurrency={normalizeCurrency(order.charge_currency ?? order.currency)}
                     />
                   )}
+                {proposalHistory.length > 0 && (
+                  <ProposalActivity proposals={proposalHistory} />
+                )}
                 <Card className="p-4">
                   <div className="flex items-center justify-between gap-3 mb-4">
                     <div className="min-w-0">
@@ -759,22 +777,30 @@ export default function OrderWorkspace({
             )}
 
             {activeTab === "chat" && (
-              <div className="h-[calc(100dvh-20rem)] min-h-[280px] overflow-hidden lg:hidden">
-                <ChatPanel
-                  fill
-                  filesBucket="order-files"
-                  messages={messages}
-                  draft={draft}
-                  setDraft={setDraft}
-                  files={chatFiles}
-                  setFiles={setChatFiles}
-                  sending={sendingMsg}
-                  error={chatError}
-                  onSend={sendMessage}
-                  bottomRef={bottomRef}
-                  currentUserId={currentUserId}
-                  counterpartName={isHelper ? undefined : ACADIVO_HELPER_NAME}
-                />
+              <div className="flex flex-col gap-2 lg:hidden">
+                {proposalHistory.length > 0 && (
+                  <ProposalActivity
+                    proposals={proposalHistory}
+                    className="shrink-0 max-h-40 overflow-y-auto"
+                  />
+                )}
+                <div className="h-[calc(100dvh-20rem)] min-h-[280px] overflow-hidden">
+                  <ChatPanel
+                    fill
+                    filesBucket="order-files"
+                    messages={messages}
+                    draft={draft}
+                    setDraft={setDraft}
+                    files={chatFiles}
+                    setFiles={setChatFiles}
+                    sending={sendingMsg}
+                    error={chatError}
+                    onSend={sendMessage}
+                    bottomRef={bottomRef}
+                    currentUserId={currentUserId}
+                    counterpartName={isHelper ? undefined : ACADIVO_HELPER_NAME}
+                  />
+                </div>
               </div>
             )}
 
@@ -1154,6 +1180,12 @@ export default function OrderWorkspace({
           </div>
         </div>
         <div className="hidden lg:flex flex-col lg:col-span-5 xl:col-span-4 min-h-0 lg:h-full lg:sticky lg:top-0">
+          {proposalHistory.length > 0 && (
+            <ProposalActivity
+              proposals={proposalHistory}
+              className="shrink-0 max-h-44 overflow-y-auto mb-2"
+            />
+          )}
           <div className="flex-1 min-h-0">
             <ChatPanel
               fill

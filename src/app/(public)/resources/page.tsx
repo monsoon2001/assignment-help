@@ -31,7 +31,7 @@ export default function ResourcesPage() {
       />
 
       <div className="bg-white border-b border-outline-variant/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
+        <div className="page-container pb-6">
           <span className="inline-flex items-center gap-2 text-sm rounded-full px-3.5 py-1.5 bg-white ring-1 ring-outline-variant/50 text-on-surface-variant">
             <Search className="w-4 h-4" />
             {ALL_RESOURCES.length} free guides, no sign-up required
@@ -40,7 +40,7 @@ export default function ResourcesPage() {
       </div>
 
       <section className="py-12 sm:py-16 band-soft">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="page-container">
           <section className="mb-10 sm:mb-16">
             <h2 className="font-display text-2xl font-bold text-on-surface mb-2">
               Featured Guides

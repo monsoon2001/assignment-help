@@ -24,7 +24,7 @@
   --color-accent-tint: #fef3c7;
   --color-on-accent-tint: #78350f;
 
-  --color-canvas: #f8fafc;
+  --color-canvas: #f1f5f9;
   --color-surface: #ffffff;
   --color-line: #e2e8f0;
   --color-ink: #0f172a;
@@ -84,7 +84,7 @@
   --color-google-red: #ea4335;
 
   /* Canvas + surfaces — mostly white and cool grey (the 60%). */
-  --color-background: #f8fafc;
+  --color-background: #f1f5f9;
   --color-surface: #ffffff;
   --color-surface-bright: #ffffff;
   --color-surface-dim: #e2e8f0;
@@ -190,21 +190,15 @@
 }
 
 html {
-  /* Tailwind's rem-based type scale is built on this, so the root size sets the
-     whole page's scale. Phones sit just below the 17px design size (denser
-     bars, more content per screen) but not so far that body copy reads as
-     small; from the sm breakpoint up we use the design size. */
-  font-size: 16px;
+  /* Fluid root size: 16px on small screens, easing to 17px on very wide ones.
+     Every rem-based size (type, gaps, containers) follows this instead of
+     jumping at one breakpoint, so Windows laptops at 125–150% scaling and
+     Macs at native resolution share the same proportions. */
+  font-size: clamp(1rem, 0.9rem + 0.15vw, 1.0625rem);
   /* Safari boosts font sizes on wide viewports ("text autosizing") on top of
      the rem scale above, which overflows dense bars like the navbar. */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-}
-
-@media (min-width: 640px) {
-  html {
-    font-size: 17px;
-  }
 }
 
 /* Phones: tighten Tailwind's spacing scale (padding, margin, gap, space-*)
@@ -245,6 +239,53 @@ html {
     font-size: 1.07rem;
     --spacing: 0.255rem;
   }
+}
+
+/* Shared layout rhythm -------------------------------------------------------
+   Every page uses the same centred container and the same 8px-based spacing
+   scale. Gutters and section spacing grow with the viewport instead of being
+   tuned to one laptop, and the container stays between 1200–1280px so text
+   lines never become uncomfortably long on very wide monitors. */
+:root {
+  --page-max: 75rem;
+  --page-gutter: clamp(1rem, 2.5vw, 2.5rem);
+  --section-space: clamp(3rem, 6vw, 6rem);
+  --stack-space: clamp(1.5rem, 2.5vw, 3rem);
+
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-5: 3rem;
+  --space-6: 4rem;
+  --space-7: 6rem;
+}
+
+@utility page-container {
+  width: 100%;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--page-gutter);
+}
+
+/* Long-form pages keep a readable measure but share the same gutters,
+   centring and section rhythm as the full-width container. */
+@utility page-container-reading {
+  width: 100%;
+  max-width: 56rem;
+  margin-inline: auto;
+  padding-inline: var(--page-gutter);
+}
+
+@utility page-container-prose {
+  width: 100%;
+  max-width: 48rem;
+  margin-inline: auto;
+  padding-inline: var(--page-gutter);
+}
+
+@utility section-space {
+  padding-block: var(--section-space);
 }
 
 body {
@@ -456,7 +497,7 @@ h6 {
   --site-control-radius: 0.75rem;
   --site-surface-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.04);
   --site-surface-shadow-hover: 0 8px 20px -12px rgb(15 23 42 / 0.22);
-  --site-section-space: clamp(3rem, 5vw, 4rem);
+  --site-section-space: var(--section-space);
 }
 
 .public-site {

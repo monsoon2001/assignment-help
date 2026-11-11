@@ -96,7 +96,9 @@ export async function POST(request: Request) {
             : `A helper has responded to your request "${title}" with a proposal. Review it and accept to move forward.`,
         emailLinkLabel: "Review the proposal",
         audience: ["student", "helper", "admin"],
-        inAppRoles: event === "proposal.revised" ? ["student", "admin"] : ["admin"],
+        // The proposals insert trigger already creates the student's in-app row
+        // (and now distinguishes revised quotes). Only top up admins here.
+        inAppRoles: ["admin"],
         actorId: user.id,
       }));
       break;

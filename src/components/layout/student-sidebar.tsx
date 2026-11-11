@@ -14,7 +14,7 @@ const links = [
 export default function StudentSidebar() {
   const pathname = usePathname();
   return (
-    <aside className="w-64 shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 min-h-[calc(100vh-4rem)] p-4 hidden lg:flex flex-col gap-1">
+    <aside className="w-64 shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 min-h-[calc(100dvh-4rem)] p-4 hidden lg:flex flex-col gap-1">
       {links.map((link) => {
         const Icon = link.icon;
         const active = pathname === link.href;

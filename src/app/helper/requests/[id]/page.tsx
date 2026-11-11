@@ -37,20 +37,31 @@ export default async function HelperRequestDetailPage({
     redirect("/helper/requests");
   }
 
-  // Once a proposal is accepted the request becomes an order. Show the order
-  // workspace for that stage so a single request always opens one page.
+  // Once a proposal is accepted the request becomes an order, but the order
+  // workspace (and its delivery tab) only unlocks once the Stripe webhook has
+  // recorded the payment. Before that the helper keeps the request/proposal
+  // stage and can still discuss the price in chat.
   const { data: proposals } = await supabase.from("proposals").select("id").eq("request_id", id);
 
   const proposalIds = (proposals ?? []).map((p) => p.id);
 
   const { data: orders } = proposalIds.length
-    ? await supabase.from("orders").select("id").in("proposal_id", proposalIds).limit(1)
+    ? await supabase
+        .from("orders")
+        .select("id, payments(status)")
+        .in("proposal_id", proposalIds)
+        .limit(1)
     : { data: null };
 
-  const orderId = (orders?.[0] as { id: string } | undefined)?.id ?? null;
+  const orderRow = (orders?.[0] ?? null) as {
+    id: string;
+    payments: { status: string }[] | { status: string } | null;
+  } | null;
+  const payments = Array.isArray(orderRow?.payments) ? orderRow?.payments : [orderRow?.payments];
+  const paid = !!orderRow && (payments ?? []).some((payment) => payment?.status === "paid");
 
-  if (orderId) {
-    return <OrderWorkspace orderId={orderId} />;
+  if (orderRow && paid) {
+    return <OrderWorkspace orderId={orderRow.id} />;
   }
 
   const { data: student } = await supabase
@@ -65,8 +76,6 @@ export default async function HelperRequestDetailPage({
       requestId={id}
       mode="helper"
       localCurrency={chargeContext.localCurrency}
-      rates={chargeContext.rates}
-      surchargePercent={chargeContext.surchargePercent}
     />
   );
 }

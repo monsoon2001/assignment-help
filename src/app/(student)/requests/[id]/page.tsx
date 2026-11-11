@@ -85,8 +85,6 @@ export default async function StudentRequestDetailPage({
       requestId={id}
       mode="student"
       localCurrency={chargeContext.localCurrency}
-      rates={chargeContext.rates}
-      surchargePercent={chargeContext.surchargePercent}
     />
   );
 }

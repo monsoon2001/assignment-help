@@ -74,29 +74,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <VoiceCallProvider role="admin">
-      <div className="min-h-screen flex flex-col bg-background">
-        <div className="lg:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-2.5 bg-surface-container-lowest border-b border-outline-variant">
-          <Link href="/admin/dashboard" className="flex items-center gap-2 min-h-11">
-            <span className="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">
-              <MaterialIcon name="school" size={18} className="text-on-primary" />
-            </span>
-            <span className="font-display font-bold text-lg text-on-surface">Acadivo</span>
-            <span className="px-1.5 py-0.5 text-xs font-semibold bg-primary-container text-on-primary rounded-md">
-              Admin
-            </span>
-          </Link>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSignOutOpen(true)}
-            aria-label="Sign out"
-          >
-            <LogOut size={16} />
-            <span className="hidden sm:inline">Sign Out</span>
-          </Button>
+      <div className="min-h-dvh flex flex-col bg-background">
+        <div className="lg:hidden sticky top-0 z-40 bg-surface-container-lowest border-b border-outline-variant">
+          <div className="page-container flex items-center justify-between py-2.5">
+            <Link href="/admin/dashboard" className="flex items-center gap-2 min-h-11">
+              <span className="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center">
+                <MaterialIcon name="school" size={18} className="text-on-primary" />
+              </span>
+              <span className="font-display font-bold text-lg text-on-surface">Acadivo</span>
+              <span className="px-1.5 py-0.5 text-xs font-semibold bg-primary-container text-on-primary rounded-md">
+                Admin
+              </span>
+            </Link>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSignOutOpen(true)}
+              aria-label="Sign out"
+            >
+              <LogOut size={16} />
+              <span className="hidden sm:inline">Sign Out</span>
+            </Button>
+          </div>
         </div>
-        <div className="flex flex-1 min-h-0">
-          <aside className="hidden lg:flex w-64 shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 min-h-screen p-4 flex-col sticky top-0 h-screen overflow-y-auto">
+        <div className="flex flex-1 min-h-0 page-container">
+          <aside className="hidden lg:flex w-64 shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 p-4 flex-col sticky top-0 h-dvh overflow-y-auto">
             <div className="flex items-center gap-2 px-3 py-3 mb-4">
               <div className="w-8 h-8 bg-primary-container rounded-lg flex items-center justify-center">
                 <MaterialIcon name="school" size={18} className="text-on-primary" />
@@ -155,7 +157,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </aside>
 
-          <main className="flex-1 min-w-0 p-4 md:p-6 lg:p-8 pb-24 lg:pb-8 overflow-auto min-h-screen">
+          <main className="flex-1 min-w-0 py-6 pb-24 md:py-8 md:pl-8 md:pb-10 lg:pb-8 overflow-auto min-h-dvh">
             {children}
           </main>
         </div>

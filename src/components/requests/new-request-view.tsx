@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { FileText, Info, CheckCircle2, ShieldCheck } from "lucide-react";
 import Card from "@/components/ui/card";
@@ -110,6 +110,20 @@ export default function NewRequestView({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
+  // A ref (not the button state) is the real double-submit guard: React state
+  // updates are async, so two rapid clicks can both see submitting === false.
+  const submitLock = useRef(false);
+  const idempotencyKey = useRef<string | null>(null);
+
+  function getSubmissionKey(): string {
+    if (!idempotencyKey.current) {
+      idempotencyKey.current =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    }
+    return idempotencyKey.current;
+  }
 
   const set = useCallback(<K extends TaskRequestField>(key: K, value: TaskRequestFormValues[K]) => {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -165,7 +179,7 @@ export default function NewRequestView({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (submitting) return;
+    if (submitLock.current || submitting) return;
     setError("");
 
     if (!termsAccepted) {
@@ -202,6 +216,7 @@ export default function NewRequestView({
       return;
     }
 
+    submitLock.current = true;
     setSubmitting(true);
 
     const title = `${resolvedHelpType} — ${resolvedSubject}`;
@@ -216,25 +231,37 @@ export default function NewRequestView({
       .filter(Boolean)
       .join("\n\n");
 
-    const result = await submitRequest({
-      title,
-      description: descriptionWithMeta || undefined,
-      subject: resolvedSubject,
-      country: effectiveCountry,
-      deadline: values.deadline
-        ? new Date(`${values.deadline}T${values.dueTime || LAST_DUE_TIME}:00`).toISOString()
-        : null,
-      files: values.files,
-    });
+    try {
+      const result = await submitRequest({
+        title,
+        description: descriptionWithMeta || undefined,
+        subject: resolvedSubject,
+        country: effectiveCountry,
+        deadline: values.deadline
+          ? new Date(`${values.deadline}T${values.dueTime || LAST_DUE_TIME}:00`).toISOString()
+          : null,
+        files: values.files,
+        idempotencyKey: getSubmissionKey(),
+      });
 
-    setSubmitting(false);
-    if ("error" in result) {
-      setError(result.error);
-      return;
+      if ("error" in result) {
+        // Only an error unlocks the form. On success we keep the button in its
+        // "Sending..." state until the success screen is mounted.
+        submitLock.current = false;
+        setSubmitting(false);
+        setError(result.error);
+        return;
+      }
+
+      clearPendingDraft();
+      await clearDraftFiles();
+      router.push(`/requests/sent?id=${result.id}`);
+    } catch (submitError) {
+      console.error("request submission failed", submitError);
+      submitLock.current = false;
+      setSubmitting(false);
+      setError("We couldn't send your request. Please try again.");
     }
-    clearPendingDraft();
-    await clearDraftFiles();
-    router.push(`/requests/sent?id=${result.id}`);
   };
 
   return (

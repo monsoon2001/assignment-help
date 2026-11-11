@@ -9,6 +9,7 @@ import {
   ShoppingCart,
   CreditCard,
   MessageSquare,
+  Mail,
   Settings,
 } from "lucide-react";
 
@@ -20,13 +21,14 @@ const links = [
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/payments", label: "Payments", icon: CreditCard },
   { href: "/admin/messages", label: "Messages", icon: MessageSquare },
+  { href: "/admin/email-log", label: "Email log", icon: Mail },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 export default function AdminSidebar() {
   const pathname = usePathname();
   return (
-    <aside className="w-64 shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 min-h-screen p-4 flex flex-col gap-1">
+    <aside className="w-64 shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 min-h-dvh p-4 flex flex-col gap-1">
       <div className="flex items-center gap-3 mb-4 px-3">
         <div className="flex items-center gap-2">
           <span className="text-primary-container text-xl">◆</span>

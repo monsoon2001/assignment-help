@@ -424,12 +424,23 @@ export default function TaskRequestForm({
         </p>
       )}
 
-      <Button type="submit" variant={submitVariant} disabled={submitting} className="w-full h-11">
-        {submitting ? <Loader2 size={16} className="animate-spin" /> : submitLabel}
+      <Button
+        type="submit"
+        variant={submitVariant}
+        disabled={submitting}
+        aria-busy={submitting}
+        className="w-full h-11"
+      >
         {submitting ? (
-          <span className="sr-only">Submitting</span>
+          <>
+            <Loader2 size={16} className="animate-spin" />
+            <span>Sending...</span>
+          </>
         ) : (
-          <ArrowRight className="w-4 h-4" />
+          <>
+            {submitLabel}
+            <ArrowRight className="w-4 h-4" />
+          </>
         )}
       </Button>
 

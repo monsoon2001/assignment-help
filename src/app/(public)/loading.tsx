@@ -10,7 +10,7 @@ export default function PublicLoading() {
       <span className="sr-only">Loading…</span>
 
       <section className="relative overflow-hidden band-hero">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 lg:py-28">
+        <div className="page-container py-14 sm:py-20 lg:py-28">
           <div className="max-w-3xl space-y-5">
             <Skeleton className="h-7 w-56 rounded-full" />
             <Skeleton className="h-12 w-full max-w-2xl" />
@@ -25,7 +25,7 @@ export default function PublicLoading() {
       </section>
 
       <section className="py-12 border-y border-outline-variant/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="page-container">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="flex flex-col items-center gap-3">
@@ -38,7 +38,7 @@ export default function PublicLoading() {
       </section>
 
       <section className="py-12 sm:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="page-container">
           <div className="max-w-2xl mb-8 sm:mb-12 space-y-3">
             <Skeleton className="h-8 w-72" />
             <SkeletonText lines={2} />

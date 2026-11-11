@@ -79,6 +79,9 @@ export default async function RequestsPage() {
 
   const proposalsByRequest: Record<string, ProposalRow[]> = {};
   for (const raw of proposals) {
+    // History rows (replaced/declined) stay in the database but must not
+    // inflate the "N proposals" badge on the request list.
+    if (!["pending", "revision_requested", "accepted"].includes(raw.status)) continue;
     const p = {
       ...raw,
       helper: Array.isArray(raw.helper) ? (raw.helper[0] ?? null) : raw.helper,

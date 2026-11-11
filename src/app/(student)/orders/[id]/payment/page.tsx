@@ -9,7 +9,6 @@ import Card from "@/components/ui/card";
 import Badge from "@/components/ui/badge";
 import Avatar from "@/components/ui/avatar";
 import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
-import CheckoutPanel from "@/components/orders/checkout-panel";
 import ProposalCard, { type RequestProposal } from "@/components/requests/proposal-card";
 
 export const dynamic = "force-dynamic";
@@ -150,10 +149,11 @@ export default async function OrderPaymentPage({ params }: { params: Promise<{ i
               orderId={order.id}
               orderStatus={order.status}
               orderPaid={false}
+              lockedAmount={chargeAmount}
+              lockedCurrency={chargeCurrency}
               localCurrency={order.currency}
             />
           )}
-          <CheckoutPanel orderId={order.id} amount={order.price} currency={order.currency} />
         </div>
       </div>
     </div>

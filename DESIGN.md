@@ -16,7 +16,7 @@ never hard-code hex values or arbitrary colour classes.
 | `--color-accent` | `text-accent` / `fill-accent` | `#F59E0B` | Stars and small highlights only |
 | `--color-accent-tint` | `bg-accent-tint` | `#FEF3C7` | Accent tint |
 | `--color-on-accent-tint` | `text-on-accent-tint` | `#78350F` | Text on accent tint |
-| `--color-canvas` | `bg-canvas` | `#F8FAFC` | Page background |
+| `--color-canvas` | `bg-canvas` | `#F1F5F9` | Page background |
 | `--color-surface` | `bg-surface` | `#FFFFFF` | Cards, inputs, surfaces |
 | `--color-line` | `border-line` | `#E2E8F0` | Borders and dividers |
 | `--color-ink` | `text-ink` | `#0F172A` | Primary text |

@@ -42,6 +42,18 @@ export default function PriceEstimateForm() {
   const [submitting, setSubmitting] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const restoredRef = useRef(false);
+  const submitLock = useRef(false);
+  const idempotencyKey = useRef<string | null>(null);
+
+  function getSubmissionKey(): string {
+    if (!idempotencyKey.current) {
+      idempotencyKey.current =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    }
+    return idempotencyKey.current;
+  }
 
   const set = useCallback(<K extends TaskRequestField>(key: K, value: TaskRequestFormValues[K]) => {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -77,6 +89,7 @@ export default function PriceEstimateForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitLock.current || submitting) return;
     setError("");
 
     if (!termsAccepted) {
@@ -116,6 +129,7 @@ export default function PriceEstimateForm() {
       return;
     }
 
+    submitLock.current = true;
     setSubmitting(true);
     try {
       const supabase = createClient();
@@ -145,6 +159,8 @@ export default function PriceEstimateForm() {
         .maybeSingle();
       if (profileError) {
         console.error("homepage request submission: profile country lookup failed", profileError);
+        submitLock.current = false;
+        setSubmitting(false);
         setError("We couldn't verify your billing country. Please try again.");
         return;
       }
@@ -168,21 +184,26 @@ export default function PriceEstimateForm() {
           ? new Date(`${values.deadline}T${values.dueTime || LAST_DUE_TIME}:00`).toISOString()
           : null,
         files: values.files,
+        idempotencyKey: getSubmissionKey(),
       });
 
       if ("error" in result) {
+        submitLock.current = false;
+        setSubmitting(false);
         setError(result.error);
         return;
       }
 
       clearPendingDraft();
       await clearDraftFiles();
+      // Keep the button disabled and showing "Sending..." until navigation to
+      // the success screen. Do not reset state in a finally block.
       router.push(`/requests/sent?id=${result.id}`);
     } catch (submitError) {
       console.error("homepage request submission failed", submitError);
-      setError("We couldn't send your request. Please try again.");
-    } finally {
+      submitLock.current = false;
       setSubmitting(false);
+      setError("We couldn't send your request. Please try again.");
     }
   };
 

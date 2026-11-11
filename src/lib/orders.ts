@@ -9,6 +9,12 @@ export interface ProposalForAccept {
   request_deadline?: string | null;
 }
 
+export interface AcceptProposalResult {
+  orderId: string;
+  chargeAmount?: number;
+  chargeCurrency?: string;
+}
+
 /**
  * Accepts a proposal through the server so the local charge currency/amount is
  * derived and locked on the order authoritatively. The client-supplied price
@@ -16,7 +22,7 @@ export interface ProposalForAccept {
  */
 export async function acceptProposal(
   input: ProposalForAccept,
-): Promise<{ orderId: string } | { error: string }> {
+): Promise<AcceptProposalResult | { error: string }> {
   try {
     const res = await fetch("/api/orders/accept", {
       method: "POST",
@@ -29,27 +35,64 @@ export async function acceptProposal(
 
     const data = (await res.json().catch(() => null)) as {
       orderId?: string;
+      chargeAmount?: number;
+      chargeCurrency?: string;
       error?: string;
     } | null;
 
     if (!res.ok || !data?.orderId) {
       return { error: data?.error ?? "Could not accept this proposal. Please try again." };
     }
-    return { orderId: data.orderId };
+    return {
+      orderId: data.orderId,
+      chargeAmount: data.chargeAmount,
+      chargeCurrency: data.chargeCurrency,
+    };
   } catch {
     return { error: "Could not accept this proposal. Please try again." };
   }
 }
 
+/** Ask the helper for a different price. Keeps the old quote in history. */
+export async function requestProposalRevision(
+  proposal_id: string,
+  request_id: string,
+  note?: string,
+  target_price?: number,
+): Promise<{ ok: true } | { error: string }> {
+  try {
+    const response = await fetch("/api/proposals/revision", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ proposal_id, request_id, note, target_price }),
+    });
+    const data = (await response.json().catch(() => null)) as {
+      ok?: boolean;
+      error?: string;
+    } | null;
+    if (!response.ok || data?.ok !== true) {
+      return { error: data?.error ?? "Could not request a revised price. Please try again." };
+    }
+  } catch (error) {
+    console.error("proposal revision request failed", error);
+    return { error: "Could not request a revised price. Please try again." };
+  }
+
+  notifyActivity("proposal.revision_requested", request_id);
+  return { ok: true };
+}
+
+/** Decline a proposal (or cancel an accepted, unpaid order) with an optional reason. */
 export async function declineProposal(
   proposal_id: string,
   request_id: string,
+  reason?: string,
 ): Promise<{ ok: true } | { error: string }> {
   try {
     const response = await fetch("/api/proposals/decline", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ proposal_id, request_id }),
+      body: JSON.stringify({ proposal_id, request_id, reason }),
     });
     const data = (await response.json().catch(() => null)) as {
       ok?: boolean;
@@ -63,6 +106,6 @@ export async function declineProposal(
     return { error: "Could not decline this proposal. Please try again." };
   }
 
-  notifyActivity("proposal.revision_requested", request_id);
+  notifyActivity("proposal.declined", proposal_id);
   return { ok: true };
 }

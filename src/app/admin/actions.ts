@@ -159,3 +159,28 @@ export async function requestRefund(
   revalidatePath("/admin/orders", "layout");
   return { ok: true, message: "Refund processed." };
 }
+
+export async function resendEmail(
+  _prev: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  const adminId = await requireAdmin();
+  const id = clean(formData.get("id"));
+  if (!id) return { ok: false, message: "Missing email id." };
+
+  const { data: row } = await adminClient
+    .from("email_outbox")
+    .select("id, status")
+    .eq("id", id)
+    .maybeSingle();
+  if (!row) return { ok: false, message: "Email not found." };
+  if (row.status !== "failed") return { ok: false, message: "Only failed emails can be resent." };
+
+  await adminClient
+    .from("email_outbox")
+    .update({ status: "pending", attempts: 0, last_error: null })
+    .eq("id", id);
+  await logAdminAction(adminId, "email_resend", id, {});
+  revalidatePath("/admin/email-log");
+  return { ok: true, message: "Queued for resend." };
+}

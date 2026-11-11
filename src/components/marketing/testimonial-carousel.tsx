@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { BadgeCheck, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import Avatar from "@/components/ui/avatar";
 import { MaterialIcon } from "@/lib/icons-map";
@@ -49,9 +49,6 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
     },
     [maxIndex],
   );
-
-  const indexRef = useRef(safeIndex);
-  indexRef.current = safeIndex;
 
   useEffect(() => {
     if (paused || maxIndex <= 0) return;

@@ -29,9 +29,12 @@ const REQUEST_STATUS: Record<string, StatusMeta> = {
 };
 
 const PROPOSAL_STATUS: Record<string, StatusMeta> = {
-  pending: { label: "Pending", tone: "blue" },
+  pending: { label: "Sent", tone: "blue" },
+  revision_requested: { label: "Revised price requested", tone: "amber" },
+  replaced: { label: "Replaced", tone: "slate" },
   accepted: { label: "Accepted", tone: "blueStrong" },
   declined: { label: "Declined", tone: "slate" },
+  withdrawn: { label: "Withdrawn", tone: "slate" },
 };
 
 const PAYMENT_STATUS: Record<string, StatusMeta> = {

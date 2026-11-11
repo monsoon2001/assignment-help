@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
-  let body: { proposal_id?: unknown; request_id?: unknown };
+  let body: { proposal_id?: unknown; request_id?: unknown; reason?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -22,6 +22,20 @@ export async function POST(request: Request) {
     requestId.length === 0
   ) {
     return NextResponse.json({ error: "Missing proposal or request id." }, { status: 400 });
+  }
+
+  let reason: string | null = null;
+  if (body.reason !== undefined && body.reason !== null) {
+    if (typeof body.reason !== "string") {
+      return NextResponse.json({ error: "The reason must be text." }, { status: 400 });
+    }
+    reason = body.reason.trim() || null;
+    if (reason && reason.length > 2000) {
+      return NextResponse.json(
+        { error: "Keep the decline reason under 2000 characters." },
+        { status: 400 },
+      );
+    }
   }
 
   const supabase = await createClient();
@@ -72,14 +86,17 @@ export async function POST(request: Request) {
   if (proposal.status === "declined") {
     return NextResponse.json({ ok: true });
   }
-  if (proposal.status !== "pending" && proposal.status !== "accepted") {
+  if (
+    proposal.status !== "pending" &&
+    proposal.status !== "revision_requested" &&
+    proposal.status !== "accepted"
+  ) {
     return NextResponse.json(
       { error: "This proposal has already been resolved." },
       { status: 409 },
     );
   }
 
-  let unpaidOrderId: string | null = null;
   if (proposal.status === "accepted") {
     const { data: order, error: orderError } = await adminClient
       .from("orders")
@@ -99,7 +116,6 @@ export async function POST(request: Request) {
         { status: 409 },
       );
     }
-    unpaidOrderId = order.id;
 
     const { data: payments, error: paymentError } = await adminClient
       .from("payments")
@@ -195,129 +211,45 @@ export async function POST(request: Request) {
     }
   }
 
-  if (proposal.status === "pending") {
-    const { data: removedProposal, error: declineError } = await supabase.rpc(
-      "remove_pending_proposal_for_revision",
+  if (proposal.status === "accepted") {
+    const { data: declined, error: declineError } = await supabase.rpc("decline_unpaid_proposal", {
+      p_proposal_id: proposal.id,
+      p_request_id: proposal.request_id,
+    });
+    if (declineError) {
+      console.error("proposal decline: database operation failed", declineError);
+      return NextResponse.json(
+        { error: declineError.message || "This unpaid order could not be cancelled." },
+        { status: 409 },
+      );
+    }
+    if (declined !== true) {
+      return NextResponse.json(
+        { error: "This order was not cancelled. Refresh and try again." },
+        { status: 409 },
+      );
+    }
+  } else {
+    const { data: declined, error: declineError } = await supabase.rpc(
+      "decline_proposal_with_reason",
       {
         p_proposal_id: proposal.id,
         p_request_id: proposal.request_id,
+        p_reason: reason,
       },
     );
     if (declineError) {
       console.error("proposal decline: database operation failed", declineError);
       return NextResponse.json(
-        {
-          error:
-            "This proposal could not be reset for a revised quote. Apply the latest database migration and try again.",
-        },
+        { error: declineError.message || "This proposal could not be declined." },
         { status: 409 },
       );
     }
-    if (removedProposal !== true) {
+    if (declined !== true) {
       return NextResponse.json(
-        { error: "This proposal was not reset. Refresh and try again." },
+        { error: "This proposal was not declined. Refresh and try again." },
         { status: 409 },
       );
-    }
-  } else {
-    const { error: declineError } = await supabase.rpc("decline_unpaid_proposal", {
-      p_proposal_id: proposal.id,
-      p_request_id: proposal.request_id,
-    });
-    if (declineError) {
-      if (declineError.code !== "PGRST202" || !unpaidOrderId) {
-        console.error("proposal decline: database operation failed", declineError);
-        return NextResponse.json(
-          {
-            error:
-              "This unpaid accepted proposal could not be declined. Apply the latest database migration and try again.",
-          },
-          { status: 409 },
-        );
-      }
-
-      console.warn("proposal decline: database function unavailable; using guarded fallback");
-      const { data: declinedProposal, error: updateError } = await adminClient
-        .from("proposals")
-        .update({ status: "declined" })
-        .eq("id", proposal.id)
-        .eq("status", "accepted")
-        .select("id")
-        .maybeSingle();
-      if (updateError || !declinedProposal) {
-        console.error("proposal decline: fallback proposal update failed", updateError);
-        return NextResponse.json(
-          { error: "This proposal could not be declined. Refresh and try again." },
-          { status: 409 },
-        );
-      }
-
-      const { data: deletedOrder, error: deleteError } = await adminClient
-        .from("orders")
-        .delete()
-        .eq("id", unpaidOrderId)
-        .eq("status", "payment_pending")
-        .select("id")
-        .maybeSingle();
-      if (deleteError || !deletedOrder) {
-        console.error("proposal decline: fallback order cancellation failed", deleteError);
-        const { error: restoreError } = await adminClient
-          .from("proposals")
-          .update({ status: "accepted" })
-          .eq("id", proposal.id)
-          .eq("status", "declined");
-        if (restoreError) {
-          console.error("proposal decline: fallback proposal restore failed", restoreError);
-        }
-        return NextResponse.json(
-          { error: "This unpaid order could not be cancelled. Refresh and try again." },
-          { status: 409 },
-        );
-      }
-
-      const { data: removedProposal, error: removeError } = await adminClient
-        .from("proposals")
-        .delete()
-        .eq("id", proposal.id)
-        .eq("status", "declined")
-        .select("id")
-        .maybeSingle();
-      if (removeError || !removedProposal) {
-        console.error("proposal decline: fallback proposal removal failed", removeError);
-        return NextResponse.json(
-          { error: "The order was cancelled, but the old quote could not be removed." },
-          { status: 500 },
-        );
-      }
-
-      const { count, error: countError } = await adminClient
-        .from("proposals")
-        .select("id", { count: "exact", head: true })
-        .eq("request_id", proposal.request_id)
-        .eq("status", "pending");
-      if (countError) {
-        console.error("proposal decline: fallback pending proposal lookup failed", countError);
-        return NextResponse.json(
-          { error: "Proposal declined, but the request status could not be updated." },
-          { status: 500 },
-        );
-      }
-
-      const { error: requestUpdateError } = await adminClient
-        .from("requests")
-        .update({ status: count ? "proposal_sent" : "requested" })
-        .eq("id", proposal.request_id)
-        .eq("status", "accepted");
-      if (requestUpdateError) {
-        console.error(
-          "proposal decline: fallback request status update failed",
-          requestUpdateError,
-        );
-        return NextResponse.json(
-          { error: "Proposal declined, but the request status could not be updated." },
-          { status: 500 },
-        );
-      }
     }
   }
 

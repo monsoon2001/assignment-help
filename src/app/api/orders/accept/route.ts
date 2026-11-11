@@ -121,11 +121,15 @@ export async function POST(request: Request) {
     if (acceptError.code === "23505") {
       const { data: existingOrder } = await adminClient
         .from("orders")
-        .select("id, student_id")
+        .select("id, student_id, charge_amount, charge_currency")
         .eq("proposal_id", proposal.id)
         .maybeSingle();
       if (existingOrder?.student_id === user.id) {
-        return NextResponse.json({ orderId: existingOrder.id });
+        return NextResponse.json({
+          orderId: existingOrder.id,
+          chargeAmount: existingOrder.charge_amount,
+          chargeCurrency: existingOrder.charge_currency,
+        });
       }
       return NextResponse.json(
         { error: "This proposal has already been accepted." },
@@ -163,5 +167,9 @@ export async function POST(request: Request) {
     })),
   );
 
-  return NextResponse.json({ orderId: acceptedOrderId });
+  return NextResponse.json({
+    orderId: acceptedOrderId,
+    chargeAmount: charge.amount,
+    chargeCurrency: charge.currency,
+  });
 }

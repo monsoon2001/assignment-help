@@ -362,7 +362,7 @@ export default async function HomePage() {
         <div className="absolute inset-x-0 bottom-0 h-24 bg-section" aria-hidden="true" />
         <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary-tint opacity-60 blur-3xl" aria-hidden="true" />
         <div className="pointer-events-none absolute top-1/3 -left-32 h-64 w-64 rounded-full bg-accent-tint opacity-40 blur-3xl" aria-hidden="true" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-20">
+        <div className="relative page-container py-10 sm:py-16 lg:py-20">
           <div className="grid lg:grid-cols-[1fr_minmax(0,640px)] gap-8 lg:gap-10 items-start">
             {/* Left Column */}
             <div className="space-y-5 home-enter">
@@ -437,13 +437,13 @@ export default async function HomePage() {
       </section>
 
       {/* Mobile: hero form is hidden, so open it in a sheet from here */}
-      <div className="lg:hidden max-w-7xl mx-auto px-4 sm:px-6 py-5">
+      <div className="lg:hidden page-container py-5">
         <AssistanceCta />
       </div>
 
       {/* Trust band */}
       <section className="py-8 sm:py-10 bg-white border-y border-outline-variant/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="page-container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {[
               { icon: BookOpen, value: SUBJECTS.length, label: "Subjects covered", tint: "bg-primary-tint text-primary" },
@@ -472,7 +472,7 @@ export default async function HomePage() {
 
       {/* Core Academic Services */}
       <section className="py-12 sm:py-16 bg-section border-t border-outline-variant/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="page-container">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8 sm:mb-10">
             <div className="max-w-2xl">
               <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-3">
@@ -551,7 +551,7 @@ export default async function HomePage() {
 
       {/* How It Works */}
       <section className="py-12 sm:py-16 bg-white" aria-labelledby="how-heading">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="page-container">
           <div className="max-w-3xl mb-8">
             <h2
               id="how-heading"
@@ -639,7 +639,7 @@ export default async function HomePage() {
 
       {/* Why Students Choose Us */}
       <section className="py-12 sm:py-16 bg-white" aria-labelledby="why-heading">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="page-container">
           <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-10 lg:gap-16">
             <div>
               <h2
@@ -690,7 +690,7 @@ export default async function HomePage() {
 
       {/* Subjects We Cover */}
       <section className="py-12 sm:py-16 bg-section border-t border-outline-variant/40" aria-labelledby="subjects-heading">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="page-container">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
             <div className="max-w-2xl">
               <h2
@@ -745,7 +745,7 @@ export default async function HomePage() {
 
       {/* Free Study Guides */}
       <section className="py-12 sm:py-16 bg-white border-t border-outline-variant/40" aria-labelledby="guides-heading">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="page-container">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
             <div className="max-w-2xl">
               <h2
@@ -814,7 +814,7 @@ export default async function HomePage() {
 
       {/* Testimonials */}
       <section className="py-12 sm:py-16 bg-section border-t border-outline-variant/40" aria-labelledby="testimonials-heading">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="page-container">
           <div className="max-w-2xl mx-auto text-center mb-8">
             <h2
               id="testimonials-heading"
@@ -870,7 +870,7 @@ export default async function HomePage() {
 
       {/* FAQ */}
       <section className="py-12 sm:py-16 bg-white" aria-labelledby="faq-heading">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="page-container">
           <div className="max-w-3xl mb-8">
             <h2
               id="faq-heading"
@@ -899,7 +899,7 @@ export default async function HomePage() {
        >
          <div className="pointer-events-none absolute -top-20 -left-20 h-64 w-64 rounded-full bg-primary/30 blur-3xl" aria-hidden="true" />
          <div className="pointer-events-none absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-accent/20 blur-3xl" aria-hidden="true" />
-         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+         <div className="relative page-container">
           <div className="text-center">
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 bg-white/12 ring-1 ring-white/25">
               <MaterialIcon name="school" size={24} className="text-white/80" />

@@ -26,20 +26,12 @@ import Textarea from "@/components/ui/textarea";
 import ChatPanel, { type ChatMessageRow, fileNameFromUrl } from "@/components/chat/chat-panel";
 import SecureFileLink from "@/components/ui/secure-file-link";
 import ProposalCard, { type RequestProposal } from "@/components/requests/proposal-card";
+import ProposalActivity from "@/components/requests/proposal-activity";
 import { createClient } from "@/lib/supabase/client";
 import { realtimeTopic } from "@/lib/supabase/realtime";
 import { fetchRequestMessages, sendRequestMessage } from "@/lib/request-chat";
 import { submitProposal } from "@/lib/proposals";
-import {
-  CHARGE_CURRENCIES,
-  computeLocalCharge,
-  convertViaCad,
-  currencyFlag,
-  currencyName,
-  DEFAULT_CURRENCY,
-  formatCurrency,
-  roundMoney,
-} from "@/lib/currency";
+import { DEFAULT_CURRENCY } from "@/lib/currency";
 import { markThreadNotificationsRead } from "@/lib/notifications";
 import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 import { requestStatusTone } from "@/lib/status-meta";
@@ -78,14 +70,10 @@ export default function RequestWorkspace({
   requestId,
   mode,
   localCurrency = DEFAULT_CURRENCY,
-  rates = null,
-  surchargePercent = 0,
 }: {
   requestId: string;
   mode: "student" | "helper";
   localCurrency?: string;
-  rates?: Record<string, number> | null;
-  surchargePercent?: number;
 }) {
   const supabase = useRef(createClient());
 
@@ -96,9 +84,12 @@ export default function RequestWorkspace({
 
   const [messages, setMessages] = useState<ChatMessageRow[]>([]);
   const [proposal, setProposal] = useState<RequestProposal | null>(null);
+  const [proposalHistory, setProposalHistory] = useState<RequestProposal[]>([]);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [orderStatus, setOrderStatus] = useState<string | null>(null);
   const [orderPaid, setOrderPaid] = useState(false);
+  const [orderChargeAmount, setOrderChargeAmount] = useState<number | undefined>(undefined);
+  const [orderChargeCurrency, setOrderChargeCurrency] = useState<string | undefined>(undefined);
 
   const [draft, setDraft] = useState("");
   const [chatFiles, setChatFiles] = useState<File[]>([]);
@@ -106,7 +97,6 @@ export default function RequestWorkspace({
   const [chatError, setChatError] = useState<string | null>(null);
 
   const [bidPrice, setBidPrice] = useState("");
-  const [bidCurrency, setBidCurrency] = useState(DEFAULT_CURRENCY);
   const [bidDescription, setBidDescription] = useState("");
   const [bidRevisions, setBidRevisions] = useState("1");
   const [sendingBid, setSendingBid] = useState(false);
@@ -165,48 +155,71 @@ export default function RequestWorkspace({
     const { data } = await supabase.current
       .from("proposals")
       .select(
-        "id, request_id, helper_id, price, currency, description, revisions_included, expires_at, status, created_at, helper:users(id, name)",
+        "id, request_id, helper_id, price, currency, description, revisions_included, expires_at, status, created_at, student_note, target_price, decline_reason, revision_requested_at, replaced_by, revision_of, helper:users(id, name)",
       )
       .eq("request_id", requestId)
-      .maybeSingle();
+      .order("created_at", { ascending: false });
 
-    const row = Array.isArray(data) ? (data?.[0] ?? null) : data;
-    if (!row) {
-      setProposal(null);
+    const rows = (Array.isArray(data) ? data : []) as unknown as Array<
+      Omit<RequestProposal, "helper"> & {
+        helper: { id: string; name: string | null } | { id: string; name: string | null }[] | null;
+      }
+    >;
+    const normalized: RequestProposal[] = rows.map((row) => ({
+      ...row,
+      helper: Array.isArray(row.helper) ? (row.helper[0] ?? null) : row.helper,
+    }));
+    setProposalHistory(normalized);
+
+    // The active quote is the one the student can still act on. Older rows are
+    // kept as history (replaced/declined) and never overwrite it.
+    const active =
+      normalized.find((p) => ["pending", "revision_requested", "accepted"].includes(p.status)) ??
+      null;
+    setProposal(active);
+
+    // When the student asks for a different price, start the helper's revised
+    // quote form at their target (still fully editable). This runs in the async
+    // loader rather than an effect so it never cascades renders.
+    if (
+      active?.status === "revision_requested" &&
+      typeof active.target_price === "number" &&
+      active.target_price > 0
+    ) {
+      setBidPrice((current) => current || String(Math.round(active.target_price as number)));
+    }
+
+    if (!active || active.status !== "accepted") {
       setOrderId(null);
       setOrderStatus(null);
       setOrderPaid(false);
+      setOrderChargeAmount(undefined);
+      setOrderChargeCurrency(undefined);
       return;
     }
-    const normalized: RequestProposal = {
-      ...(row as Omit<RequestProposal, "helper">),
-      helper: Array.isArray(row.helper) ? (row.helper[0] ?? null) : row.helper,
-    };
-    setProposal(normalized);
 
-    if (normalized.status === "accepted") {
-      const { data: order } = await supabase.current
-        .from("orders")
-        .select("id, status")
-        .eq("proposal_id", normalized.id)
+    const { data: order } = await supabase.current
+      .from("orders")
+      .select("id, status, charge_amount, charge_currency")
+      .eq("proposal_id", active.id)
+      .maybeSingle();
+    const currentOrder = order && !Array.isArray(order) ? order : null;
+    setOrderId(currentOrder?.id ?? null);
+    setOrderStatus(currentOrder?.status ?? null);
+    setOrderChargeAmount(
+      currentOrder?.charge_amount != null ? Number(currentOrder.charge_amount) : undefined,
+    );
+    setOrderChargeCurrency(currentOrder?.charge_currency ?? undefined);
+
+    if (currentOrder?.id) {
+      const { data: payment } = await supabase.current
+        .from("payments")
+        .select("id")
+        .eq("order_id", currentOrder.id)
+        .eq("status", "paid")
         .maybeSingle();
-      const currentOrder = order && !Array.isArray(order) ? order : null;
-      setOrderId(currentOrder?.id ?? null);
-      setOrderStatus(currentOrder?.status ?? null);
-      if (currentOrder?.id) {
-        const { data: payment } = await supabase.current
-          .from("payments")
-          .select("id")
-          .eq("order_id", currentOrder.id)
-          .eq("status", "paid")
-          .maybeSingle();
-        setOrderPaid(!!payment);
-      } else {
-        setOrderPaid(false);
-      }
+      setOrderPaid(!!payment);
     } else {
-      setOrderId(null);
-      setOrderStatus(null);
       setOrderPaid(false);
     }
   }, [requestId]);
@@ -356,7 +369,7 @@ export default function RequestWorkspace({
     const result = await submitProposal({
       request_id: requestId,
       price: parsedPrice,
-      currency: bidCurrency,
+      currency: "CAD",
       description: bidDescription.trim() || undefined,
       revisions_included: Math.max(0, Number(bidRevisions) || 0),
     });
@@ -384,16 +397,6 @@ export default function RequestWorkspace({
   }
 
   const title = request.title || "Untitled Request";
-  const quoteAmount = Number(bidPrice);
-  const estimatedStudentTotal =
-    bidPrice.trim() && Number.isFinite(quoteAmount) && quoteAmount > 0
-      ? computeLocalCharge(quoteAmount, bidCurrency, localCurrency, rates, surchargePercent)
-      : null;
-  const convertedQuote = convertViaCad(quoteAmount, bidCurrency, localCurrency, rates);
-  const estimatedProcessingCosts =
-    estimatedStudentTotal !== null && convertedQuote !== null
-      ? Math.max(0, estimatedStudentTotal - roundMoney(convertedQuote, localCurrency))
-      : null;
 
   const chatLabel = isHelper ? "Chat with student" : "Chat with helper";
   const tabs = [
@@ -554,14 +557,16 @@ export default function RequestWorkspace({
                   orderId={orderId}
                   orderStatus={orderStatus}
                   orderPaid={orderPaid}
+                  lockedAmount={orderChargeAmount}
+                  lockedCurrency={orderChargeCurrency}
                   localCurrency={localCurrency}
-                  rates={rates}
-                  surchargePercent={surchargePercent}
                   onRevisionRequested={() => {
-                    setProposal(null);
-                    setOrderId(null);
-                    setOrderStatus(null);
-                    setOrderPaid(false);
+                    void loadProposal();
+                    void loadRequest();
+                  }}
+                  onDeclined={() => {
+                    void loadProposal();
+                    void loadRequest();
                   }}
                 />
               )}
@@ -616,6 +621,10 @@ export default function RequestWorkspace({
                 )}
               </Card>
 
+              {proposalHistory.length > 0 && (
+                <ProposalActivity proposals={proposalHistory} />
+              )}
+
               {isHelper && bidNotice && (
                 <p
                   role="status"
@@ -626,78 +635,55 @@ export default function RequestWorkspace({
               )}
 
               {isHelper &&
-                (!proposal || proposal.status === "declined") &&
+                (!proposal || proposal.status === "revision_requested") &&
                 request.status !== "accepted" && (
                   <Card className="p-3.5">
                     <h2 className="font-display font-semibold text-on-surface text-sm mb-1">
-                      {!proposal ? "Send a proposal" : "Send revised quote"}
+                      {proposal?.status === "revision_requested"
+                        ? "Send revised quote"
+                        : "Send a proposal"}
                     </h2>
                     <p className="text-xs text-on-surface-variant mb-3">
-                      {proposal?.status === "declined"
-                        ? "The student requested a new price. Enter a fresh quote; the previous quote has been removed."
-                        : "Set your price and explain what's included. The student will see an estimated total with processing and currency costs before accepting."}
+                      {proposal?.status === "revision_requested"
+                        ? "The student asked for a different price. Send a revised quote in Canadian dollars (CAD). Your previous quote stays in the history as replaced."
+                        : "Set your price in Canadian dollars (CAD) and explain what's included. The student can accept, ask for a different price, or decline."}
                     </p>
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
-                      <div className="w-full sm:w-64 sm:shrink-0">
-                        <Input
-                          label="Your quote (whole units)"
-                          type="number"
-                          inputMode="numeric"
-                          min="1"
-                          step="1"
-                          placeholder="Enter amount"
-                          className="placeholder:text-on-surface-variant"
-                          value={bidPrice}
-                          onChange={(e) => setBidPrice(e.target.value)}
-                          onBlur={() => {
-                            const raw = Number(bidPrice);
-                            if (Number.isFinite(raw) && raw > 0)
-                              setBidPrice(String(Math.round(raw)));
-                          }}
-                        />
-                      </div>
-                      <div className="flex flex-1 min-w-0 flex-col gap-1.5">
-                        <label className="text-sm font-medium text-on-surface">Currency</label>
-                        <select
-                          aria-label="Currency"
-                          value={bidCurrency}
-                          onChange={(e) => setBidCurrency(e.target.value)}
-                          className="h-11 w-full min-w-0 truncate rounded-lg border border-outline-variant bg-surface-container-lowest px-3 text-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20"
-                        >
-                          {CHARGE_CURRENCIES.map((code) => (
-                            <option key={code} value={code}>
-                              {currencyFlag(code)} {code} · {currencyName(code)}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                    {bidPrice.trim() && (
-                      <div className="mt-3 rounded-lg border border-outline-variant bg-surface-container-low p-3">
+                    {proposal?.status === "revision_requested" && proposal.student_note && (
+                      <div className="mb-3 rounded-lg border border-warning/30 bg-warning-container/20 p-2.5">
                         <p className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
-                          Estimated student total
+                          Student note
                         </p>
-                        {estimatedStudentTotal !== null ? (
-                          <>
-                            <p className="mt-1 font-display text-lg font-bold text-on-surface">
-                              {formatCurrency(estimatedStudentTotal, localCurrency)}
-                            </p>
-                            <p className="text-xs text-on-surface-variant">
-                              Your quote is {formatCurrency(quoteAmount, bidCurrency)}
-                              {estimatedProcessingCosts !== null && estimatedProcessingCosts > 0
-                                ? `; includes about ${formatCurrency(estimatedProcessingCosts, localCurrency)} for payment processing and currency conversion.`
-                                : "."}{" "}
-                              The final amount is recalculated at acceptance and then locked.
-                            </p>
-                          </>
-                        ) : (
-                          <p className="mt-1 text-xs text-on-surface-variant">
-                            A local total is unavailable right now. The student will need to retry
-                            after currency conversion is available.
+                        <p className="mt-1 text-xs text-on-surface-variant whitespace-pre-line">
+                          “{proposal.student_note}”
+                        </p>
+                        {typeof proposal.target_price === "number" && proposal.target_price > 0 && (
+                          <p className="mt-1 text-xs font-medium text-on-surface">
+                            Target price: C${Math.round(proposal.target_price)}
                           </p>
                         )}
                       </div>
                     )}
+                    <div className="w-full sm:max-w-64">
+                      <Input
+                        label="Your quote in CAD"
+                        type="number"
+                        inputMode="numeric"
+                        min="1"
+                        step="1"
+                        placeholder="Enter amount"
+                        className="placeholder:text-on-surface-variant"
+                        value={bidPrice}
+                        onChange={(e) => setBidPrice(e.target.value)}
+                        onBlur={() => {
+                          const raw = Number(bidPrice);
+                          if (Number.isFinite(raw) && raw > 0)
+                            setBidPrice(String(Math.round(raw)));
+                        }}
+                      />
+                      <p className="mt-1 text-xs text-on-surface-variant">
+                        Charged in Canadian dollars (CAD).
+                      </p>
+                    </div>
                     <div className="mt-3 flex items-start gap-2 p-2.5 rounded-lg bg-surface-container-low border border-outline-variant">
                       <RotateCcw size={14} className="text-primary shrink-0 mt-0.5" />
                       <p className="text-xs leading-relaxed text-on-surface-variant">
@@ -727,7 +713,7 @@ export default function RequestWorkspace({
                       )}
                       {sendingBid
                         ? "Sending..."
-                        : proposal
+                        : proposal?.status === "revision_requested"
                           ? "Send Revised Quote"
                           : "Send Proposal"}
                     </Button>
@@ -756,6 +742,12 @@ export default function RequestWorkspace({
             {view === "chat" && (
               <div className="lg:hidden flex flex-col gap-3">
                 {contactCard}
+                {proposalHistory.length > 0 && (
+                  <ProposalActivity
+                    proposals={proposalHistory}
+                    className="shrink-0 max-h-44 overflow-y-auto"
+                  />
+                )}
                 <div className="h-[calc(100dvh-22rem)] min-h-[280px]">{chatPanel}</div>
               </div>
             )}
@@ -764,6 +756,12 @@ export default function RequestWorkspace({
 
         <div className="hidden lg:flex flex-col gap-3 lg:col-span-5 min-h-0 lg:h-full">
           {contactCard}
+          {proposalHistory.length > 0 && (
+            <ProposalActivity
+              proposals={proposalHistory}
+              className="shrink-0 max-h-48 overflow-y-auto"
+            />
+          )}
           <div className="flex-1 min-h-0">{chatPanel}</div>
         </div>
       </div>

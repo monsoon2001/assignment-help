@@ -73,7 +73,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
         ]}
       />
       <div className="bg-white border-b border-outline-variant/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-7">
+        <div className="page-container pb-7">
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href="/#estimate"
@@ -92,7 +92,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
         </div>
       </div>
       <div className="bg-white band-hero">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 grid lg:grid-cols-3 gap-10">
+        <div className="page-container py-12 sm:py-16 grid lg:grid-cols-3 gap-10">
           <div className="lg:col-span-2 space-y-12">
             <section aria-labelledby="included-heading">
               <h2

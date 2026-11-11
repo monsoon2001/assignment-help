@@ -1,4 +1,5 @@
 import Header, { type MenuGroup, type MenuItem } from "@/components/layout/header";
+import WhatsAppButton from "@/components/layout/whatsapp-button";
 import Footer from "@/components/layout/footer";
 import { SUBJECT_CONTENT } from "@/lib/subject-content";
 import { SERVICE_GROUPS } from "@/lib/services";
@@ -70,6 +71,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <Header showSearch={false} menuItems={publicMenuItems} />
       <main className="public-site flex-1">{children}</main>
       <Footer />
+      <WhatsAppButton />
     </>
   );
 }

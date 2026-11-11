@@ -1,6 +1,6 @@
 import "server-only";
 import { adminClient } from "@/lib/supabase/admin";
-import { sendEmail } from "@/lib/email.server";
+import { enqueueEmail } from "@/lib/email/outbox.server";
 
 /**
  * Fan-out notifications for a marketplace activity.
@@ -63,6 +63,7 @@ function greeting(party: Party): string {
 async function notifyParties(
   parties: { party: Party; role: PartyRole }[],
   notice: ActivityNotice,
+  recordKey: string,
 ): Promise<void> {
   const inAppRoles = new Set(notice.inAppRoles ?? []);
   const audience = new Set(notice.audience);
@@ -81,12 +82,19 @@ async function notifyParties(
     }
 
     if (party.id !== notice.actorId || role === "admin") {
-      await sendEmail({
-        to: [party.email],
+      if (!party.email) return;
+      await enqueueEmail({
+        eventType: notice.type,
+        recipientUserId: party.id,
+        toEmail: party.email,
         subject: notice.emailSubject,
-        text: `${greeting(party)}\n\n${notice.emailBody}`,
-        link: notice.link,
-        linkLabel: notice.emailLinkLabel ?? "Open Acadivo",
+        template: notice.type,
+        dedupeKey: `email:${notice.type}:${recordKey}:${party.id}`,
+        payload: {
+          text: `${greeting(party)}\n\n${notice.emailBody}`,
+          link: notice.link,
+          linkLabel: notice.emailLinkLabel ?? "Open Acadivo",
+        },
       });
     }
   });
@@ -143,7 +151,7 @@ export async function notifyRequestActivity(
     if (ctx.student) parties.push({ party: ctx.student, role: "student" });
     if (ctx.helper) parties.push({ party: ctx.helper, role: "helper" });
     admins.forEach((admin) => parties.push({ party: admin, role: "admin" }));
-    await notifyParties(parties, notice);
+    await notifyParties(parties, notice, requestId);
   } catch (error) {
     console.error("[notify] request activity failed", error);
   }
@@ -163,7 +171,7 @@ export async function notifyOrderActivity(
     if (ctx.student) parties.push({ party: ctx.student, role: "student" });
     if (ctx.helper) parties.push({ party: ctx.helper, role: "helper" });
     admins.forEach((admin) => parties.push({ party: admin, role: "admin" }));
-    await notifyParties(parties, notice);
+    await notifyParties(parties, notice, orderId);
   } catch (error) {
     console.error("[notify] order activity failed", error);
   }

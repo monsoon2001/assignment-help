@@ -276,7 +276,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
         scrollHidden && !mobileMenuOpen ? "-translate-y-full" : "translate-y-0"
       }`}
     >
-      <div className="max-w-360 mx-auto px-3 sm:px-6 h-16 flex items-center gap-3 sm:gap-6">
+      <div className="page-container h-16 flex items-center gap-3 sm:gap-6">
         <Link href="/" className="flex items-center gap-2 shrink-0 min-h-11 min-w-11">
           <span className="w-9 h-9 rounded-xl bg-brand text-on-brand flex items-center justify-center">
             <GraduationCap size={20} />
@@ -480,7 +480,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
             document.body,
           )}
           <div className="absolute inset-x-0 top-full hidden xl:block">
-            <div className="mx-auto max-w-360 px-3 sm:px-6 pt-3">
+            <div className="page-container pt-3">
               <div
                 className="max-h-[72vh] overflow-y-auto rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-5 shadow-2xl shadow-black/20 animate-[sheet-up_0.18s_ease-out]"
                 onMouseEnter={() => openNow(activeMenu.href)}
@@ -557,7 +557,7 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
         mobileMenuOpen &&
         createPortal(
           <div className="fixed inset-x-0 top-16 bottom-0 z-40 overflow-y-auto xl:hidden bg-surface-container-lowest border-t border-outline-variant">
-            <nav className="max-w-360 mx-auto px-4 sm:px-6 py-4 pb-12 flex flex-col gap-3">
+            <nav className="page-container py-4 pb-12 flex flex-col gap-3">
               {menuItems.map((item) => {
                 const isActive = pathname === item.href;
                 const hasGroups = (item.groups?.length ?? 0) > 0;

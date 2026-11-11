@@ -95,13 +95,6 @@ export default async function DashboardPage() {
     ...r,
     helper: unwrapRow<{ id: string; name: string | null }>(r.helper),
   }));
-  const completedRequestIds = new Set(
-    (completedOrders ?? []).flatMap((order) => {
-      const proposal = unwrapRow<{ request_id: string | null }>(order.proposal);
-      return proposal?.request_id ? [proposal.request_id] : [];
-    }),
-  );
-
   const activeIds = requests
     .filter((r) => ["proposal_sent", "accepted"].includes(r.status))
     .map((r) => r.id);
