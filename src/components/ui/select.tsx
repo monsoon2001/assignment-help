@@ -8,18 +8,41 @@ interface SelectOption {
 
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
+  labelClassName?: string;
   options: SelectOption[];
   placeholder?: string;
+  selectSize?: "sm" | "md";
 }
 
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className = "", label, options, placeholder, ...props }, ref) => {
+  (
+    {
+      className = "",
+      label,
+      labelClassName,
+      options,
+      placeholder,
+      selectSize = "md",
+      ...props
+    },
+    ref,
+  ) => {
+    const sizeClasses =
+      selectSize === "sm"
+        ? "h-9.5 px-3 rounded-lg text-sm"
+        : "h-11 px-3.5 rounded-xl text-sm";
+    const labelClasses =
+      labelClassName ??
+      (selectSize === "sm"
+        ? "text-xs font-semibold text-on-surface"
+        : "text-sm font-medium text-ink");
+
     return (
-      <div className="flex flex-col gap-1.5">
-        {label && <label className="text-sm font-medium text-ink">{label}</label>}
+      <div className="flex flex-col gap-1">
+        {label && <label className={labelClasses}>{label}</label>}
         <select
           ref={ref}
-          className={`site-control w-full h-11 px-3.5 bg-surface border border-line rounded-xl text-sm text-ink focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-150 appearance-none cursor-pointer ${className}`}
+          className={`site-control w-full ${sizeClasses} bg-surface border border-line text-ink focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-150 appearance-none cursor-pointer ${className}`}
           {...props}
         >
           {placeholder && (

@@ -14,6 +14,10 @@ const DRAFT_KEY = "acadivo:pending-request";
 export const DESIGNATED_HELPER_ID =
   process.env.NEXT_PUBLIC_DESIGNATED_HELPER_ID?.trim() || "7c981abd-85b5-4005-86c0-9cfffd6d9bf1";
 
+// Bump when the Terms of Service wording/meaning changes in a way that requires
+// fresh acceptance. Stored with each request alongside the acceptance timestamp.
+export const TERMS_VERSION = "2026-10-25";
+
 /**
  * The helper every new request is routed to right now. Admins switch the active
  * helper from /admin/helpers; falls back to DESIGNATED_HELPER_ID if the read
@@ -32,6 +36,10 @@ export interface NewRequestInput {
   deadline?: string | null;
   country?: string;
   files?: File[];
+  /** ISO timestamp recorded when the student accepted the Terms for this request. */
+  termsAcceptedAt?: string;
+  /** Version of the Terms accepted for this request. */
+  termsVersion?: string;
   /**
    * Client-generated key that makes retries safe. A double click or a retried
    * submission reuses the existing request instead of creating a duplicate.
@@ -48,6 +56,8 @@ export type PendingRequestDraft = {
   dueTime?: string;
   wordCount?: string;
   details?: string;
+  /** Set when the draft originated from the home "Get a Price Estimate" flow. */
+  termsAcceptedFromHome?: boolean;
 };
 
 export function savePendingDraft(draft: PendingRequestDraft) {
@@ -198,6 +208,8 @@ export async function submitRequest(
       file_urls: fileUrls,
       status: "requested",
       idempotency_key: idempotencyKey,
+      terms_accepted_at: input.termsAcceptedAt ?? null,
+      terms_version: input.termsVersion ?? null,
     })
     .select("id")
     .single();

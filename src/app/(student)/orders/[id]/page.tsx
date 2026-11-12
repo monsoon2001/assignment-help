@@ -38,8 +38,9 @@ export default async function StudentOrderPage({
     (payment) => payment?.status === "paid",
   );
 
-  // Delivery is server-gated: an unpaid order is still in the request/proposal
-  // stage, so strip the delivery tab and send the student back there.
-  const suffix = paid && query.tab === "delivery" ? "?tab=delivery" : "";
+  // The order workspace is server-gated: an unpaid order is still in the
+  // request/proposal stage, so only forward tabs once payment is recorded.
+  const tab = paid && (query.tab === "delivery" || query.tab === "chat") ? query.tab : null;
+  const suffix = tab ? `?tab=${tab}` : "";
   redirect(requestId ? `/requests/${requestId}${suffix}` : "/requests");
 }

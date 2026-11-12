@@ -40,7 +40,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
   }
 
   const navItems: {
-    key: "dashboard" | "requests" | "messages" | "notifications" | "profile";
+    key: "dashboard" | "requests" | "notifications" | "profile";
     href: string;
     label: string;
     badge?: string;
@@ -52,7 +52,6 @@ export default async function StudentLayout({ children }: { children: React.Reac
       label: "My Requests",
       badge: requestCount > 0 ? String(requestCount) : undefined,
     },
-    { key: "messages", href: "/messages", label: "Messages" },
     {
       key: "notifications",
       href: "/notifications",
@@ -103,7 +102,6 @@ export default async function StudentLayout({ children }: { children: React.Reac
             icon: "requests",
             badge: requestCount > 0 ? requestCount : undefined,
           },
-          { href: "/messages", label: "Messages", icon: "messages" },
           {
             href: "/notifications",
             label: "Notifications",

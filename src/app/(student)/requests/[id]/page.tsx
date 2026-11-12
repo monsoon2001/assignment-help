@@ -62,7 +62,8 @@ export default async function StudentRequestDetailPage({
   const paid = !!orderRow && (payments ?? []).some((payment) => payment?.status === "paid");
 
   if (orderRow && paid) {
-    const initialTab = query.tab === "delivery" ? "delivery" : "overview";
+    const initialTab =
+      query.tab === "delivery" ? "delivery" : query.tab === "chat" ? "chat" : "overview";
     return (
       <OrderWorkspace
         key={`${orderRow.id}:${initialTab}`}

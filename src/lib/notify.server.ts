@@ -29,6 +29,10 @@ export interface ActivityNotice {
   message: string;
   /** App path used for both the in-app link and the email CTA. */
   link: string;
+  /** Related order, when applicable. */
+  orderId?: string | null;
+  /** Related request, when applicable. */
+  requestId?: string | null;
   emailSubject: string;
   /** Plain-text email body, without greeting/sign-off. */
   emailBody: string;
@@ -77,6 +81,8 @@ async function notifyParties(
         type: notice.type,
         message: notice.message.slice(0, 500),
         link: notice.link,
+        order_id: notice.orderId ?? null,
+        request_id: notice.requestId ?? null,
       });
       if (error) console.error("[notify] in-app insert failed", error.message);
     }

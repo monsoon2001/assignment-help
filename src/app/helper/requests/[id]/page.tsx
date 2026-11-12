@@ -13,10 +13,12 @@ export const metadata: Metadata = {
 
 export default async function HelperRequestDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }) {
-  const { id } = await params;
+  const [{ id }, query] = await Promise.all([params, searchParams]);
 
   const supabase = await createClient();
   const {
@@ -61,7 +63,15 @@ export default async function HelperRequestDetailPage({
   const paid = !!orderRow && (payments ?? []).some((payment) => payment?.status === "paid");
 
   if (orderRow && paid) {
-    return <OrderWorkspace orderId={orderRow.id} />;
+    const initialTab =
+      query.tab === "delivery" ? "delivery" : query.tab === "chat" ? "chat" : "overview";
+    return (
+      <OrderWorkspace
+        key={`${orderRow.id}:${initialTab}`}
+        orderId={orderRow.id}
+        initialTab={initialTab}
+      />
+    );
   }
 
   const { data: student } = await supabase

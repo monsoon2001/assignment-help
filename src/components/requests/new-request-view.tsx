@@ -19,6 +19,7 @@ import {
   clearPendingDraft,
   loadDraftFiles,
   clearDraftFiles,
+  TERMS_VERSION,
 } from "@/lib/requests";
 
 import { OTHER_OPTION, withCustom } from "@/lib/constants";
@@ -137,8 +138,8 @@ export default function NewRequestView({
       const d = loadPendingDraft();
       const saved = await loadDraftFiles();
       if (cancelled) return;
-      if (d) clearPendingDraft();
       if (d) {
+        clearPendingDraft();
         const dd = resolveDraftSelection(HELP_TYPE_OPTIONS, d.service);
         const ds = resolveDraftSelection(SUBJECT_OPTIONS, d.subject);
         setValues((prev) => ({
@@ -153,6 +154,7 @@ export default function NewRequestView({
           details: d.details ?? prev.details,
           level: d.level ?? prev.level,
         }));
+        if (d.termsAcceptedFromHome) setTermsAccepted(true);
       }
       if (saved.length > 0) setValues((prev) => ({ ...prev, files: saved }));
       setReady(true);
@@ -242,6 +244,8 @@ export default function NewRequestView({
           : null,
         files: values.files,
         idempotencyKey: getSubmissionKey(),
+        termsAcceptedAt: new Date().toISOString(),
+        termsVersion: TERMS_VERSION,
       });
 
       if ("error" in result) {
@@ -265,21 +269,21 @@ export default function NewRequestView({
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col gap-6">
+    <div className="w-full max-w-7xl mx-auto flex flex-col gap-4 sm:gap-5">
       <div className="flex items-center gap-3">
-        <span className="w-12 h-12 rounded-xl bg-primary-container text-on-primary flex items-center justify-center shrink-0">
-          <FileText size={22} />
+        <span className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center shrink-0 shadow-sm">
+          <FileText size={20} />
         </span>
         <div>
-          <h1 className="font-display font-bold text-2xl text-on-surface">Request Academic Help</h1>
-          <p className="text-sm text-on-surface-variant">
+          <h1 className="font-display font-bold text-xl sm:text-2xl text-on-surface">Request Academic Help</h1>
+          <p className="text-xs sm:text-sm text-on-surface-variant">
             Describe your assignment and send it straight to our academic helper.
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <Card className="lg:col-span-2 p-6 sm:p-8">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,780px)_minmax(0,340px)] gap-5 lg:gap-6 items-start">
+        <Card className="max-w-[780px] w-full p-4 sm:p-5 lg:p-6 max-h-[calc(100dvh-8rem)] flex flex-col overflow-hidden">
           {!ready ? (
             <div className="flex flex-col gap-3" aria-busy="true" aria-live="polite">
               <span className="sr-only">Preparing your request…</span>
@@ -307,27 +311,29 @@ export default function NewRequestView({
               <Skeleton className="h-11 w-full rounded-xl" />
             </div>
           ) : (
-            <TaskRequestForm
-              values={values}
-              set={set}
-              error={error}
-              onSubmit={handleSubmit}
-              submitting={submitting}
-              termsAccepted={termsAccepted}
-              setTermsAccepted={setTermsAccepted}
-              submitLabel="Send Task Request"
-              note="Your request goes straight to our verified academic helper. No charge until you accept a proposal."
-            />
+            <div className="overflow-y-auto pr-0.5 max-h-full">
+              <TaskRequestForm
+                values={values}
+                set={set}
+                error={error}
+                onSubmit={handleSubmit}
+                submitting={submitting}
+                termsAccepted={termsAccepted}
+                setTermsAccepted={setTermsAccepted}
+                submitLabel="Send Task Request"
+                note="Your request goes straight to our verified academic helper. No charge until you accept a proposal."
+              />
+            </div>
           )}
         </Card>
 
         <div className="flex flex-col gap-4">
-          <Card className="p-5">
-            <h2 className="font-semibold text-sm text-on-surface mb-3 flex items-center gap-2">
+          <Card className="p-4 sm:p-5">
+            <h2 className="font-semibold text-sm text-on-surface mb-2.5 flex items-center gap-2">
               <Info size={15} className="text-primary" />
               Pricing &amp; Timeline
             </h2>
-            <div className="space-y-2.5 text-sm">
+            <div className="space-y-2 text-sm">
               {PRICING_BANDS.map((band) => (
                 <div key={band.label} className="flex items-center justify-between">
                   <span className="text-on-surface-variant">{band.label}</span>
@@ -337,7 +343,7 @@ export default function NewRequestView({
                 </div>
               ))}
             </div>
-            <p className="text-xs text-on-surface-variant mt-3 leading-relaxed">
+            <p className="text-xs text-on-surface-variant mt-2.5 leading-relaxed">
               Indicative guidance in <span className="font-semibold">CAD</span>; you&apos;ll be
               charged in your local currency at checkout. Your helper responds in the request chat
               within <span className="font-semibold">2 hours</span>. Rush orders under 12 hours
@@ -345,12 +351,12 @@ export default function NewRequestView({
             </p>
           </Card>
 
-          <Card className="p-5 bg-surface-container-low border border-outline-variant">
+          <Card className="p-4 sm:p-5 bg-surface border border-line">
             <div className="flex items-center gap-2 mb-2">
               <ShieldCheck size={16} className="text-success" />
               <h3 className="font-semibold text-sm text-on-surface">Why students trust Acadivo</h3>
             </div>
-            <ul className="space-y-2 text-xs text-on-surface-variant leading-relaxed">
+            <ul className="space-y-1.5 text-xs text-on-surface-variant leading-relaxed">
               <li className="flex items-start gap-2">
                 <CheckCircle2 size={13} className="text-success shrink-0 mt-0.5" /> Subject-matter
                 experts verified against university records.

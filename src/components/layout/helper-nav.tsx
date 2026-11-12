@@ -7,7 +7,6 @@ import {
   Inbox,
   Briefcase,
   DollarSign,
-  MessageSquare,
   MessagesSquare,
   SquarePen,
   Phone,
@@ -17,7 +16,7 @@ import Button from "@/components/ui/button";
 import Badge from "@/components/ui/badge";
 import { useVoiceCall } from "@/components/call/voice-call";
 
-type HelperBadgeKey = "incomingRequests" | "activeOrders" | "unreadMessages";
+type HelperBadgeKey = "incomingRequests" | "activeOrders";
 
 const links: Array<{
   key: string;
@@ -42,13 +41,6 @@ const links: Array<{
     badge: "activeOrders",
   },
   { key: "earnings", href: "/helper/earnings", label: "Earnings", icon: DollarSign },
-  {
-    key: "messages",
-    href: "/helper/messages",
-    label: "Messages",
-    icon: MessageSquare,
-    badge: "unreadMessages",
-  },
   { key: "chat-admin", href: "/helper/chat-admin", label: "Chat With Admin", icon: MessagesSquare },
   { key: "profile", href: "/helper/profile", label: "Edit Profile", icon: SquarePen },
 ];
@@ -57,16 +49,14 @@ export default function HelperNav({
   completedOrders,
   activeOrders,
   incomingRequests,
-  unreadMessages,
 }: {
   completedOrders: number;
   activeOrders: number;
   incomingRequests: number;
-  unreadMessages: number;
 }) {
   const segments = useSelectedLayoutSegments();
   const current = segments[0];
-  const badges = { activeOrders, incomingRequests, unreadMessages };
+  const badges = { activeOrders, incomingRequests };
 
   return (
     <aside className="w-64 shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 p-4 hidden md:flex flex-col gap-1 md:h-[calc(100dvh-4rem)] lg:h-full">

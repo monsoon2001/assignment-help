@@ -358,22 +358,22 @@ export default async function HomePage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden band-hero bg-[radial-gradient(circle_at_1px_1px,rgba(37,99,235,0.07)_1px,transparent_0)] bg-[size:28px_28px]">
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-section" aria-hidden="true" />
+      <section className="relative overflow-hidden band-hero min-h-[calc(100dvh-4rem)] flex flex-col justify-center bg-[radial-gradient(circle_at_1px_1px,rgba(37,99,235,0.07)_1px,transparent_0)] bg-[size:28px_28px]">
+        <div className="absolute inset-x-0 bottom-0 h-16 sm:h-24 bg-section" aria-hidden="true" />
         <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary-tint opacity-60 blur-3xl" aria-hidden="true" />
         <div className="pointer-events-none absolute top-1/3 -left-32 h-64 w-64 rounded-full bg-accent-tint opacity-40 blur-3xl" aria-hidden="true" />
-        <div className="relative page-container py-10 sm:py-16 lg:py-20">
-          <div className="grid lg:grid-cols-[1fr_minmax(0,640px)] gap-8 lg:gap-10 items-start">
+        <div className="relative page-container py-4 sm:py-6 lg:py-[clamp(1rem,2.5vh,2.5rem)] flex-1 flex flex-col justify-center">
+          <div className="grid lg:grid-cols-[1fr_minmax(0,560px)] xl:grid-cols-[1fr_minmax(0,600px)] gap-6 lg:gap-8 items-center">
             {/* Left Column */}
-            <div className="space-y-5 home-enter">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-tint border border-brand-tint text-brand text-xs sm:text-sm font-semibold">
+            <div className="space-y-[clamp(0.5rem,1.5vh,1.25rem)] home-enter">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-tint border border-brand-tint text-brand text-xs sm:text-sm font-semibold">
                 <MaterialIcon name="verified_user" size={16} />
                 100% human help, never AI
               </span>
-              <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold text-on-surface leading-tight">
+              <h1 className="font-display text-[clamp(1.75rem,3.2vw,3.25rem)] font-bold text-on-surface leading-[1.15]">
                 Get Help from a Verified <span className="text-brand">Assignment Helper</span>
               </h1>
-              <p className="text-base sm:text-lg text-on-surface-variant leading-relaxed max-w-xl">
+              <p className="text-[clamp(0.875rem,1.1vw,1.125rem)] text-on-surface-variant leading-relaxed max-w-xl">
                 Tell us what you&apos;re working on — the subject, the deadline, the brief if you
                 have it. A real helper in that subject reads it, comes back with a plan and a price
                 in writing, and you decide from there. No bidding, no surprise invoice, and the work
@@ -381,31 +381,31 @@ export default async function HomePage() {
               </p>
 
               {/* Trust Checkmarks */}
-              <div className="flex flex-col sm:flex-row gap-x-5 gap-y-2.5 text-sm text-on-surface-variant font-medium">
-                <span className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-primary shrink-0" />
+              <div className="flex flex-col sm:flex-row gap-x-4 gap-y-2 text-xs sm:text-sm text-on-surface-variant font-medium">
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0" />
                   Verified subject helpers
                 </span>
-                <span className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-primary shrink-0" />
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0" />
                   Quote before you pay
                 </span>
-                <span className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-primary shrink-0" />
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0" />
                   Unlimited revisions in scope
                 </span>
               </div>
 
               {/* Coverage Panel */}
-              <div className="flex items-center gap-4 pt-1">
-                <span className="w-11 h-11 rounded-xl bg-primary-fixed flex items-center justify-center shrink-0">
-                  <MaterialIcon name="groups" size={22} className="text-primary" />
+              <div className="flex items-center gap-3 pt-0.5">
+                <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary-fixed flex items-center justify-center shrink-0">
+                  <MaterialIcon name="groups" size={20} className="text-primary" />
                 </span>
                 <div>
-                  <p className="text-base font-semibold text-on-surface leading-relaxed">
+                  <p className="text-sm sm:text-base font-semibold text-on-surface leading-tight sm:leading-relaxed">
                     {SUBJECTS.length} subjects, {HOME_SERVICE_COUNT} kinds of help
                   </p>
-                  <p className="text-base text-on-surface-variant leading-relaxed">
+                  <p className="text-xs sm:text-sm text-on-surface-variant leading-tight sm:leading-relaxed">
                     from a literature essay to a lab report to a stubborn line of code
                   </p>
                 </div>
@@ -415,17 +415,17 @@ export default async function HomePage() {
             {/* Right Column - Price Estimate Form */}
             <div
               id="estimate"
-              className="hidden lg:block scroll-mt-24 bg-surface-container-lowest rounded-2xl shadow-2xl shadow-primary/10 ring-1 ring-outline-variant/70 border-2 border-outline-variant/70 p-6 sm:p-8 home-enter home-enter-delay"
+              className="hidden lg:block scroll-mt-24 bg-surface rounded-2xl shadow-xl shadow-primary/5 ring-1 ring-line border border-line p-4 sm:p-5 xl:p-6 home-enter home-enter-delay"
             >
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 bg-primary-fixed rounded-xl flex items-center justify-center shrink-0">
-                  <MaterialIcon name="calculate" size={20} className="text-primary" />
+              <div className="flex items-center gap-2.5 mb-2.5">
+                <div className="w-8 h-8 bg-primary-fixed rounded-lg flex items-center justify-center shrink-0">
+                  <MaterialIcon name="calculate" size={18} className="text-primary" />
                 </div>
                 <div>
-                  <h2 className="estimate-heading font-display font-bold text-on-surface leading-tight">
+                  <h2 className="estimate-heading font-display font-bold text-on-surface text-base sm:text-lg leading-tight">
                     Let&apos;s understand your assignment
                   </h2>
-                  <p className="text-base text-on-surface-variant leading-relaxed">
+                  <p className="text-xs sm:text-sm text-on-surface-variant leading-tight">
                     Share a few details to get started
                   </p>
                 </div>

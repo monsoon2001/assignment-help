@@ -26,11 +26,11 @@ export const HELP_TYPE_OPTIONS = [...SERVICE_TYPES, OTHER_OPTION];
 export const LEVEL_OPTIONS = [...ACADEMIC_LEVELS];
 
 const FIELD_CLASS =
-  "w-full h-10 px-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all";
+  "w-full h-9 px-3 bg-surface border border-line rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all";
 // Safari renders native date/time widgets tiny and hides the time value when it
 // is empty, so these fields are styled as plain inputs and open the picker from
 // their own icon button.
-const PICKER_CLASS = `${FIELD_CLASS} h-11 text-base appearance-none pr-10 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-date-and-time-value]:w-full [&::-webkit-date-and-time-value]:text-left`;
+const PICKER_CLASS = `${FIELD_CLASS} appearance-none pr-9 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-date-and-time-value]:w-full [&::-webkit-date-and-time-value]:text-left`;
 export const LAST_DUE_TIME = "23:59";
 export const WORDS_PER_PAGE = 250;
 
@@ -228,31 +228,16 @@ export default function TaskRequestForm({
   };
 
   return (
-    <form className="space-y-3" onSubmit={onSubmit}>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div className="flex flex-col gap-1">
-          <Select
-            label="What subject?"
-            value={values.subject}
-            onChange={(e) => set("subject", e.target.value)}
-            placeholder="Select subject"
-            options={SUBJECT_OPTIONS.map((s) => ({ value: s, label: s }))}
-          />
-          {values.subject === OTHER_OPTION && (
-            <Input
-              type="text"
-              placeholder="Type your subject, e.g. Music Theory"
-              value={values.customSubject}
-              onChange={(e) => set("customSubject", e.target.value)}
-            />
-          )}
-        </div>
-        <div className="flex flex-col gap-1">
+    <form className="space-y-2 sm:space-y-2.5" onSubmit={onSubmit}>
+      {/* Row 1: Type of help & Subject */}
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div className="flex flex-col gap-0.5">
           <Select
             label="What are you working on?"
             value={values.helpType}
             onChange={(e) => set("helpType", e.target.value)}
             placeholder="Select type"
+            selectSize="sm"
             options={HELP_TYPE_OPTIONS.map((t) => ({ value: t, label: t }))}
           />
           {values.helpType === OTHER_OPTION && (
@@ -261,29 +246,41 @@ export default function TaskRequestForm({
               placeholder="Type the help you need, e.g. Lab Report"
               value={values.customHelpType}
               onChange={(e) => set("customHelpType", e.target.value)}
+              className="mt-1 !h-9 text-sm"
+            />
+          )}
+        </div>
+        <div className="flex flex-col gap-0.5">
+          <Select
+            label="What subject?"
+            value={values.subject}
+            onChange={(e) => set("subject", e.target.value)}
+            placeholder="Select subject"
+            selectSize="sm"
+            options={SUBJECT_OPTIONS.map((s) => ({ value: s, label: s }))}
+          />
+          {values.subject === OTHER_OPTION && (
+            <Input
+              type="text"
+              placeholder="Type your subject, e.g. Music Theory"
+              value={values.customSubject}
+              onChange={(e) => set("customSubject", e.target.value)}
+              className="mt-1 !h-9 text-sm"
             />
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div className="flex flex-col gap-1">
-          <Select
-            label="Academic level"
-            value={values.level}
-            onChange={(e) => set("level", e.target.value)}
-            placeholder="Select level"
-            options={LEVEL_OPTIONS.map((l) => ({ value: l, label: l }))}
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-baseline justify-between gap-2">
-            <label htmlFor="field-pages" className="text-sm font-medium text-ink">
+      {/* Row 2: Pages & Deadline */}
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-baseline justify-between gap-1">
+            <label htmlFor="field-pages" className="text-xs font-semibold text-on-surface">
               Pages
             </label>
-            <span className="text-xs text-ink-soft whitespace-nowrap">
+            <span className="text-[11px] text-on-surface-variant whitespace-nowrap">
               {wordEstimate > 0
-                ? `Approx. ${wordEstimate.toLocaleString()} words`
+                ? `~${wordEstimate.toLocaleString()} words`
                 : "1 page \u2248 250 words"}
             </span>
           </div>
@@ -311,32 +308,29 @@ export default function TaskRequestForm({
                   Number.isFinite(pageCount) ? String(Math.max(0, Math.trunc(pageCount))) : "",
                 );
               }}
-              className={`${FIELD_CLASS} pr-10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+              className={`${FIELD_CLASS} pr-9 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
             />
             <span className="page-count-stepper absolute right-1 top-1/2 flex -translate-y-1/2 flex-col justify-center">
               <button
                 type="button"
                 onClick={() => stepPages(1)}
                 aria-label="Add one page"
-                className="flex h-5 w-7 items-center justify-center rounded-md text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface"
+                className="flex h-4 w-6 items-center justify-center rounded text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface"
               >
-                <ChevronUp size={14} strokeWidth={2} />
+                <ChevronUp size={13} strokeWidth={2} />
               </button>
               <button
                 type="button"
                 onClick={() => stepPages(-1)}
                 disabled={pages <= 0}
                 aria-label="Remove one page"
-                className="flex h-5 w-7 items-center justify-center rounded-md text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface disabled:opacity-40 disabled:pointer-events-none"
+                className="flex h-4 w-6 items-center justify-center rounded text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface disabled:opacity-40 disabled:pointer-events-none"
               >
-                <ChevronDown size={14} strokeWidth={2} />
+                <ChevronDown size={13} strokeWidth={2} />
               </button>
             </span>
           </div>
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <PickerField
           label="When is it due?"
           kind="date"
@@ -344,6 +338,20 @@ export default function TaskRequestForm({
           min={today}
           onChange={(value) => set("deadline", value)}
         />
+      </div>
+
+      {/* Row 3: Academic level & Due time */}
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div className="flex flex-col gap-0.5">
+          <Select
+            label="Academic level"
+            value={values.level}
+            onChange={(e) => set("level", e.target.value)}
+            placeholder="Select level"
+            selectSize="sm"
+            options={LEVEL_OPTIONS.map((l) => ({ value: l, label: l }))}
+          />
+        </div>
         <PickerField
           label="Due time"
           kind="time"
@@ -353,24 +361,26 @@ export default function TaskRequestForm({
         />
       </div>
 
+      {/* Description: 2 to 3 lines */}
       <Textarea
         label="Tell us about your assignment"
-        rows={3}
+        rows={2}
         placeholder="Describe what you need help with..."
         value={values.details}
         onChange={(e) => set("details", e.target.value)}
       />
 
-      <div className="flex flex-col gap-1">
+      {/* Files */}
+      <div className="flex flex-col gap-0.5">
         <span className="text-xs font-semibold text-on-surface">Files</span>
         {values.files.length > 0 ? (
           <button
             type="button"
             onClick={() => setFilesOpen(true)}
-            className="flex items-center justify-center gap-2 w-full py-2 border border-dashed border-primary-container/50 bg-primary-container/5 rounded-xl text-on-surface-variant hover:border-primary-container hover:bg-primary-hover/10 transition-all cursor-pointer"
+            className="flex items-center justify-center gap-2 w-full py-1.5 border border-dashed border-primary/50 bg-primary-tint/30 rounded-lg text-on-surface-variant hover:border-primary hover:bg-primary-tint/50 transition-all cursor-pointer"
           >
-            <Upload className="w-4 h-4" />
-            <span className="text-sm font-medium">
+            <Upload className="w-3.5 h-3.5 text-primary" />
+            <span className="text-xs font-medium">
               {values.files.length} file{values.files.length > 1 ? "s" : ""} attached — click to
               review
             </span>
@@ -379,10 +389,10 @@ export default function TaskRequestForm({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center justify-center gap-2 w-full py-2 border border-dashed border-outline-variant rounded-xl text-on-surface-variant hover:border-primary-container hover:bg-primary-hover/5 transition-all cursor-pointer"
+            className="flex items-center justify-center gap-2 w-full py-1.5 border border-dashed border-line rounded-lg text-on-surface-variant hover:border-primary hover:bg-surface-container-low transition-all cursor-pointer"
           >
-            <Upload className="w-4 h-4" />
-            <span className="text-sm font-medium">+ Upload assignment instructions</span>
+            <Upload className="w-3.5 h-3.5" />
+            <span className="text-xs font-medium">+ Upload assignment instructions</span>
           </button>
         )}
         <input
@@ -398,10 +408,11 @@ export default function TaskRequestForm({
         />
       </div>
 
-      <label className="flex cursor-pointer items-start gap-2.5 text-xs leading-relaxed text-on-surface-variant">
+      {/* Terms Checkbox */}
+      <label className="flex cursor-pointer items-start gap-2 text-xs leading-tight text-on-surface-variant">
         <input
           type="checkbox"
-          className="mt-0.5 h-4 w-4 shrink-0 rounded border-outline-variant accent-primary"
+          className="mt-0.5 h-3.5 w-3.5 shrink-0 rounded border-line accent-primary"
           checked={termsAccepted}
           onChange={(e) => setTermsAccepted(e.target.checked)}
         />
@@ -419,21 +430,22 @@ export default function TaskRequestForm({
       </label>
 
       {error && (
-        <p className="text-sm text-error bg-error-container/40 border border-error/30 rounded-lg px-3 py-2">
+        <p className="text-xs text-error bg-error-container/40 border border-error/30 rounded-lg px-2.5 py-1.5">
           {error}
         </p>
       )}
 
+      {/* Submit Button always inside card */}
       <Button
         type="submit"
         variant={submitVariant}
         disabled={submitting}
         aria-busy={submitting}
-        className="w-full h-11"
+        className="w-full h-10 text-sm font-semibold"
       >
         {submitting ? (
           <>
-            <Loader2 size={16} className="animate-spin" />
+            <Loader2 size={15} className="animate-spin" />
             <span>Sending...</span>
           </>
         ) : (
@@ -444,7 +456,7 @@ export default function TaskRequestForm({
         )}
       </Button>
 
-      {note && <p className="text-xs text-on-surface-variant text-center">{note}</p>}
+      {note && <p className="text-[11px] text-on-surface-variant text-center leading-tight">{note}</p>}
 
       {filesOpen &&
         createPortal(

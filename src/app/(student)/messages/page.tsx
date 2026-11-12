@@ -1,26 +1,7 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { buildThreads } from "@/lib/threads";
-import MessagesInbox from "@/components/requests/messages-inbox";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Messages | Acadivo",
-};
-
-export default async function StudentMessagesPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/sign-in");
-  }
-
-  const threads = await buildThreads(supabase, user.id, false);
-
-  return <MessagesInbox initialThreads={threads} isHelper={false} />;
+export default function StudentMessagesPage() {
+  redirect("/notifications");
 }

@@ -7,7 +7,6 @@ import {
   Sparkles,
   Clock,
   RefreshCcw,
-  MessageSquare,
   RotateCcw,
   Package,
   AlertTriangle,
@@ -526,16 +525,6 @@ export default async function DashboardPage() {
             </Link>
           </div>
           <Card className="p-4 flex flex-col gap-2">
-            <Link
-              href="/messages"
-              className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-surface-container-low transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <MessageSquare size={16} className="text-primary" />
-                <span className="text-sm text-on-surface">Messages</span>
-              </div>
-              <ArrowRight size={14} className="text-on-surface-variant" />
-            </Link>
             <Link
               href="/orders"
               className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-surface-container-low transition-colors"

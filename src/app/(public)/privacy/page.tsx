@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PageHeader } from "@/components/marketing/page-shell";
+import { LegalPage } from "@/components/marketing/legal-page";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | Acadivo",
@@ -68,32 +68,12 @@ const sections = [
 
 export default function PrivacyPage() {
   return (
-    <>
-      <PageHeader
-        title="Privacy Policy"
-        subtitle="Last updated: September 10, 2026"
-        crumbs={[{ label: "Home", href: "/" }, { label: "Privacy Policy" }]}
-      />
-
-      <section className="band-soft">
-        <div className="page-container-prose py-12 sm:py-16">
-          <div className="space-y-6">
-            {sections.map((section) => (
-              <div
-                key={section.title}
-                className="bg-white rounded-2xl border border-outline-variant/30 p-6 shadow-sm hover:border-primary-container/60 transition-colors"
-              >
-                <h2 className="font-display text-lg font-bold text-on-surface mb-2">
-                  {section.title}
-                </h2>
-                <p className="text-base text-on-surface-variant leading-relaxed">
-                  {section.content}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </>
+    <LegalPage
+      title="Privacy Policy"
+      lastUpdated="September 10, 2026"
+      summary="This policy explains what information we collect, how we use and protect it, and the choices and rights you have when using Acadivo."
+      sections={sections}
+      crumbLabel="Privacy Policy"
+    />
   );
 }

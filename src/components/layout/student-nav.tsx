@@ -1,18 +1,11 @@
 "use client";
 import Link from "next/link";
 import { useSelectedLayoutSegments } from "next/navigation";
-import {
-  LayoutDashboard,
-  FileText,
-  MessageSquare,
-  Bell,
-  User,
-  type LucideIcon,
-} from "lucide-react";
+import { LayoutDashboard, FileText, Bell, User, type LucideIcon } from "lucide-react";
 import Badge from "@/components/ui/badge";
 
 export type StudentNavItem = {
-  key: "dashboard" | "requests" | "messages" | "notifications" | "profile";
+  key: "dashboard" | "requests" | "notifications" | "profile";
   href: string;
   label: string;
   badge?: string;
@@ -21,7 +14,6 @@ export type StudentNavItem = {
 const ICONS: Record<StudentNavItem["key"], LucideIcon> = {
   dashboard: LayoutDashboard,
   requests: FileText,
-  messages: MessageSquare,
   notifications: Bell,
   profile: User,
 };

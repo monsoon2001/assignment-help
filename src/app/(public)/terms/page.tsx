@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PageHeader } from "@/components/marketing/page-shell";
+import { LegalPage } from "@/components/marketing/legal-page";
 
 export const metadata: Metadata = {
   title: "Terms of Service | Acadivo",
@@ -72,32 +72,12 @@ const sections = [
 
 export default function TermsPage() {
   return (
-    <>
-      <PageHeader
-        title="Terms of Service"
-        subtitle="Last updated: October 25, 2026"
-        crumbs={[{ label: "Home", href: "/" }, { label: "Terms of Service" }]}
-      />
-
-      <section className="band-soft">
-        <div className="page-container-prose py-12 sm:py-16">
-          <div className="prose-custom space-y-6">
-            {sections.map((section) => (
-              <div
-                key={section.title}
-                className="bg-white rounded-2xl border border-outline-variant/30 p-6 shadow-sm hover:border-primary-container/40 transition-colors"
-              >
-                <h2 className="font-display text-lg font-bold text-on-surface mb-2">
-                  {section.title}
-                </h2>
-                <p className="text-base text-on-surface-variant leading-relaxed">
-                  {section.content}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </>
+    <LegalPage
+      title="Terms of Service"
+      lastUpdated="October 25, 2026"
+      summary="These terms explain how Acadivo works, what you can expect from helpers, how payments and revisions are handled, and the responsibilities that apply when you use the platform."
+      sections={sections}
+      crumbLabel="Terms of Service"
+    />
   );
 }

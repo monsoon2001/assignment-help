@@ -21,9 +21,8 @@ export default async function HelperLayout({ children }: { children: React.React
   let completedOrders = 0;
   let activeOrders = 0;
   let incomingRequests = 0;
-  let unreadMessages = 0;
   if (user) {
-    const [completedResult, activeResult, requestResult, messageResult] = await Promise.all([
+    const [completedResult, activeResult, requestResult] = await Promise.all([
       supabase
         .from("orders")
         .select("id", { count: "exact", head: true })
@@ -39,12 +38,6 @@ export default async function HelperLayout({ children }: { children: React.React
         .select("id", { count: "exact", head: true })
         .eq("helper_id", user.id)
         .eq("status", "requested"),
-      supabase
-        .from("notifications")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .eq("type", "message")
-        .eq("read", false),
     ]);
 
     if (completedResult.error)
@@ -53,13 +46,10 @@ export default async function HelperLayout({ children }: { children: React.React
       throw new Error(`Could not load active order count: ${activeResult.error.message}`);
     if (requestResult.error)
       throw new Error(`Could not load incoming request count: ${requestResult.error.message}`);
-    if (messageResult.error)
-      throw new Error(`Could not load unread message count: ${messageResult.error.message}`);
 
     completedOrders = completedResult.count ?? 0;
     activeOrders = activeResult.count ?? 0;
     incomingRequests = requestResult.count ?? 0;
-    unreadMessages = messageResult.count ?? 0;
   }
 
   return (
@@ -72,7 +62,6 @@ export default async function HelperLayout({ children }: { children: React.React
             completedOrders={completedOrders}
             activeOrders={activeOrders}
             incomingRequests={incomingRequests}
-            unreadMessages={unreadMessages}
           />
           <main className="flex-1 min-w-0 py-6 md:pl-8 pb-24 md:pb-10 lg:pb-0 lg:min-h-0 lg:overflow-y-auto">
             {children}
@@ -88,12 +77,6 @@ export default async function HelperLayout({ children }: { children: React.React
               label: "Requests",
               icon: "inbox",
               badge: incomingRequests || undefined,
-            },
-            {
-              href: "/helper/messages",
-              label: "Messages",
-              icon: "messages",
-              badge: unreadMessages || undefined,
             },
           ]}
           more={[

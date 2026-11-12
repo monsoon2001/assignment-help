@@ -32,7 +32,10 @@ import { realtimeTopic } from "@/lib/supabase/realtime";
 import { fetchRequestMessages, sendRequestMessage } from "@/lib/request-chat";
 import { submitProposal } from "@/lib/proposals";
 import { DEFAULT_CURRENCY } from "@/lib/currency";
-import { markThreadNotificationsRead } from "@/lib/notifications";
+import {
+  markThreadNotificationsRead,
+  markRequestNotificationsRead,
+} from "@/lib/notifications";
 import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 import { requestStatusTone } from "@/lib/status-meta";
 import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
@@ -110,8 +113,9 @@ export default function RequestWorkspace({
   const pathname = usePathname();
 
   useEffect(() => {
+    markRequestNotificationsRead(requestId);
     markThreadNotificationsRead(pathname);
-  }, [pathname]);
+  }, [pathname, requestId]);
 
   // A student arriving from the dashboard's "Act now" card for a new proposal
   // lands on the request page expecting to review the offer, not the chat. On
@@ -348,6 +352,7 @@ export default function RequestWorkspace({
     }
     setDraft("");
     setChatFiles([]);
+    markRequestNotificationsRead(requestId);
     await loadMessages();
   }
 
@@ -380,6 +385,7 @@ export default function RequestWorkspace({
         result.error.includes("This proposal is locked and can no longer be edited.") ||
         result.error.includes("This proposal is locked because an order already exists.")
       ) {
+        markRequestNotificationsRead(requestId);
         await Promise.all([loadProposal(), loadRequest()]);
         setBidNotice(
           "This proposal has already been accepted or resolved. The latest status is shown.",
@@ -392,6 +398,7 @@ export default function RequestWorkspace({
     setBidPrice("");
     setBidDescription("");
     setBidRevisions("1");
+    markRequestNotificationsRead(requestId);
     await loadProposal();
     await loadRequest();
   }

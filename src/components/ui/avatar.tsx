@@ -9,7 +9,7 @@ interface AvatarProps {
   alt?: string;
   name?: string;
   role?: string | null;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   online?: boolean;
   className?: string;
 }
@@ -22,8 +22,8 @@ export default function Avatar({
   online,
   className = "",
 }: AvatarProps) {
-  const sizes = { sm: "w-8 h-8", md: "w-10 h-10", lg: "w-14 h-14" };
-  const dims = { sm: 32, md: 40, lg: 56 };
+  const sizes = { sm: "w-8 h-8", md: "w-10 h-10", lg: "w-14 h-14", xl: "w-20 h-20" };
+  const dims = { sm: 32, md: 40, lg: 56, xl: 80 };
   const parts = (name ?? "").trim().split(/\s+/).filter(Boolean);
   const initials =
     parts.length === 0

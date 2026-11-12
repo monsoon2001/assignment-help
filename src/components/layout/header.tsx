@@ -7,7 +7,6 @@ import { createPortal } from "react-dom";
 import {
   Search,
   Bell,
-  MessageSquare,
   GraduationCap,
   Menu,
   X,
@@ -262,7 +261,6 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
 
   const profileHref = role === "helper" ? "/helper/profile" : "/profile";
   const dashboardHref = role === "helper" ? "/helper/dashboard" : "/dashboard";
-  const messagesHref = role === "helper" ? "/helper/messages" : "/messages";
   const notificationsHref = role === "helper" ? "/helper/notifications" : "/notifications";
   const firstName = userName
     ? userName.includes("@")
@@ -387,12 +385,6 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                   ) : (
                     <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-error ring-2 ring-surface-container-lowest" />
                   )}
-                </Button>
-              </Link>
-              <Link href={messagesHref} className="hidden md:inline-flex">
-                <Button variant="ghost" size="sm" className="relative">
-                  <MessageSquare size={18} />
-                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary-container ring-2 ring-surface-container-lowest" />
                 </Button>
               </Link>
               {role === "student" && pathname.startsWith("/dashboard") && (
@@ -636,7 +628,6 @@ export default function Header({ title, showSearch = true, menuItems = [] }: Hea
                   <div className="grid grid-cols-2 gap-2">
                     {[
                       { href: dashboardHref, label: "Dashboard", icon: LayoutDashboard },
-                      { href: messagesHref, label: "Messages", icon: MessageSquare },
                       { href: notificationsHref, label: "Notifications", icon: Bell },
                       { href: profileHref, label: "Profile", icon: User },
                     ].map(({ href, label, icon: Icon }) => (

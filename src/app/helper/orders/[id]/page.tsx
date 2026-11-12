@@ -3,8 +3,14 @@ import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function HelperOrderPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default async function HelperOrderPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ tab?: string }>;
+}) {
+  const [{ id }, query] = await Promise.all([params, searchParams]);
 
   const supabase = await createClient();
   const {
@@ -29,5 +35,7 @@ export default async function HelperOrderPage({ params }: { params: Promise<{ id
   const requestId = (proposal as { request_id: string | null } | null)?.request_id;
 
   // Orders are now shown inside the single request workspace.
-  redirect(requestId ? `/helper/requests/${requestId}` : "/helper/orders");
+  const tab = query.tab === "chat" || query.tab === "delivery" ? query.tab : null;
+  const suffix = tab ? `?tab=${tab}` : "";
+  redirect(requestId ? `/helper/requests/${requestId}${suffix}` : "/helper/orders");
 }

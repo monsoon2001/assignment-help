@@ -199,6 +199,8 @@ html {
      the rem scale above, which overflows dense bars like the navbar. */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Phones: tighten Tailwind's spacing scale (padding, margin, gap, space-*)
@@ -247,10 +249,10 @@ html {
    tuned to one laptop, and the container stays between 1200–1280px so text
    lines never become uncomfortably long on very wide monitors. */
 :root {
-  --page-max: 75rem;
+  --page-max: 80rem;
   --page-gutter: clamp(1rem, 2.5vw, 2.5rem);
-  --section-space: clamp(3rem, 6vw, 6rem);
-  --stack-space: clamp(1.5rem, 2.5vw, 3rem);
+  --section-space: clamp(2.5rem, 5vw, 5rem);
+  --stack-space: clamp(1.25rem, 2vw, 2.5rem);
 
   --space-1: 0.5rem;
   --space-2: 1rem;
@@ -466,10 +468,9 @@ h6 {
   background-color: var(--bp-section);
 }
 
-/* The hero: white with two barely-there corner tints so the estimate card and
-   the headline each sit on a slightly different plane. */
+/* The hero: soft canvas so the estimate card and navigation stand out. */
 @utility band-hero {
-  background-color: var(--color-surface);
+  background-color: var(--color-canvas);
 }
 
 @keyframes home-enter {
@@ -549,7 +550,7 @@ h6 {
 .public-site :is(a, article, div, li)[class*="rounded-xl"][class*="border"] {
   border-radius: var(--site-card-radius);
   box-shadow: var(--site-surface-shadow);
-  transition-duration: 180ms;
+  transition-duration: 150ms;
 }
 
 .public-site a[class*="group"][class*="rounded-"][class*="border"] {
@@ -588,7 +589,13 @@ button,
 input,
 textarea,
 select {
-  transition-duration: 180ms;
+  transition-duration: 150ms;
+}
+
+button,
+a,
+[role="button"] {
+  touch-action: manipulation;
 }
 
 button {

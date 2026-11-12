@@ -24,7 +24,7 @@ export default async function HelperNotificationsPage() {
 
   const { data, error } = await supabase
     .from("notifications")
-    .select("id, type, message, link, read, created_at")
+    .select("id, type, message, link, read, created_at, order_id, request_id")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
     .limit(60);
@@ -38,6 +38,10 @@ export default async function HelperNotificationsPage() {
   }
 
   return (
-    <NotificationsView initial={(data ?? []) as AppNotification[]} emptyHref="/helper/dashboard" />
+    <NotificationsView
+      initial={(data ?? []) as AppNotification[]}
+      emptyHref="/helper/dashboard"
+      isHelper
+    />
   );
 }

@@ -35,7 +35,12 @@ import { uploadOrderFile } from "@/lib/order-files";
 import { normalizeCurrency, formatCurrency } from "@/lib/currency";
 import { orderStatusMeta, paymentStatusTone } from "@/lib/status-meta";
 import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
-import { markThreadNotificationsRead } from "@/lib/notifications";
+import {
+  markThreadNotificationsRead,
+  markOrderNotificationsRead,
+  markOrderMessageNotificationsRead,
+  markRequestNotificationsRead,
+} from "@/lib/notifications";
 import { notifyActivity } from "@/lib/notify-client";
 import ChatPanel, {
   type ChatMessageRow,
@@ -138,13 +143,31 @@ export default function OrderWorkspace({
   const pathname = usePathname();
 
   useEffect(() => {
+    markOrderNotificationsRead(orderId);
     markThreadNotificationsRead(`/orders/${orderId}`);
     markThreadNotificationsRead(`/orders/${orderId}?tab=delivery`);
     markThreadNotificationsRead(`/helper/orders/${orderId}`);
     markThreadNotificationsRead(pathname);
     const requestId = order?.proposal?.request_id;
-    if (requestId) markThreadNotificationsRead(`/requests/${requestId}`);
+    if (requestId) {
+      markRequestNotificationsRead(requestId);
+      markThreadNotificationsRead(`/requests/${requestId}`);
+    }
   }, [pathname, orderId, order?.proposal?.request_id]);
+
+  // Keep message notifications for this order read while the chat is open and
+  // the tab is visible (covers newly arriving messages without a refresh).
+  useEffect(() => {
+    if (activeTab !== "chat") return;
+    const mark = () => {
+      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+        markOrderMessageNotificationsRead(orderId);
+      }
+    };
+    mark();
+    document.addEventListener("visibilitychange", mark);
+    return () => document.removeEventListener("visibilitychange", mark);
+  }, [activeTab, orderId, messages.length]);
 
   const loadOrder = useCallback(async () => {
     const { data, error } = await supabase.current

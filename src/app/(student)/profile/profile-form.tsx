@@ -6,7 +6,7 @@ import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import Select from "@/components/ui/select";
 import Avatar from "@/components/ui/avatar";
-import { Save, Mail, GraduationCap, BookOpen, MapPin } from "lucide-react";
+import { Save, Mail, GraduationCap, BookOpen, ShieldCheck } from "lucide-react";
 import { COUNTRY_OPTIONS } from "@/lib/currency";
 import { saveStudentProfile, type StudentProfileResult } from "./actions";
 
@@ -49,66 +49,56 @@ export default function StudentProfileForm({
   const displayName = name || (email ? email.split("@")[0] : "Acadivo Student");
 
   return (
-    <div className="w-full max-w-6xl mx-auto flex flex-col gap-6">
+    <div className="w-full max-w-5xl mx-auto flex flex-col gap-5">
       <div>
-        <h1 className="font-display font-bold text-2xl text-on-surface">Profile</h1>
+        <h1 className="font-display font-bold text-xl sm:text-2xl text-on-surface">Profile</h1>
         <p className="text-sm text-on-surface-variant mt-0.5">
-          Manage your personal details, academics, and security
+          Manage your personal details and account settings.
         </p>
       </div>
 
-      <section className="relative overflow-hidden rounded-3xl border border-outline-variant/60 bg-surface-container-lowest">
-        <div className="h-24 sm:h-28 bg-primary" />
-        <div className="px-5 sm:px-7 pb-6">
-          <div className="flex items-start gap-4">
-            <Avatar
-              name={displayName}
-              size="lg"
-              src={avatarUrl ?? undefined}
-              className="-mt-11 ring-4 ring-surface-container-lowest"
-            />
-            <div className="min-w-0 pt-1.5">
-              <h2 className="font-display font-bold text-xl text-on-surface truncate">
-                {displayName}
-              </h2>
-              <p className="text-sm text-on-surface-variant flex items-center gap-1.5 min-w-0">
-                <Mail size={14} className="shrink-0" />{" "}
-                <span className="truncate">{email || "—"}</span>
-              </p>
-            </div>
+      <Card className="p-4 sm:p-5">
+        <div className="flex items-center gap-4 sm:gap-5">
+          <div className="flex flex-col items-center gap-1.5 shrink-0">
+            <Avatar name={displayName} size="xl" src={avatarUrl ?? undefined} />
+            <button
+              type="button"
+              className="text-xs font-medium text-primary hover:underline"
+            >
+              Change photo
+            </button>
           </div>
-
-          <div className="mt-5 flex flex-wrap gap-2 text-xs">
-            {institution && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-container-low px-3 py-1.5 font-medium text-on-surface-variant">
-                <GraduationCap size={13} className="text-primary" /> {institution}
-              </span>
-            )}
-            {levelOfStudy && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-container-low px-3 py-1.5 font-medium text-on-surface-variant">
-                <BookOpen size={13} className="text-primary" /> {levelOfStudy}
-              </span>
-            )}
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-container-low px-3 py-1.5 font-medium text-on-surface-variant">
-              <MapPin size={13} className="text-primary" />{" "}
+          <div className="min-w-0">
+            <h2 className="font-display font-semibold text-lg text-on-surface truncate">
+              {displayName}
+            </h2>
+            <p className="text-sm text-on-surface-variant truncate">{email || "—"}</p>
+            <p className="text-xs text-on-surface-variant mt-1">
               {memberSince ? `Member since ${memberSince}` : "Student member"}
-            </span>
+            </p>
           </div>
         </div>
-      </section>
+      </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <form action={formAction} className="lg:col-span-2 flex flex-col gap-6">
-          <Card className="p-6">
-            <h3 className="font-display font-semibold text-on-surface mb-1">
-              Personal Information
-            </h3>
-            <p className="text-xs text-on-surface-variant mb-5">
-              Used to personalize your workspace and match helpers.
+      <form action={formAction} className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Card className="p-4 sm:p-5">
+            <h3 className="font-display font-semibold text-on-surface mb-1">Personal info</h3>
+            <p className="text-xs text-on-surface-variant mb-4">
+              Your name as it appears in your workspace.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input name="firstName" label="First Name" defaultValue={firstName} required />
               <Input name="lastName" label="Last Name" defaultValue={lastName} />
+            </div>
+          </Card>
+
+          <Card className="p-4 sm:p-5">
+            <h3 className="font-display font-semibold text-on-surface mb-1">Contact</h3>
+            <p className="text-xs text-on-surface-variant mb-4">
+              How we reach you and where you’re based.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2 flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-on-surface">Email</label>
                 <div className="w-full h-11 flex items-center px-3.5 gap-2 bg-surface-container-low border border-outline-variant rounded-lg text-sm text-on-surface-variant">
@@ -137,12 +127,10 @@ export default function StudentProfileForm({
             </div>
           </Card>
 
-          <Card className="p-6">
-            <h3 className="font-display font-semibold text-on-surface mb-1">
-              Academic Information
-            </h3>
-            <p className="text-xs text-on-surface-variant mb-5">
-              Helps tailored mentor recommendations.
+          <Card className="p-4 sm:p-5">
+            <h3 className="font-display font-semibold text-on-surface mb-1">Academic</h3>
+            <p className="text-xs text-on-surface-variant mb-4">
+              Helps tailor recommendations and support.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2 flex flex-col gap-1.5">
@@ -153,62 +141,74 @@ export default function StudentProfileForm({
                   defaultValue={institution}
                 />
               </div>
-              <Select
-                name="levelOfStudy"
-                label="Level of Study"
-                placeholder="Select your level"
-                defaultValue={levelOfStudy || ""}
-                options={LEVELS.map((l) => ({ value: l, label: l }))}
-              />
+              <div className="sm:col-span-2">
+                <Select
+                  name="levelOfStudy"
+                  label="Level of Study"
+                  placeholder="Select your level"
+                  defaultValue={levelOfStudy || ""}
+                  options={LEVELS.map((l) => ({ value: l, label: l }))}
+                />
+              </div>
             </div>
           </Card>
 
-          {state.message && (
-            <p
-              className={`text-sm rounded-lg px-3 py-2 ${state.ok ? "text-success bg-success-tint" : "text-error bg-error-container/30"}`}
-            >
-              {state.message}
+          <Card className="p-4 sm:p-5">
+            <h3 className="font-display font-semibold text-on-surface mb-1">Security</h3>
+            <p className="text-xs text-on-surface-variant mb-4">
+              Your sign-in and account details.
             </p>
-          )}
-
-          <div className="flex justify-end">
-            <Button type="submit" disabled={pending}>
-              <Save size={16} />
-              {pending ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
-        </form>
-
-        <div className="flex flex-col gap-6">
-          <Card className="p-6">
-            <h3 className="font-display font-semibold text-on-surface mb-4">Security</h3>
             <div className="flex flex-col gap-3">
-              <button className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant hover:bg-surface-container-low text-left transition-colors cursor-pointer w-full">
+              <div className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant bg-surface-container-low/40">
                 <span className="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
-                  <Mail size={16} />
+                  <ShieldCheck size={16} />
                 </span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-on-surface">Sign-in method</p>
-                  <p className="text-xs text-on-surface-variant">
-                    Google or email verification code
-                  </p>
+                  <p className="text-xs text-on-surface-variant">Google or email verification code</p>
                 </div>
-              </button>
-              <button className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant hover:bg-surface-container-low text-left transition-colors cursor-pointer w-full">
+              </div>
+              <div className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant bg-surface-container-low/40">
                 <span className="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
                   <GraduationCap size={16} />
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-on-surface">Academic information</p>
-                  <p className="text-xs text-on-surface-variant">
+                  <p className="text-sm font-semibold text-on-surface">Academic profile</p>
+                  <p className="text-xs text-on-surface-variant truncate">
                     {institution || "No institution set"} · {levelOfStudy || "No level set"}
                   </p>
                 </div>
-              </button>
+              </div>
+              <div className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant bg-surface-container-low/40">
+                <span className="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
+                  <BookOpen size={16} />
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-on-surface">Membership</p>
+                  <p className="text-xs text-on-surface-variant">
+                    {memberSince ? `Member since ${memberSince}` : "Student member"}
+                  </p>
+                </div>
+              </div>
             </div>
           </Card>
         </div>
-      </div>
+
+        {state.message && (
+          <p
+            className={`text-sm rounded-lg px-3 py-2 ${state.ok ? "text-success bg-success-tint" : "text-error bg-error-container/30"}`}
+          >
+            {state.message}
+          </p>
+        )}
+
+        <div className="sticky bottom-20 md:bottom-4 z-10 flex justify-end pt-1">
+          <Button type="submit" disabled={pending} className="shadow-sm">
+            <Save size={16} />
+            {pending ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }

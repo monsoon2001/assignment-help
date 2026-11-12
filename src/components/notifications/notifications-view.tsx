@@ -28,6 +28,8 @@ export type AppNotification = {
   link: string | null;
   read: boolean;
   created_at: string;
+  order_id?: string | null;
+  request_id?: string | null;
 };
 
 type Tone = { icon: React.ComponentType<{ size?: number; className?: string }>; tone: string };
@@ -58,12 +60,36 @@ function timeAgo(value: string): string {
   return `${days} day${days > 1 ? "s" : ""} ago`;
 }
 
+function notificationHref(n: AppNotification, isHelper: boolean): string | null {
+  if (!n.link) return null;
+  let href = n.link;
+
+  // Order notifications share one link shape across both roles. Point helpers
+  // at their own workspace and open the conversation directly, except for
+  // delivery updates which should land on the delivered files.
+  if (href.startsWith("/orders/") || href.startsWith("/helper/orders/")) {
+    if (isHelper && href.startsWith("/orders/")) {
+      href = `/helper${href}`;
+    } else if (!isHelper && href.startsWith("/helper/orders/")) {
+      href = href.slice("/helper".length);
+    }
+    if (!href.includes("tab=")) {
+      const tab = n.type === "delivery" ? "delivery" : "chat";
+      href += href.includes("?") ? `&tab=${tab}` : `?tab=${tab}`;
+    }
+  }
+
+  return href;
+}
+
 export default function NotificationsView({
   initial,
   emptyHref = "/dashboard",
+  isHelper = false,
 }: {
   initial: AppNotification[];
   emptyHref?: string;
+  isHelper?: boolean;
 }) {
   const router = useRouter();
   const [notifications, setNotifications] = useState<AppNotification[]>(initial);
@@ -88,7 +114,20 @@ export default function NotificationsView({
           },
           (payload) => {
             const n = payload.new as AppNotification;
-            setNotifications((prev) => [n, ...prev]);
+            setNotifications((prev) => (prev.some((x) => x.id === n.id) ? prev : [n, ...prev]));
+          },
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "notifications",
+            filter: `user_id=eq.${data.user.id}`,
+          },
+          (payload) => {
+            const n = payload.new as AppNotification;
+            setNotifications((prev) => prev.map((x) => (x.id === n.id ? { ...x, ...n } : x)));
           },
         )
         .subscribe();
@@ -128,13 +167,8 @@ export default function NotificationsView({
 
   function handleOpen(n: AppNotification) {
     if (!n.read) void markRead(n.id);
-    if (n.link) {
-      // Delivery notifications should land on the delivered files, not the
-      // order overview. Older notification rows predate the deep link.
-      let href = n.link;
-      if (n.type === "delivery" && href.startsWith("/orders/") && !href.includes("tab=")) {
-        href += href.includes("?") ? "&tab=delivery" : "?tab=delivery";
-      }
+    const href = notificationHref(n, isHelper);
+    if (href) {
       router.push(href);
       router.refresh();
     }

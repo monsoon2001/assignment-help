@@ -104,7 +104,7 @@ function SignInForm() {
             <Building2 size={12} />
             Academic Portal
           </span>
-          <h1 className="font-display text-2xl font-bold text-on-surface">Welcome back</h1>
+          <h1 className="font-display text-2xl font-bold text-on-surface">Sign in</h1>
           <p className="mt-1.5 text-sm text-on-surface-variant">
             Sign in with Google or your email &amp; password
           </p>

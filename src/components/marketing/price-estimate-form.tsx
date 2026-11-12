@@ -17,6 +17,7 @@ import {
   submitRequest,
   clearPendingDraft,
   clearDraftFiles,
+  TERMS_VERSION,
 } from "@/lib/requests";
 import { OTHER_OPTION, composeSelection } from "@/lib/constants";
 import { countryNameFor, defaultCurrencyForCountry, DEFAULT_COUNTRY } from "@/lib/currency";
@@ -80,6 +81,7 @@ export default function PriceEstimateForm() {
         customHelpType: BLANK.customHelpType,
         files: BLANK.files,
       });
+      if (draft.termsAcceptedFromHome) setTermsAccepted(true);
       // Remove the ?draft=1 param from the URL without a reload
       const url = new URL(window.location.href);
       url.searchParams.delete("draft");
@@ -146,6 +148,7 @@ export default function PriceEstimateForm() {
           dueTime: values.dueTime || undefined,
           wordCount: values.pages,
           details: values.details,
+          termsAcceptedFromHome: true,
         });
         await saveDraftFiles(values.files);
         router.push("/sign-in?next=/requests/new");
@@ -185,6 +188,8 @@ export default function PriceEstimateForm() {
           : null,
         files: values.files,
         idempotencyKey: getSubmissionKey(),
+        termsAcceptedAt: new Date().toISOString(),
+        termsVersion: TERMS_VERSION,
       });
 
       if ("error" in result) {
