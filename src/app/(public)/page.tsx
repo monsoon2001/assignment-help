@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { roleToHome } from "@/lib/auth";
 import { CheckCircle, ArrowRight, BookOpen, Sparkles, Clock, Users } from "lucide-react";
 import { MaterialIcon } from "@/lib/icons-map";
 import PriceEstimateForm from "@/components/marketing/price-estimate-form";
@@ -162,19 +160,6 @@ const HOMEPAGE_SUBJECTS = [
 
 export default async function HomePage() {
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (user) {
-    const { data: profile } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .maybeSingle();
-    redirect(roleToHome(profile?.role));
-  }
 
   const { data: reviewRows, error: reviewsError } = await supabase
     .from("helper_reviews")
