@@ -32,10 +32,7 @@ import { realtimeTopic } from "@/lib/supabase/realtime";
 import { fetchRequestMessages, sendRequestMessage } from "@/lib/request-chat";
 import { submitProposal } from "@/lib/proposals";
 import { DEFAULT_CURRENCY } from "@/lib/currency";
-import {
-  markThreadNotificationsRead,
-  markRequestNotificationsRead,
-} from "@/lib/notifications";
+import { markThreadNotificationsRead, markRequestNotificationsRead } from "@/lib/notifications";
 import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 import { requestStatusTone } from "@/lib/status-meta";
 import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
@@ -179,13 +176,34 @@ export default function RequestWorkspace({
   }, [requestId]);
 
   const loadProposal = useCallback(async () => {
-    const { data } = await supabase.current
+    const proposalColumns =
+      "id, request_id, helper_id, price, base_cad, final_cad, fee_cad, currency, description, revisions_included, expires_at, status, created_at, student_note, decline_reason, revision_requested_at, replaced_by, revision_of, helper:users(id, name)";
+    // Older deployments may not have the fee-inclusive pricing columns yet.
+    // Fall back to the base quote fields so the proposal and its accept/decline/
+    // revise actions still render instead of the whole quote disappearing.
+    const legacyProposalColumns =
+      "id, request_id, helper_id, price, currency, description, revisions_included, expires_at, status, created_at, student_note, decline_reason, revision_requested_at, replaced_by, revision_of, helper:users(id, name)";
+
+    const primary = await supabase.current
       .from("proposals")
-      .select(
-        "id, request_id, helper_id, price, base_cad, final_cad, fee_cad, currency, description, revisions_included, expires_at, status, created_at, student_note, decline_reason, revision_requested_at, replaced_by, revision_of, helper:users(id, name)",
-      )
+      .select(proposalColumns)
       .eq("request_id", requestId)
       .order("created_at", { ascending: false });
+
+    let data: unknown = primary.data;
+
+    if (primary.error) {
+      const legacy = await supabase.current
+        .from("proposals")
+        .select(legacyProposalColumns)
+        .eq("request_id", requestId)
+        .order("created_at", { ascending: false });
+      if (!legacy.error) {
+        data = legacy.data;
+      } else {
+        console.error("request workspace: failed to load proposals", primary.error, legacy.error);
+      }
+    }
 
     const rows = (Array.isArray(data) ? data : []) as unknown as Array<
       Omit<RequestProposal, "helper"> & {
@@ -640,9 +658,7 @@ export default function RequestWorkspace({
                 )}
               </Card>
 
-              {proposalHistory.length > 0 && (
-                <ProposalActivity proposals={proposalHistory} />
-              )}
+              {proposalHistory.length > 0 && <ProposalActivity proposals={proposalHistory} />}
 
               {isHelper && bidNotice && (
                 <p
@@ -690,8 +706,7 @@ export default function RequestWorkspace({
                         onChange={(e) => setBidPrice(e.target.value)}
                         onBlur={() => {
                           const raw = Number(bidPrice);
-                          if (Number.isFinite(raw) && raw > 0)
-                            setBidPrice(String(Math.round(raw)));
+                          if (Number.isFinite(raw) && raw > 0) setBidPrice(String(Math.round(raw)));
                         }}
                       />
                       <p className="mt-1 text-xs text-on-surface-variant">

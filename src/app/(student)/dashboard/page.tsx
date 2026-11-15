@@ -23,6 +23,7 @@ import { requestStatusTone } from "@/lib/status-meta";
 import { ACADIVO_HELPER_NAME } from "@/lib/avatars";
 import DashboardRefresh from "@/components/dashboard/dashboard-refresh";
 import DismissActionCardButton from "@/components/dashboard/dismiss-action-card-button";
+import ProposalCard, { type RequestProposal } from "@/components/requests/proposal-card";
 import SecureFileLink from "@/components/ui/secure-file-link";
 import { fileNameFromStoredUrl } from "@/lib/signed-files";
 
@@ -62,6 +63,8 @@ type ActionCardItem = {
   icon: LucideIcon;
   dot?: boolean;
   deliveryFiles?: string[];
+  proposal?: RequestProposal;
+  requestDeadline?: string | null;
 };
 
 export default async function DashboardPage() {
@@ -98,22 +101,27 @@ export default async function DashboardPage() {
     .filter((r) => ["proposal_sent", "accepted"].includes(r.status))
     .map((r) => r.id);
 
+  // `*` (rather than an explicit column list) keeps the dashboard working even
+  // if a newer pricing column has not been migrated on the database yet.
   const proposalRowsRes =
     activeIds.length > 0
       ? await supabase
           .from("proposals")
-          .select("id, request_id, status, created_at, helper_id, price, currency, description")
+          .select("*, helper:users(id, name)")
           .in("request_id", activeIds)
           .order("created_at", { ascending: false })
       : { data: null };
 
-  const proposals = (proposalRowsRes.data ?? []) as Array<{
-    id: string;
-    request_id: string;
-    status: string;
-    created_at: string;
-    helper_id: string | null;
-  }>;
+  const proposals: RequestProposal[] = (
+    (proposalRowsRes.data ?? []) as unknown as Array<
+      Omit<RequestProposal, "helper"> & {
+        helper: RequestProposal["helper"] | RequestProposal["helper"][];
+      }
+    >
+  ).map((row) => ({
+    ...row,
+    helper: Array.isArray(row.helper) ? (row.helper[0] ?? null) : row.helper,
+  }));
 
   const acceptedByRequest = new Map<string, string>();
   for (const p of proposals) {
@@ -192,6 +200,8 @@ export default async function DashboardPage() {
         tone: "bg-secondary-container text-on-secondary-container",
         icon: FileText,
         dot: true,
+        proposal: p,
+        requestDeadline: req.deadline,
       });
     }
   }
@@ -387,54 +397,66 @@ export default async function DashboardPage() {
               const Icon = card.icon;
               return (
                 <div key={card.key} className="relative">
-                  <DismissActionCardButton cardKey={card.key} />
-                  <Card className="action-card p-5 transition-shadow hover:shadow-lg" hover>
-                    <Link href={card.href} className="block">
-                      <div className="flex items-start gap-3">
-                        <span
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${card.tone}`}
-                        >
-                          <Icon size={18} />
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className="font-semibold text-on-surface truncate">{card.title}</p>
-                            {card.dot && <span className="w-2 h-2 rounded-full bg-primary" />}
-                          </div>
-                          <p className="text-sm text-on-surface-variant line-clamp-2 mt-1">
-                            {card.body}
-                          </p>
-                          <div className="flex items-center justify-between mt-3">
-                            <p className="text-xs text-on-surface-variant">
-                              {timeAgo(card.createdAt)}
-                            </p>
-                            <span className="text-sm font-medium text-primary inline-flex items-center gap-1">
-                              Act now <ChevronRight size={14} />
+                  {card.proposal ? (
+                    <ProposalCard
+                      proposal={card.proposal}
+                      requestDeadline={card.requestDeadline}
+                      className="h-full"
+                    />
+                  ) : (
+                    <>
+                      <DismissActionCardButton cardKey={card.key} />
+                      <Card className="action-card p-5 transition-shadow hover:shadow-lg" hover>
+                        <Link href={card.href} className="block">
+                          <div className="flex items-start gap-3">
+                            <span
+                              className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${card.tone}`}
+                            >
+                              <Icon size={18} />
                             </span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p className="font-semibold text-on-surface truncate">
+                                  {card.title}
+                                </p>
+                                {card.dot && <span className="w-2 h-2 rounded-full bg-primary" />}
+                              </div>
+                              <p className="text-sm text-on-surface-variant line-clamp-2 mt-1">
+                                {card.body}
+                              </p>
+                              <div className="flex items-center justify-between mt-3">
+                                <p className="text-xs text-on-surface-variant">
+                                  {timeAgo(card.createdAt)}
+                                </p>
+                                <span className="text-sm font-medium text-primary inline-flex items-center gap-1">
+                                  Act now <ChevronRight size={14} />
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    </Link>
-                    {card.deliveryFiles && card.deliveryFiles.length > 0 && (
-                      <div className="mt-3 flex flex-col gap-2">
-                        {card.deliveryFiles.map((file, index) => (
-                          <SecureFileLink
-                            key={`${file}-${index}`}
-                            stored={file}
-                            bucket="order-files"
-                            showDownload
-                            label={fileNameFromStoredUrl(file)}
-                            className="flex items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest p-2 text-sm text-on-surface hover:bg-surface-container-low"
-                          >
-                            <FileText size={15} className="shrink-0 text-primary" />
-                            <span className="min-w-0 flex-1 truncate">
-                              {fileNameFromStoredUrl(file)}
-                            </span>
-                          </SecureFileLink>
-                        ))}
-                      </div>
-                    )}
-                  </Card>
+                        </Link>
+                        {card.deliveryFiles && card.deliveryFiles.length > 0 && (
+                          <div className="mt-3 flex flex-col gap-2">
+                            {card.deliveryFiles.map((file, index) => (
+                              <SecureFileLink
+                                key={`${file}-${index}`}
+                                stored={file}
+                                bucket="order-files"
+                                showDownload
+                                label={fileNameFromStoredUrl(file)}
+                                className="flex items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest p-2 text-sm text-on-surface hover:bg-surface-container-low"
+                              >
+                                <FileText size={15} className="shrink-0 text-primary" />
+                                <span className="min-w-0 flex-1 truncate">
+                                  {fileNameFromStoredUrl(file)}
+                                </span>
+                              </SecureFileLink>
+                            ))}
+                          </div>
+                        )}
+                      </Card>
+                    </>
+                  )}
                 </div>
               );
             })}
