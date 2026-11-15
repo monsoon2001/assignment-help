@@ -1,10 +1,9 @@
-import { Mail, Shield, GraduationCap } from "lucide-react";
+import { Mail, Shield } from "lucide-react";
 import Card from "@/components/ui/card";
 import Avatar from "@/components/ui/avatar";
 import Badge from "@/components/ui/badge";
-import Button from "@/components/ui/button";
-import Input from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/server";
+import AdminProfileForm from "./admin-profile-form";
 
 export const dynamic = "force-dynamic";
 
@@ -58,31 +57,7 @@ export default async function AdminProfilePage() {
         </div>
       </Card>
 
-      <Card className="p-6">
-        <h3 className="font-display font-semibold text-on-surface mb-1">Account Information</h3>
-        <p className="text-xs text-on-surface-variant mb-5">
-          Your identity is verified. Email cannot be changed.
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input label="First Name" defaultValue={firstName} />
-          <Input label="Last Name" defaultValue={lastName} />
-          <div className="sm:col-span-2 flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-on-surface">Email</label>
-            <div className="w-full h-11 flex items-center px-3.5 gap-2 bg-surface-container-low border border-outline-variant rounded-lg text-sm text-on-surface-variant">
-              <Mail size={16} className="shrink-0 text-on-surface-variant" />
-              <span className="truncate">{email || "—"}</span>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 mt-5 pt-5 border-t border-outline-variant">
-          <GraduationCap size={15} className="text-primary shrink-0" />
-          <p className="text-xs text-on-surface-variant">
-            Admin credentials are provisioned by the platform team. Contact your setup owner for any
-            account changes.
-          </p>
-        </div>
-        <Button className="mt-4">Save Changes</Button>
-      </Card>
+      <AdminProfileForm firstName={firstName} lastName={lastName} email={email} />
     </div>
   );
 }

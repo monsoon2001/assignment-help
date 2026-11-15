@@ -1,12 +1,12 @@
+import { WHATSAPP_NUMBER, WHATSAPP_DEFAULT_MESSAGE } from "@/lib/constants";
+
 export default function WhatsAppButton() {
-  const number = "9779745617717";
-  const message = encodeURIComponent(
-    "Hi Acadivo! How may we assist you with your assignment?",
-  );
+  const number = WHATSAPP_NUMBER;
+  const message = encodeURIComponent(WHATSAPP_DEFAULT_MESSAGE);
   const href = `https://wa.me/${number}?text=${message}`;
 
   return (
-    <div className="acadivo-wa-float group fixed bottom-8 right-8 z-50 flex items-center gap-3">
+    <div className="acadivo-wa-float group fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-40 flex items-center gap-3">
       <style>{`
         @keyframes acadivo-wa-float {
           0%, 100% { transform: translateY(0); }
@@ -18,9 +18,15 @@ export default function WhatsAppButton() {
         }
       `}</style>
 
-      <span className="pointer-events-none hidden translate-x-2 rounded-full bg-slate-900/90 px-3.5 py-2 text-sm font-medium text-white opacity-0 shadow-lg backdrop-blur transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 sm:block">
-        Chat on WhatsApp
-      </span>
+      {/* Pill label on desktop/tablet, hidden on phone */}
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hidden sm:inline-flex items-center rounded-full bg-white px-3.5 py-1.5 text-xs sm:text-sm font-medium text-on-surface shadow-[0_2px_12px_rgba(0,0,0,0.08)] border border-outline-variant/40 hover:bg-slate-50 transition-colors cursor-pointer select-none"
+      >
+        Or send task in WhatsApp directly
+      </a>
 
       <a
         href={href}

@@ -45,5 +45,39 @@ export function isAdminRoute(pathname: string): boolean {
 }
 
 export function isAuthRoute(pathname: string): boolean {
-  return pathname === "/sign-in" || pathname === "/sign-up";
+  return (
+    pathname === "/sign-in" ||
+    pathname === "/sign-up" ||
+    pathname === "/login" ||
+    pathname === "/signup"
+  );
+}
+
+/**
+ * Checks whether a relative path is allowed for a given role.
+ * Only same-site safe relative paths matching the role's allowed routes return true.
+ */
+export function isRouteAllowedForRole(role: string | null | undefined, pathname: string): boolean {
+  const safe = safeNextPath(pathname);
+  if (!safe) return false;
+
+  const targetPath = safe.split("?")[0].split("#")[0];
+
+  // Auth routes are never valid after sign in
+  if (isAuthRoute(targetPath) || targetPath === "/") return false;
+
+  const r = (role as UserRole) ?? "student";
+  if (r === "admin") {
+    // Admin can access admin routes and shared inspection routes
+    return isAdminRoute(targetPath) || !isHelperRoute(targetPath);
+  }
+  if (r === "helper") {
+    // Helpers can access helper routes and shared public assets/info
+    return isHelperRoute(targetPath);
+  }
+  if (r === "student") {
+    // Students cannot access helper or admin areas
+    return !isHelperRoute(targetPath) && !isAdminRoute(targetPath);
+  }
+  return false;
 }

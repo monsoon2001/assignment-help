@@ -53,13 +53,50 @@ export default function SettingsForm({ fx }: { fx: FxSettings }) {
           </h2>
         </div>
         <p className="text-sm text-on-surface-variant">
-          Private to admins. This buffer is baked into the local price a student sees outside
-          Canada; it is never itemised. Helpers are paid manually — there is no commission.
+          Private to admins. These rates determine the fee-inclusive price students see when helpers send quotes. Never shown to students or helpers.
         </p>
         <form action={formAction} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
+            <Input
+              label="Stripe percentage (STRIPE_PCT)"
+              name="stripePct"
+              type="number"
+              min="0"
+              max="1"
+              step="0.0001"
+              defaultValue={String(fx.stripePct)}
+            />
+            <Input
+              label="Stripe fixed CAD (STRIPE_FIXED)"
+              name="stripeFixed"
+              type="number"
+              min="0"
+              max="100"
+              step="0.01"
+              defaultValue={String(fx.stripeFixed)}
+            />
+            <Input
+              label="International card fee (INTL_CARD_PCT)"
+              name="intlCardPct"
+              type="number"
+              min="0"
+              max="1"
+              step="0.0001"
+              defaultValue={String(fx.intlCardPct)}
+            />
+            <Input
+              label="Currency conversion fee (CONVERSION_PCT)"
+              name="conversionPct"
+              type="number"
+              min="0"
+              max="1"
+              step="0.0001"
+              defaultValue={String(fx.conversionPct)}
+            />
+          </div>
           <div className="max-w-xs">
             <Input
-              label="International processing / FX buffer (%)"
+              label="Legacy FX buffer (%)"
               name="surchargePercent"
               type="number"
               min="0"
@@ -71,7 +108,7 @@ export default function SettingsForm({ fx }: { fx: FxSettings }) {
           <div className="flex items-center gap-3">
             <Button disabled={pending}>
               <Save size={16} />
-              {pending ? "Saving…" : "Save FX Settings"}
+              {pending ? "Saving…" : "Save Pricing & FX Settings"}
             </Button>
             {state.message && (
               <span className={`text-sm ${state.ok ? "text-success" : "text-error"}`}>

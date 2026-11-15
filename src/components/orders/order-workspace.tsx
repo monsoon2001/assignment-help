@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   ChevronRight,
   LayoutGrid,
@@ -48,9 +48,11 @@ import ChatPanel, {
   fileNameFromUrl,
 } from "@/components/chat/chat-panel";
 import SecureFileLink from "@/components/ui/secure-file-link";
+import { EmptyState } from "@/components/ui/states";
 import ProposalCard, { type RequestProposal } from "@/components/requests/proposal-card";
 import ProposalActivity from "@/components/requests/proposal-activity";
 import { Skeleton, SkeletonCircle, SkeletonText } from "@/components/ui/skeleton";
+import { pathFromStoredUrl } from "@/lib/signed-files";
 
 type OrderStatus =
   "payment_pending" | "in_progress" | "delivered" | "revision_requested" | "completed" | "disputed";
@@ -102,6 +104,29 @@ type PaymentRow = {
 
 type WorkspaceTab = "overview" | "chat" | "delivery";
 
+type DeliveryFileMeta = {
+  size: number | null;
+  uploadedAt: string | null;
+};
+
+function formatDeliveryDate(value: string): string {
+  return new Date(value).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function formatFileSize(bytes: number | null | undefined): string {
+  if (typeof bytes !== "number" || !Number.isFinite(bytes) || bytes < 0) {
+    return "Size unavailable";
+  }
+  if (bytes === 0) return "0 B";
+  const units = ["B", "KB", "MB", "GB"];
+  const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+  return `${parseFloat((bytes / Math.pow(1024, index)).toFixed(1))} ${units[index]}`;
+}
+
 export default function OrderWorkspace({
   orderId,
   initialTab = "overview",
@@ -133,14 +158,17 @@ export default function OrderWorkspace({
   const [submittingDelivery, setSubmittingDelivery] = useState(false);
   const [deliveryError, setDeliveryError] = useState<string | null>(null);
   const [deliveryLoadError, setDeliveryLoadError] = useState<string | null>(null);
+  const [deliveryFileMeta, setDeliveryFileMeta] = useState<Record<string, DeliveryFileMeta>>({});
   const [revisionOpen, setRevisionOpen] = useState(false);
   const [revisionNote, setRevisionNote] = useState("");
   const [sendingRevision, setSendingRevision] = useState(false);
   const [revisionError, setRevisionError] = useState<string | null>(null);
+  const [approvingDelivery, setApprovingDelivery] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const requestIdRef = useRef<string | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     markOrderNotificationsRead(orderId);
@@ -191,7 +219,7 @@ export default function OrderWorkspace({
       const { data: history } = await supabase.current
         .from("proposals")
         .select(
-          "id, request_id, helper_id, price, currency, description, revisions_included, expires_at, status, created_at, student_note, target_price, decline_reason, revision_requested_at, replaced_by, revision_of, helper:users(id, name)",
+          "id, request_id, helper_id, price, currency, description, revisions_included, expires_at, status, created_at, student_note, decline_reason, revision_requested_at, replaced_by, revision_of, helper:users(id, name)",
         )
         .eq("request_id", proposal.request_id)
         .order("created_at", { ascending: true });
@@ -269,6 +297,57 @@ export default function OrderWorkspace({
     setDeliveryLoadError(null);
     setDeliveries((data ?? []) as DeliveryRow[]);
   }, [orderId]);
+
+  // File sizes live in storage metadata, not in the deliveries row. Read them
+  // through the participant-scoped storage policy so each file card can show
+  // its size and upload date without exposing the bucket publicly.
+  useEffect(() => {
+    let active = true;
+    const files = Array.from(new Set(deliveries.flatMap((delivery) => delivery.file_urls)));
+
+    if (files.length === 0) return;
+
+    async function loadFileMeta() {
+      const byFolder = new Map<string, string[]>();
+      for (const stored of files) {
+        const path = pathFromStoredUrl(stored);
+        if (!path) continue;
+        const folder = path.split("/").slice(0, -1).join("/");
+        byFolder.set(folder, [...(byFolder.get(folder) ?? []), path]);
+      }
+
+      const next: Record<string, DeliveryFileMeta> = {};
+      await Promise.all(
+        Array.from(byFolder.entries()).map(async ([folder, paths]) => {
+          const { data } = await supabase.current.storage
+            .from("order-files")
+            .list(folder, { limit: 100 });
+          for (const item of data ?? []) {
+            const itemPath = folder ? `${folder}/${item.name}` : item.name;
+            if (!paths.includes(itemPath)) continue;
+            const sizeValue = item.metadata?.size;
+            next[itemPath] = {
+              size: typeof sizeValue === "number" ? sizeValue : null,
+              uploadedAt: item.created_at ?? item.updated_at ?? null,
+            };
+          }
+        }),
+      );
+
+      if (!active) return;
+      const keyed: Record<string, DeliveryFileMeta> = {};
+      for (const stored of files) {
+        const path = pathFromStoredUrl(stored);
+        if (path && next[path]) keyed[stored] = next[path];
+      }
+      setDeliveryFileMeta(keyed);
+    }
+
+    void loadFileMeta();
+    return () => {
+      active = false;
+    };
+  }, [deliveries]);
 
   useEffect(() => {
     let channel: RealtimeChannel | null = null;
@@ -421,6 +500,21 @@ export default function OrderWorkspace({
   }
 
   const latestRevisionNotes = [...deliveries].filter((d) => !!d.revision_note).reverse();
+  const deliveryRows = deliveries.filter((delivery) => !delivery.revision_note);
+  const currentDelivery = deliveryRows.length > 0 ? deliveryRows[deliveryRows.length - 1] : null;
+  const deliveryHistory = [...deliveries]
+    .filter((delivery) => delivery.id !== currentDelivery?.id)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  const deliveryStatus =
+    order?.status === "completed"
+      ? { label: "Approved", tone: "green" as const }
+      : order?.status === "revision_requested"
+        ? { label: "Changes requested", tone: "orange" as const }
+        : order?.status === "delivered"
+          ? { label: "Delivered", tone: "indigo" as const }
+          : { label: "Not delivered", tone: "slate" as const };
+  const deliveryCount = deliveryRows.length;
+  const fileCount = deliveries.reduce((sum, delivery) => sum + delivery.file_urls.length, 0);
 
   async function submitDelivery() {
     if (!deliveryMessage.trim() && deliveryFiles.length === 0) {
@@ -492,14 +586,31 @@ export default function OrderWorkspace({
     }
   }
 
-  async function setOrderStatus(status: OrderStatus) {
-    const { error } = await supabase.current.from("orders").update({ status }).eq("id", orderId);
-    if (error) {
-      setDeliveryError(error.message);
+  async function approveDelivery() {
+    if (
+      !window.confirm(
+        "Approve this delivery and mark the order completed? You can leave a review next.",
+      )
+    ) {
       return;
     }
-    if (status === "completed") notifyActivity("order.completed", orderId);
-    await loadOrder();
+    setApprovingDelivery(true);
+    setDeliveryError(null);
+    try {
+      const { error } = await supabase.current
+        .from("orders")
+        .update({ status: "completed" })
+        .eq("id", orderId);
+      if (error) throw new Error(error.message);
+
+      notifyActivity("order.completed", orderId);
+      router.push(`/orders/${orderId}/review`);
+      router.refresh();
+    } catch (e) {
+      setDeliveryError(e instanceof Error ? e.message : "Could not approve the delivery.");
+    } finally {
+      setApprovingDelivery(false);
+    }
   }
 
   const tabs = [
@@ -525,7 +636,7 @@ export default function OrderWorkspace({
   ];
 
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col gap-3 h-full min-h-0">
+    <div className="w-full flex flex-col gap-3 h-full min-h-0">
       <nav className="shrink-0 flex items-center gap-1.5 text-sm text-on-surface-variant">
         <Link href={isHelper ? "/helper/orders" : "/requests"} className="hover:text-on-surface">
           {isHelper ? "Active Orders" : "My Requests"}
@@ -536,8 +647,8 @@ export default function OrderWorkspace({
         </span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0 lg:overflow-hidden lg:auto-rows-fr">
-        <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-3 min-h-0 lg:h-full">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_400px] gap-4 flex-1 min-h-0 lg:overflow-hidden lg:auto-rows-fr">
+        <div className="flex flex-col gap-3 min-h-0 lg:h-full min-w-0">
           <section className="shrink-0 flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant">
             <div className="flex items-center gap-4 min-w-0">
               <div>
@@ -558,25 +669,15 @@ export default function OrderWorkspace({
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
-              {isStudent && order.status === "completed" && (
+            {isStudent && order.status === "completed" && (
+              <div className="flex items-center gap-2 shrink-0">
                 <Link href={`/orders/${order.id}/review`}>
                   <Button size="sm" variant="outline">
                     <Star size={15} className="mr-1.5" /> Leave a Review
                   </Button>
                 </Link>
-              )}
-              {isHelper && order.status !== "completed" && (
-                <Button size="sm" onClick={() => setActiveTab("delivery")}>
-                  Submit Delivery
-                </Button>
-              )}
-              {isStudent && order.status === "delivered" && (
-                <Button size="sm" onClick={() => setActiveTab("delivery")}>
-                  Review Delivery
-                </Button>
-              )}
-            </div>
+              </div>
+            )}
           </section>
 
           <div className="shrink-0 flex items-center gap-1 border-b border-outline-variant">
@@ -639,9 +740,7 @@ export default function OrderWorkspace({
                       localCurrency={normalizeCurrency(order.charge_currency ?? order.currency)}
                     />
                   )}
-                {proposalHistory.length > 0 && (
-                  <ProposalActivity proposals={proposalHistory} />
-                )}
+                {proposalHistory.length > 0 && <ProposalActivity proposals={proposalHistory} />}
                 <Card className="p-4">
                   <div className="flex items-center justify-between gap-3 mb-4">
                     <div className="min-w-0">
@@ -828,291 +927,333 @@ export default function OrderWorkspace({
             )}
 
             {activeTab === "delivery" && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
-                <div className="flex flex-col gap-4">
-                  {isStudent && payment?.status === "paid" && (
-                    <Card className="flex flex-wrap items-center justify-between gap-3 border-success/30 bg-success-tint/30 p-4">
-                      <div>
-                        <p className="font-semibold text-on-surface">
-                          Payment complete · {chargePrice}
-                        </p>
-                        <p className="text-xs text-on-surface-variant">
-                          {payment.created_at
-                            ? `Paid ${new Date(payment.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
-                            : "Your payment is confirmed."}
-                        </p>
+              <div className="flex flex-col gap-4">
+                <section className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-4 sm:p-5">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h1 className="font-display font-bold text-xl text-on-surface">Delivery</h1>
+                        <StatusBadge tone={deliveryStatus.tone} dot>
+                          {deliveryStatus.label}
+                        </StatusBadge>
                       </div>
-                      {payment.receipt_url && (
-                        <a
-                          href={payment.receipt_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary-container px-4 py-2 text-sm font-semibold text-on-primary shadow-sm transition-colors hover:bg-primary-hover"
-                        >
-                          <Receipt size={16} /> View receipt <ExternalLink size={14} />
-                        </a>
-                      )}
-                      {!payment.receipt_url && (
-                        <p className="text-xs text-on-surface-variant">
-                          Receipt sent to your account email.
-                        </p>
-                      )}
-                    </Card>
-                  )}
-                  <Card className="p-5 border-primary-tint-line bg-primary-tint/40">
-                    {deliveryLoadError && (
-                      <p role="alert" className="mb-3 text-sm text-error">
-                        {deliveryLoadError}
+                      <p className="text-xs text-on-surface-variant mt-1 inline-flex items-center gap-1.5">
+                        <CalendarDays size={12} />
+                        {currentDelivery
+                          ? `Delivered ${formatDeliveryDate(currentDelivery.created_at)}`
+                          : "No delivery yet"}
                       </p>
-                    )}
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-3 min-w-0">
-                        <span className="w-11 h-11 rounded-xl bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-sm">
-                          <Package size={20} />
-                        </span>
-                        <div className="min-w-0">
-                          <h2 className="font-display font-semibold text-on-surface">
-                            Deliverables
-                          </h2>
-                          <p className="text-sm text-on-surface-variant mt-0.5">
-                            {isHelper
-                              ? "Upload completed work. This creates a delivery and marks the order Delivered."
-                              : deliveries.length > 0
-                                ? "Your helper has sent files. Open or download them below."
-                                : "Reviewed files appear here once your helper delivers."}
-                          </p>
-                        </div>
-                      </div>
-                      <StatusBadge tone={meta.tone} dot className="shrink-0">
-                        {meta.label}
-                      </StatusBadge>
                     </div>
-
-                    <div className="mt-4 grid grid-cols-2 gap-2">
-                      <div className="rounded-xl border border-outline-variant/70 bg-white/80 px-3 py-2">
+                    <div className="flex items-center gap-5 text-right">
+                      <div>
                         <p className="text-xs uppercase tracking-wide text-on-surface-variant">
                           Deliveries
                         </p>
                         <p className="font-display text-lg font-bold text-on-surface">
-                          {deliveries.length}
+                          {deliveryCount}
                         </p>
                       </div>
-                      <div className="rounded-xl border border-outline-variant/70 bg-white/80 px-3 py-2">
+                      <div>
                         <p className="text-xs uppercase tracking-wide text-on-surface-variant">
                           Files
                         </p>
                         <p className="font-display text-lg font-bold text-on-surface">
-                          {deliveries.reduce((sum, d) => sum + d.file_urls.length, 0)}
+                          {fileCount}
                         </p>
                       </div>
                     </div>
+                  </div>
+                </section>
 
-                    {isStudent && order.status === "delivered" && (
-                      <div className="mt-3 flex items-start gap-2 rounded-xl border border-success/30 bg-success-tint/70 px-3 py-2.5">
-                        <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-success" />
-                        <p className="text-sm text-on-surface">
-                          Review the files below, then approve the work or request changes.
-                        </p>
-                      </div>
-                    )}
-
-                    {isStudent && order.status === "revision_requested" && (
-                      <div className="mt-3 flex items-start gap-2 rounded-xl border border-warning/30 bg-warning-container/40 px-3 py-2.5">
-                        <RotateCcw size={16} className="mt-0.5 shrink-0 text-warning" />
-                        <p className="text-sm text-on-surface">
-                          Changes requested. Your helper is updating the delivery.
-                        </p>
-                      </div>
-                    )}
-
-                    {deliveries.length === 0 && (
-                      <div className="flex flex-col items-center gap-2 py-8 text-center">
-                        <span className="w-12 h-12 rounded-2xl bg-primary-container/10 flex items-center justify-center">
-                          <Package size={22} className="text-primary" />
-                        </span>
-                        <p className="text-sm font-medium text-on-surface">No deliveries yet</p>
-                        <p className="text-xs text-on-surface-variant">
-                          {isHelper
-                            ? "Submit your first deliverable below."
-                            : "Your helper hasn't delivered yet."}
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="flex flex-col gap-3">
-                      {deliveries.map((d) => (
-                        <div
-                          key={d.id}
-                          className={`p-4 rounded-xl border shadow-sm ${
-                            d.revision_note
-                              ? "border-warning/50 bg-warning-container/10"
-                              : "border-outline-variant bg-white"
-                          }`}
-                        >
-                          <div className="flex items-center justify-between gap-2 mb-2">
-                            <div className="flex items-center gap-2 text-xs font-semibold text-on-surface-variant">
-                              <span
-                                className={`w-2 h-2 rounded-full inline-block ${
-                                  d.revision_note ? "bg-warning" : "bg-success"
-                                }`}
-                              />
-                              {d.revision_note ? "Changes requested" : "Delivered"}{" "}
-                              {timeLabel(d.created_at)}
-                            </div>
-                            <span className="text-xs text-on-surface-variant">
-                              {d.file_urls.length} {d.file_urls.length === 1 ? "file" : "files"}
-                            </span>
-                          </div>
-                          {d.revision_note ? (
-                            <>
-                              <p className="text-xs font-semibold uppercase tracking-wide text-warning mb-1">
-                                What needs to be corrected
-                              </p>
-                              <p className="text-sm text-on-surface whitespace-pre-line">
-                                {d.revision_note}
-                              </p>
-                            </>
-                          ) : (
-                            d.message && <p className="text-sm text-on-surface mb-3">{d.message}</p>
-                          )}
-                          {d.file_urls.length > 0 && (
-                            <div className="flex flex-col gap-2">
-                              {d.file_urls.map((url, i) => (
-                                <SecureFileLink
-                                  key={i}
-                                  stored={url}
-                                  bucket="order-files"
-                                  showDownload
-                                  label={fileNameFromUrl(url)}
-                                  className="flex items-center gap-3 p-3 rounded-lg border border-outline-variant bg-surface-container-lowest hover:border-primary-container/50 hover:bg-primary-container/5 transition-colors"
-                                >
-                                  <span className="w-9 h-9 rounded-lg bg-primary-container/10 text-primary flex items-center justify-center shrink-0">
-                                    <FileText size={16} />
-                                  </span>
-                                  <span className="min-w-0 flex-1 text-sm font-medium text-on-surface truncate">
-                                    {fileNameFromUrl(url)}
-                                  </span>
-                                </SecureFileLink>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-
-                  {isStudent && order.status === "delivered" && (
-                    <Card className="p-5 flex flex-col gap-3 border-success/30 bg-success-tint/30">
-                      <div>
-                        <h3 className="font-semibold text-on-surface">
-                          How did the delivery look?
-                        </h3>
-                        <p className="text-xs text-on-surface-variant mt-1">
-                          Approve to release the order, or ask for corrections first.
-                        </p>
-                      </div>
-
-                      {revisionOpen ? (
-                        <div className="flex flex-col gap-3">
-                          <div className="flex flex-col gap-1.5">
-                            <Textarea
-                              id="revision-note"
-                              label="What needs to be corrected?"
-                              rows={4}
-                              value={revisionNote}
-                              onChange={(e) => {
-                                setRevisionNote(e.target.value);
-                                setRevisionError(null);
-                              }}
-                              placeholder="e.g. Section 2 still needs the regression output explained in your own words, and the reference list is missing two sources."
-                            />
-                            <p className="text-xs text-on-surface-variant">
-                              Your helper sees this note and works through it before delivering
-                              again.
+                {isStudent && order.status === "delivered" && (
+                  <div className="sticky top-16 z-20 rounded-2xl border border-success/30 bg-success-tint/95 p-4 shadow-sm backdrop-blur lg:top-0">
+                    {revisionOpen ? (
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <h2 className="font-semibold text-on-surface">
+                              How did the delivery look?
+                            </h2>
+                            <p className="text-xs text-on-surface-variant mt-1">
+                              Tell your helper exactly what needs to change.
                             </p>
                           </div>
-                          {revisionError && <p className="text-sm text-error">{revisionError}</p>}
-                          <div className="flex items-center gap-2">
-                            <Button onClick={submitRevisionRequest} disabled={sendingRevision}>
-                              {sendingRevision ? (
-                                <Loader2 size={15} className="animate-spin" />
-                              ) : (
-                                <RotateCcw size={15} />
-                              )}
-                              Send change request
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              onClick={() => {
-                                setRevisionOpen(false);
-                                setRevisionNote("");
-                                setRevisionError(null);
-                              }}
-                              disabled={sendingRevision}
-                            >
-                              Cancel
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col gap-2">
-                          <Button onClick={() => setOrderStatus("completed")} className="w-full">
-                            <Check size={15} /> Approve &amp; Complete
-                          </Button>
-                          <Button variant="outline" onClick={() => setRevisionOpen(true)}>
-                            <RotateCcw size={15} /> Request a Change
-                          </Button>
-                        </div>
-                      )}
-                      {deliveryError && <p className="text-sm text-error">{deliveryError}</p>}
-                    </Card>
-                  )}
-
-                  {isStudent && order.status === "revision_requested" && (
-                    <Card className="p-5">
-                      <div className="flex items-center gap-2">
-                        <RotateCcw size={16} className="text-warning" />
-                        <p className="text-sm font-medium text-on-surface">Revision requested</p>
-                      </div>
-                      <p className="text-xs text-on-surface-variant mt-1">
-                        Your helper is working through the notes below — you&apos;ll see the revised
-                        delivery here.
-                      </p>
-                      <ul className="mt-3 flex flex-col gap-2">
-                        {latestRevisionNotes.map((d) => (
-                          <li
-                            key={d.id}
-                            className="text-sm text-on-surface border-l-2 border-warning pl-3"
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setRevisionOpen(false);
+                              setRevisionNote("");
+                              setRevisionError(null);
+                            }}
+                            disabled={sendingRevision}
                           >
-                            {d.revision_note}
-                          </li>
-                        ))}
-                      </ul>
-                    </Card>
-                  )}
-
-                  {isStudent && order.status === "completed" && (
-                    <Card className="p-5 flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 size={18} className="text-success" />
+                            Cancel
+                          </Button>
+                        </div>
+                        <Textarea
+                          id="revision-note"
+                          label="What needs to be corrected?"
+                          rows={3}
+                          required
+                          value={revisionNote}
+                          onChange={(e) => {
+                            setRevisionNote(e.target.value);
+                            setRevisionError(null);
+                          }}
+                          placeholder="e.g. Section 2 still needs the regression output explained in your own words, and the reference list is missing two sources."
+                        />
+                        <p className="text-xs text-on-surface-variant">
+                          Your helper sees this note and works through it before delivering again.
+                        </p>
+                        {revisionError && <p className="text-sm text-error">{revisionError}</p>}
+                        <div className="flex items-center gap-2">
+                          <Button
+                            onClick={submitRevisionRequest}
+                            disabled={sendingRevision || !revisionNote.trim()}
+                          >
+                            {sendingRevision ? (
+                              <Loader2 size={15} className="animate-spin" />
+                            ) : (
+                              <RotateCcw size={15} />
+                            )}
+                            Send change request
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                          <p className="font-semibold text-on-surface">Order completed</p>
-                          <p className="text-xs text-on-surface-variant">
-                            Share your experience below.
+                          <h2 className="font-semibold text-on-surface">
+                            How did the delivery look?
+                          </h2>
+                          <p className="text-xs text-on-surface-variant mt-1">
+                            Approve to release the order, or ask for corrections first.
                           </p>
                         </div>
+                        <div className="flex flex-col gap-2 sm:flex-row sm:shrink-0">
+                          <Button onClick={approveDelivery} disabled={approvingDelivery}>
+                            {approvingDelivery ? (
+                              <Loader2 size={15} className="animate-spin" />
+                            ) : (
+                              <Check size={15} />
+                            )}
+                            Approve delivery
+                          </Button>
+                          <Button variant="secondary" onClick={() => setRevisionOpen(true)}>
+                            <RotateCcw size={15} /> Request changes
+                          </Button>
+                        </div>
                       </div>
-                      <Link href={`/orders/${order.id}/review`}>
-                        <Button size="sm">
-                          <Star size={14} /> Review
-                        </Button>
-                      </Link>
+                    )}
+                    {deliveryError && <p className="mt-3 text-sm text-error">{deliveryError}</p>}
+                  </div>
+                )}
+
+                {isStudent && payment?.status === "paid" && (
+                  <Card className="flex flex-wrap items-center justify-between gap-3 border-success/30 bg-success-tint/30 p-4">
+                    <div>
+                      <p className="font-semibold text-on-surface">
+                        Payment complete · {chargePrice}
+                      </p>
+                      <p className="text-xs text-on-surface-variant">
+                        {payment.created_at
+                          ? `Paid ${new Date(payment.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+                          : "Your payment is confirmed."}
+                      </p>
+                    </div>
+                    {payment.receipt_url && (
+                      <a
+                        href={payment.receipt_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary-container px-4 py-2 text-sm font-semibold text-on-primary shadow-sm transition-colors hover:bg-primary-hover"
+                      >
+                        <Receipt size={16} /> View receipt <ExternalLink size={14} />
+                      </a>
+                    )}
+                    {!payment.receipt_url && (
+                      <p className="text-xs text-on-surface-variant">
+                        Receipt sent to your account email.
+                      </p>
+                    )}
+                  </Card>
+                )}
+
+                {isStudent && order.status === "revision_requested" && (
+                  <div className="flex items-start gap-2 rounded-xl border border-warning/30 bg-warning-container/40 px-3 py-2.5">
+                    <RotateCcw size={16} className="mt-0.5 shrink-0 text-warning" />
+                    <p className="text-sm text-on-surface">
+                      Changes requested. Your helper is updating the delivery.
+                    </p>
+                  </div>
+                )}
+
+                {deliveryLoadError && (
+                  <p role="alert" className="text-sm text-error">
+                    {deliveryLoadError}
+                  </p>
+                )}
+
+                {!currentDelivery ? (
+                  <EmptyState
+                    icon={<Package size={24} className="text-primary" />}
+                    title="No delivery yet"
+                    message={
+                      isHelper
+                        ? "Upload your completed files below to deliver the work."
+                        : "Your helper hasn't delivered any files yet."
+                    }
+                  />
+                ) : (
+                  <>
+                    <Card className="p-5">
+                      <div className="mb-4 flex items-center justify-between gap-3">
+                        <h2 className="font-display font-semibold text-on-surface">
+                          Delivered files
+                        </h2>
+                        <span className="text-xs text-on-surface-variant">
+                          {currentDelivery.file_urls.length}{" "}
+                          {currentDelivery.file_urls.length === 1 ? "file" : "files"}
+                        </span>
+                      </div>
+                      {currentDelivery.file_urls.length === 0 ? (
+                        <p className="text-sm text-on-surface-variant">
+                          No files were attached to this delivery.
+                        </p>
+                      ) : (
+                        <div className="flex flex-col gap-3">
+                          {currentDelivery.file_urls.map((stored, index) => {
+                            const fileMeta = deliveryFileMeta[stored];
+                            const uploadedAt = fileMeta?.uploadedAt ?? currentDelivery.created_at;
+                            return (
+                              <SecureFileLink
+                                key={`${currentDelivery.id}-${index}-${stored}`}
+                                stored={stored}
+                                bucket="order-files"
+                                showDownload
+                                label={fileNameFromUrl(stored)}
+                                className="flex w-full items-center gap-3 rounded-xl border border-outline-variant bg-surface p-4 transition-colors hover:border-primary-container/50 hover:bg-primary-container/5"
+                              >
+                                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-container/10 text-primary">
+                                  <FileText size={18} />
+                                </span>
+                                <span className="min-w-0 flex-1">
+                                  <span className="block truncate text-sm font-medium text-on-surface">
+                                    {fileNameFromUrl(stored)}
+                                  </span>
+                                  <span className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-on-surface-variant">
+                                    <span>{formatFileSize(fileMeta?.size)}</span>
+                                    <span className="inline-flex items-center gap-1">
+                                      <CalendarDays size={11} />
+                                      {formatDeliveryDate(uploadedAt)}
+                                    </span>
+                                  </span>
+                                </span>
+                              </SecureFileLink>
+                            );
+                          })}
+                        </div>
+                      )}
                     </Card>
-                  )}
-                </div>
+
+                    <Card className="p-5">
+                      <h2 className="font-display font-semibold text-on-surface">
+                        Helper&apos;s delivery note
+                      </h2>
+                      <p className="mt-2 whitespace-pre-line text-sm text-on-surface-variant">
+                        {currentDelivery.message || "No delivery note was added."}
+                      </p>
+                    </Card>
+
+                    <Card className="p-5">
+                      <div className="flex items-center justify-between gap-3">
+                        <h2 className="font-display font-semibold text-on-surface">
+                          Delivery history
+                        </h2>
+                        <span className="text-xs text-on-surface-variant">Newest first</span>
+                      </div>
+                      {deliveryHistory.length === 0 ? (
+                        <p className="mt-2 text-sm text-on-surface-variant">
+                          No earlier deliveries or change requests.
+                        </p>
+                      ) : (
+                        <ul className="mt-1 flex flex-col divide-y divide-outline-variant/50">
+                          {deliveryHistory.map((entry) => (
+                            <li
+                              key={entry.id}
+                              className="flex items-start justify-between gap-3 py-3 first:pt-2 last:pb-0"
+                            >
+                              <div className="min-w-0">
+                                <p className="inline-flex items-center gap-1.5 text-sm font-medium text-on-surface">
+                                  {entry.revision_note ? (
+                                    <RotateCcw size={13} className="shrink-0 text-warning" />
+                                  ) : (
+                                    <Package size={13} className="shrink-0 text-primary" />
+                                  )}
+                                  {entry.revision_note ? "Changes requested" : "Delivery"}
+                                </p>
+                                <p className="mt-0.5 line-clamp-2 text-xs text-on-surface-variant">
+                                  {entry.revision_note ||
+                                    entry.message ||
+                                    `${entry.file_urls.length} ${entry.file_urls.length === 1 ? "file" : "files"} delivered`}
+                                </p>
+                              </div>
+                              <span className="shrink-0 text-xs text-on-surface-variant">
+                                {timeLabel(entry.created_at)}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </Card>
+                  </>
+                )}
+
+                {isStudent && order.status === "revision_requested" && (
+                  <Card className="p-5">
+                    <div className="flex items-center gap-2">
+                      <RotateCcw size={16} className="text-warning" />
+                      <p className="text-sm font-medium text-on-surface">Revision requested</p>
+                    </div>
+                    <p className="text-xs text-on-surface-variant mt-1">
+                      Your helper is working through the notes below — you&apos;ll see the revised
+                      delivery here.
+                    </p>
+                    <ul className="mt-3 flex flex-col gap-2">
+                      {latestRevisionNotes.map((d) => (
+                        <li
+                          key={d.id}
+                          className="text-sm text-on-surface border-l-2 border-warning pl-3"
+                        >
+                          {d.revision_note}
+                        </li>
+                      ))}
+                    </ul>
+                  </Card>
+                )}
+
+                {isStudent && order.status === "completed" && (
+                  <Card className="p-5 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 size={18} className="text-success" />
+                      <div>
+                        <p className="font-semibold text-on-surface">Order completed</p>
+                        <p className="text-xs text-on-surface-variant">
+                          Share your experience below.
+                        </p>
+                      </div>
+                    </div>
+                    <Link href={`/orders/${order.id}/review`}>
+                      <Button size="sm">
+                        <Star size={14} /> Review
+                      </Button>
+                    </Link>
+                  </Card>
+                )}
 
                 {isHelper && (
-                  <Card className="p-5 sticky top-6">
+                  <Card className="p-5">
                     {order.status === "revision_requested" && latestRevisionNotes.length > 0 && (
                       <div className="mb-4 rounded-xl border border-warning/50 bg-warning-container/10 p-3">
                         <p className="text-sm font-semibold text-on-surface flex items-center gap-1.5">
@@ -1181,7 +1322,7 @@ export default function OrderWorkspace({
                       {deliveryError && <p className="text-sm text-error">{deliveryError}</p>}
 
                       <Button
-                        disabled={submittingDelivery}
+                        disabled={submittingDelivery || deliveryFiles.length === 0}
                         onClick={submitDelivery}
                         className="w-full justify-center"
                       >
@@ -1202,7 +1343,7 @@ export default function OrderWorkspace({
             )}
           </div>
         </div>
-        <div className="hidden lg:flex flex-col lg:col-span-5 xl:col-span-4 min-h-0 lg:h-full lg:sticky lg:top-0">
+        <div className="hidden lg:flex flex-col min-h-0 lg:h-full lg:sticky lg:top-0 min-w-0">
           {proposalHistory.length > 0 && (
             <ProposalActivity
               proposals={proposalHistory}

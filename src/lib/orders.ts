@@ -58,13 +58,12 @@ export async function requestProposalRevision(
   proposal_id: string,
   request_id: string,
   note?: string,
-  target_price?: number,
 ): Promise<{ ok: true } | { error: string }> {
   try {
     const response = await fetch("/api/proposals/revision", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ proposal_id, request_id, note, target_price }),
+      body: JSON.stringify({ proposal_id, request_id, note }),
     });
     const data = (await response.json().catch(() => null)) as {
       ok?: boolean;

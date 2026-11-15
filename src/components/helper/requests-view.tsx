@@ -114,7 +114,7 @@ export default function HelperRequestsView({
           const alreadyProposed = proposedIds.has(req.id);
           return (
             <Link key={req.id} href={`/helper/requests/${req.id}`} className="block">
-              <Card className="p-6" hover>
+              <Card className="p-5" hover>
                 <div className="flex items-start gap-4">
                   <Avatar name={req.student?.name || "Student"} size="lg" />
                   <div className="flex-1 min-w-0">

@@ -19,7 +19,6 @@ import {
   clearPendingDraft,
   loadDraftFiles,
   clearDraftFiles,
-  TERMS_VERSION,
 } from "@/lib/requests";
 
 import { OTHER_OPTION, withCustom } from "@/lib/constants";
@@ -106,6 +105,7 @@ export default function NewRequestView({
     dueTime: LAST_DUE_TIME,
     pages: "",
     details: "",
+    country: defaultCountry,
     files: [],
   });
   const [submitting, setSubmitting] = useState(false);
@@ -138,8 +138,8 @@ export default function NewRequestView({
       const d = loadPendingDraft();
       const saved = await loadDraftFiles();
       if (cancelled) return;
+      if (d) clearPendingDraft();
       if (d) {
-        clearPendingDraft();
         const dd = resolveDraftSelection(HELP_TYPE_OPTIONS, d.service);
         const ds = resolveDraftSelection(SUBJECT_OPTIONS, d.subject);
         setValues((prev) => ({
@@ -154,7 +154,6 @@ export default function NewRequestView({
           details: d.details ?? prev.details,
           level: d.level ?? prev.level,
         }));
-        if (d.termsAcceptedFromHome) setTermsAccepted(true);
       }
       if (saved.length > 0) setValues((prev) => ({ ...prev, files: saved }));
       setReady(true);
@@ -175,9 +174,10 @@ export default function NewRequestView({
       : values.subject;
 
   const effectiveCountry =
-    !countryKnown && typeof window !== "undefined"
+    values.country?.trim() ||
+    (!countryKnown && typeof window !== "undefined"
       ? (countryNameFor(browserRegion()) ?? defaultCountry)
-      : defaultCountry;
+      : defaultCountry);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -244,8 +244,6 @@ export default function NewRequestView({
           : null,
         files: values.files,
         idempotencyKey: getSubmissionKey(),
-        termsAcceptedAt: new Date().toISOString(),
-        termsVersion: TERMS_VERSION,
       });
 
       if ("error" in result) {
@@ -320,6 +318,7 @@ export default function NewRequestView({
                 submitting={submitting}
                 termsAccepted={termsAccepted}
                 setTermsAccepted={setTermsAccepted}
+                showCountry={true}
                 submitLabel="Send Task Request"
                 note="Your request goes straight to our verified academic helper. No charge until you accept a proposal."
               />

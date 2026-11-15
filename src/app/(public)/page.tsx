@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { roleToHome } from "@/lib/auth";
 import { CheckCircle, ArrowRight, BookOpen, Sparkles, Clock, Users } from "lucide-react";
 import { MaterialIcon } from "@/lib/icons-map";
 import PriceEstimateForm from "@/components/marketing/price-estimate-form";
@@ -145,8 +147,8 @@ const services = [
 
 // Shared default for process cards. Subject and service cards pick up their
 // own accents from `accent-styles`.
-// Nine subjects promoted on the homepage; every subject page stays reachable
-// from /subjects.
+// Eight subjects promoted on the homepage so the 2-column grid ends in a full row;
+// every subject page stays reachable from /subjects.
 const HOMEPAGE_SUBJECTS = [
   "english-literature",
   "chemistry",
@@ -156,11 +158,24 @@ const HOMEPAGE_SUBJECTS = [
   "physics",
   "computer-science",
   "engineering",
-  "academic-writing",
 ] as const;
 
 export default async function HomePage() {
   const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    redirect(roleToHome(profile?.role));
+  }
+
   const { data: reviewRows, error: reviewsError } = await supabase
     .from("helper_reviews")
     .select("id, rating, comment, created_at, student_name, student_avatar_url")
@@ -277,8 +292,8 @@ export default async function HomePage() {
     return { ...subject, detail: HOMEPAGE_SUBJECT_DETAIL[slug] ?? "" };
   });
 
-  // Six category cards plus three individual guides keeps the row at nine
-  // entries while every description comes from the resource data itself.
+  // Six category cards plus two individual guides keeps the grid at eight
+  // entries so the 4-column (and 2-column) grid ends in a full row.
   const homepageGuides = [
     ...RESOURCE_CATEGORIES.map((category) => ({
       key: `category-${category.slug}`,
@@ -291,7 +306,7 @@ export default async function HomePage() {
       accent: accentForGuideCategory(category.slug),
     })),
     ...ALL_RESOURCES.filter((resource) => resource.featured)
-      .slice(0, 3)
+      .slice(0, 2)
       .map((resource) => ({
         key: `guide-${resource.slug}`,
         href: `/resources/${resource.category}/${resource.slug}`,

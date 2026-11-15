@@ -105,6 +105,29 @@ export default function RequestWorkspace({
   const [sendingBid, setSendingBid] = useState(false);
   const [bidError, setBidError] = useState<string | null>(null);
   const [bidNotice, setBidNotice] = useState<string | null>(null);
+  const [previewFinalCad, setPreviewFinalCad] = useState<number | null>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      const raw = Number(bidPrice);
+      if (!Number.isFinite(raw) || raw <= 0) {
+        setPreviewFinalCad(null);
+        return;
+      }
+      try {
+        const res = await fetch(`/api/proposals/preview?base=${raw}&requestId=${requestId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (typeof data.finalCad === "number") {
+            setPreviewFinalCad(data.finalCad);
+          }
+        }
+      } catch {
+        // ignore preview failure
+      }
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [bidPrice, requestId]);
 
   const [view, setView] = useState<"chat" | "details">("chat");
 
@@ -159,7 +182,7 @@ export default function RequestWorkspace({
     const { data } = await supabase.current
       .from("proposals")
       .select(
-        "id, request_id, helper_id, price, currency, description, revisions_included, expires_at, status, created_at, student_note, target_price, decline_reason, revision_requested_at, replaced_by, revision_of, helper:users(id, name)",
+        "id, request_id, helper_id, price, base_cad, final_cad, fee_cad, currency, description, revisions_included, expires_at, status, created_at, student_note, decline_reason, revision_requested_at, replaced_by, revision_of, helper:users(id, name)",
       )
       .eq("request_id", requestId)
       .order("created_at", { ascending: false });
@@ -181,17 +204,6 @@ export default function RequestWorkspace({
       normalized.find((p) => ["pending", "revision_requested", "accepted"].includes(p.status)) ??
       null;
     setProposal(active);
-
-    // When the student asks for a different price, start the helper's revised
-    // quote form at their target (still fully editable). This runs in the async
-    // loader rather than an effect so it never cascades renders.
-    if (
-      active?.status === "revision_requested" &&
-      typeof active.target_price === "number" &&
-      active.target_price > 0
-    ) {
-      setBidPrice((current) => current || String(Math.round(active.target_price as number)));
-    }
 
     if (!active || active.status !== "accepted") {
       setOrderId(null);
@@ -663,11 +675,6 @@ export default function RequestWorkspace({
                         <p className="mt-1 text-xs text-on-surface-variant whitespace-pre-line">
                           “{proposal.student_note}”
                         </p>
-                        {typeof proposal.target_price === "number" && proposal.target_price > 0 && (
-                          <p className="mt-1 text-xs font-medium text-on-surface">
-                            Target price: C${Math.round(proposal.target_price)}
-                          </p>
-                        )}
                       </div>
                     )}
                     <div className="w-full sm:max-w-64">
@@ -690,6 +697,11 @@ export default function RequestWorkspace({
                       <p className="mt-1 text-xs text-on-surface-variant">
                         Charged in Canadian dollars (CAD).
                       </p>
+                      {previewFinalCad !== null && (
+                        <p className="mt-1 text-xs font-semibold text-primary">
+                          Student will see: C${previewFinalCad.toFixed(2)}
+                        </p>
+                      )}
                     </div>
                     <div className="mt-3 flex items-start gap-2 p-2.5 rounded-lg bg-surface-container-low border border-outline-variant">
                       <RotateCcw size={14} className="text-primary shrink-0 mt-0.5" />

@@ -48,9 +48,6 @@ export default function HelperProfile({
         <div className="flex items-center gap-4 sm:gap-5">
           <div className="flex flex-col items-center gap-1.5 shrink-0">
             <Avatar name={displayName} role="helper" size="xl" src={avatarUrl ?? undefined} />
-            <button type="button" className="text-xs font-medium text-primary hover:underline">
-              Change photo
-            </button>
           </div>
           <div className="min-w-0">
             <h2 className="font-display font-semibold text-lg text-on-surface truncate">

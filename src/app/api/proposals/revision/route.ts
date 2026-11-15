@@ -13,7 +13,6 @@ export async function POST(request: Request) {
     proposal_id?: unknown;
     request_id?: unknown;
     note?: unknown;
-    target_price?: unknown;
   };
   try {
     body = await request.json();
@@ -46,17 +45,6 @@ export async function POST(request: Request) {
     }
   }
 
-  let targetPrice: number | null = null;
-  if (body.target_price !== undefined && body.target_price !== null) {
-    if (typeof body.target_price !== "number" || !Number.isFinite(body.target_price)) {
-      return NextResponse.json({ error: "Enter a valid target price." }, { status: 400 });
-    }
-    targetPrice = Math.round(body.target_price);
-    if (targetPrice <= 0) {
-      return NextResponse.json({ error: "Enter a positive target price." }, { status: 400 });
-    }
-  }
-
   const supabase = await createClient();
   const {
     data: { user },
@@ -72,7 +60,7 @@ export async function POST(request: Request) {
     p_proposal_id: proposalId,
     p_request_id: requestId,
     p_note: note,
-    p_target_price: targetPrice,
+    p_target_price: null,
   });
 
   if (error) {

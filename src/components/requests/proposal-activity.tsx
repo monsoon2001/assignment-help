@@ -4,7 +4,10 @@ import { formatCurrency, normalizeCurrency } from "@/lib/currency";
 import type { RequestProposal } from "@/components/requests/proposal-card";
 
 function eventTitle(proposal: RequestProposal): string {
-  const amount = formatCurrency(Number(proposal.price), normalizeCurrency(proposal.currency));
+  const amount = formatCurrency(
+    Number(proposal.final_cad ?? proposal.price),
+    normalizeCurrency(proposal.currency),
+  );
   switch (proposal.status) {
     case "pending":
       return `The helper sent a quote of ${amount}.`;
@@ -71,11 +74,6 @@ export default function ProposalActivity({
             {proposal.student_note && (
               <p className="mt-0.5 text-xs text-on-surface-variant whitespace-pre-line">
                 “{proposal.student_note}”
-              </p>
-            )}
-            {typeof proposal.target_price === "number" && proposal.target_price > 0 && (
-              <p className="mt-0.5 text-xs text-on-surface-variant">
-                Target price: {formatCurrency(proposal.target_price, "CAD")}
               </p>
             )}
             {proposal.decline_reason && (

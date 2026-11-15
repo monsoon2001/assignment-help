@@ -86,7 +86,7 @@ export async function proxy(request: NextRequest) {
 
   const home = roleToHome(role);
 
-  if (isAuthRoute(pathname)) {
+  if (pathname === "/" || isAuthRoute(pathname)) {
     return NextResponse.redirect(new URL(home, request.url));
   }
 

@@ -93,7 +93,7 @@ export default async function HelperOrders() {
           const subject = order.proposal?.request?.subject ?? "General";
           return (
             <Link key={order.id} href={`/helper/orders/${order.id}`} className="block">
-              <Card className="p-6" hover>
+              <Card className="p-5" hover>
                 <div className="flex items-start gap-4">
                   <Avatar name={order.student?.name || "Student"} />
                   <div className="flex-1 min-w-0">

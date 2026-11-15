@@ -93,14 +93,26 @@ const nextConfig: NextConfig = {
       "www.acadivo.com",
       "acadivo.vercel.app",
     ];
-    return hosts.flatMap((host) => [
+    return [
       {
-        source: "/:path*",
-        has: [{ type: "host", value: host }],
-        destination: `${canonical}/:path*`,
+        source: "/login",
+        destination: "/sign-in",
         permanent: true,
       },
-    ]);
+      {
+        source: "/signup",
+        destination: "/sign-up",
+        permanent: true,
+      },
+      ...hosts.flatMap((host) => [
+        {
+          source: "/:path*",
+          has: [{ type: "host" as const, value: host }],
+          destination: `${canonical}/:path*`,
+          permanent: true,
+        },
+      ]),
+    ];
   },
 };
 

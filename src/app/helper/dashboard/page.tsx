@@ -10,6 +10,10 @@ import {
   FileText,
   Inbox,
   Sparkles,
+  AlertCircle,
+  BookOpen,
+  Calendar,
+  ChevronRight,
 } from "lucide-react";
 import Button from "@/components/ui/button";
 import { EmptyState, PanelEmpty } from "@/components/ui/states";
@@ -31,6 +35,22 @@ function timeAgo(value: string): string {
   return `${days}d ago`;
 }
 
+function respondWithinLabel(createdAt: string): { label: string; overdue: boolean } {
+  const windowMs = 2 * 60 * 60 * 1000; // 2 hours
+  const elapsed = Date.now() - new Date(createdAt).getTime();
+  const remaining = windowMs - elapsed;
+  if (remaining <= 0) return { label: "Overdue", overdue: true };
+  const mins = Math.floor(remaining / 60000);
+  if (mins < 60) return { label: `Respond within ${mins}m`, overdue: false };
+  const hrs = Math.floor(mins / 60);
+  return { label: `Respond within ${hrs}h`, overdue: false };
+}
+
+function deadlineLabel(value: string | null): string {
+  if (!value) return "Flexible";
+  return new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 export default async function HelperDashboard() {
   const supabase = await createClient();
   const {
@@ -44,29 +64,40 @@ export default async function HelperDashboard() {
   const today = new Date();
   const monthStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
 
-  const [{ data: orderRows }, { data: reqRows }, { data: notifRows }, { data: payRows }] =
-    await Promise.all([
-      supabase
-        .from("orders")
-        .select(
-          "id, status, price, currency, deadline, created_at, student:users!orders_student_id_fkey(id, name), proposal:proposals(request:requests(title))",
-        )
-        .eq("helper_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(30),
-      supabase
-        .from("requests")
-        .select("id, title, subject, status")
-        .eq("helper_id", user.id)
-        .in("status", ["requested", "proposal_sent"]),
-      supabase
-        .from("notifications")
-        .select("id, type, message, link, read, created_at")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(5),
-      supabase.from("helper_payouts").select("amount_sent_cad, paid_at"),
-    ]);
+  const [
+    { data: orderRows },
+    { data: reqRows },
+    { data: notifRows },
+    { data: payRows },
+    { data: proposalRows },
+  ] = await Promise.all([
+    supabase
+      .from("orders")
+      .select(
+        "id, status, price, currency, deadline, created_at, student:users!orders_student_id_fkey(id, name), proposal:proposals(request:requests(title))",
+      )
+      .eq("helper_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(30),
+    supabase
+      .from("requests")
+      .select(
+        "id, title, subject, status, deadline, created_at, student:users!requests_student_id_fkey(id, name)",
+      )
+      .eq("helper_id", user.id)
+      .in("status", ["requested", "proposal_sent"]),
+    supabase
+      .from("notifications")
+      .select("id, type, message, link, read, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(5),
+    supabase.from("helper_payouts").select("amount_sent_cad, paid_at"),
+    supabase
+      .from("proposals")
+      .select("id, request_id")
+      .eq("helper_id", user.id),
+  ]);
 
   const orders = (orderRows ?? []).map((o) => ({
     ...o,
@@ -81,7 +112,33 @@ export default async function HelperDashboard() {
 
   const activeOrders = orders.filter((o) => o.status !== "completed");
   const awaitingReview = orders.filter((o) => o.status === "delivered").length;
-  const incoming = reqRows ?? [];
+
+  // Requests that need a quote: status "requested" and no proposal sent yet from this helper
+  const proposedRequestIds = new Set((proposalRows ?? []).map((p) => p.request_id));
+
+  type RawIncomingReq = {
+    id: string;
+    title: string;
+    subject: string | null;
+    status: string;
+    deadline: string | null;
+    created_at: string;
+    student: { id: string; name: string | null }[] | null;
+  };
+
+  const allIncoming = (reqRows ?? []) as unknown as RawIncomingReq[];
+  const incoming = allIncoming;
+
+  // Action required = status "requested" and no existing proposal from this helper
+  const actionRequired = allIncoming
+    .filter((r) => r.status === "requested" && !proposedRequestIds.has(r.id))
+    .map((r) => ({
+      ...r,
+      student: (Array.isArray(r.student) ? (r.student[0] ?? null) : r.student) as {
+        id: string;
+        name: string | null;
+      } | null,
+    }));
 
   const monthPaid = (payRows ?? []).filter(
     (p) => new Date(p.paid_at).getTime() >= new Date(monthStart).getTime(),
@@ -137,9 +194,11 @@ export default async function HelperDashboard() {
             Hi, {firstName}
           </h1>
           <p className="text-on-surface-variant text-sm sm:text-base mt-1">
-            {incoming.length > 0
-              ? `You have ${incoming.length} incoming request${incoming.length === 1 ? "" : "s"} waiting for a proposal.`
-              : "Here's what needs your attention today."}
+            {actionRequired.length > 0
+              ? `You have ${actionRequired.length} request${actionRequired.length === 1 ? "" : "s"} waiting for a quote.`
+              : incoming.length > 0
+                ? `You have ${incoming.length} incoming request${incoming.length === 1 ? "" : "s"} waiting for a proposal.`
+                : "Here's what needs your attention today."}
           </p>
         </div>
         <Link href="/helper/requests">
@@ -149,6 +208,69 @@ export default async function HelperDashboard() {
           </Button>
         </Link>
       </div>
+
+      {/* Action Required */}
+      {actionRequired.length > 0 && (
+        <section className="flex flex-col gap-4" aria-label="Action required">
+          <div className="flex items-center gap-3">
+            <h2 className="font-display text-lg font-bold text-on-surface">
+              Action Required
+            </h2>
+            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary text-on-primary text-xs font-bold">
+              {actionRequired.length}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {actionRequired.map((req) => {
+              const countdown = respondWithinLabel(req.created_at);
+              const studentFirstName = req.student?.name?.split(/\s+/)[0] ?? "Student";
+              return (
+                <Card key={req.id} className="p-5 transition-shadow hover:shadow-lg" hover>
+                  <Link href={`/helper/requests/${req.id}`} className="block">
+                    <div className="flex items-start gap-3">
+                      <span className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-accent-tint text-on-accent-tint">
+                        <AlertCircle size={18} />
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-on-surface truncate">{req.title}</p>
+                        <p className="text-sm text-on-surface-variant mt-0.5 truncate">
+                          From {studentFirstName}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex flex-col gap-1.5">
+                      {req.subject && (
+                        <span className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant">
+                          <BookOpen size={12} />
+                          {req.subject}
+                        </span>
+                      )}
+                      <span className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant">
+                        <Calendar size={12} />
+                        Due {deadlineLabel(req.deadline)}
+                      </span>
+                    </div>
+                    <div className="mt-3 flex items-center justify-between">
+                      <span
+                        className={`text-xs font-medium px-2 py-1 rounded-full ${
+                          countdown.overdue
+                            ? "bg-error/10 text-error"
+                            : "bg-accent-tint text-on-accent-tint"
+                        }`}
+                      >
+                        {countdown.label}
+                      </span>
+                      <span className="text-sm font-medium text-primary inline-flex items-center gap-1">
+                        View &amp; quote <ChevronRight size={14} />
+                      </span>
+                    </div>
+                  </Link>
+                </Card>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* At a glance */}
       <section className="grid grid-cols-3 gap-2.5 sm:gap-4" aria-label="At a glance">
@@ -244,7 +366,7 @@ export default async function HelperDashboard() {
         {/* Right rail: incoming + activity */}
         <div className="space-y-6">
           <section>
-            <div className="flex items-center justify-between gap-4 mb-3">
+            <div className="flex items-center justify-between gap-4 mb-4">
               <h2 className="font-display text-lg font-semibold text-on-surface">
                 Incoming Requests
               </h2>
@@ -285,7 +407,7 @@ export default async function HelperDashboard() {
           </section>
 
           <section>
-            <div className="flex items-center justify-between gap-4 mb-3">
+            <div className="flex items-center justify-between gap-4 mb-4">
               <h2 className="font-display text-lg font-semibold text-on-surface">
                 Recent Activity
               </h2>

@@ -24,6 +24,9 @@ export type RequestProposal = {
   request_id: string;
   helper_id: string;
   price: number;
+  base_cad?: number | null;
+  final_cad?: number | null;
+  fee_cad?: number | null;
   currency?: string | null;
   description: string | null;
   revisions_included: number;
@@ -31,7 +34,6 @@ export type RequestProposal = {
   status: string;
   created_at: string;
   student_note?: string | null;
-  target_price?: number | null;
   decline_reason?: string | null;
   revision_requested_at?: string | null;
   replaced_by?: string | null;
@@ -83,11 +85,11 @@ export default function ProposalCard({
   const [error, setError] = useState<string | null>(null);
   const [panel, setPanel] = useState<"none" | "revise" | "decline">("none");
   const [revisionNote, setRevisionNote] = useState("");
-  const [targetPrice, setTargetPrice] = useState("");
   const [declineReason, setDeclineReason] = useState("");
 
   const currency = normalizeCurrency(proposal.currency);
-  const basePrice = Number(proposal.price);
+  const effectivePrice = Number(proposal.final_cad ?? proposal.price);
+  const basePrice = effectivePrice;
 
   const awaitingPayment =
     proposal.status === "accepted" && !!orderId && orderStatus === "payment_pending" && !orderPaid;
@@ -113,7 +115,6 @@ export default function ProposalCard({
   function resetPanels() {
     setPanel("none");
     setRevisionNote("");
-    setTargetPrice("");
     setDeclineReason("");
     setError(null);
   }
@@ -141,25 +142,12 @@ export default function ProposalCard({
 
   async function handleRequestRevision() {
     if (busy) return;
-    const trimmedTarget = targetPrice.trim();
-    const parsedTarget = trimmedTarget ? Number(trimmedTarget) : null;
-    if (
-      parsedTarget !== null &&
-      (!Number.isFinite(parsedTarget) ||
-        parsedTarget <= 0 ||
-        !Number.isSafeInteger(Math.round(parsedTarget)))
-    ) {
-      setError("Enter a valid whole-number target price, or leave it blank.");
-      return;
-    }
-
     setBusy("revise");
     setError(null);
     const result = await requestProposalRevision(
       proposal.id,
       proposal.request_id,
       revisionNote.trim() || undefined,
-      parsedTarget === null ? undefined : Math.round(parsedTarget),
     );
     setBusy(null);
     if ("error" in result) {
@@ -308,11 +296,6 @@ export default function ProposalCard({
                 “{proposal.student_note}”
               </p>
             )}
-            {typeof proposal.target_price === "number" && proposal.target_price > 0 && (
-              <p className="mt-1 text-xs text-on-surface-variant">
-                Target: {formatCurrency(proposal.target_price, "CAD")}
-              </p>
-            )}
           </div>
         )}
 
@@ -359,10 +342,10 @@ export default function ProposalCard({
         {canDecide && panel === "revise" && (
           <div className="flex flex-col gap-2">
             <p className="text-sm text-on-surface-variant">
-              Ask the helper for a different price. Both fields are optional.
+              Ask the helper for a different price with an optional note.
             </p>
             <label className="text-sm font-medium text-on-surface" htmlFor="revision-note">
-              Note for the helper
+              Note for the helper (optional)
             </label>
             <textarea
               id="revision-note"
@@ -374,23 +357,6 @@ export default function ProposalCard({
               }}
               placeholder="e.g. This is above my budget because the assignment is shorter than expected."
               className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20"
-            />
-            <label className="text-sm font-medium text-on-surface" htmlFor="target-price">
-              Target price in CAD (optional)
-            </label>
-            <input
-              id="target-price"
-              type="number"
-              inputMode="numeric"
-              min="1"
-              step="1"
-              value={targetPrice}
-              onChange={(e) => {
-                setTargetPrice(e.target.value);
-                setError(null);
-              }}
-              placeholder="e.g. 80"
-              className="h-10 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-2 focus:ring-primary-container/20"
             />
             <div className="flex flex-col-reverse sm:flex-row items-center gap-2">
               <Button

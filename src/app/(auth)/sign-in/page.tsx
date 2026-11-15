@@ -7,7 +7,7 @@ import { GraduationCap, Mail, ArrowRight, Building2, Lock, Loader2 } from "lucid
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
-import { roleToHome, safeNextPath } from "@/lib/auth";
+import { roleToHome, safeNextPath, isRouteAllowedForRole } from "@/lib/auth";
 import { stampAuthAtCookie } from "@/lib/session-timebox";
 
 export default function SignInPage() {
@@ -71,11 +71,10 @@ function SignInForm() {
       .eq("id", userId)
       .maybeSingle();
     const home = roleToHome(profile?.role);
-    // nextPath() is "/" unless the page was reached with an explicit ?next, so
-    // an explicit target (e.g. /requests/new with a saved draft) wins over the
-    // role landing page.
-    const next = nextPath();
-    const destination = next !== "/" && next !== home ? next : home;
+    // nextPath() is checked against role permission so users cannot be redirected
+    // to unauthorized areas or unsafe cross-origin targets.
+    const rawNext = nextPath();
+    const destination = isRouteAllowedForRole(profile?.role, rawNext) ? rawNext : home;
     await router.replace(destination);
   }
 

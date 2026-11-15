@@ -62,6 +62,9 @@ export const OTHER_OPTION = "Other";
 
 export const OTHER_PREFIX = "Other: ";
 
+export const WHATSAPP_NUMBER = "9779745617717";
+export const WHATSAPP_DEFAULT_MESSAGE = "Hi Acadivo! I need help with my assignment.";
+
 export function withCustom(selection: string): {
   isOther: boolean;
   value: string;

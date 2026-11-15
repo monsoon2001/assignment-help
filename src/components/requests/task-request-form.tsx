@@ -16,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { SUBJECTS, SERVICE_TYPES, ACADEMIC_LEVELS, OTHER_OPTION } from "@/lib/constants";
+import { COUNTRY_OPTIONS } from "@/lib/currency";
 import Input from "@/components/ui/input";
 import Select from "@/components/ui/select";
 import Textarea from "@/components/ui/textarea";
@@ -56,6 +57,7 @@ export interface TaskRequestFormValues {
   dueTime: string;
   pages: string;
   details: string;
+  country?: string;
   files: File[];
 }
 
@@ -69,6 +71,7 @@ export type TaskRequestField =
   | "dueTime"
   | "pages"
   | "details"
+  | "country"
   | "files";
 
 interface TaskRequestFormProps {
@@ -82,6 +85,7 @@ interface TaskRequestFormProps {
   submitting?: boolean;
   termsAccepted: boolean;
   setTermsAccepted: (accepted: boolean) => void;
+  showCountry?: boolean;
 }
 
 /**
@@ -175,6 +179,7 @@ export default function TaskRequestForm({
   submitting = false,
   termsAccepted,
   setTermsAccepted,
+  showCountry = false,
 }: TaskRequestFormProps) {
   const today = new Date().toISOString().slice(0, 10);
   const [filesOpen, setFilesOpen] = useState(false);
@@ -360,6 +365,20 @@ export default function TaskRequestForm({
           onChange={handleDueTime}
         />
       </div>
+
+      {/* Optional Country selector if enabled */}
+      {showCountry && (
+        <div className="flex flex-col gap-0.5">
+          <Select
+            label="Country"
+            value={values.country || ""}
+            onChange={(e) => set("country", e.target.value)}
+            placeholder="Select your country"
+            selectSize="sm"
+            options={COUNTRY_OPTIONS.map((c) => ({ value: c.name, label: c.name }))}
+          />
+        </div>
+      )}
 
       {/* Description: 2 to 3 lines */}
       <Textarea

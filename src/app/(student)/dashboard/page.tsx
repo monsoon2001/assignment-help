@@ -378,8 +378,8 @@ export default async function DashboardPage() {
       )}
 
       {actionable.length > 0 && (
-        <section className="flex flex-col gap-3">
-          <div className="flex items-center justify-between gap-4">
+        <section className="flex flex-col gap-4" aria-label="Action required">
+          <div className="flex items-center gap-4">
             <h2 className="font-display font-bold text-lg text-on-surface">Action Required</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -515,7 +515,7 @@ export default async function DashboardPage() {
         </section>
 
         <section>
-          <div className="flex items-center justify-between gap-4 mb-3">
+          <div className="flex items-center justify-between gap-4 mb-4">
             <h2 className="font-display font-bold text-lg text-on-surface">Quick Links</h2>
             <Link
               href="/notifications"

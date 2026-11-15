@@ -31,7 +31,7 @@ export default async function AdminPaymentsPage() {
   const { data: payments, error } = await adminClient
     .from("payments")
     .select(
-      "id, amount, currency, status, stripe_payment_intent_id, gross_cad, stripe_fee_cad, net_cad, charge_currency, charge_amount, platform_fee_cad, helper_payout_status, refunded_amount_cad, disputed, created_at, order:orders(id, status, student:users!orders_student_id_fkey(name), helper:users!orders_helper_id_fkey(name))",
+      "id, amount, currency, status, stripe_payment_intent_id, gross_cad, stripe_fee_cad, net_cad, charge_currency, charge_amount, platform_fee_cad, base_cad, final_cad, fee_cad, helper_payout_status, refunded_amount_cad, disputed, created_at, order:orders(id, status, student:users!orders_student_id_fkey(name), helper:users!orders_helper_id_fkey(name))",
     )
     .order("created_at", { ascending: false })
     .limit(200);
@@ -142,6 +142,16 @@ export default async function AdminPaymentsPage() {
                     </td>
                     <td className="px-3 sm:px-4 py-4 text-right text-sm font-semibold text-on-surface">
                       {formatCurrency(gross)}
+                      {payment.base_cad !== null && payment.base_cad !== undefined && (
+                        <span className="block text-xs font-normal text-on-surface-variant">
+                          base {formatCurrency(Number(payment.base_cad))}
+                        </span>
+                      )}
+                      {payment.fee_cad !== null && payment.fee_cad !== undefined && Number(payment.fee_cad) > 0 && (
+                        <span className="block text-xs font-normal text-on-surface-variant">
+                          fee {formatCurrency(Number(payment.fee_cad))}
+                        </span>
+                      )}
                       {refunded > 0 && (
                         <span className="block text-xs font-normal text-error">
                           -{formatCurrency(refunded)} refunded
